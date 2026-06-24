@@ -196,7 +196,7 @@ CREATE TABLE UtilityBooking (
     Status          TINYINT         NOT NULL         DEFAULT 0,  -- 0: PENDING | 1: APPROVED | 2: REJECTED | 3: CANCELED
     ApprovedBy      INT             NULL,
     CreatedAt       DATETIME        NOT NULL         DEFAULT GETDATE(),
-    CanceledAt      DATETIME        NULL,
+    CancelledAt      DATETIME        NULL,
     CancelReason    NVARCHAR(255)   NULL,
 
     CONSTRAINT FK_Booking_Profile       FOREIGN KEY (ProfileID)      REFERENCES Profile(ProfileID),
