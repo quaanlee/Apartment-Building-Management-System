@@ -45,4 +45,12 @@ public class UtilityServiceImpl implements UtilityService {
     public void deleteById(Integer id) {
         utilityRepository.deleteById(id);
     }
+
+    @Override
+    public List<Utility> searchUtilities(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return findAll();
+        }
+        return utilityRepository.findByUtilityNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query);
+    }
 }

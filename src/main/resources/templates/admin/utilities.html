@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/head :: head('Utilities Management')}"></head>
+<body>
+
+<!-- Sidebar Navigation -->
+<aside th:replace="~{layout/sidebar :: sidebar('utilities')}"></aside>
+
+<!-- Main Content Area -->
+<main class="main-wrapper">
+
+    <!-- Header & Search -->
+    <div th:replace="~{layout/header :: header(${query}, @{/admin/utilities})}"></div>
+
+    <!-- Title Section -->
+    <div class="main-header">
+        <div class="title-section">
+            <h2>Utilities Management</h2>
+            <p>Configure utility types, define pricing tiers, and manage physical resources.</p>
+        </div>
+
+        <button class="btn-primary" onclick="openAddUtilityModal()">
+            <i class="fas fa-plus"></i> Add Utility
+        </button>
+    </div>
+
+    <!-- Utilities List Card -->
+    <div class="table-card">
+        <!-- Headers -->
+        <div class="table-header">
+            <div>Utility Information</div>
+            <div>Status</div>
+            <div style="text-align: right;">Actions</div>
+        </div>
+
+        <!-- List rows -->
+        <div class="card-row" th:each="util : ${utilities}">
+            <div class="card-main-info">
+                <!-- Icon + Info -->
+                <div class="utility-details">
+                    <div class="icon-wrapper">
+                        <!-- Show dumbbell for Gym, Swimming icon for Swimming, etc. -->
+                        <i th:class="${util.utilityName == 'Gym'} ? 'fas fa-dumbbell' :
+                                         (${util.utilityName == 'Swimming'} ? 'fas fa-person-swimming' :
+                                         (${util.utilityName == 'Club Lounge'} ? 'fas fa-mug-hot' : 'fas fa-tools'))"></i>
+                    </div>
+                    <div class="utility-meta">
+                        <h3 th:text="${util.utilityName}">Gym</h3>
+                        <p th:text="${util.description}">Fitness and wellness facility for residents.</p>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div>
+                        <span th:class="${util.status} ? 'badge badge-active' : 'badge badge-stopped'"
+                              th:text="${util.status} ? 'Active' : 'Stopped'">Active</span>
+                </div>
+
+                <!-- Actions -->
+                <div class="action-buttons">
+                    <!-- Edit Icon Button -->
+                    <button class="icon-btn" th:onclick="openEditUtilityModal([[${util.utilityId}]], [[${util.utilityName}]], [[${util.description}]], [[${util.status}]])" title="Edit Utility">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+
+                    <!-- Toggle Status (Lock/Unlock) -->
+                    <form th:action="@{/admin/utilities/toggle-status/{id}(id=${util.utilityId})}" method="POST" style="display:inline;">
+                        <button type="submit" class="icon-btn icon-btn-toggle" th:classappend="${util.status} ? 'active-status' : 'stopped-status'" title="Toggle Status">
+                            <i th:class="${util.status} ? 'fas fa-lock-open' : 'fas fa-lock'"></i>
+                        </button>
+                    </form>
+
+                    <!-- Others dropdown trigger -->
+                    <button class="dropdown-btn">
+                        Others <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Expanded Card Drawer -->
+            <div class="card-drawer">
+                <div class="drawer-column">
+                    <h4>
+                        <span>Utility Resources (<span th:text="${#lists.size(util.utilityResources)}">0</span>)</span>
+                        <a class="add-link" th:onclick="openAddResourceModal([[${util.utilityId}]], [[${util.utilityName}]])">
+                            <i class="fas fa-plus"></i> Add Resource
+                        </a>
+                    </h4>
+
+                    <div class="resource-list">
+                        <div class="resource-card" th:each="res : ${util.utilityResources}">
+                            <div class="resource-info">
+                                <h5 th:text="${res.resourceName}">Main Training Hall</h5>
+                                <p th:text="${res.location}">Floor 1</p>
+                            </div>
+                            <span th:class="${res.status} ? 'badge badge-ready' : 'badge badge-maintenance'"
+                                  th:text="${res.status} ? 'READY' : 'MAINTENANCE'">READY</span>
+                        </div>
+                        <div th:if="${#lists.isEmpty(util.utilityResources)}" style="padding: 12px; color: var(--text-muted); font-size: 13px; text-align: center; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No resources defined.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(utilities)}" style="padding: 40px; text-align: center; color: var(--text-muted);">
+            No utilities found. Try searching for something else or add a new utility.
+        </div>
+    </div>
+
+    <!-- Pagination Row -->
+    <div class="pagination-container" th:if="${totalPages > 1}">
+        <a th:href="@{/admin/utilities(query=${query}, page=${currentPage - 1})}"
+           class="pagination-btn" th:classappend="${currentPage == 1} ? 'disabled'">Previous</a>
+
+        <div class="pagination-pages">
+            <a th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+               th:href="@{/admin/utilities(query=${query}, page=${pageNum})}"
+               class="page-num"
+               th:classappend="${currentPage == pageNum} ? 'active'"
+               th:text="${pageNum}">1</a>
+        </div>
+
+        <a th:href="@{/admin/utilities(query=${query}, page=${currentPage + 1})}"
+           class="pagination-btn" th:classappend="${currentPage == totalPages} ? 'disabled'">Next</a>
+    </div>
+
+    <!-- Pricing Configurations Card -->
+    <div class="main-header" style="margin-top: 48px;">
+        <div class="title-section">
+            <h2>Pricing Configurations</h2>
+            <p>Set price structures and units for each utility.</p>
+        </div>
+        <button class="btn-primary" onclick="openConfigurePricingModal()">
+            <i class="fas fa-plus"></i> Configure Price
+        </button>
+    </div>
+
+    <div class="table-card" style="margin-top: 16px;">
+        <!-- Headers -->
+        <div class="pricing-table-header">
+            <div>Utility</div>
+            <div>Unit</div>
+            <div>Price</div>
+            <div style="text-align: right;">Actions</div>
+        </div>
+
+        <!-- List rows -->
+        <div class="pricing-table-row" th:each="price : ${utilityPrices}">
+            <div class="pricing-meta">
+                <h3 th:text="${price.utility.utilityName}">Gym</h3>
+            </div>
+            <div th:text="${price.unit.unitName}">hour</div>
+            <div class="price-amount" th:text="'$' + ${#numbers.formatDecimal(price.price, 1, 2)}">$0.00</div>
+
+            <!-- Actions -->
+            <div class="action-buttons">
+                <!-- Edit Button -->
+                <button class="icon-btn" th:onclick="openEditPricingModal([[${price.utility.utilityId}]], [[${price.unit.unitId}]], [[${price.price}]])" title="Edit Price">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+                <!-- Delete Button -->
+                <form th:action="@{/admin/utilities/delete-pricing/{id}(id=${price.utilityPriceId})}" method="POST" style="display:inline;">
+                    <button type="submit" class="icon-btn" style="color: #ef4444;" title="Delete Price" onclick="return confirm('Are you sure you want to delete this pricing configuration?')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(utilityPrices)}" style="padding: 40px; text-align: center; color: var(--text-muted);">
+            No pricing configurations defined. Click "Configure Price" to add one.
+        </div>
+    </div>
+
+</main>
+
+<!-- Modals -->
+
+<!-- Add/Edit Utility Modal -->
+<div class="modal-overlay" id="utilityModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="utilityModalTitle">Add New Utility</h3>
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+        </div>
+        <form th:action="@{/admin/utilities/save}" th:object="${newUtility}" method="POST">
+            <input type="hidden" th:field="*{utilityId}" id="utilityIdField">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="utilityNameField">Utility Name</label>
+                    <input type="text" th:field="*{utilityName}" id="utilityNameField" class="form-control" placeholder="e.g. Gym, Swimming Pool" required>
+                </div>
+                <div class="form-group">
+                    <label for="utilityDescField">Description</label>
+                    <textarea th:field="*{description}" id="utilityDescField" class="form-control" placeholder="e.g. Fitness and wellness facility..." required></textarea>
+                </div>
+                <div class="form-group" style="display: none;">
+                    <label for="utilityStatusField">Status</label>
+                    <select th:field="*{status}" id="utilityStatusField" class="form-control">
+                        <option value="true">Active</option>
+                        <option value="false">Stopped</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('utilityModal')">Cancel</button>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Resource Modal -->
+<div class="modal-overlay" id="resourceModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="resourceTitle">Add Resource</h3>
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+        </div>
+        <form th:action="@{/admin/utilities/add-resource}" method="POST">
+            <input type="hidden" name="utilityId" id="resourceUtilityId">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="resourceName">Resource Name</label>
+                    <input type="text" name="resourceName" id="resourceName" class="form-control" placeholder="e.g. Main Training Hall" required>
+                </div>
+                <div class="form-group">
+                    <label for="resourceLocation">Location</label>
+                    <input type="text" name="resourceLocation" id="resourceLocation" class="form-control" placeholder="e.g. Floor 1, Outdoor" required>
+                </div>
+                <div class="form-group">
+                    <label for="resourceStatus">Status</label>
+                    <select name="status" id="resourceStatus" class="form-control">
+                        <option value="true">Ready</option>
+                        <option value="false">Maintenance</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('resourceModal')">Cancel</button>
+                <button type="submit" class="btn-primary">Add Resource</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Manage Pricing Modal -->
+<div class="modal-overlay" id="pricingModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="pricingTitle">Configure Pricing</h3>
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+        </div>
+        <form th:action="@{/admin/utilities/manage-pricing}" method="POST">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="pricingUtilityId">Select Utility</label>
+                    <select name="utilityId" id="pricingUtilityId" class="form-control">
+                        <option th:each="util : ${allUtilities}" th:value="${util.utilityId}" th:text="${util.utilityName}">Gym</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pricingUnitId">Pricing Unit</label>
+                    <select name="unitId" id="pricingUnitId" class="form-control">
+                        <option th:each="unit : ${allUnits}" th:value="${unit.unitId}" th:text="${unit.unitName}">hour</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pricingPrice">Price ($)</label>
+                    <input type="number" name="price" id="pricingPrice" step="0.01" min="0" class="form-control" placeholder="0.00" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('pricingModal')">Cancel</button>
+                <button type="submit" class="btn-primary">Save Pricing</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block th:replace="~{layout/scripts :: scripts}"></th:block>
+</body>
+</html>
