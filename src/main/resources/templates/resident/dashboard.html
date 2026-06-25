@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | ABM System</title>
+    <title>Resident Dashboard | ABM System</title>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -40,8 +40,8 @@
 </head>
 <body>
     <div class="card">
-        <h1>Admin Dashboard</h1>
-        <p>Welcome back, <span th:text="${session.currentUser != null ? session.currentUser.username : 'Admin'}">Admin</span>!</p>
+        <h1>Resident Dashboard</h1>
+        <p>Welcome back, <span th:text="${session.currentUser != null ? session.currentUser.username : 'Resident'}">Resident</span>!</p>
         <a th:href="@{/logout}" class="btn-logout">Logout</a>
     </div>
 </body>

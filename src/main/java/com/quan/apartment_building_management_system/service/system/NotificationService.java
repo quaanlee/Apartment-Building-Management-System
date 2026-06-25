@@ -16,4 +16,6 @@ public interface NotificationService {
     Notification save(Notification notification);
 
     void deleteById(Long id);
+
+    void sendOtpEmail(String toEmail, String otp);
 }
