@@ -1,31 +1,31 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin/layout :: admin-layout(~{::main}, 'users')}">
+<html xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout/admin/layout :: admin-layout(~{::main}, 'users')}">
 <head>
-    <title>Add New User - ABMS</title>
+    <meta charset="UTF-8">
+    <title th:text="${userDto.profileId == null ? 'Create User' : 'Edit User'}">Create User</title>
 </head>
 <body>
 
-<main>
-    <!-- Link page-specific styling -->
-    <link rel="stylesheet" th:href="@{/css/admin/create_user.css}">
+<main th:fragment="content">
+    <!-- Load custom form CSS -->
+    <link rel="stylesheet" th:href="@{/css/admin/form_user.css}">
 
-    <!-- Page Header -->
-    <div style="margin-bottom: 24px;">
-        <h2>Add New User</h2>
-        <p>Register new accounts and user profiles in the system.</p>
+    <!-- Page Header Actions -->
+    <div class="detail-header-actions" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 32px; border-bottom: 1px solid var(--border-color); background-color: #F9FAFB; margin-bottom: 24px; border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
+        <div class="detail-title" style="font-size: 20px; font-weight: 700; color: var(--text-primary);"
+             th:text="${userDto.profileId == null ? 'Create User Account' : 'Edit User Profile & Account'}">
+            Create User Account
+        </div>
+        <a th:href="@{/admin/users}" class="btn-secondary">
+            <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>Back to List
+        </a>
     </div>
 
-    <!-- Error message display -->
-    <div th:if="${error != null}" style="color: #EF4444; background-color: #FEF2F2; border: 1px solid #FCA5A5; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 500;">
-        <i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>
-        <span th:text="${error}">Error Message</span>
-    </div>
-
-    <!-- Tabs Layout Container -->
+    <!-- Main Container -->
     <div class="tabs-container">
-        
-        <!-- Tab Headers -->
-        <div class="tabs-header">
+        <!-- Tabs Header (Hidden in Edit Mode) -->
+        <div class="tabs-header" th:if="${userDto.profileId == null}">
             <button class="tab-btn active" data-tab="resident-tab">
                 <i class="fa-solid fa-house-user" style="margin-right: 8px;"></i>Resident
             </button>
@@ -42,22 +42,31 @@
             
             <!-- RESIDENT FORM -->
             <div id="resident-tab" class="tab-panel active">
-                <form th:action="@{/admin/users/create}" method="post" th:object="${userDto}">
+                <form th:action="${userDto.profileId == null ? '/admin/users/create' : '/admin/users/edit/' + userDto.profileId}" method="post" th:object="${userDto}">
                     <input type="hidden" name="roleName" value="RESIDENT">
-                    <div class="form-title">Resident Profile & Account Information</div>
+                    <input type="hidden" th:field="*{profileId}">
+                    <input type="hidden" th:field="*{accountId}">
+                    
+                    <div class="form-title" th:text="${userDto.profileId == null ? 'Resident Profile & Account Information' : 'Edit Resident Profile & Account'}">
+                        Resident Profile & Account Information
+                    </div>
                     
                     <!-- Form Fields Grid -->
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="res-username">Username<span class="required-star">*</span></label>
-                            <input type="text" id="res-username" th:field="*{username}" class="form-control" th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'" placeholder="e.g. resident101">
+                            <label for="res-username">Username<span class="required-star" th:if="${userDto.profileId == null}">*</span></label>
+                            <input type="text" id="res-username" th:field="*{username}" class="form-control" th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'" placeholder="e.g. resident101" th:readonly="${userDto.profileId != null}">
                             <span class="error-text" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
                         </div>
-                        <div class="form-group">
+                        
+                        <!-- Password field visible on create, hidden on edit -->
+                        <div class="form-group" th:if="${userDto.profileId == null}">
                             <label for="res-password">Password<span class="required-star">*</span></label>
                             <input type="password" id="res-password" th:field="*{password}" class="form-control" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" placeholder="••••••••">
                             <span class="error-text" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
                         </div>
+                        <input type="hidden" th:field="*{password}" th:if="${userDto.profileId != null}">
+
                         <div class="form-group">
                             <label for="res-fullname">Full Name<span class="required-star">*</span></label>
                             <input type="text" id="res-fullname" th:field="*{fullName}" class="form-control" th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'" placeholder="e.g. Tahani Al-Jamil">
@@ -118,8 +127,8 @@
                             <label for="res-status">Resident Status<span class="required-star">*</span></label>
                             <select id="res-status" th:field="*{residentStatus}" class="form-control" required>
                                 <option value="1">Active / Live-in</option>
-                                <option value="2">Moved out</option>
                                 <option value="3">Temporary</option>
+                                <option value="2">Moved out</option>
                             </select>
                         </div>
                         
@@ -138,41 +147,50 @@
                         </div>
                         <div class="form-group">
                             <label for="res-emergency-phone">Emergency Contact Phone</label>
-                            <input type="number" id="res-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" placeholder="e.g. Phone number">
+                            <input type="text" id="res-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" placeholder="e.g. Phone number">
                         </div>
                         
                         <div class="form-group full-width">
                             <div class="checkbox-group">
                                 <input type="checkbox" id="res-owner" th:field="*{isHouseholdOwner}" class="checkbox-control" value="true">
-                                <label for="res-owner">Is Household Owner? (Là chủ hộ)</label>
+                                <label for="res-owner">Is Household Owner ?</label>
                             </div>
                         </div>
                     </div>
                     
                     <div class="form-actions">
                         <a th:href="@{/admin/users}" class="btn-secondary">Cancel</a>
-                        <button type="submit" class="btn-primary">Save Resident</button>
+                        <button type="submit" class="btn-primary" th:text="${userDto.profileId == null ? 'Save Resident' : 'Update Resident'}">Save Resident</button>
                     </div>
                 </form>
             </div>
             
             <!-- MANAGER FORM -->
             <div id="manager-tab" class="tab-panel">
-                <form th:action="@{/admin/users/create}" method="post" th:object="${userDto}">
+                <form th:action="${userDto.profileId == null ? '/admin/users/create' : '/admin/users/edit/' + userDto.profileId}" method="post" th:object="${userDto}">
                     <input type="hidden" name="roleName" value="MANAGER">
-                    <div class="form-title">Manager Profile & Account Information</div>
+                    <input type="hidden" th:field="*{profileId}">
+                    <input type="hidden" th:field="*{accountId}">
+                    
+                    <div class="form-title" th:text="${userDto.profileId == null ? 'Manager Profile & Account Information' : 'Edit Manager Profile & Account'}">
+                        Manager Profile & Account Information
+                    </div>
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="man-username">Username<span class="required-star">*</span></label>
-                            <input type="text" id="man-username" th:field="*{username}" class="form-control" th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'" placeholder="e.g. manager01">
+                            <label for="man-username">Username<span class="required-star" th:if="${userDto.profileId == null}">*</span></label>
+                            <input type="text" id="man-username" th:field="*{username}" class="form-control" th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'" placeholder="e.g. manager01" th:readonly="${userDto.profileId != null}">
                             <span class="error-text" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
                         </div>
-                        <div class="form-group">
+                        
+                        <!-- Password field visible on create, hidden on edit -->
+                        <div class="form-group" th:if="${userDto.profileId == null}">
                             <label for="man-password">Password<span class="required-star">*</span></label>
                             <input type="password" id="man-password" th:field="*{password}" class="form-control" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" placeholder="••••••••">
                             <span class="error-text" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
                         </div>
+                        <input type="hidden" th:field="*{password}" th:if="${userDto.profileId != null}">
+
                         <div class="form-group">
                             <label for="man-fullname">Full Name<span class="required-star">*</span></label>
                             <input type="text" id="man-fullname" th:field="*{fullName}" class="form-control" th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'" placeholder="e.g. Eleanor Shellstrop">
@@ -240,34 +258,43 @@
                         </div>
                         <div class="form-group">
                             <label for="man-emergency-phone">Emergency Contact Phone</label>
-                            <input type="number" id="man-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" placeholder="e.g. Phone number">
+                            <input type="text" id="man-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" placeholder="e.g. Phone number">
                         </div>
                     </div>
                     
                     <div class="form-actions">
                         <a th:href="@{/admin/users}" class="btn-secondary">Cancel</a>
-                        <button type="submit" class="btn-primary">Save Manager</button>
+                        <button type="submit" class="btn-primary" th:text="${userDto.profileId == null ? 'Save Manager' : 'Update Manager'}">Save Manager</button>
                     </div>
                 </form>
             </div>
             
             <!-- MAINTENANCE STAFF FORM -->
             <div id="staff-tab" class="tab-panel">
-                <form th:action="@{/admin/users/create}" method="post" th:object="${userDto}">
+                <form th:action="${userDto.profileId == null ? '/admin/users/create' : '/admin/users/edit/' + userDto.profileId}" method="post" th:object="${userDto}">
                     <input type="hidden" name="roleName" value="MAINTENANCE_STAFF">
-                    <div class="form-title">Maintenance Staff Profile & Account Information</div>
+                    <input type="hidden" th:field="*{profileId}">
+                    <input type="hidden" th:field="*{accountId}">
+                    
+                    <div class="form-title" th:text="${userDto.profileId == null ? 'Maintenance Staff Profile & Account Information' : 'Edit Maintenance Staff Profile & Account'}">
+                        Maintenance Staff Profile & Account Information
+                    </div>
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="st-username">Username<span class="required-star">*</span></label>
-                            <input type="text" id="st-username" th:field="*{username}" class="form-control" th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'" placeholder="e.g. staff01">
+                            <label for="st-username">Username<span class="required-star" th:if="${userDto.profileId == null}">*</span></label>
+                            <input type="text" id="st-username" th:field="*{username}" class="form-control" th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'" placeholder="e.g. staff01" th:readonly="${userDto.profileId != null}">
                             <span class="error-text" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
                         </div>
-                        <div class="form-group">
+                        
+                        <!-- Password field visible on create, hidden on edit -->
+                        <div class="form-group" th:if="${userDto.profileId == null}">
                             <label for="st-password">Password<span class="required-star">*</span></label>
                             <input type="password" id="st-password" th:field="*{password}" class="form-control" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" placeholder="••••••••">
                             <span class="error-text" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
                         </div>
+                        <input type="hidden" th:field="*{password}" th:if="${userDto.profileId != null}">
+
                         <div class="form-group">
                             <label for="st-fullname">Full Name<span class="required-star">*</span></label>
                             <input type="text" id="st-fullname" th:field="*{fullName}" class="form-control" th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'" placeholder="e.g. John Doe">
@@ -335,13 +362,13 @@
                         </div>
                         <div class="form-group">
                             <label for="st-emergency-phone">Emergency Contact Phone</label>
-                            <input type="number" id="st-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" placeholder="e.g. Phone number">
+                            <input type="text" id="st-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" placeholder="e.g. Phone number">
                         </div>
                     </div>
                     
                     <div class="form-actions">
                         <a th:href="@{/admin/users}" class="btn-secondary">Cancel</a>
-                        <button type="submit" class="btn-primary">Save Staff</button>
+                        <button type="submit" class="btn-primary" th:text="${userDto.profileId == null ? 'Save Staff' : 'Update Staff'}">Save Staff</button>
                     </div>
                 </form>
             </div>
@@ -376,8 +403,7 @@
                 });
             });
 
-            // Keep tab active based on roleName from model if present (in case of validation error)
-            /*[# th:if="${userDto.roleName != null}"]*/
+            // Keep tab active based on roleName from model if present
             const submittedRole = /*[[${userDto.roleName}]]*/ '';
             if (submittedRole === 'MANAGER') {
                 switchTab('manager-tab');
@@ -386,7 +412,6 @@
             } else {
                 switchTab('resident-tab');
             }
-            /*[/]*/
         });
     </script>
 </main>

@@ -108,6 +108,13 @@
     box-shadow: 0 0 0 3px rgba(88, 43, 232, 0.1);
 }
 
+.form-control[readonly] {
+    background-color: #F3F4F6;
+    color: #9CA3AF;
+    cursor: not-allowed;
+    border-color: var(--border-color);
+}
+
 .checkbox-group {
     display: flex;
     align-items: center;

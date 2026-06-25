@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -40,6 +41,7 @@ public class UserDTO {
     private String gender;
 
     @Past(message = "Date of Birth must be in the past")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
 
     private String placeOfBirth;
@@ -48,7 +50,9 @@ public class UserDTO {
     @Pattern(regexp = "^[0-9]{9,12}$", message = "Citizen ID must be between 9 and 12 digits")
     private String citizenId;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate citizenIdIssueDate;
+
     private String citizenIdIssuePlace;
     private String nationality = "Vietnam";
     private String ethnicity = "Kinh";
@@ -66,8 +70,13 @@ public class UserDTO {
     private String emergencyContactName;
     private String emergencyContactPhone;
     private String relationshipToOwner;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate moveInDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate moveOutDate;
+
     private Boolean isHouseholdOwner = false;
     private Byte residentStatus = 1;
     private String occupation;
@@ -104,6 +113,7 @@ public class UserDTO {
             if (profile.getAccount() != null) {
                 this.accountId = profile.getAccount().getAccountId();
                 this.username = profile.getAccount().getUsername();
+                this.password = profile.getAccount().getPassword();
                 this.roleName = profile.getAccount().getRole() != null ? profile.getAccount().getRole().getRoleName() : null;
                 this.accountStatus = profile.getAccount().getStatus();
                 this.accountCreatedAt = profile.getAccount().getCreatedAt();

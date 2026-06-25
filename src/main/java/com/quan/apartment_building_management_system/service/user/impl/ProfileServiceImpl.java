@@ -79,16 +79,34 @@ public class ProfileServiceImpl implements ProfileService {
             throw new IllegalArgumentException("Role not found: " + userDto.getRoleName());
         }
 
-        // Save Account
-        Account account = new Account();
-        account.setUsername(userDto.getUsername());
+        Account account;
+        Profile profile;
+
+        if (userDto.getProfileId() != null) {
+            // Edit / Update Mode
+            profile = profileRepository.findById(userDto.getProfileId())
+                    .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Profile not found with ID: " + userDto.getProfileId()));
+            account = profile.getAccount();
+            if (account == null) {
+                account = new Account();
+            }
+        } else {
+            // Create Mode
+            profile = new Profile();
+            account = new Account();
+        }
+
+        // Save/Update Account
+        // Keep username and role unchangeable in edit mode
+        if (userDto.getProfileId() == null) {
+            account.setUsername(userDto.getUsername());
+            account.setRole(roleOpt.get());
+        }
         account.setPassword(userDto.getPassword());
-        account.setRole(roleOpt.get());
         account.setStatus(userDto.getAccountStatus() != null ? userDto.getAccountStatus() : true);
         account = accountRepository.save(account);
 
-        // Save Profile
-        Profile profile = new Profile();
+        // Save/Update Profile
         profile.setAccount(account);
         profile.setFullName(userDto.getFullName());
         profile.setGender(userDto.getGender());
@@ -97,8 +115,8 @@ public class ProfileServiceImpl implements ProfileService {
         profile.setCitizenId(userDto.getCitizenId());
         profile.setCitizenIdIssueDate(userDto.getCitizenIdIssueDate());
         profile.setCitizenIdIssuePlace(userDto.getCitizenIdIssuePlace());
-        profile.setNationality(userDto.getNationality());
-        profile.setEthnicity(userDto.getEthnicity());
+        profile.setNationality(userDto.getNationality() != null ? userDto.getNationality() : "Vietnam");
+        profile.setEthnicity(userDto.getEthnicity() != null ? userDto.getEthnicity() : "Kinh");
         profile.setPhoneNumber(userDto.getPhoneNumber());
         profile.setEmail(userDto.getEmail());
         profile.setAvatarUrl(userDto.getAvatarUrl());
@@ -111,8 +129,13 @@ public class ProfileServiceImpl implements ProfileService {
             profile.setResidentStatus(userDto.getResidentStatus() != null ? userDto.getResidentStatus() : 1);
             profile.setMoveInDate(userDto.getMoveInDate());
             profile.setMoveOutDate(userDto.getMoveOutDate());
+            profile.setOccupation(null); // Clear occupation just in case
         } else if ("MANAGER".equalsIgnoreCase(userDto.getRoleName()) || "MAINTENANCE_STAFF".equalsIgnoreCase(userDto.getRoleName())) {
             profile.setOccupation(userDto.getOccupation());
+            profile.setIsHouseholdOwner(false);
+            profile.setResidentStatus((byte) 1);
+            profile.setMoveInDate(null);
+            profile.setMoveOutDate(null);
         }
 
         profile = profileRepository.save(profile);

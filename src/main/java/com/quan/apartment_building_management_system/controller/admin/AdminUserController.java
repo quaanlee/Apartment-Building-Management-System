@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Optional;
@@ -84,12 +85,16 @@ public class AdminUserController {
     }
 
     @PostMapping("/admin/users/{id}/toggle-lock")
-    public String toggleLock(@PathVariable("id") Integer accountId) {
+    public String toggleLock(@PathVariable("id") Integer accountId, RedirectAttributes redirectAttributes) {
         Optional<Account> accountOpt = accountService.findById(accountId);
         if (accountOpt.isPresent()) {
             Account account = accountOpt.get();
-            account.setStatus(!account.getStatus());
+            boolean newStatus = !account.getStatus();
+            account.setStatus(newStatus);
             accountService.save(account);
+            String statusMsg = newStatus ? "unlocked" : "locked";
+            redirectAttributes.addFlashAttribute("message", "Account for " + account.getUsername() + " has been successfully " + statusMsg + "!");
+            redirectAttributes.addFlashAttribute("messageType", "info");
         }
         return "redirect:/admin/users";
     }
@@ -109,21 +114,49 @@ public class AdminUserController {
     public String showCreateForm(Model model) {
         model.addAttribute("userDto", new UserDTO());
         model.addAttribute("activeTab", "users");
-        return "admin/create_user";
+        return "admin/form_user";
     }
 
     @PostMapping("/admin/users/create")
-    public String createUser(@Valid @ModelAttribute("userDto") UserDTO userDto, BindingResult bindingResult, Model model) {
+    public String createUser(@Valid @ModelAttribute("userDto") UserDTO userDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         if (accountService.existsByUsername(userDto.getUsername())) {
             bindingResult.rejectValue("username", "error.userDto", "Username already exists!");
         }
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("activeTab", "users");
-            return "admin/create_user";
+            return "admin/form_user";
         }
 
         profileService.saveUserDTO(userDto);
+        redirectAttributes.addFlashAttribute("message", "User " + userDto.getFullName() + " created successfully!");
+        redirectAttributes.addFlashAttribute("messageType", "success");
+        return "redirect:/admin/users";
+    }
+
+    @GetMapping("/admin/users/edit/{id}")
+    public String showEditForm(@PathVariable("id") Integer id, Model model) {
+        Optional<Profile> profileOpt = profileService.findById(id);
+        if (profileOpt.isEmpty()) {
+            return "redirect:/admin/users";
+        }
+        UserDTO userDto = new UserDTO(profileOpt.get());
+        model.addAttribute("userDto", userDto);
+        model.addAttribute("activeTab", "users");
+        return "admin/form_user";
+    }
+
+    @PostMapping("/admin/users/edit/{id}")
+    public String updateUser(@PathVariable("id") Integer id, @Valid @ModelAttribute("userDto") UserDTO userDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            bindingResult.getFieldErrors()
+                    .forEach(System.out::println);
+            model.addAttribute("activeTab", "users");
+            return "admin/form_user";
+        }
+        profileService.saveUserDTO(userDto);
+        redirectAttributes.addFlashAttribute("message", "User " + userDto.getFullName() + " updated successfully!");
+        redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/admin/users";
     }
 }
