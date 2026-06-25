@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ABMS Admin - System Logs</title>
+    <link rel="stylesheet" th:href="@{/css/system-logs.css}">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <aside class="sidebar">
+        <div>
+            <div class="brand">
+                <h1>ABMS Admin</h1>
+                <p>Management Portal</p>
+            </div>
+
+            <nav class="menu">
+                <a href="#">▦ Dashboard</a>
+                <a href="#">👥 User Management</a>
+                <a href="#">▦ Building Management</a>
+                <a href="#">▤ Service Catalog</a>
+                <a href="#">▣ Pricing</a>
+                <a href="#">🛠 Utilities</a>
+                <a href="#" class="active">↺ System Logs</a>
+            </nav>
+        </div>
+
+        <button class="logout-btn">↪ Logout</button>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" placeholder="Search by account, entity, action...">
+            </div>
+
+            <div class="top-actions">
+                <button class="icon-btn">🔔</button>
+                <button class="icon-btn">⚙</button>
+                <button class="export-btn">⬇ EXPORT DATA</button>
+            </div>
+        </header>
+
+        <section class="page-body">
+
+            <div class="stat-card">
+                <div>
+                    <p>TOTAL EVENTS</p>
+                    <h2 th:text="${#numbers.formatInteger(totalEvents, 0, 'COMMA')}">128,492</h2>
+                </div>
+                <span class="stat-icon">▣</span>
+            </div>
+
+            <form th:action="@{/admin/system-logs}" method="get" id="filterForm">
+
+                <div class="filter-panel">
+
+                    <div class="filter-item">
+                        <label>From Date</label>
+
+                        <button type="button" class="date-input" data-picker-target="from">
+                            <span>📅</span>
+                            <span id="fromDateText"
+                                  th:text="${#temporals.format(fromDate, 'MMM dd, yyyy')}">
+                                Oct 24, 2023
+                            </span>
+                        </button>
+
+                        <input type="hidden"
+                               id="fromDateValue"
+                               name="fromDate"
+                               th:value="${fromDate}">
+                    </div>
+
+                    <div class="filter-item">
+                        <label>To Date</label>
+
+                        <button type="button" class="date-input" data-picker-target="to">
+                            <span>📅</span>
+                            <span id="toDateText"
+                                  th:text="${#temporals.format(toDate, 'MMM dd, yyyy')}">
+                                Oct 31, 2023
+                            </span>
+                        </button>
+
+                        <input type="hidden"
+                               id="toDateValue"
+                               name="toDate"
+                               th:value="${toDate}">
+                    </div>
+
+                    <div class="filter-item role-filter">
+                        <label>User Role</label>
+
+                        <select name="role" onchange="document.getElementById('filterForm').submit()">
+                            <option value="All Roles" th:selected="${role == 'All Roles'}">All Roles</option>
+                            <option value="Admin" th:selected="${role == 'Admin'}">Admin</option>
+                            <option value="Manager" th:selected="${role == 'Manager'}">Manager</option>
+                            <option value="Security Officer" th:selected="${role == 'Security Officer'}">Security Officer</option>
+                            <option value="System" th:selected="${role == 'System'}">System</option>
+                        </select>
+                    </div>
+
+                    <div id="calendarPopup" class="calendar-popup hidden">
+                        <div class="calendar-header">
+                            <button type="button" id="prevMonth">‹</button>
+                            <h4 id="calendarTitle">October 2023</h4>
+                            <button type="button" id="nextMonth">›</button>
+                        </div>
+
+                        <div class="calendar-weekdays">
+                            <span>SU</span>
+                            <span>MO</span>
+                            <span>TU</span>
+                            <span>WE</span>
+                            <span>TH</span>
+                            <span>FR</span>
+                            <span>SA</span>
+                        </div>
+
+                        <div id="calendarDays" class="calendar-days"></div>
+
+                        <p id="calendarError" class="calendar-error hidden">
+                            To Date must be greater than From Date.
+                        </p>
+
+                        <div class="calendar-actions">
+                            <button type="button" class="btn-cancel" id="cancelDate">Cancel</button>
+                            <button type="button" class="btn-apply" id="applyDate">Apply</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <p class="date-error"
+                   th:if="${error != null}"
+                   th:text="${error}">
+                    To Date must be greater than From Date.
+                </p>
+
+            </form>
+
+            <div class="table-card">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>CREATED AT</th>
+                        <th>ROLE</th>
+                        <th>ACCOUNT NAME</th>
+                        <th>ACTION</th>
+                        <th>ENTITY TYPE</th>
+                        <th>ACTION</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="log : ${logs}">
+                        <td th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}">
+                            2023-10-31 14:23:11
+                        </td>
+
+                        <td>
+                            <span class="role-badge"
+                                  th:classappend="${#strings.toLowerCase(#strings.replace(log.role, ' ', '-'))}"
+                                  th:text="${log.role}">
+                                Admin
+                            </span>
+                        </td>
+
+                        <td class="account-name" th:text="${log.accountName}">
+                            Alex Mercer
+                        </td>
+
+                        <td>
+                            <span class="action-text" th:text="${log.action}">
+                                LOGIN
+                            </span>
+                        </td>
+
+                        <td th:text="${log.entityType}">
+                            Account
+                        </td>
+
+                        <td>
+                            <button type="button" class="view-btn">View Details</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <button type="button">‹</button>
+                    <button type="button" class="page-active">1</button>
+                    <button type="button">2</button>
+                    <button type="button">3</button>
+                    <span>...</span>
+                    <button type="button">569</button>
+                    <button type="button">›</button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+</div>
+
+<script th:src="@{/js/system-logs.js}"></script>
+</body>
+</html>
