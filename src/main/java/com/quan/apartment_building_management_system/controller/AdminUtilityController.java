@@ -1,7 +1,7 @@
 package com.quan.apartment_building_management_system.controller;
 
-import com.quan.apartment_building_management_system.dto.AdminUtilityDTOHandler;
-import com.quan.apartment_building_management_system.dto.UtilityDTO;
+import com.quan.apartment_building_management_system.dto.admin.AdminUtilityDTOHandler;
+import com.quan.apartment_building_management_system.dto.admin.UtilityDTO;
 import com.quan.apartment_building_management_system.entity.Utility;
 import com.quan.apartment_building_management_system.entity.UtilityPrice;
 import com.quan.apartment_building_management_system.entity.UtilityResource;

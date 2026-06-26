@@ -1,4 +1,4 @@
-package com.quan.apartment_building_management_system.dto;
+package com.quan.apartment_building_management_system.dto.admin;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
