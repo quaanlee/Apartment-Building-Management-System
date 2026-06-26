@@ -125,6 +125,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         // Handle role-specific attributes
         if ("RESIDENT".equalsIgnoreCase(userDto.getRoleName())) {
+            profile.setRelationshipToOwner(userDto.getRelationshipToOwner());
             profile.setIsHouseholdOwner(userDto.getIsHouseholdOwner() != null && userDto.getIsHouseholdOwner());
             profile.setResidentStatus(userDto.getResidentStatus() != null ? userDto.getResidentStatus() : 1);
             profile.setMoveInDate(userDto.getMoveInDate());

@@ -23,7 +23,7 @@
             <ul class="sidebar-menu">
                 <li class="sidebar-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
                     <a th:href="@{/admin/dashboard}">
-                        <i class="fa-solid th:classappend='fa-chart-pie'"></i>
+                        <i class="fas fa-th-large"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
@@ -104,40 +104,14 @@
 
     <!-- Toast Notification Container -->
     <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Toast message data bridge for external layout.js script -->
+    <div id="toastMessageData" 
+         th:if="${message != null}" 
+         th:data-message="${message}" 
+         th:data-type="${messageType != null ? messageType : 'success'}" 
+         style="display: none;"></div>
 
-    <script th:inline="javascript">
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
-
-            const toast = document.createElement('div');
-            toast.className = `toast-notification ${type}`;
-            
-            let iconClass = 'fa-circle-check';
-            if (type === 'info') iconClass = 'fa-circle-info';
-            
-            toast.innerHTML = `
-                <div class="toast-icon"><i class="fa-solid ${iconClass}"></i></div>
-                <div class="toast-message">${message}</div>
-            `;
-            
-            container.appendChild(toast);
-            
-            // Force reflow and add show class
-            setTimeout(() => toast.classList.add('show'), 10);
-            
-            // Slide out and remove after 3 seconds
-            setTimeout(() => {
-                toast.classList.replace('show', 'hide');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // Trigger toast dynamically if flash attribute 'message' is present
-        /*[# th:if="${message != null}"]*/
-        showToast(/*[[${message}]]*/ '', /*[[${messageType != null ? messageType : 'success'}]]*/ 'success');
-        /*[/]*/
-    </script>
-
+    <script th:src="@{/js/layout/layout.js}"></script>
 </body>
 </html>

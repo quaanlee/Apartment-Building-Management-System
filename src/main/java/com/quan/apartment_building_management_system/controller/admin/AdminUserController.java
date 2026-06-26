@@ -43,7 +43,7 @@ public class AdminUserController {
             @RequestParam(value = "roleId", required = false) Integer roleId,
             @RequestParam(value = "status", required = false) Boolean status,
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "size", defaultValue = "5") int size,
             Model model) {
 
         Pageable pageable = PageRequest.of(page, size);

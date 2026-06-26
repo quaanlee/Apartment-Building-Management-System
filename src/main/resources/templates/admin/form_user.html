@@ -156,6 +156,11 @@
                                 <label for="res-owner">Is Household Owner ?</label>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label for="res-relation-to-owner">Relationship To Owner</label>
+                            <input type="text" id="res-relation-to-owner" th:field="*{relationshipToOwner}" class="form-control" placeholder="e.g. Parents, Child, ...">
+                        </div>
                     </div>
                     
                     <div class="form-actions">
@@ -376,44 +381,11 @@
         </div>
     </div>
 
+    <!-- submittedRole data bridge for external form_user.js script -->
+    <input type="hidden" id="submittedRole" th:value="${userDto.roleName}">
+
     <!-- Client-side Tab Switcher Script -->
-    <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.tab-btn');
-            const panels = document.querySelectorAll('.tab-panel');
-
-            function switchTab(tabId) {
-                tabs.forEach(t => t.classList.remove('active'));
-                panels.forEach(p => p.classList.remove('active'));
-
-                const activeTabBtn = Array.from(tabs).find(t => t.getAttribute('data-tab') === tabId);
-                if (activeTabBtn) {
-                    activeTabBtn.classList.add('active');
-                }
-                const activePanel = document.getElementById(tabId);
-                if (activePanel) {
-                    activePanel.classList.add('active');
-                }
-            }
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const targetPanel = tab.getAttribute('data-tab');
-                    switchTab(targetPanel);
-                });
-            });
-
-            // Keep tab active based on roleName from model if present
-            const submittedRole = /*[[${userDto.roleName}]]*/ '';
-            if (submittedRole === 'MANAGER') {
-                switchTab('manager-tab');
-            } else if (submittedRole === 'MAINTENANCE_STAFF') {
-                switchTab('staff-tab');
-            } else {
-                switchTab('resident-tab');
-            }
-        });
-    </script>
+    <script th:src="@{/js/admin/form_user.js}"></script>
 </main>
 
 </body>
