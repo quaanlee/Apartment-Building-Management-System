@@ -99,7 +99,8 @@
                         </div>
                         <div class="form-group">
                             <label for="res-placebirth">Place of Birth</label>
-                            <input type="text" id="res-placebirth" th:field="*{placeOfBirth}" class="form-control" placeholder="e.g. Hanoi">
+                            <input type="text" id="res-placebirth" th:field="*{placeOfBirth}" class="form-control" th:classappend="${#fields.hasErrors('placeOfBirth')} ? 'is-invalid'" placeholder="e.g. Hanoi">
+                            <span class="error-text" th:if="${#fields.hasErrors('placeOfBirth')}" th:errors="*{placeOfBirth}"></span>
                         </div>
                         
                         <div class="form-group">
@@ -109,19 +110,23 @@
                         </div>
                         <div class="form-group">
                             <label for="res-citizen-date">Issue Date</label>
-                            <input type="date" id="res-citizen-date" th:field="*{citizenIdIssueDate}" class="form-control">
+                            <input type="date" id="res-citizen-date" th:field="*{citizenIdIssueDate}" class="form-control" th:classappend="${#fields.hasErrors('citizenIdIssueDate')} ? 'is-invalid'">
+                            <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssueDate')}" th:errors="*{citizenIdIssueDate}"></span>
                         </div>
                         <div class="form-group">
                             <label for="res-citizen-place">Issue Place</label>
-                            <input type="text" id="res-citizen-place" th:field="*{citizenIdIssuePlace}" class="form-control" placeholder="e.g. Cục QLHC về TTXH">
+                            <input type="text" id="res-citizen-place" th:field="*{citizenIdIssuePlace}" class="form-control" th:classappend="${#fields.hasErrors('citizenIdIssuePlace')} ? 'is-invalid'" placeholder="e.g. Cục QLHC về TTXH">
+                            <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssuePlace')}" th:errors="*{citizenIdIssuePlace}"></span>
                         </div>
                         <div class="form-group">
                             <label for="res-nationality">Nationality</label>
-                            <input type="text" id="res-nationality" th:field="*{nationality}" class="form-control">
+                            <input type="text" id="res-nationality" th:field="*{nationality}" class="form-control" th:classappend="${#fields.hasErrors('nationality')} ? 'is-invalid'">
+                            <span class="error-text" th:if="${#fields.hasErrors('nationality')}" th:errors="*{nationality}"></span>
                         </div>
                         <div class="form-group">
                             <label for="res-ethnicity">Ethnicity</label>
-                            <input type="text" id="res-ethnicity" th:field="*{ethnicity}" class="form-control">
+                            <input type="text" id="res-ethnicity" th:field="*{ethnicity}" class="form-control" th:classappend="${#fields.hasErrors('ethnicity')} ? 'is-invalid'">
+                            <span class="error-text" th:if="${#fields.hasErrors('ethnicity')}" th:errors="*{ethnicity}"></span>
                         </div>
                         <div class="form-group">
                             <label for="res-status">Resident Status<span class="required-star">*</span></label>
@@ -134,20 +139,24 @@
                         
                         <div class="form-group">
                             <label for="res-movein">Move-in Date</label>
-                            <input type="date" id="res-movein" th:field="*{moveInDate}" class="form-control">
+                            <input type="date" id="res-movein" th:field="*{moveInDate}" class="form-control" th:classappend="${#fields.hasErrors('moveInDate')} ? 'is-invalid'">
+                            <span class="error-text" th:if="${#fields.hasErrors('moveInDate')}" th:errors="*{moveInDate}"></span>
                         </div>
                         <div class="form-group">
                             <label for="res-moveout">Move-out Date</label>
-                            <input type="date" id="res-moveout" th:field="*{moveOutDate}" class="form-control">
+                            <input type="date" id="res-moveout" th:field="*{moveOutDate}" class="form-control" th:classappend="${#fields.hasErrors('moveOutDate')} ? 'is-invalid'">
+                            <span class="error-text" th:if="${#fields.hasErrors('moveOutDate')}" th:errors="*{moveOutDate}"></span>
                         </div>
                         
                         <div class="form-group">
                             <label for="res-emergency-name">Emergency Contact Name</label>
-                            <input type="text" id="res-emergency-name" th:field="*{emergencyContactName}" class="form-control" placeholder="e.g. Family member name">
+                            <input type="text" id="res-emergency-name" th:field="*{emergencyContactName}" class="form-control" th:classappend="${#fields.hasErrors('emergencyContactName')} ? 'is-invalid'" placeholder="e.g. Family member name">
+                            <span class="error-text" th:if="${#fields.hasErrors('emergencyContactName')}" th:errors="*{emergencyContactName}"></span>
                         </div>
                         <div class="form-group">
                             <label for="res-emergency-phone">Emergency Contact Phone</label>
-                            <input type="text" id="res-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" placeholder="e.g. Phone number">
+                            <input type="text" id="res-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" th:classappend="${#fields.hasErrors('emergencyContactPhone')} ? 'is-invalid'" placeholder="e.g. Phone number">
+                            <span class="error-text" th:if="${#fields.hasErrors('emergencyContactPhone')}" th:errors="*{emergencyContactPhone}"></span>
                         </div>
                         
                         <div class="form-group full-width">
@@ -159,7 +168,8 @@
 
                         <div class="form-group">
                             <label for="res-relation-to-owner">Relationship To Owner</label>
-                            <input type="text" id="res-relation-to-owner" th:field="*{relationshipToOwner}" class="form-control" placeholder="e.g. Parents, Child, ...">
+                            <input type="text" id="res-relation-to-owner" th:field="*{relationshipToOwner}" class="form-control" th:classappend="${#fields.hasErrors('relationshipToOwner')} ? 'is-invalid'" placeholder="e.g. Parents, Child, ...">
+                            <span class="error-text" th:if="${#fields.hasErrors('relationshipToOwner')}" th:errors="*{relationshipToOwner}"></span>
                         </div>
                     </div>
                     
@@ -228,7 +238,8 @@
                         </div>
                         <div class="form-group">
                             <label for="man-placebirth">Place of Birth</label>
-                            <input type="text" id="man-placebirth" th:field="*{placeOfBirth}" class="form-control" placeholder="e.g. Saigon">
+                            <input type="text" id="man-placebirth" th:field="*{placeOfBirth}" class="form-control" th:classappend="${#fields.hasErrors('placeOfBirth')} ? 'is-invalid'" placeholder="e.g. Saigon">
+                            <span class="error-text" th:if="${#fields.hasErrors('placeOfBirth')}" th:errors="*{placeOfBirth}"></span>
                         </div>
                         
                         <div class="form-group">
@@ -238,32 +249,39 @@
                         </div>
                         <div class="form-group">
                             <label for="man-citizen-date">Issue Date</label>
-                            <input type="date" id="man-citizen-date" th:field="*{citizenIdIssueDate}" class="form-control">
+                            <input type="date" id="man-citizen-date" th:field="*{citizenIdIssueDate}" class="form-control" th:classappend="${#fields.hasErrors('citizenIdIssueDate')} ? 'is-invalid'">
+                            <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssueDate')}" th:errors="*{citizenIdIssueDate}"></span>
                         </div>
                         <div class="form-group">
                             <label for="man-citizen-place">Issue Place</label>
-                            <input type="text" id="man-citizen-place" th:field="*{citizenIdIssuePlace}" class="form-control" placeholder="e.g. Cục QLHC về TTXH">
+                            <input type="text" id="man-citizen-place" th:field="*{citizenIdIssuePlace}" class="form-control" th:classappend="${#fields.hasErrors('citizenIdIssuePlace')} ? 'is-invalid'" placeholder="e.g. Cục QLHC về TTXH">
+                            <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssuePlace')}" th:errors="*{citizenIdIssuePlace}"></span>
                         </div>
                         <div class="form-group">
                             <label for="man-nationality">Nationality</label>
-                            <input type="text" id="man-nationality" th:field="*{nationality}" class="form-control">
+                            <input type="text" id="man-nationality" th:field="*{nationality}" class="form-control" th:classappend="${#fields.hasErrors('nationality')} ? 'is-invalid'">
+                            <span class="error-text" th:if="${#fields.hasErrors('nationality')}" th:errors="*{nationality}"></span>
                         </div>
                         <div class="form-group">
                             <label for="man-ethnicity">Ethnicity</label>
-                            <input type="text" id="man-ethnicity" th:field="*{ethnicity}" class="form-control">
+                            <input type="text" id="man-ethnicity" th:field="*{ethnicity}" class="form-control" th:classappend="${#fields.hasErrors('ethnicity')} ? 'is-invalid'">
+                            <span class="error-text" th:if="${#fields.hasErrors('ethnicity')}" th:errors="*{ethnicity}"></span>
                         </div>
                         <div class="form-group">
                             <label for="man-occupation">Occupation / Title</label>
-                            <input type="text" id="man-occupation" th:field="*{occupation}" class="form-control" placeholder="e.g. Building Supervisor">
+                            <input type="text" id="man-occupation" th:field="*{occupation}" class="form-control" th:classappend="${#fields.hasErrors('occupation')} ? 'is-invalid'" placeholder="e.g. Building Supervisor">
+                            <span class="error-text" th:if="${#fields.hasErrors('occupation')}" th:errors="*{occupation}"></span>
                         </div>
                         
                         <div class="form-group">
                             <label for="man-emergency-name">Emergency Contact Name</label>
-                            <input type="text" id="man-emergency-name" th:field="*{emergencyContactName}" class="form-control" placeholder="e.g. Family member name">
+                            <input type="text" id="man-emergency-name" th:field="*{emergencyContactName}" class="form-control" th:classappend="${#fields.hasErrors('emergencyContactName')} ? 'is-invalid'" placeholder="e.g. Family member name">
+                            <span class="error-text" th:if="${#fields.hasErrors('emergencyContactName')}" th:errors="*{emergencyContactName}"></span>
                         </div>
                         <div class="form-group">
                             <label for="man-emergency-phone">Emergency Contact Phone</label>
-                            <input type="text" id="man-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" placeholder="e.g. Phone number">
+                            <input type="text" id="man-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" th:classappend="${#fields.hasErrors('emergencyContactPhone')} ? 'is-invalid'" placeholder="e.g. Phone number">
+                            <span class="error-text" th:if="${#fields.hasErrors('emergencyContactPhone')}" th:errors="*{emergencyContactPhone}"></span>
                         </div>
                     </div>
                     
@@ -332,7 +350,8 @@
                         </div>
                         <div class="form-group">
                             <label for="st-placebirth">Place of Birth</label>
-                            <input type="text" id="st-placebirth" th:field="*{placeOfBirth}" class="form-control" placeholder="e.g. Danang">
+                            <input type="text" id="st-placebirth" th:field="*{placeOfBirth}" class="form-control" th:classappend="${#fields.hasErrors('placeOfBirth')} ? 'is-invalid'" placeholder="e.g. Danang">
+                            <span class="error-text" th:if="${#fields.hasErrors('placeOfBirth')}" th:errors="*{placeOfBirth}"></span>
                         </div>
                         
                         <div class="form-group">
@@ -342,32 +361,39 @@
                         </div>
                         <div class="form-group">
                             <label for="st-citizen-date">Issue Date</label>
-                            <input type="date" id="st-citizen-date" th:field="*{citizenIdIssueDate}" class="form-control">
+                            <input type="date" id="st-citizen-date" th:field="*{citizenIdIssueDate}" class="form-control" th:classappend="${#fields.hasErrors('citizenIdIssueDate')} ? 'is-invalid'">
+                            <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssueDate')}" th:errors="*{citizenIdIssueDate}"></span>
                         </div>
                         <div class="form-group">
                             <label for="st-citizen-place">Issue Place</label>
-                            <input type="text" id="st-citizen-place" th:field="*{citizenIdIssuePlace}" class="form-control" placeholder="e.g. Cục QLHC về TTXH">
+                            <input type="text" id="st-citizen-place" th:field="*{citizenIdIssuePlace}" class="form-control" th:classappend="${#fields.hasErrors('citizenIdIssuePlace')} ? 'is-invalid'" placeholder="e.g. Cục QLHC về TTXH">
+                            <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssuePlace')}" th:errors="*{citizenIdIssuePlace}"></span>
                         </div>
                         <div class="form-group">
                             <label for="st-nationality">Nationality</label>
-                            <input type="text" id="st-nationality" th:field="*{nationality}" class="form-control">
+                            <input type="text" id="st-nationality" th:field="*{nationality}" class="form-control" th:classappend="${#fields.hasErrors('nationality')} ? 'is-invalid'">
+                            <span class="error-text" th:if="${#fields.hasErrors('nationality')}" th:errors="*{nationality}"></span>
                         </div>
                         <div class="form-group">
                             <label for="st-ethnicity">Ethnicity</label>
-                            <input type="text" id="st-ethnicity" th:field="*{ethnicity}" class="form-control">
+                            <input type="text" id="st-ethnicity" th:field="*{ethnicity}" class="form-control" th:classappend="${#fields.hasErrors('ethnicity')} ? 'is-invalid'">
+                            <span class="error-text" th:if="${#fields.hasErrors('ethnicity')}" th:errors="*{ethnicity}"></span>
                         </div>
                         <div class="form-group">
                             <label for="st-occupation">Specialty / Occupation</label>
-                            <input type="text" id="st-occupation" th:field="*{occupation}" class="form-control" placeholder="e.g. Plumber, Electrician">
+                            <input type="text" id="st-occupation" th:field="*{occupation}" class="form-control" th:classappend="${#fields.hasErrors('occupation')} ? 'is-invalid'" placeholder="e.g. Plumber, Electrician">
+                            <span class="error-text" th:if="${#fields.hasErrors('occupation')}" th:errors="*{occupation}"></span>
                         </div>
                         
                         <div class="form-group">
                             <label for="st-emergency-name">Emergency Contact Name</label>
-                            <input type="text" id="st-emergency-name" th:field="*{emergencyContactName}" class="form-control" placeholder="e.g. Family member name">
+                            <input type="text" id="st-emergency-name" th:field="*{emergencyContactName}" class="form-control" th:classappend="${#fields.hasErrors('emergencyContactName')} ? 'is-invalid'" placeholder="e.g. Family member name">
+                            <span class="error-text" th:if="${#fields.hasErrors('emergencyContactName')}" th:errors="*{emergencyContactName}"></span>
                         </div>
                         <div class="form-group">
                             <label for="st-emergency-phone">Emergency Contact Phone</label>
-                            <input type="text" id="st-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" placeholder="e.g. Phone number">
+                            <input type="text" id="st-emergency-phone" th:field="*{emergencyContactPhone}" class="form-control" th:classappend="${#fields.hasErrors('emergencyContactPhone')} ? 'is-invalid'" placeholder="e.g. Phone number">
+                            <span class="error-text" th:if="${#fields.hasErrors('emergencyContactPhone')}" th:errors="*{emergencyContactPhone}"></span>
                         </div>
                     </div>
                     

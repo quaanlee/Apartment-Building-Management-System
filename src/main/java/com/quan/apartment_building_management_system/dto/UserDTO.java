@@ -44,21 +44,26 @@ public class UserDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
 
+    @Size(max = 100, message = "Place of Birth must not exceed 100 characters")
     private String placeOfBirth;
 
     @NotBlank(message = "Citizen ID is required and can not only space")
-    @Pattern(regexp = "^[0-9]{9,12}$", message = "Citizen ID must be between 9 and 12 digits")
+    @Pattern(regexp = "^[0-9]{12}$", message = "Citizen ID must be exactly 12 digits")
     private String citizenId;
 
+    @Past(message = "Citizen ID Issue Date must be in the past")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate citizenIdIssueDate;
 
+    @Size(max = 100, message = "Citizen ID Issue Place must not exceed 100 characters")
     private String citizenIdIssuePlace;
-    private String nationality = "Vietnam";
-    private String ethnicity = "Kinh";
+    @Size(max = 50, message = "Nationality must not exceed 50 characters")
+    private String nationality;
+    @Size(max = 50, message = "Ethnicity must not exceed 50 characters")
+    private String ethnicity;
 
     @NotBlank(message = "Phone Number is required and can not only space")
-    @Pattern(regexp = "^[0-9]{10,11}$", message = "Phone Number must contain 10 or 11 digits")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Phone Number must contain exactly 10 digits and only number")
     private String phoneNumber;
 
     @NotBlank(message = "Email is required")
@@ -67,8 +72,14 @@ public class UserDTO {
     private String email;
 
     private String avatarUrl;
+
+    @Size(max = 100, message = "Emergency Contact Name must not exceed 100 characters")
     private String emergencyContactName;
+
+    @Pattern(regexp = "^$|^[0-9]{10}$", message = "Emergency Contact Phone must contain exactly 10 digits and only number")
     private String emergencyContactPhone;
+
+    @Size(max = 50, message = "Relationship to Owner must not exceed 50 characters")
     private String relationshipToOwner;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -79,6 +90,8 @@ public class UserDTO {
 
     private Boolean isHouseholdOwner = false;
     private Byte residentStatus = 1;
+
+    @Size(max = 100, message = "Occupation must not exceed 100 characters")
     private String occupation;
 
     // Default Constructor

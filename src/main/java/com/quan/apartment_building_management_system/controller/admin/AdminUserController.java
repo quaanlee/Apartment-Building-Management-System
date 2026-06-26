@@ -123,6 +123,21 @@ public class AdminUserController {
             bindingResult.rejectValue("username", "error.userDto", "Username already exists!");
         }
 
+        // Validate duplicate CitizenID
+        if (userDto.getCitizenId() != null && !userDto.getCitizenId().isBlank()) {
+            Optional<Profile> existingProfile = profileService.findByCitizenId(userDto.getCitizenId());
+            if (existingProfile.isPresent()) {
+                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID already exists!");
+            }
+        }
+
+        // Validate Move-In vs Move-Out dates
+        if (userDto.getMoveInDate() != null && userDto.getMoveOutDate() != null) {
+            if (userDto.getMoveInDate().isAfter(userDto.getMoveOutDate())) {
+                bindingResult.rejectValue("moveOutDate", "error.userDto", "Move-out date must be after move-in date!");
+            }
+        }
+        
         if (bindingResult.hasErrors()) {
             model.addAttribute("activeTab", "users");
             return "admin/form_user";
@@ -148,6 +163,21 @@ public class AdminUserController {
 
     @PostMapping("/admin/users/edit/{id}")
     public String updateUser(@PathVariable("id") Integer id, @Valid @ModelAttribute("userDto") UserDTO userDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        // Validate duplicate CitizenID (excluding the profile currently being edited)
+        if (userDto.getCitizenId() != null && !userDto.getCitizenId().isBlank()) {
+            Optional<Profile> existingProfile = profileService.findByCitizenId(userDto.getCitizenId());
+            if (existingProfile.isPresent() && !existingProfile.get().getProfileId().equals(id)) {
+                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID already exists!");
+            }
+        }
+
+        // Validate Move-In vs Move-Out dates
+        if (userDto.getMoveInDate() != null && userDto.getMoveOutDate() != null) {
+            if (userDto.getMoveInDate().isAfter(userDto.getMoveOutDate())) {
+                bindingResult.rejectValue("moveOutDate", "error.userDto", "Move-out date must be after move-in date!");
+            }
+        }
+
         if (bindingResult.hasErrors()) {
             bindingResult.getFieldErrors()
                     .forEach(System.out::println);

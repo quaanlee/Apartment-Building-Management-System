@@ -106,8 +106,8 @@
     <div class="toast-container" id="toastContainer"></div>
     
     <!-- Toast message data bridge for external layout.js script -->
-    <div id="toastMessageData" 
-         th:if="${message != null}" 
+    <div id="toastMessageData"
+         th:if="${message != null}"
          th:data-message="${message}" 
          th:data-type="${messageType != null ? messageType : 'success'}" 
          style="display: none;"></div>
