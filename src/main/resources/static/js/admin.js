@@ -44,6 +44,23 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // Auto-close toast message after 4 seconds
+    const toastAlert = document.getElementById('toastAlert');
+    if (toastAlert) {
+        setTimeout(() => {
+            closeToast();
+        }, 4000);
+    }
+
+    // 3. Enable disabled dropdowns in pricingModal on form submit so values are posted
+    const pricingForm = document.querySelector('#pricingModal form');
+    if (pricingForm) {
+        pricingForm.addEventListener('submit', function () {
+            document.getElementById('pricingUtilityId').disabled = false;
+            document.getElementById('pricingUnitId').disabled = false;
+        });
+    }
 });
 
 // Helper functions for modals
@@ -118,11 +135,15 @@ function openConfigurePricingModal() {
     document.getElementById('pricingTitle').innerText = 'Configure Pricing';
     
     const utilSelect = document.getElementById('pricingUtilityId');
+    utilSelect.disabled = false;
     if (utilSelect.options.length > 0) {
         utilSelect.selectedIndex = 0;
     }
     
-    document.getElementById('pricingUnitId').selectedIndex = 0;
+    const unitSelect = document.getElementById('pricingUnitId');
+    unitSelect.disabled = false;
+    unitSelect.selectedIndex = 0;
+    
     document.getElementById('pricingPrice').value = '0.00';
     openModal('pricingModal');
 }
@@ -130,8 +151,26 @@ function openConfigurePricingModal() {
 // Open modal to edit existing pricing
 function openEditPricingModal(utilityId, unitId, price) {
     document.getElementById('pricingTitle').innerText = 'Edit Pricing';
-    document.getElementById('pricingUtilityId').value = utilityId;
-    document.getElementById('pricingUnitId').value = unitId;
+    
+    const utilSelect = document.getElementById('pricingUtilityId');
+    utilSelect.value = utilityId;
+    utilSelect.disabled = true;
+    
+    const unitSelect = document.getElementById('pricingUnitId');
+    unitSelect.value = unitId;
+    unitSelect.disabled = true;
+    
     document.getElementById('pricingPrice').value = parseFloat(price).toFixed(2);
     openModal('pricingModal');
+}
+
+// Function to close toast notification with fade-out effect
+function closeToast() {
+    const toastAlert = document.getElementById('toastAlert');
+    if (toastAlert) {
+        toastAlert.classList.add('fade-out');
+        setTimeout(() => {
+            toastAlert.remove();
+        }, 300);
+    }
 }

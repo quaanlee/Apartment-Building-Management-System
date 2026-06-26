@@ -1,16 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head th:replace="~{layout/head :: head('Utilities Management')}"></head>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: admin-layout(~{::main}, 'utilities')}" lang="en">
+<head>
+</head>
 <body>
 
-<!-- Sidebar Navigation -->
-<aside th:replace="~{layout/sidebar :: sidebar('utilities')}"></aside>
-
 <!-- Main Content Area -->
-<main class="main-wrapper">
-
-    <!-- Header & Search -->
-    <div th:replace="~{layout/header :: header(${query}, @{/admin/utilities})}"></div>
+<main class="utility-container">
 
     <!-- Title Section -->
     <div class="main-header">
@@ -22,6 +18,50 @@
         <button class="btn-primary" onclick="openAddUtilityModal()">
             <i class="fas fa-plus"></i> Add Utility
         </button>
+    </div>
+
+    <!-- KPI Stats Row -->
+    <div class="stats-row">
+        <!-- Total Utilities -->
+        <div class="stats-card card-1">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Total Utilities</div>
+                <div class="stats-card-value" th:text="${totalUtilities}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+        </div>
+        <!-- Active Utilities -->
+        <div class="stats-card card-2">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Active Utilities</div>
+                <div class="stats-card-value" th:text="${activeUtilities}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+        </div>
+        <!-- Total Resources -->
+        <div class="stats-card card-3">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Total Resources</div>
+                <div class="stats-card-value" th:text="${totalResources}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-cubes"></i>
+            </div>
+        </div>
+        <!-- Pricing Tiers -->
+        <div class="stats-card card-4">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Pricing Configurations</div>
+                <div class="stats-card-value" th:text="${totalPricing}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-tags"></i>
+            </div>
+        </div>
     </div>
 
     <!-- Utilities List Card -->
@@ -93,8 +133,12 @@
                                 <h5 th:text="${res.resourceName}">Main Training Hall</h5>
                                 <p th:text="${res.location}">Floor 1</p>
                             </div>
-                            <span th:class="${res.status} ? 'badge badge-ready' : 'badge badge-maintenance'"
-                                  th:text="${res.status} ? 'READY' : 'MAINTENANCE'">READY</span>
+                            <form th:action="@{/admin/utilities/resources/toggle-status/{id}(id=${res.resourceId})}" method="POST" style="margin: 0; display: inline-block;">
+                                <button type="submit" class="badge" th:classappend="${res.status} ? 'badge-ready' : 'badge-maintenance'"
+                                        th:text="${res.status} ? 'READY' : 'MAINTENANCE'" style="border: none; cursor: pointer; font-family: inherit; outline: none; transition: filter 0.2s;" title="Toggle Status">
+                                    READY
+                                </button>
+                            </form>
                         </div>
                         <div th:if="${#lists.isEmpty(util.utilityResources)}" style="padding: 12px; color: var(--text-muted); font-size: 13px; text-align: center; border: 1px dashed #e2e8f0; border-radius: 8px;">
                             No resources defined.
@@ -174,8 +218,6 @@
         </div>
     </div>
 
-</main>
-
 <!-- Modals -->
 
 <!-- Add/Edit Utility Modal -->
@@ -185,20 +227,20 @@
             <h3 id="utilityModalTitle">Add New Utility</h3>
             <button class="modal-close"><i class="fas fa-times"></i></button>
         </div>
-        <form th:action="@{/admin/utilities/save}" th:object="${newUtility}" method="POST">
-            <input type="hidden" th:field="*{utilityId}" id="utilityIdField">
+        <form th:action="@{/admin/utilities/save}" method="POST">
+            <input type="hidden" name="utilityId" id="utilityIdField">
             <div class="modal-body">
                 <div class="form-group">
                     <label for="utilityNameField">Utility Name</label>
-                    <input type="text" th:field="*{utilityName}" id="utilityNameField" class="form-control" placeholder="e.g. Gym, Swimming Pool" required>
+                    <input type="text" name="utilityName" id="utilityNameField" class="form-control" placeholder="e.g. Gym, Swimming Pool" required>
                 </div>
                 <div class="form-group">
                     <label for="utilityDescField">Description</label>
-                    <textarea th:field="*{description}" id="utilityDescField" class="form-control" placeholder="e.g. Fitness and wellness facility..." required></textarea>
+                    <textarea name="description" id="utilityDescField" class="form-control" placeholder="e.g. Fitness and wellness facility..." required></textarea>
                 </div>
                 <div class="form-group" style="display: none;">
                     <label for="utilityStatusField">Status</label>
-                    <select th:field="*{status}" id="utilityStatusField" class="form-control">
+                    <select name="status" id="utilityStatusField" class="form-control">
                         <option value="true">Active</option>
                         <option value="false">Stopped</option>
                     </select>
@@ -280,6 +322,6 @@
     </div>
 </div>
 
-<th:block th:replace="~{layout/scripts :: scripts}"></th:block>
+</main>
 </body>
 </html>
