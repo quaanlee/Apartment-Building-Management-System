@@ -196,7 +196,7 @@ CREATE TABLE UtilityBooking (
     Status          TINYINT         NOT NULL         DEFAULT 0,  -- 0: PENDING | 1: APPROVED | 2: REJECTED | 3: CANCELED
     ApprovedBy      INT             NULL,
     CreatedAt       DATETIME        NOT NULL         DEFAULT GETDATE(),
-    CanceledAt      DATETIME        NULL,
+    CancelledAt      DATETIME        NULL,
     CancelReason    NVARCHAR(255)   NULL,
 
     CONSTRAINT FK_Booking_Profile       FOREIGN KEY (ProfileID)      REFERENCES Profile(ProfileID),
@@ -284,7 +284,6 @@ CREATE TABLE MaintenanceRequest (
     ApartmentID INT             NOT NULL,
     Title       NVARCHAR(100)   NOT NULL,
     Description NVARCHAR(MAX)   NOT NULL,
-    ImageURL    NVARCHAR(500)   NULL,                        -- Ảnh đính kèm sự cố
     RequestDate DATETIME        NOT NULL         DEFAULT GETDATE(),
     Status      TINYINT         NOT NULL         DEFAULT 0,  -- 0: PENDING | 1: ASSIGNED | 2: COMPLETED
 
@@ -373,3 +372,93 @@ CREATE TABLE SystemLog (
     CONSTRAINT FK_SystemLog_Account FOREIGN KEY (AccountID) REFERENCES Account(AccountID)
 );
 GO
+
+-- ===============THÊM BẢNG=========================
+
+
+-- ========================================================================
+-- 19.1 Bảng lưu ảnh báo cáo tiến độ bảo trì
+-- ========================================================================
+CREATE TABLE MaintenanceReportImage (
+    ImageID         BIGINT          IDENTITY(1,1)   PRIMARY KEY,
+    ReportID        BIGINT          NOT NULL,               -- Khóa ngoại liên kết tới MaintenanceReport (Dùng BIGINT giống ReportID)
+    ImageURL       NVARCHAR(500)   NOT NULL,               -- Đường dẫn lưu tệp ảnh
+    Caption         NVARCHAR(255)       NULL,               -- Chú thích ảnh (VD: "Đang lắp ống", "Đã hàn xong mối nối")
+
+    -- Định nghĩa khóa ngoại
+    CONSTRAINT FK_ReportImage_Report FOREIGN KEY (ReportID) REFERENCES MaintenanceReport(ReportID)
+        ON DELETE CASCADE -- Nếu báo cáo tiến độ bị xóa, tự động dọn dẹp các ảnh liên quan
+);
+GO
+-- ============================================================
+-- 17.1 MaintenanceRequestImage (Ảnh tình trạng vấn đề cần bảo trì)
+-- ============================================================
+CREATE TABLE MaintenanceRequestImage (
+    ImageID         INT             IDENTITY(1,1)   PRIMARY KEY,
+    RequestID       INT             NOT NULL,               -- Khóa ngoại liên kết tới MaintenanceRequest
+    ImageURL       NVARCHAR(500)   NOT NULL,               -- Đường dẫn file ảnh tình trạng
+    Description     NVARCHAR(255)       NULL,               -- Ghi chú ngắn gọn cho bức ảnh (VD: "Đã thay vòi nước mới")
+
+    -- Định nghĩa khóa ngoại
+    CONSTRAINT FK_MaintImage_Request FOREIGN KEY (RequestID) REFERENCES MaintenanceRequest(RequestID)
+        ON DELETE CASCADE -- Nếu yêu cầu bảo trì bị xóa, tự động xóa các ảnh liên quan
+);
+GO
+-- ============================================================
+-- 23. ApartmentImage (Ảnh căn hộ)
+-- ============================================================
+CREATE TABLE ApartmentImage (
+    ImageID         INT             IDENTITY(1,1)   PRIMARY KEY,
+    ApartmentID     INT             NOT NULL,               -- Khóa ngoại liên kết tới bảng Apartment
+    ImageURL       VARCHAR(500)    NOT NULL,               -- Đường dẫn lưu tệp ảnh (URL hoặc đường dẫn thư mục)
+    ImageTitle      NVARCHAR(100)       NULL,               -- Tiêu đề ảnh (VD: Phòng khách, Ban công...)
+    IsPrimary       BIT             NOT NULL        DEFAULT 0, -- 1: Ảnh đại diện/Ảnh chính | 0: Ảnh phụ
+    UploadedAt      DATETIME        NOT NULL        DEFAULT GETDATE(), -- Ngày giờ tải ảnh lên
+
+    -- Định nghĩa khóa ngoại
+    CONSTRAINT FK_Image_Apartment FOREIGN KEY (ApartmentID) REFERENCES Apartment(ApartmentID) 
+        ON DELETE CASCADE -- Nếu căn hộ bị xóa, tự động xóa thông tin ảnh liên quan
+);
+GO
+-- ============================================================
+-- 24. ApartmentPriceHistory (Lịch sử giá căn hộ)
+-- ============================================================
+CREATE TABLE ApartmentPriceHistory (
+    PriceHistoryID  INT             IDENTITY(1,1)   PRIMARY KEY,
+    ApartmentID     INT             NOT NULL,               -- Khóa ngoại liên kết tới Apartment
+    
+    Price           DECIMAL(18, 2)  NOT NULL,               -- Mức giá tại thời điểm áp dụng
+    
+    EffectiveDate   DATE            NOT NULL,               -- Ngày bắt đầu áp dụng mức giá này
+    EndDate         DATE                NULL,               -- Ngày kết thúc áp dụng (NULL nghĩa là giá hiện tại)
+    
+    CreatedAt       DATETIME        NOT NULL        DEFAULT GETDATE(), -- Ngày hệ thống ghi nhận việc đổi giá
+    Note            NVARCHAR(255)       NULL,               -- Lý do đổi giá (VD: "Tăng giá theo thị trường", "Sửa sang lại phòng")
+
+    -- Định nghĩa các ràng buộc
+    CONSTRAINT FK_PriceHistory_Apartment FOREIGN KEY (ApartmentID) REFERENCES Apartment(ApartmentID) ON DELETE CASCADE,
+    CONSTRAINT CHK_PriceHistory_Dates CHECK (EndDate IS NULL OR EndDate >= EffectiveDate),
+    CONSTRAINT CHK_PriceHistory_Price CHECK (Price >= 0)
+);
+GO
+-- ============================================================
+-- 25. SalesContract (Hợp đồn mua bán)
+-- ============================================================
+CREATE TABLE SalesContract (
+    SalesContractID   INT             IDENTITY(1,1)   PRIMARY KEY,
+    ApartmentID       INT             NOT NULL,
+    ProfileID         INT             NOT NULL,
+    SellingPrice      DECIMAL(18, 2)  NOT NULL, -- Giá bán đứt căn hộ
+    MaintenanceFee    DECIMAL(18, 2)  NOT NULL        DEFAULT 0, -- Phí bảo trì (thường là 2% giá trị căn hộ)
+    HandoverDate      DATE                NULL, -- Ngày bàn giao nhà dự kiến/thực tế
+    SignDate          DATE            NOT NULL        DEFAULT GETDATE(), -- Ngày ký hợp đồng
+
+    PaymentStatus     TINYINT         NOT NULL        DEFAULT 0, -- 0: Chưa thanh toán | 1: Đang trả góp/theo đợt | 2: Đã thanh toán 100%
+    Note              NVARCHAR(255)       NULL,
+	CreatedAt       DATETIME        NOT NULL        DEFAULT GETDATE(), -- Ngày tạo hợp đồng
+    CONSTRAINT FK_SalesContract_Apartment FOREIGN KEY (ApartmentID) REFERENCES Apartment(ApartmentID),
+	CONSTRAINT FK_SalesContract_Profile FOREIGN KEY (ProfileID) REFERENCES Profile(ProfileID),
+    CONSTRAINT CHK_SalesContract_Price CHECK (SellingPrice >= 0)
+);
+GO
+

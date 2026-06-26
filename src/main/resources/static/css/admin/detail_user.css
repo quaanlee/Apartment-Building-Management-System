@@ -1,0 +1,195 @@
+/* Profile Detail Page Styling */
+.detail-container {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+/* Back Button bar */
+.detail-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #F9FAFB;
+}
+.detail-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+/* User Card Overview */
+.profile-overview-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 32px;
+    background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
+    border-bottom: 1px solid var(--border-color);
+}
+.profile-large-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #8B5CF6 100%);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(88, 43, 232, 0.2);
+    border: 3px solid var(--white);
+}
+.profile-main-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.profile-main-meta h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+.profile-sub-meta {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+.badges-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 4px;
+}
+/* Role Badges */
+.badge-role {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+}
+.badge-role.resident {
+    background-color: #E0F2FE;
+    color: #0369A1;
+}
+.badge-role.manager {
+    background-color: #F3E8FF;
+    color: #6B21A8;
+}
+.badge-role.staff {
+    background-color: #FFEDD5;
+    color: #C2410C;
+}
+/* Status Badges */
+.badge-status {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+.badge-status.active {
+    background-color: #D1FAE5;
+    color: #065F46;
+}
+.badge-status.locked {
+    background-color: #FEE2E2;
+    color: #991B1B;
+}
+/* Detail Section Grid */
+.detail-sections {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+.detail-section {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 32px;
+}
+.detail-section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.section-title i {
+    color: var(--primary-color);
+}
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.info-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.info-value {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+.info-value.empty {
+    color: #9CA3AF;
+    font-style: italic;
+}
+/* Apartment Card */
+.apartment-detail-card {
+    background-color: #F9FAFB;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+.apartment-icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-md);
+    background-color: #EEF2F6;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+.apartment-meta-info {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+.no-apartment-box {
+    background-color: #FFFBEB;
+    border: 1px dashed #F59E0B;
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    color: #B45309;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+}
