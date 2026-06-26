@@ -155,18 +155,18 @@
 
     <!-- Pagination Row -->
     <div class="pagination-container" th:if="${totalPages > 1}">
-        <a th:href="@{/admin/utilities(query=${query}, page=${currentPage - 1})}"
+        <a th:href="@{/admin/utilities(query=${query}, page=${currentPage - 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
            class="pagination-btn" th:classappend="${currentPage == 1} ? 'disabled'">Previous</a>
 
         <div class="pagination-pages">
             <a th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
-               th:href="@{/admin/utilities(query=${query}, page=${pageNum})}"
+               th:href="@{/admin/utilities(query=${query}, page=${pageNum}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
                class="page-num"
                th:classappend="${currentPage == pageNum} ? 'active'"
                th:text="${pageNum}">1</a>
         </div>
 
-        <a th:href="@{/admin/utilities(query=${query}, page=${currentPage + 1})}"
+        <a th:href="@{/admin/utilities(query=${query}, page=${currentPage + 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
            class="pagination-btn" th:classappend="${currentPage == totalPages} ? 'disabled'">Next</a>
     </div>
 
@@ -176,9 +176,27 @@
             <h2>Pricing Configurations</h2>
             <p>Set price structures and units for each utility.</p>
         </div>
-        <button class="btn-primary" onclick="openConfigurePricingModal()">
-            <i class="fas fa-plus"></i> Configure Price
-        </button>
+        
+        <!-- Search and Actions Wrapper -->
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <form th:action="@{/admin/utilities}" method="GET" style="display: flex; gap: 8px; margin: 0; align-items: center;">
+                <input type="hidden" name="query" th:value="${query}">
+                <input type="hidden" name="page" th:value="${currentPage}">
+                <input type="text" name="priceQuery" th:value="${priceQuery}" placeholder="Search pricing..." 
+                       style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.2s; min-width: 200px;"
+                       onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#cbd5e1'">
+                <button type="submit" class="btn-primary" style="padding: 8px 16px; background-color: var(--secondary-color, #4b5563); border-color: var(--secondary-color, #4b5563);">
+                    <i class="fas fa-search"></i>
+                </button>
+                <a th:if="${priceQuery != null && !priceQuery.isEmpty()}" th:href="@{/admin/utilities(query=${query}, page=${currentPage})}" 
+                   class="btn-secondary" style="padding: 8px 12px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; color: #475569;">
+                    <i class="fas fa-times"></i>
+                </a>
+            </form>
+            <button class="btn-primary" onclick="openConfigurePricingModal()">
+                <i class="fas fa-plus"></i> Configure Price
+            </button>
+        </div>
     </div>
 
     <div class="table-card" style="margin-top: 16px;">
@@ -218,6 +236,23 @@
         </div>
     </div>
 
+    <!-- Pricing Pagination Row -->
+    <div class="pagination-container" th:if="${totalPricePages > 1}" style="margin-top: 16px;">
+        <a th:href="@{/admin/utilities(query=${query}, page=${currentPage}, pricePage=${currentPricePage - 1}, priceQuery=${priceQuery})}"
+           class="pagination-btn" th:classappend="${currentPricePage == 1} ? 'disabled'">Previous</a>
+
+        <div class="pagination-pages">
+            <a th:each="pageNum : ${#numbers.sequence(1, totalPricePages)}"
+               th:href="@{/admin/utilities(query=${query}, page=${currentPage}, pricePage=${pageNum}, priceQuery=${priceQuery})}"
+               class="page-num"
+               th:classappend="${currentPricePage == pageNum} ? 'active'"
+               th:text="${pageNum}">1</a>
+        </div>
+
+        <a th:href="@{/admin/utilities(query=${query}, page=${currentPage}, pricePage=${currentPricePage + 1}, priceQuery=${priceQuery})}"
+           class="pagination-btn" th:classappend="${currentPricePage == totalPricePages} ? 'disabled'">Next</a>
+    </div>
+
 <!-- Modals -->
 
 <!-- Add/Edit Utility Modal -->
@@ -232,11 +267,11 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label for="utilityNameField">Utility Name</label>
-                    <input type="text" name="utilityName" id="utilityNameField" class="form-control" placeholder="e.g. Gym, Swimming Pool" required>
+                    <input type="text" name="utilityName" id="utilityNameField" class="form-control" placeholder="e.g. Gym, Swimming Pool" maxlength="100" required>
                 </div>
                 <div class="form-group">
                     <label for="utilityDescField">Description</label>
-                    <textarea name="description" id="utilityDescField" class="form-control" placeholder="e.g. Fitness and wellness facility..." required></textarea>
+                    <textarea name="description" id="utilityDescField" class="form-control" placeholder="e.g. Fitness and wellness facility..." maxlength="100" required></textarea>
                 </div>
                 <div class="form-group" style="display: none;">
                     <label for="utilityStatusField">Status</label>
@@ -266,11 +301,11 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label for="resourceName">Resource Name</label>
-                    <input type="text" name="resourceName" id="resourceName" class="form-control" placeholder="e.g. Main Training Hall" required>
+                    <input type="text" name="resourceName" id="resourceName" class="form-control" placeholder="e.g. Main Training Hall" maxlength="100" required>
                 </div>
                 <div class="form-group">
                     <label for="resourceLocation">Location</label>
-                    <input type="text" name="resourceLocation" id="resourceLocation" class="form-control" placeholder="e.g. Floor 1, Outdoor" required>
+                    <input type="text" name="resourceLocation" id="resourceLocation" class="form-control" placeholder="e.g. Floor 1, Outdoor" maxlength="100" required>
                 </div>
                 <div class="form-group">
                     <label for="resourceStatus">Status</label>

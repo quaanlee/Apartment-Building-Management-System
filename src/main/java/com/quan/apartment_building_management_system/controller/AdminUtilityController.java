@@ -1,6 +1,7 @@
 package com.quan.apartment_building_management_system.controller;
 
-import com.quan.apartment_building_management_system.entity.Unit;
+import com.quan.apartment_building_management_system.dto.AdminUtilityDTOHandler;
+import com.quan.apartment_building_management_system.dto.UtilityDTO;
 import com.quan.apartment_building_management_system.entity.Utility;
 import com.quan.apartment_building_management_system.entity.UtilityPrice;
 import com.quan.apartment_building_management_system.entity.UtilityResource;
@@ -20,7 +21,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/admin/utilities")
@@ -30,54 +30,70 @@ public class AdminUtilityController {
     private final UtilityResourceService utilityResourceService;
     private final UtilityPriceService utilityPriceService;
     private final UnitService unitService;
+    private final AdminUtilityDTOHandler dtoHandler;
 
     public AdminUtilityController(UtilityService utilityService,
                                   UtilityResourceService utilityResourceService,
                                   UtilityPriceService utilityPriceService,
-                                  UnitService unitService) {
+                                  UnitService unitService,
+                                  AdminUtilityDTOHandler dtoHandler) {
         this.utilityService = utilityService;
         this.utilityResourceService = utilityResourceService;
         this.utilityPriceService = utilityPriceService;
         this.unitService = unitService;
+        this.dtoHandler = dtoHandler;
     }
 
     @GetMapping
     public String listUtilities(@RequestParam(value = "query", required = false) String query,
                                 @RequestParam(value = "page", defaultValue = "1") int page,
                                 @RequestParam(value = "size", defaultValue = "5") int size,
+                                @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+                                @RequestParam(value = "priceQuery", required = false) String priceQuery,
                                 Model model) {
         List<Utility> allUtilities = utilityService.searchUtilities(query);
 
-        // Perform simple custom pagination
         int totalItems = allUtilities.size();
-        int totalPages = (int) Math.ceil((double) totalItems / size);
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        if (page < 1) {
-            page = 1;
-        } else if (page > totalPages) {
-            page = totalPages;
-        }
+        int totalPages = dtoHandler.calculateTotalPages(totalItems, size);
+        int validPage = dtoHandler.validatePage(page, totalPages);
 
-        int startIdx = (page - 1) * size;
-        int endIdx = Math.min(startIdx + size, totalItems);
-        List<Utility> paginatedUtilities = allUtilities.subList(startIdx, endIdx);
+        List<Utility> paginatedEntities = dtoHandler.getPaginatedList(allUtilities, validPage, size);
+        List<UtilityDTO> paginatedUtilities = dtoHandler.toUtilityDTOList(paginatedEntities, true);
 
         List<Utility> fullUtilities = utilityService.findAll();
         long totalUtilities = fullUtilities.size();
-        long activeUtilities = fullUtilities.stream().filter(Utility::getStatus).count();
+        long activeUtilities = dtoHandler.countActiveUtilities(fullUtilities);
         long totalResources = utilityResourceService.findAll().size();
-        long totalPricing = utilityPriceService.findAll().size();
+
+        // Paginate Pricing Configurations (5 items per page) with search
+        List<UtilityPrice> allPrices;
+        if (priceQuery != null && !priceQuery.trim().isEmpty()) {
+            String pq = priceQuery.trim().toLowerCase();
+            allPrices = utilityPriceService.findAll().stream()
+                    .filter(price -> (price.getUtility() != null && price.getUtility().getUtilityName() != null && price.getUtility().getUtilityName().toLowerCase().contains(pq)) ||
+                                     (price.getUnit() != null && price.getUnit().getUnitName() != null && price.getUnit().getUnitName().toLowerCase().contains(pq)))
+                    .toList();
+        } else {
+            allPrices = utilityPriceService.findAll();
+        }
+
+        long totalPricing = allPrices.size();
+        int totalPricePages = dtoHandler.calculateTotalPages((int) totalPricing, 5);
+        int validPricePage = dtoHandler.validatePage(pricePage, totalPricePages);
+        List<UtilityPrice> paginatedPrices = dtoHandler.getPaginatedList(allPrices, validPricePage, 5);
+        List<UtilityDTO.Price> paginatedPricesDTO = dtoHandler.toUtilityPriceDTOList(paginatedPrices);
 
         model.addAttribute("utilities", paginatedUtilities);
         model.addAttribute("query", query);
-        model.addAttribute("currentPage", page);
+        model.addAttribute("priceQuery", priceQuery);
+        model.addAttribute("currentPage", validPage);
         model.addAttribute("totalPages", totalPages);
-        model.addAttribute("allUnits", unitService.findAll());
-        model.addAttribute("allUtilities", fullUtilities);
-        model.addAttribute("utilityPrices", utilityPriceService.findAll());
-        model.addAttribute("newUtility", new Utility());
+        model.addAttribute("allUnits", dtoHandler.toUnitDTOList(unitService.findAll()));
+        model.addAttribute("allUtilities", dtoHandler.toUtilityDTOList(fullUtilities, false));
+        model.addAttribute("utilityPrices", paginatedPricesDTO);
+        model.addAttribute("currentPricePage", validPricePage);
+        model.addAttribute("totalPricePages", totalPricePages);
+        model.addAttribute("newUtility", new UtilityDTO());
         model.addAttribute("totalUtilities", totalUtilities);
         model.addAttribute("activeUtilities", activeUtilities);
         model.addAttribute("totalResources", totalResources);
@@ -87,20 +103,29 @@ public class AdminUtilityController {
     }
 
     @PostMapping("/save")
-    public String saveUtility(@ModelAttribute("newUtility") Utility utility, RedirectAttributes redirectAttributes) {
-        if (utility.getUtilityId() != null) {
+    public String saveUtility(@ModelAttribute("newUtility") UtilityDTO utilityDTO, RedirectAttributes redirectAttributes) {
+        if (utilityDTO.getUtilityName() == null || utilityDTO.getUtilityName().trim().isEmpty() || utilityDTO.getUtilityName().trim().length() > 100) {
+            redirectAttributes.addFlashAttribute("message", "Utility name must not be empty and must be under 100 characters.");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/admin/utilities";
+        }
+        if (utilityDTO.getDescription() == null || utilityDTO.getDescription().trim().isEmpty() || utilityDTO.getDescription().trim().length() > 100) {
+            redirectAttributes.addFlashAttribute("message", "Description must not be empty and must be under 100 characters.");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/admin/utilities";
+        }
+
+        if (utilityDTO.getUtilityId() != null) {
             // Edit mode
-            utilityService.findById(utility.getUtilityId()).ifPresent(existing -> {
-                existing.setUtilityName(utility.getUtilityName());
-                existing.setDescription(utility.getDescription());
-                existing.setStatus(utility.getStatus());
+            utilityService.findById(utilityDTO.getUtilityId()).ifPresent(existing -> {
+                dtoHandler.updateEntityFromDTO(utilityDTO, existing);
                 utilityService.save(existing);
                 redirectAttributes.addFlashAttribute("message", "Utility updated successfully!");
                 redirectAttributes.addFlashAttribute("messageType", "success");
             });
         } else {
             // Add mode
-            utility.setStatus(true); // default active
+            Utility utility = dtoHandler.toEntity(utilityDTO);
             utilityService.save(utility);
             redirectAttributes.addFlashAttribute("message", "New utility added successfully!");
             redirectAttributes.addFlashAttribute("messageType", "success");
@@ -125,6 +150,17 @@ public class AdminUtilityController {
                               @RequestParam("resourceLocation") String location,
                               @RequestParam(value = "status", defaultValue = "true") Boolean status,
                               RedirectAttributes redirectAttributes) {
+        if (resourceName == null || resourceName.trim().isEmpty() || resourceName.trim().length() > 100) {
+            redirectAttributes.addFlashAttribute("message", "Resource name must not be empty and must be under 100 characters.");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/admin/utilities";
+        }
+        if (location == null || location.trim().isEmpty() || location.trim().length() > 100) {
+            redirectAttributes.addFlashAttribute("message", "Resource location must not be empty and must be under 100 characters.");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/admin/utilities";
+        }
+
         utilityService.findById(utilityId).ifPresent(utility -> {
             UtilityResource resource = new UtilityResource();
             resource.setUtility(utility);
