@@ -1,212 +1,762 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>ABMS Admin - System Logs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Logs - ABMS Admin</title>
+    <!-- Include Custom Stylesheet -->
     <link rel="stylesheet" th:href="@{/css/system-logs.css}">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<div class="admin-layout">
+    <!-- Main Form wrapping the workspace for simple form state submission -->
+    <form id="filterForm" method="get" th:action="@{/admin/system-logs}">
+        <!-- Hidden Inputs for Date Filters and Pagination -->
+        <input type="hidden" name="fromDate" id="hiddenFromDate" th:value="${fromDate}">
+        <input type="hidden" name="toDate" id="hiddenToDate" th:value="${toDate}">
+        <input type="hidden" name="page" id="hiddenPage" th:value="${currentPage}">
+    </form>
 
-    <aside class="sidebar">
-        <div>
-            <div class="brand">
-                <h1>ABMS Admin</h1>
-                <p>Management Portal</p>
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">ABMS Admin</div>
+                <div class="sidebar-subtitle">Management Portal</div>
             </div>
-
-            <nav class="menu">
-                <a href="#">▦ Dashboard</a>
-                <a href="#">👥 User Management</a>
-                <a href="#">▦ Building Management</a>
-                <a href="#">▤ Service Catalog</a>
-                <a href="#">▣ Pricing</a>
-                <a href="#">🛠 Utilities</a>
-                <a href="#" class="active">↺ System Logs</a>
-            </nav>
-        </div>
-
-        <button class="logout-btn">↪ Logout</button>
-    </aside>
-
-    <main class="main-content">
-
-        <header class="topbar">
-            <div class="search-box">
-                <span>🔍</span>
-                <input type="text" placeholder="Search by account, entity, action...">
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="#">
+                        <span class="menu-icon">
+                            <!-- Dashboard Icon SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+                            </svg>
+                        </span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <span class="menu-icon">
+                            <!-- User Management SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A11.386 11.386 0 0 1 10.089 20c-2.202 0-4.277-.624-6.04-1.714V19.13c0-2.207 1.777-3.987 4.125-3.987h2.247c2.348 0 4.125 1.78 4.125 3.987v-.003ZM12 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM18.75 6.75a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                            </svg>
+                        </span>
+                        User Management
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <span class="menu-icon">
+                            <!-- Building Management SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M2.25 21h1.5m18 0h-18M5.25 6h4.5m10.5 3v12m0-12v-3.75a1.5 1.5 0 0 0-1.5-1.5H8.25A1.5 1.5 0 0 0 6.75 3.45v13.8M5.25 9.75h4.5m-4.5 3h4.5m-4.5 3h4.5" />
+                            </svg>
+                        </span>
+                        Building Management
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <span class="menu-icon">
+                            <!-- Service Catalog SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-3.75 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                            </svg>
+                        </span>
+                        Service Catalog
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <span class="menu-icon">
+                            <!-- Pricing SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </span>
+                        Pricing
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <span class="menu-icon">
+                            <!-- Utilities SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A1.79 1.79 0 1 1 14.75 23.5l-5.83-5.83M11.42 15.17l2.49-2.49M11.42 15.17l-5.83 5.83A1.79 1.79 0 1 1 3.08 18.5l5.83-5.83M13.91 12.68l-2.49 2.49m2.49-2.49L21 6.83A1.79 1.79 0 1 0 18.5 4.33l-5.83 5.83m-1.25 1.25a2.25 2.25 0 1 1-3.18-3.18 2.25 2.25 0 0 1 3.18 3.18Z" />
+                            </svg>
+                        </span>
+                        Utilities
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a th:href="@{/admin/system-logs}">
+                        <span class="menu-icon">
+                            <!-- System Logs SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.793 1.976 1.808M15 12h.008v.008H15V12Zm0 3h.008v.008H15V15Zm0 3h.008v.008H15V18ZM4.5 6h3.75v12H4.5V6Z" />
+                            </svg>
+                        </span>
+                        System Logs
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a href="#" class="logout-link">
+                    <span class="menu-icon">
+                        <!-- Logout SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                        </svg>
+                    </span>
+                    Logout
+                </a>
             </div>
-
-            <div class="top-actions">
-                <button class="icon-btn">🔔</button>
-                <button class="icon-btn">⚙</button>
-                <button class="export-btn">⬇ EXPORT DATA</button>
-            </div>
-        </header>
-
-        <section class="page-body">
-
-            <div class="stat-card">
-                <div>
-                    <p>TOTAL EVENTS</p>
-                    <h2 th:text="${#numbers.formatInteger(totalEvents, 0, 'COMMA')}">128,492</h2>
+        </aside>
+        
+        <!-- Main Content Panel -->
+        <main class="main-content">
+            
+            <!-- Top Nav Bar -->
+            <div class="top-navbar">
+                <!-- Search bar targeting the main form -->
+                <div class="search-box-wrapper">
+                    <input type="text" form="filterForm" name="search" th:value="${search}" class="search-input" placeholder="Search by account, action, entity...">
+                    <!-- Search Icon SVG -->
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
                 </div>
-                <span class="stat-icon">▣</span>
+                
+                <!-- Action Buttons -->
+                <div class="nav-actions">
+                    <button type="button" class="icon-btn" title="Thông báo">
+                        <!-- Bell SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                        </svg>
+                    </button>
+                    <button type="button" class="icon-btn" title="Cài đặt">
+                        <!-- Gear SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.645-.869L9.594 3.94ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                        </svg>
+                    </button>
+                    <!-- Export Button triggers Javascript to export data -->
+                    <button type="button" class="export-btn" onclick="exportLogs()">
+                        <!-- Export SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                        </svg>
+                        EXPORT DATA
+                    </button>
+                </div>
             </div>
-
-            <form th:action="@{/admin/system-logs}" method="get" id="filterForm">
-
-                <div class="filter-panel">
-
-                    <div class="filter-item">
-                        <label>From Date</label>
-
-                        <button type="button" class="date-input" data-picker-target="from">
-                            <span>📅</span>
-                            <span id="fromDateText"
-                                  th:text="${#temporals.format(fromDate, 'MMM dd, yyyy')}">
-                                Oct 24, 2023
-                            </span>
-                        </button>
-
-                        <input type="hidden"
-                               id="fromDateValue"
-                               name="fromDate"
-                               th:value="${fromDate}">
+            
+            <!-- Cards Row -->
+            <div class="stats-grid">
+                <!-- Total Events -->
+                <div class="stats-card">
+                    <div class="stats-info">
+                        <span class="stats-title">Total Events</span>
+                        <!-- Display total Elements from page object -->
+                        <span class="stats-value" th:text="${#numbers.formatInteger(totalElements, 1, 'COMMA')}">128,492</span>
                     </div>
-
-                    <div class="filter-item">
-                        <label>To Date</label>
-
-                        <button type="button" class="date-input" data-picker-target="to">
-                            <span>📅</span>
-                            <span id="toDateText"
-                                  th:text="${#temporals.format(toDate, 'MMM dd, yyyy')}">
-                                Oct 31, 2023
-                            </span>
-                        </button>
-
-                        <input type="hidden"
-                               id="toDateValue"
-                               name="toDate"
-                               th:value="${toDate}">
+                    <div class="stats-icon-box">
+                        <!-- Log Icon SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 22px; height: 22px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                        </svg>
                     </div>
-
-                    <div class="filter-item role-filter">
-                        <label>User Role</label>
-
-                        <select name="role" onchange="document.getElementById('filterForm').submit()">
-                            <option value="All Roles" th:selected="${role == 'All Roles'}">All Roles</option>
-                            <option value="Admin" th:selected="${role == 'Admin'}">Admin</option>
-                            <option value="Manager" th:selected="${role == 'Manager'}">Manager</option>
-                            <option value="Security Officer" th:selected="${role == 'Security Officer'}">Security Officer</option>
-                            <option value="System" th:selected="${role == 'System'}">System</option>
+                </div>
+            </div>
+            
+            <!-- Date Swapped Warning Alert -->
+            <div class="alert-warning" th:if="${dateSwapped}">
+                <!-- Alert Icon SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width: 18px; height: 18px; flex-shrink: 0;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+                <span><strong>Lưu ý:</strong> Ngày bắt đầu đã được tự động đảo ngược vì lớn hơn ngày kết thúc để hiển thị dữ liệu nhật ký chính xác nhất.</span>
+            </div>
+            
+            <!-- Filter Bar Container -->
+            <div class="filter-bar">
+                <!-- From Date Trigger -->
+                <div class="filter-group">
+                    <label class="filter-label">From Date</label>
+                    <button type="button" class="date-trigger-btn" id="fromDateBtn">
+                        <span style="display: flex; align-items: center; gap: 8px;">
+                            <!-- Calendar Icon SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                            </svg>
+                            <span id="fromDateText">Select Date</span>
+                        </span>
+                        <!-- Chevron Down SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 12px; height: 12px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- To Date Trigger -->
+                <div class="filter-group">
+                    <label class="filter-label">To Date</label>
+                    <button type="button" class="date-trigger-btn" id="toDateBtn">
+                        <span style="display: flex; align-items: center; gap: 8px;">
+                            <!-- Calendar Icon SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                            </svg>
+                            <span id="toDateText">Select Date</span>
+                        </span>
+                        <!-- Chevron Down SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 12px; height: 12px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Role Dropdown -->
+                <div class="filter-group">
+                    <label class="filter-label">User Role</label>
+                    <div class="select-wrapper">
+                        <select name="roleName" form="filterForm" onchange="resetPageAndSubmit()" class="filter-select">
+                            <option th:each="role : ${roles}" th:value="${role}" th:text="${role}" th:selected="${role == selectedRole}"></option>
                         </select>
+                        <span class="select-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 12px; height: 12px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </span>
                     </div>
-
-                    <div id="calendarPopup" class="calendar-popup hidden">
-                        <div class="calendar-header">
-                            <button type="button" id="prevMonth">‹</button>
-                            <h4 id="calendarTitle">October 2023</h4>
-                            <button type="button" id="nextMonth">›</button>
-                        </div>
-
-                        <div class="calendar-weekdays">
-                            <span>SU</span>
-                            <span>MO</span>
-                            <span>TU</span>
-                            <span>WE</span>
-                            <span>TH</span>
-                            <span>FR</span>
-                            <span>SA</span>
-                        </div>
-
-                        <div id="calendarDays" class="calendar-days"></div>
-
-                        <p id="calendarError" class="calendar-error hidden">
-                            To Date must be greater than From Date.
-                        </p>
-
-                        <div class="calendar-actions">
-                            <button type="button" class="btn-cancel" id="cancelDate">Cancel</button>
-                            <button type="button" class="btn-apply" id="applyDate">Apply</button>
-                        </div>
-                    </div>
-
                 </div>
 
-                <p class="date-error"
-                   th:if="${error != null}"
-                   th:text="${error}">
-                    To Date must be greater than From Date.
-                </p>
+                <!-- Reset Filters Button -->
+                <div class="filter-group" th:if="${search != null && search != '' || selectedRole != 'All Roles' || fromDate != null || toDate != null}">
+                    <button type="button" class="reset-filter-btn" onclick="clearAllFilters()">Clear Filters</button>
+                </div>
 
-            </form>
-
-            <div class="table-card">
-                <table>
+                <!-- Shared Custom Calendar Popover Overlay -->
+                <div id="calendarPopover" class="calendar-popover">
+                    <div class="calendar-header">
+                        <button type="button" class="calendar-nav-btn" id="prevMonthBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                            </svg>
+                        </button>
+                        <span class="calendar-month-year" id="monthYearTitle">October 2023</span>
+                        <button type="button" class="calendar-nav-btn" id="nextMonthBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="calendar-grid-header">
+                        <span class="calendar-day-label">Su</span>
+                        <span class="calendar-day-label">Mo</span>
+                        <span class="calendar-day-label">Tu</span>
+                        <span class="calendar-day-label">We</span>
+                        <span class="calendar-day-label">Th</span>
+                        <span class="calendar-day-label">Fr</span>
+                        <span class="calendar-day-label">Sa</span>
+                    </div>
+                    <div class="calendar-days-grid" id="daysGrid">
+                        <!-- Rendered by JS -->
+                    </div>
+                    <div class="calendar-footer">
+                        <button type="button" class="calendar-btn-cancel" onclick="closeCalendar()">Cancel</button>
+                        <button type="button" class="calendar-btn-apply" onclick="applyCalendarDate()">Apply</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Table Container -->
+            <div class="table-container">
+                <table class="logs-table">
                     <thead>
-                    <tr>
-                        <th>CREATED AT</th>
-                        <th>ROLE</th>
-                        <th>ACCOUNT NAME</th>
-                        <th>ACTION</th>
-                        <th>ENTITY TYPE</th>
-                        <th>ACTION</th>
-                    </tr>
+                        <tr>
+                            <th>Created At</th>
+                            <th>Role</th>
+                            <th>Account Name</th>
+                            <th>Action</th>
+                            <th>Entity Type</th>
+                            <th>Action</th>
+                        </tr>
                     </thead>
-
                     <tbody>
-                    <tr th:each="log : ${logs}">
-                        <td th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}">
-                            2023-10-31 14:23:11
-                        </td>
-
-                        <td>
-                            <span class="role-badge"
-                                  th:classappend="${#strings.toLowerCase(#strings.replace(log.role, ' ', '-'))}"
-                                  th:text="${log.role}">
-                                Admin
-                            </span>
-                        </td>
-
-                        <td class="account-name" th:text="${log.accountName}">
-                            Alex Mercer
-                        </td>
-
-                        <td>
-                            <span class="action-text" th:text="${log.action}">
-                                LOGIN
-                            </span>
-                        </td>
-
-                        <td th:text="${log.entityType}">
-                            Account
-                        </td>
-
-                        <td>
-                            <button type="button" class="view-btn">View Details</button>
-                        </td>
-                    </tr>
+                        <!-- Loop through logs using Thymeleaf -->
+                        <tr th:each="log : ${logs}">
+                            <!-- Created At Date Formatting -->
+                            <td th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2023-10-31 14:22:11</td>
+                            
+                            <!-- Role Badge (System Process, Admin, Manager, Security Officer, Resident, Maintenance Staff) -->
+                            <td>
+                                <th:block th:if="${log.account == null}">
+                                    <span class="badge badge-role-system">System</span>
+                                </th:block>
+                                <th:block th:if="${log.account != null}">
+                                    <span class="badge" 
+                                          th:classappend="${log.account.role.roleName == 'Admin' ? 'badge-role-admin' : 
+                                                           (log.account.role.roleName == 'Manager' ? 'badge-role-manager' : 
+                                                           (log.account.role.roleName == 'Security Officer' ? 'badge-role-security' : 'badge-role-default'))}"
+                                          th:text="${log.account.role.roleName}">
+                                        Admin
+                                    </span>
+                                </th:block>
+                            </td>
+                            
+                            <!-- Account Full Name (Fallback to username or System Process if account is null) -->
+                            <td>
+                                <strong th:if="${log.account == null}">System Process</strong>
+                                <span th:if="${log.account != null}" 
+                                      th:text="${log.account.profile != null && log.account.profile.fullName != null ? log.account.profile.fullName : log.account.username}">
+                                    Alex Mercer
+                                </span>
+                            </td>
+                            
+                            <!-- Action Badge -->
+                            <td>
+                                <span class="badge-action" 
+                                      th:classappend="${log.action == 'LOGIN' ? 'action-login' : 
+                                                       (log.action == 'CREATE_BILL' ? 'action-create-bill' : 
+                                                       (log.action == 'LOCK_ACCOUNT' ? 'action-lock-account' : 
+                                                       (log.action == 'CANCEL_BOOKING' ? 'action-cancel-booking' : 
+                                                       (log.action == 'UPDATE_PERMISSIONS' ? 'action-update-permissions' : 'action-default'))))}"
+                                      th:text="${log.action}">
+                                    LOGIN
+                                </span>
+                            </td>
+                            
+                            <!-- Entity Type -->
+                            <td th:text="${log.entityType}">Account</td>
+                            
+                            <!-- Action links -->
+                            <td>
+                                <!-- Pass details dynamically through data attributes for modern JS modal -->
+                                <button type="button" class="view-details-link"
+                                        th:data-id="${log.systemLogId}"
+                                        th:data-timestamp="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}"
+                                        th:data-role="${log.account == null ? 'System' : log.account.role.roleName}"
+                                        th:data-account="${log.account == null ? 'System Process' : (log.account.profile != null ? log.account.profile.fullName : log.account.username)}"
+                                        th:data-action="${log.action}"
+                                        th:data-entitytype="${log.entityType}"
+                                        th:data-entityid="${log.entityId}"
+                                        th:data-ip="${log.ipAddress}"
+                                        onclick="openDetailsModal(this)">
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Empty State if no logs found -->
+                        <tr th:if="${logs.empty}">
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 48px; height: 48px; display: inline-block;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                                    </svg>
+                                    <p>Không tìm thấy nhật ký hệ thống nào khớp với bộ lọc.</p>
+                                </div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Pagination Section -->
+            <div class="pagination-wrapper" th:if="${totalPages > 1}">
+                <!-- Previous Page Button -->
+                <a th:href="@{/admin/system-logs(page=${currentPage - 1}, size=${pageSize}, search=${search}, roleName=${selectedRole}, fromDate=${fromDate}, toDate=${toDate})}"
+                   class="pagination-btn" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                </a>
 
-                <div class="pagination">
-                    <button type="button">‹</button>
-                    <button type="button" class="page-active">1</button>
-                    <button type="button">2</button>
-                    <button type="button">3</button>
-                    <span>...</span>
-                    <button type="button">569</button>
-                    <button type="button">›</button>
+                <!-- First Page -->
+                <a th:href="@{/admin/system-logs(page=0, size=${pageSize}, search=${search}, roleName=${selectedRole}, fromDate=${fromDate}, toDate=${toDate})}"
+                   class="pagination-btn" th:classappend="${currentPage == 0} ? 'active' : ''" th:text="1">1</a>
+
+                <!-- Ellipsis if current page is far from beginning -->
+                <span class="pagination-ellipsis" th:if="${currentPage > 2}">...</span>
+
+                <!-- Middle Page Numbers -->
+                <th:block th:each="idx : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a th:if="${idx > 0 && idx < totalPages - 1 && idx >= currentPage - 1 && idx <= currentPage + 1}"
+                       th:href="@{/admin/system-logs(page=${idx}, size=${pageSize}, search=${search}, roleName=${selectedRole}, fromDate=${fromDate}, toDate=${toDate})}"
+                       class="pagination-btn" th:classappend="${idx == currentPage} ? 'active' : ''" th:text="${idx + 1}">2</a>
+                </th:block>
+
+                <!-- Ellipsis if current page is far from end -->
+                <span class="pagination-ellipsis" th:if="${currentPage < totalPages - 3}">...</span>
+
+                <!-- Last Page (only if totalPages > 1) -->
+                <a th:href="@{/admin/system-logs(page=${totalPages - 1}, size=${pageSize}, search=${search}, roleName=${selectedRole}, fromDate=${fromDate}, toDate=${toDate})}"
+                   class="pagination-btn" th:classappend="${currentPage == totalPages - 1} ? 'active' : ''" th:text="${totalPages}">10</a>
+
+                <!-- Next Page Button -->
+                <a th:href="@{/admin/system-logs(page=${currentPage + 1}, size=${pageSize}, search=${search}, roleName=${selectedRole}, fromDate=${fromDate}, toDate=${toDate})}"
+                   class="pagination-btn" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                </a>
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- Log Details Modal Popup overlay -->
+    <div id="detailsModal" class="modal-overlay" onclick="closeDetailsModalOnOverlay(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">Chi tiết Nhật ký Hệ thống</h3>
+                <button type="button" class="modal-close-x" onclick="closeDetailsModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="details-grid">
+                    <span class="details-label">Log ID</span>
+                    <span class="details-value" id="modalLogId">#128492</span>
+                    
+                    <span class="details-label">Thời gian</span>
+                    <span class="details-value" id="modalTimestamp">2023-10-31 14:22:11</span>
+                    
+                    <span class="details-label">Tài khoản</span>
+                    <span class="details-value" id="modalAccount">Alex Mercer</span>
+                    
+                    <span class="details-label">Vai trò</span>
+                    <span class="details-value" id="modalRole">Admin</span>
+                    
+                    <span class="details-label">Hành động</span>
+                    <span class="details-value" id="modalAction" style="font-weight: 600; color: #7c3aed;">LOGIN</span>
+                    
+                    <span class="details-label">Loại thực thể</span>
+                    <span class="details-value" id="modalEntityType">Account</span>
+                    
+                    <span class="details-label">ID thực thể</span>
+                    <span class="details-value" id="modalEntityId">12</span>
+                    
+                    <span class="details-label">Địa chỉ IP</span>
+                    <span class="details-value" id="modalIpAddress">192.168.1.100</span>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn-close" onclick="closeDetailsModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
 
-        </section>
-    </main>
-</div>
-
-<script th:src="@{/js/system-logs.js}"></script>
+    <!-- Calendar Javascript Logic -->
+    <script>
+        // DOM Elements
+        const fromDateBtn = document.getElementById('fromDateBtn');
+        const toDateBtn = document.getElementById('toDateBtn');
+        const fromDateText = document.getElementById('fromDateText');
+        const toDateText = document.getElementById('toDateText');
+        
+        const hiddenFromDate = document.getElementById('hiddenFromDate');
+        const hiddenToDate = document.getElementById('hiddenToDate');
+        const hiddenPage = document.getElementById('hiddenPage');
+        
+        const calendarPopover = document.getElementById('calendarPopover');
+        const monthYearTitle = document.getElementById('monthYearTitle');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+        const daysGrid = document.getElementById('daysGrid');
+        
+        // Month Names
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        
+        const monthNamesShort = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
+        
+        // Calendar Internal State
+        let activePicker = null; // 'from' or 'to'
+        let displayMonth = new Date().getMonth();
+        let displayYear = new Date().getFullYear();
+        let tempSelectedDate = null;
+        
+        // Helper to format date display (e.g. "Oct 24, 2023")
+        function formatDateToDisplayStr(dateStr) {
+            if (!dateStr || dateStr === 'null') return 'Select Date';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const year = parts[0];
+            const monthIdx = parseInt(parts[1], 10) - 1;
+            const day = parseInt(parts[2], 10);
+            return `${monthNamesShort[monthIdx]} ${day}, ${year}`;
+        }
+        
+        // Format Date to YYYY-MM-DD
+        function formatDateToISO(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+        
+        // Initialize triggers display value on page load
+        if (hiddenFromDate.value) {
+            fromDateText.innerText = formatDateToDisplayStr(hiddenFromDate.value);
+        }
+        if (hiddenToDate.value) {
+            toDateText.innerText = formatDateToDisplayStr(hiddenToDate.value);
+        }
+        
+        // Open Calendar Popover
+        function openCalendar(pickerType, triggerBtn) {
+            activePicker = pickerType;
+            
+            // Positioning Popover directly beneath active button trigger
+            const rect = triggerBtn.getBoundingClientRect();
+            const parentRect = triggerBtn.offsetParent.getBoundingClientRect();
+            
+            calendarPopover.style.left = `${rect.left - parentRect.left}px`;
+            calendarPopover.style.top = `${rect.bottom - parentRect.top + 8}px`;
+            
+            // Set initial month/year based on hidden input value or current date
+            const dateVal = pickerType === 'from' ? hiddenFromDate.value : hiddenToDate.value;
+            let dateObj = new Date();
+            if (dateVal) {
+                const parts = dateVal.split('-');
+                if (parts.length === 3) {
+                    dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+                }
+            }
+            
+            displayMonth = dateObj.getMonth();
+            displayYear = dateObj.getFullYear();
+            tempSelectedDate = dateObj;
+            
+            renderCalendar();
+            calendarPopover.classList.add('show');
+        }
+        
+        // Render Days in Month Grid
+        function renderCalendar() {
+            // Update Header
+            monthYearTitle.innerText = `${monthNames[displayMonth]} ${displayYear}`;
+            daysGrid.innerHTML = '';
+            
+            // 1st day of the display month
+            const firstDayOfMonth = new Date(displayYear, displayMonth, 1).getDay();
+            // Total days in display month
+            const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
+            
+            // Render blank cells for offset days
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-day-cell empty-day';
+                daysGrid.appendChild(emptyCell);
+            }
+            
+            // Render actual days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('button');
+                dayCell.type = 'button';
+                dayCell.className = 'calendar-day-cell';
+                dayCell.innerText = day;
+                
+                const currentCellDate = new Date(displayYear, displayMonth, day);
+                
+                // Highlight selected day
+                if (tempSelectedDate && 
+                    currentCellDate.getDate() === tempSelectedDate.getDate() && 
+                    currentCellDate.getMonth() === tempSelectedDate.getMonth() && 
+                    currentCellDate.getFullYear() === tempSelectedDate.getFullYear()) {
+                    dayCell.classList.add('selected-day');
+                }
+                
+                // Add select click handler
+                dayCell.addEventListener('click', () => {
+                    tempSelectedDate = currentCellDate;
+                    renderCalendar(); // Rerender to show highlights
+                });
+                
+                daysGrid.appendChild(dayCell);
+            }
+        }
+        
+        // Month Navigation handlers
+        prevMonthBtn.addEventListener('click', () => {
+            if (displayMonth === 0) {
+                displayMonth = 11;
+                displayYear--;
+            } else {
+                displayMonth--;
+            }
+            renderCalendar();
+        });
+        
+        nextMonthBtn.addEventListener('click', () => {
+            if (displayMonth === 11) {
+                displayMonth = 0;
+                displayYear++;
+            } else {
+                displayMonth++;
+            }
+            renderCalendar();
+        });
+        
+        // Close calendar popover
+        function closeCalendar() {
+            calendarPopover.classList.remove('show');
+            activePicker = null;
+        }
+        
+        // Apply Selected Date
+        function applyCalendarDate() {
+            if (tempSelectedDate) {
+                const isoStr = formatDateToISO(tempSelectedDate);
+                const displayStr = formatDateToDisplayStr(isoStr);
+                
+                if (activePicker === 'from') {
+                    hiddenFromDate.value = isoStr;
+                    fromDateText.innerText = displayStr;
+                } else if (activePicker === 'to') {
+                    hiddenToDate.value = isoStr;
+                    toDateText.innerText = displayStr;
+                }
+                
+                // Business logic check: If fromDate > toDate, swap them on client-side automatically
+                const fromVal = hiddenFromDate.value;
+                const toVal = hiddenToDate.value;
+                if (fromVal && toVal) {
+                    const fd = new Date(fromVal);
+                    const td = new Date(toVal);
+                    if (fd > td) {
+                        hiddenFromDate.value = toVal;
+                        hiddenToDate.value = fromVal;
+                        
+                        fromDateText.innerText = formatDateToDisplayStr(toVal);
+                        toDateText.innerText = formatDateToDisplayStr(fromVal);
+                    }
+                }
+                
+                // Submit Form
+                resetPageAndSubmit();
+            }
+            closeCalendar();
+        }
+        
+        // Click trigger buttons toggle opening
+        fromDateBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (calendarPopover.classList.contains('show') && activePicker === 'from') {
+                closeCalendar();
+            } else {
+                openCalendar('from', fromDateBtn);
+            }
+        });
+        
+        toDateBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (calendarPopover.classList.contains('show') && activePicker === 'to') {
+                closeCalendar();
+            } else {
+                openCalendar('to', toDateBtn);
+            }
+        });
+        
+        // Click outside closes calendar popover
+        document.addEventListener('click', (e) => {
+            if (!calendarPopover.contains(e.target) && e.target !== fromDateBtn && e.target !== toDateBtn && !fromDateBtn.contains(e.target) && !toDateBtn.contains(e.target)) {
+                closeCalendar();
+            }
+        });
+        
+        // Form Submit Helper: Reset Page when new filters are applied
+        function resetPageAndSubmit() {
+            hiddenPage.value = 0;
+            document.getElementById('filterForm').submit();
+        }
+        
+        // Clear all filters action
+        function clearAllFilters() {
+            hiddenFromDate.value = '';
+            hiddenToDate.value = '';
+            document.querySelector('.search-input').value = '';
+            document.querySelector('.filter-select').value = 'All Roles';
+            resetPageAndSubmit();
+        }
+    </script>
+    
+    <!-- Modal Detail Javascript Logic -->
+    <script>
+        const detailsModal = document.getElementById('detailsModal');
+        
+        function openDetailsModal(btn) {
+            // Read dataset attributes
+            const id = btn.getAttribute('data-id');
+            const timestamp = btn.getAttribute('data-timestamp');
+            const accountName = btn.getAttribute('data-account');
+            const role = btn.getAttribute('data-role');
+            const action = btn.getAttribute('data-action');
+            const entityType = btn.getAttribute('data-entitytype');
+            const entityId = btn.getAttribute('data-entityid');
+            const ip = btn.getAttribute('data-ip');
+            
+            // Populate modal elements
+            document.getElementById('modalLogId').innerText = `#${id}`;
+            document.getElementById('modalTimestamp').innerText = timestamp;
+            document.getElementById('modalAccount').innerText = accountName;
+            document.getElementById('modalRole').innerText = role;
+            
+            const actionEl = document.getElementById('modalAction');
+            actionEl.innerText = action;
+            
+            // Add custom action color styling class to action in modal
+            actionEl.className = 'details-value';
+            if (action === 'LOGIN') actionEl.style.color = '#2563eb';
+            else if (action === 'CREATE_BILL') actionEl.style.color = '#16a34a';
+            else if (action === 'LOCK_ACCOUNT') actionEl.style.color = '#dc2626';
+            else if (action === 'CANCEL_BOOKING') actionEl.style.color = '#ea580c';
+            else if (action === 'UPDATE_PERMISSIONS') actionEl.style.color = '#7c3aed';
+            else actionEl.style.color = '#475569';
+            
+            document.getElementById('modalEntityType').innerText = entityType ? entityType : 'None';
+            document.getElementById('modalEntityId').innerText = entityId ? entityId : 'N/A';
+            document.getElementById('modalIpAddress').innerText = ip ? ip : 'Unknown';
+            
+            // Show modal with animation classes
+            detailsModal.classList.add('show');
+        }
+        
+        function closeDetailsModal() {
+            detailsModal.classList.remove('show');
+        }
+        
+        function closeDetailsModalOnOverlay(e) {
+            if (e.target === detailsModal) {
+                closeDetailsModal();
+            }
+        }
+        
+        // Export Logs Handler
+        function exportLogs() {
+            // Simulated export notification
+            alert('Xuất dữ liệu thành công! Bản xuất dữ liệu Excel (.xlsx) đã được chuẩn bị cho các bộ lọc hiện tại.');
+        }
+    </script>
 </body>
 </html>

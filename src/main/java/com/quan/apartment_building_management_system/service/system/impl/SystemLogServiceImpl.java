@@ -116,4 +116,22 @@ public class SystemLogServiceImpl implements SystemLogService {
 
         return countFromDatabase;
     }
+
+    @Override
+    public org.springframework.data.domain.Page<SystemLog> searchLogs(String search, String roleName, LocalDate fromDate, LocalDate toDate, org.springframework.data.domain.Pageable pageable) {
+        // Date range business logic validation: Swap if fromDate is after toDate to avoid empty results due to user error
+        if (fromDate != null && toDate != null && fromDate.isAfter(toDate)) {
+            LocalDate temp = fromDate;
+            fromDate = toDate;
+            toDate = temp;
+        }
+
+        // Set start time to 00:00:00 of fromDate
+        LocalDateTime startDateTime = fromDate != null ? fromDate.atStartOfDay() : null;
+        
+        // Set end time to 23:59:59.999999999 of toDate to include all logs within that day
+        LocalDateTime endDateTime = toDate != null ? toDate.atTime(java.time.LocalTime.MAX) : null;
+
+        return systemLogRepository.searchLogs(search, roleName, startDateTime, endDateTime, pageable);
+    }
 }
