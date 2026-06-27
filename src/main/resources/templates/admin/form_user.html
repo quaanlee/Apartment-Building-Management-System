@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
-      th:replace="~{layout/admin/layout :: admin-layout(~{::main}, 'users')}">
+      th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'users')}">
 <head>
     <meta charset="UTF-8">
     <title th:text="${userDto.profileId == null ? 'Create User' : 'Edit User'}">Create User</title>

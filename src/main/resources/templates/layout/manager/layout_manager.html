@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ABMS Manager Portal</title>
     <!-- CSS File -->
-    <link rel="stylesheet" th:href="@{/css/manager/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/layout/manager_layout.css}">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -57,6 +57,12 @@
                         <span>Amenity Bookings</span>
                     </a>
                 </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'service & utility' ? 'active' : ''}">
+                    <a th:href="@{#}">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Service & Utility</span>
+                    </a>
+                </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'vehicles' ? 'active' : ''}">
                     <a th:href="@{#}">
                         <i class="fa-solid fa-car"></i>
@@ -64,13 +70,14 @@
                     </a>
                 </li>
             </ul>
-            
+
             <div class="sidebar-footer">
                 <a th:href="@{/logout}" class="logout-btn">
                     <i class="fa-solid fa-right-from-bracket"></i>
                     <span>Logout</span>
                 </a>
             </div>
+
         </aside>
 
         <!-- Main Panel (Header + Main Content) -->
@@ -93,18 +100,10 @@
                         <span class="badge"></span>
                     </button>
                     
-                    <div class="user-profile-trigger" id="userProfileTrigger">
+                    <a th:href="@{/manager/profiles}" class="user-profile-trigger" id="userProfileTrigger" style="text-decoration: none;">
                         <div class="user-avatar-placeholder">M</div>
                         <span class="user-role">Manager Staff</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                        
-                        <!-- Dropdown Menu -->
-                        <div class="profile-dropdown" id="profileDropdown">
-                            <a th:href="@{#}"><i class="fa-solid fa-user"></i> My Profile</a>
-                            <hr>
-                            <a th:href="@{/logout}" class="dropdown-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </header>
             
@@ -122,13 +121,13 @@
     <!-- Toast Notification Container -->
     <div class="toast-container" id="toastContainer"></div>
     
-    <!-- Toast message data bridge for external layout.js script -->
+    <!-- Toast message data bridge for external layout_admin.js script -->
     <div id="toastMessageData"
          th:if="${message != null}"
          th:data-message="${message}" 
          th:data-type="${messageType != null ? messageType : 'success'}" 
          style="display: none;"></div>
 
-    <script th:src="@{/js/manager/layout.js}"></script>
+    <script th:src="@{/js/layout/layout_manager.js}"></script>
 </body>
 </html>

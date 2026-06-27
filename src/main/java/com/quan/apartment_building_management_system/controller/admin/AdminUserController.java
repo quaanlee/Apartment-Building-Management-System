@@ -81,7 +81,7 @@ public class AdminUserController {
 
         model.addAttribute("activeTab", "users");
 
-        return "list_users";
+        return "admin/list_users";
     }
 
     @PostMapping("/admin/users/{id}/toggle-lock")
