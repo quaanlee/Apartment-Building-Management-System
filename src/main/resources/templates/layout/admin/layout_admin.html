@@ -105,13 +105,13 @@
     <!-- Toast Notification Container -->
     <div class="toast-container" id="toastContainer"></div>
     
-    <!-- Toast message data bridge for external layout.js script -->
+    <!-- Toast message data bridge for external layout_admin.js script -->
     <div id="toastMessageData"
          th:if="${message != null}"
          th:data-message="${message}" 
          th:data-type="${messageType != null ? messageType : 'success'}" 
          style="display: none;"></div>
 
-    <script th:src="@{/js/layout/layout.js}"></script>
+    <script th:src="@{/js/layout/layout_admin.js}"></script>
 </body>
 </html>
