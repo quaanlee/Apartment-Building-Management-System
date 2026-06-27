@@ -18,4 +18,6 @@ public interface ServiceItemService {
     ServiceItem save(ServiceItem serviceItem);
 
     void deleteById(Integer id);
+
+    List<ServiceItem> searchServices(String keyword, Boolean status);
 }
