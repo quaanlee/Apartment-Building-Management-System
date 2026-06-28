@@ -1,0 +1,468 @@
+<div th:replace="~{layout/admin/layout :: admin-layout(~{::content}, 'logs')}">
+    <div th:fragment="content">
+        <!-- Load custom page styling -->
+        <link rel="stylesheet" th:href="@{/css/admin/logs.css}">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- PAGE HEADER                                                  -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="logs-page-header">
+            <h2 class="logs-page-title">System Logs</h2>
+            <button class="logs-export-btn" id="exportBtn">
+                <span class="material-symbols-outlined">download</span>
+                EXPORT DATA
+            </button>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- STATS CARDS                                                 -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="logs-stats-grid">
+            <div class="logs-stat-card">
+                <div class="logs-stat-header">
+                    <span class="logs-stat-label">TOTAL EVENTS</span>
+                    <span class="material-symbols-outlined logs-stat-icon primary">analytics</span>
+                </div>
+                <div class="logs-stat-value-row">
+                    <span class="logs-stat-number" th:text="${totalEvents != null ? totalEvents : '128,492'}">128,492</span>
+                    <span class="logs-badge-primary">+12%</span>
+                </div>
+            </div>
+            <div class="logs-stat-card">
+                <div class="logs-stat-header">
+                    <span class="logs-stat-label">SECURITY ALERTS</span>
+                    <span class="material-symbols-outlined logs-stat-icon error">security</span>
+                </div>
+                <div class="logs-stat-value-row">
+                    <span class="logs-stat-number error" th:text="${securityAlerts != null ? securityAlerts : '42'}">42</span>
+                    <span class="logs-badge-error">Critical</span>
+                </div>
+            </div>
+            <div class="logs-stat-card">
+                <div class="logs-stat-header">
+                    <span class="logs-stat-label">STORAGE USAGE</span>
+                    <span class="material-symbols-outlined logs-stat-icon primary">database</span>
+                </div>
+                <div class="logs-stat-value-row">
+                    <span class="logs-stat-number" th:text="${storageUsed != null ? storageUsed : '1.2 GB'}">1.2 GB</span>
+                    <span class="logs-stat-sub">of 5.0 GB</span>
+                </div>
+            </div>
+            <div class="logs-stat-card">
+                <div class="logs-stat-header">
+                    <span class="logs-stat-label">SYSTEM STATUS</span>
+                    <span class="material-symbols-outlined logs-stat-icon success">check_circle</span>
+                </div>
+                <div class="logs-stat-value-row">
+                    <span class="logs-stat-number success">Healthy</span>
+                    <span class="logs-stat-sub success">Stable</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- FILTER BAR                                                   -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <form method="get" th:action="@{/admin/logs}" id="filterForm" class="logs-filter-bar">
+            <!-- From Date -->
+            <div class="logs-filter-group">
+                <label class="logs-filter-label">From Date</label>
+                <div class="logs-date-input-wrapper" id="fromDateWrapper">
+                    <span class="material-symbols-outlined logs-date-icon">calendar_today</span>
+                    <input type="text" id="fromDateDisplay" class="logs-date-display"
+                           th:value="${fromDate != null ? fromDate : ''}"
+                           placeholder="Select date" readonly>
+                    <input type="hidden" id="fromDate" name="fromDate" th:value="${fromDate}">
+                </div>
+                <!-- Calendar Picker -->
+                <div class="logs-calendar-dropdown" id="fromCalendar">
+                    <div class="cal-header">
+                        <button type="button" class="cal-nav" id="fromPrev">&lt;</button>
+                        <span class="cal-month-year" id="fromMonthYear"></span>
+                        <button type="button" class="cal-nav" id="fromNext">&gt;</button>
+                    </div>
+                    <div class="cal-weekdays">
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                    </div>
+                    <div class="cal-days" id="fromDays"></div>
+                    <div class="cal-actions">
+                        <button type="button" class="cal-cancel" id="fromCancel">Cancel</button>
+                        <button type="button" class="cal-apply" id="fromApply">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- To Date -->
+            <div class="logs-filter-group">
+                <label class="logs-filter-label">To Date</label>
+                <div class="logs-date-input-wrapper" id="toDateWrapper">
+                    <span class="material-symbols-outlined logs-date-icon">calendar_today</span>
+                    <input type="text" id="toDateDisplay" class="logs-date-display"
+                           th:value="${toDate != null ? toDate : ''}"
+                           placeholder="Select date" readonly>
+                    <input type="hidden" id="toDate" name="toDate" th:value="${toDate}">
+                </div>
+                <div class="logs-calendar-dropdown" id="toCalendar">
+                    <div class="cal-header">
+                        <button type="button" class="cal-nav" id="toPrev">&lt;</button>
+                        <span class="cal-month-year" id="toMonthYear"></span>
+                        <button type="button" class="cal-nav" id="toNext">&gt;</button>
+                    </div>
+                    <div class="cal-weekdays">
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                    </div>
+                    <div class="cal-days" id="toDays"></div>
+                    <div class="cal-actions">
+                        <button type="button" class="cal-cancel" id="toCancel">Cancel</button>
+                        <button type="button" class="cal-apply" id="toApply">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Role -->
+            <div class="logs-filter-group">
+                <label class="logs-filter-label">User Role</label>
+                <select name="userRole" id="userRoleSelect" class="logs-filter-select">
+                    <option value="" th:selected="${userRole == null or userRole == ''}">All Roles</option>
+                    <option value="SUPER_ADMIN" th:selected="${userRole == 'SUPER_ADMIN'}">Super Admin</option>
+                    <option value="ADMIN" th:selected="${userRole == 'ADMIN'}">Admin</option>
+                    <option value="MANAGER" th:selected="${userRole == 'MANAGER'}">Manager</option>
+                    <option value="MAINTAINER" th:selected="${userRole == 'MAINTAINER'}">Maintainer</option>
+                    <option value="RESIDENT" th:selected="${userRole == 'RESIDENT'}">Resident</option>
+                    <option value="SYSTEM" th:selected="${userRole == 'SYSTEM'}">System</option>
+                </select>
+            </div>
+
+            <!-- Action Type -->
+            <div class="logs-filter-group">
+                <label class="logs-filter-label">Action</label>
+                <select name="action" id="actionSelect" class="logs-filter-select">
+                    <option value="" th:selected="${action == null or action == ''}">All Actions</option>
+                    <option value="LOGIN" th:selected="${action == 'LOGIN'}">LOGIN</option>
+                    <option value="LOGOUT" th:selected="${action == 'LOGOUT'}">LOGOUT</option>
+                    <option value="CREATE_BILL" th:selected="${action == 'CREATE_BILL'}">CREATE_BILL</option>
+                    <option value="LOCK_ACCOUNT" th:selected="${action == 'LOCK_ACCOUNT'}">LOCK_ACCOUNT</option>
+                    <option value="DELETE_BOOKING" th:selected="${action == 'DELETE_BOOKING'}">DELETE_BOOKING</option>
+                    <option value="AUTO_BACKUP" th:selected="${action == 'AUTO_BACKUP'}">AUTO_BACKUP</option>
+                    <option value="UPDATE_PERMISSIONS" th:selected="${action == 'UPDATE_PERMISSIONS'}">UPDATE_PERMISSIONS</option>
+                    <option value="CANCEL_BOOKING" th:selected="${action == 'CANCEL_BOOKING'}">CANCEL_BOOKING</option>
+                </select>
+            </div>
+
+            <div class="logs-filter-actions">
+                <button type="submit" class="logs-apply-btn">Apply Filters</button>
+                <a th:href="@{/admin/logs}" class="logs-clear-btn">CLEAR ALL FILTERS</a>
+            </div>
+        </form>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- DATA TABLE                                                   -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="logs-table-card">
+            <div class="logs-table-wrapper">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>SYSTEM LOG ID</th>
+                            <th>ROLE</th>
+                            <th>ACCOUNT NAME</th>
+                            <th>ACTION</th>
+                            <th>ENTITY TYPE</th>
+                            <th>ENTITY ID</th>
+                            <th>IP ADDRESS</th>
+                            <th>CREATED AT</th>
+                            <th class="text-right">DETAILS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Thymeleaf loop: th:each="log : ${logs}" -->
+                        <tr class="logs-table-row" th:each="log : ${logs}"
+                            th:data-logid="${log.logId}"
+                            th:data-logtime="${log.createdAt}"
+                            th:data-action="${log.action}"
+                            th:data-role="${log.role}"
+                            th:data-accountname="${log.accountName}"
+                            th:data-entitytype="${log.entityType}"
+                            th:data-entityid="${log.entityId}"
+                            th:data-ip="${log.ipAddress}"
+                            th:data-details="${log.details}">
+                            <td class="logs-td-mono" th:text="${log.logId}">LOG-829104</td>
+                            <td>
+                                <!-- Role badge with color by role -->
+                                <span class="logs-role-badge"
+                                      th:classappend="${log.role == 'SUPER_ADMIN' ? ' role-super-admin' :
+                                                       log.role == 'ADMIN' ? ' role-admin' :
+                                                       log.role == 'MANAGER' ? ' role-manager' :
+                                                       log.role == 'MAINTAINER' ? ' role-maintainer' :
+                                                       log.role == 'RESIDENT' ? ' role-resident' :
+                                                       log.role == 'SYSTEM' ? ' role-system' : ' role-default'}"
+                                      th:text="${log.role}">ADMIN</span>
+                            </td>
+                            <td>
+                                <div class="logs-account-cell">
+                                    <div class="logs-avatar"
+                                         th:classappend="${log.role == 'SUPER_ADMIN' ? ' avatar-super-admin' :
+                                                          log.role == 'ADMIN' ? ' avatar-admin' :
+                                                          log.role == 'MANAGER' ? ' avatar-manager' :
+                                                          log.role == 'MAINTAINER' ? ' avatar-maintainer' :
+                                                          log.role == 'RESIDENT' ? ' avatar-resident' :
+                                                          log.role == 'SYSTEM' ? ' avatar-system' : ' avatar-default'}"
+                                         th:text="${log.initials}">AM</div>
+                                    <span class="logs-account-name" th:text="${log.accountName}">Alex Mercer</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="logs-action-badge" th:text="${log.action}">LOGIN</span>
+                            </td>
+                            <td class="logs-td-secondary" th:text="${log.entityType}">Account</td>
+                            <td class="logs-td-mono" th:text="${log.entityId}">ACC-001</td>
+                            <td class="logs-td-mono logs-td-secondary" th:text="${log.ipAddress}">192.168.1.1</td>
+                            <td class="logs-td-secondary logs-td-nowrap" th:text="${log.createdAt}">2023-10-31 14:23:11</td>
+                            <td class="text-right">
+                                <button class="logs-eye-btn" title="View Details"
+                                        th:onclick="|openLogDetail(this.closest('tr'))|">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Static demo rows if no Thymeleaf data (for preview/development) -->
+                        <tr class="logs-table-row" th:if="${logs == null or logs.isEmpty()}"
+                            data-logid="LOG-829104" data-logtime="2023-10-31 14:23:11" data-action="LOCK_ACCOUNT"
+                            data-role="SUPER_ADMIN" data-accountname="Alex Mercer" data-entitytype="Account"
+                            data-entityid="ACC-10492" data-ip="192.168.1.42"
+                            data-details='{"reason":"Suspicious login attempts","lock_duration":"Indefinite"}'>
+                            <td class="logs-td-mono">LOG-829104</td>
+                            <td><span class="logs-role-badge role-super-admin">SUPER_ADMIN</span></td>
+                            <td>
+                                <div class="logs-account-cell">
+                                    <div class="logs-avatar avatar-super-admin">AM</div>
+                                    <span class="logs-account-name">Alex Mercer</span>
+                                </div>
+                            </td>
+                            <td><span class="logs-action-badge">LOCK_ACCOUNT</span></td>
+                            <td class="logs-td-secondary">Account</td>
+                            <td class="logs-td-mono">ACC-10492</td>
+                            <td class="logs-td-mono logs-td-secondary">192.168.1.42</td>
+                            <td class="logs-td-secondary logs-td-nowrap">2023-10-31 14:23:11</td>
+                            <td class="text-right">
+                                <button class="logs-eye-btn" title="View Details" onclick="openLogDetail(this.closest('tr'))">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="logs-table-row" th:if="${logs == null or logs.isEmpty()}"
+                            data-logid="LOG-829103" data-logtime="2023-10-31 14:15:04" data-action="CREATE_BILL"
+                            data-role="MANAGER" data-accountname="Jane Doe" data-entitytype="Bill"
+                            data-entityid="INV-8821" data-ip="2001:0db8::7334"
+                            data-details='{"amount":1500000,"currency":"VND"}'>
+                            <td class="logs-td-mono">LOG-829103</td>
+                            <td><span class="logs-role-badge role-manager">MANAGER</span></td>
+                            <td>
+                                <div class="logs-account-cell">
+                                    <div class="logs-avatar avatar-manager">JD</div>
+                                    <span class="logs-account-name">Jane Doe</span>
+                                </div>
+                            </td>
+                            <td><span class="logs-action-badge">CREATE_BILL</span></td>
+                            <td class="logs-td-secondary">Bill</td>
+                            <td class="logs-td-mono">INV-8821</td>
+                            <td class="logs-td-mono logs-td-secondary">2001:0db8::7334</td>
+                            <td class="logs-td-secondary logs-td-nowrap">2023-10-31 14:15:04</td>
+                            <td class="text-right">
+                                <button class="logs-eye-btn" title="View Details" onclick="openLogDetail(this.closest('tr'))">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="logs-table-row" th:if="${logs == null or logs.isEmpty()}"
+                            data-logid="LOG-829102" data-logtime="2023-10-31 13:58:22" data-action="LOGIN"
+                            data-role="ADMIN" data-accountname="Alex Mercer" data-entitytype="Account"
+                            data-entityid="ACC-9921" data-ip="192.168.1.42"
+                            data-details='{"session_id":"auth_83fa92","browser":"Chrome 118"}'>
+                            <td class="logs-td-mono">LOG-829102</td>
+                            <td><span class="logs-role-badge role-admin">ADMIN</span></td>
+                            <td>
+                                <div class="logs-account-cell">
+                                    <div class="logs-avatar avatar-admin">AM</div>
+                                    <span class="logs-account-name">Alex Mercer</span>
+                                </div>
+                            </td>
+                            <td><span class="logs-action-badge">LOGIN</span></td>
+                            <td class="logs-td-secondary">Account</td>
+                            <td class="logs-td-mono">ACC-9921</td>
+                            <td class="logs-td-mono logs-td-secondary">192.168.1.42</td>
+                            <td class="logs-td-secondary logs-td-nowrap">2023-10-31 13:58:22</td>
+                            <td class="text-right">
+                                <button class="logs-eye-btn" title="View Details" onclick="openLogDetail(this.closest('tr'))">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="logs-table-row" th:if="${logs == null or logs.isEmpty()}"
+                            data-logid="LOG-829101" data-logtime="2023-10-31 13:00:00" data-action="AUTO_BACKUP"
+                            data-role="SYSTEM" data-accountname="System Process" data-entitytype="System"
+                            data-entityid="SYS-001" data-ip="127.0.0.1"
+                            data-details='{"backup_size":"1.2GB","destination":"/backups/2023-10-31"}'>
+                            <td class="logs-td-mono">LOG-829101</td>
+                            <td><span class="logs-role-badge role-system">SYSTEM</span></td>
+                            <td>
+                                <div class="logs-account-cell">
+                                    <div class="logs-avatar avatar-system">SP</div>
+                                    <span class="logs-account-name">System Process</span>
+                                </div>
+                            </td>
+                            <td><span class="logs-action-badge">AUTO_BACKUP</span></td>
+                            <td class="logs-td-secondary">System</td>
+                            <td class="logs-td-mono">SYS-001</td>
+                            <td class="logs-td-mono logs-td-secondary">127.0.0.1</td>
+                            <td class="logs-td-secondary logs-td-nowrap">2023-10-31 13:00:00</td>
+                            <td class="text-right">
+                                <button class="logs-eye-btn" title="View Details" onclick="openLogDetail(this.closest('tr'))">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="logs-table-row" th:if="${logs == null or logs.isEmpty()}"
+                            data-logid="LOG-829100" data-logtime="2023-10-31 12:10:55" data-action="DELETE_BOOKING"
+                            data-role="RESIDENT" data-accountname="Ryan Smith" data-entitytype="Booking"
+                            data-entityid="BKG-44521" data-ip="10.0.0.15"
+                            data-details='{"reason":"User request","booking_date":"2023-11-05"}'>
+                            <td class="logs-td-mono">LOG-829100</td>
+                            <td><span class="logs-role-badge role-resident">RESIDENT</span></td>
+                            <td>
+                                <div class="logs-account-cell">
+                                    <div class="logs-avatar avatar-resident">RS</div>
+                                    <span class="logs-account-name">Ryan Smith</span>
+                                </div>
+                            </td>
+                            <td><span class="logs-action-badge">DELETE_BOOKING</span></td>
+                            <td class="logs-td-secondary">Booking</td>
+                            <td class="logs-td-mono">BKG-44521</td>
+                            <td class="logs-td-mono logs-td-secondary">10.0.0.15</td>
+                            <td class="logs-td-secondary logs-td-nowrap">2023-10-31 12:10:55</td>
+                            <td class="text-right">
+                                <button class="logs-eye-btn" title="View Details" onclick="openLogDetail(this.closest('tr'))">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="logs-pagination-bar">
+                <span class="logs-pagination-info"
+                      th:text="${totalLogs != null ? 'Showing ' + ((currentPage - 1) * pageSize + 1) + ' to ' + [[ ${currentPage * pageSize < totalLogs ? currentPage * pageSize : totalLogs} ]] + ' of ' + totalLogs + ' entries' : 'Showing 1 to 5 of 128,492 entries'}">
+                    Showing 1 to 5 of 128,492 entries
+                </span>
+                <div class="logs-pagination-controls">
+                    <a class="logs-page-btn" th:href="@{/admin/logs(page=${currentPage - 1}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action})}"
+                       th:classappend="${currentPage <= 1 ? ' disabled' : ''}">&lt;</a>
+                    <span class="logs-page-btn active" th:text="${currentPage != null ? currentPage : 1}">1</span>
+                    <a class="logs-page-btn" th:href="@{/admin/logs(page=2)}">2</a>
+                    <a class="logs-page-btn" th:href="@{/admin/logs(page=3)}">3</a>
+                    <span class="logs-page-ellipsis">...</span>
+                    <a class="logs-page-btn" th:text="${totalPages != null ? totalPages : '2569'}"
+                       th:href="@{/admin/logs(page=${totalPages})}">2569</a>
+                    <a class="logs-page-btn" th:href="@{/admin/logs(page=${currentPage + 1}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action})}"
+                       th:classappend="${currentPage >= totalPages ? ' disabled' : ''}">&gt;</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- DETAIL SIDE DRAWER MODAL                                    -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="logs-modal-overlay" id="logDetailOverlay" onclick="closeLogDetail()"></div>
+        <div class="logs-detail-panel" id="logDetailPanel">
+            <div class="logs-detail-header">
+                <div>
+                    <h3 class="logs-detail-title">Event Log Details</h3>
+                    <p class="logs-detail-id" id="detailLogId">ID: LOG-829104</p>
+                </div>
+                <button class="logs-detail-close" onclick="closeLogDetail()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="logs-detail-body">
+                <!-- Audit Summary Section -->
+                <section class="logs-detail-section">
+                    <h4 class="logs-detail-section-title">Audit Summary</h4>
+                    <div class="logs-detail-grid">
+                        <div>
+                            <p class="logs-detail-field-label">System Log ID</p>
+                            <p class="logs-detail-field-value mono" id="detailId">LOG-829104</p>
+                        </div>
+                        <div>
+                            <p class="logs-detail-field-label">Created At</p>
+                            <p class="logs-detail-field-value" id="detailTime">2023-10-31 14:23:11</p>
+                        </div>
+                        <div>
+                            <p class="logs-detail-field-label">Action Performed</p>
+                            <p class="logs-detail-field-value bold" id="detailAction">LOCK_ACCOUNT</p>
+                        </div>
+                        <div>
+                            <p class="logs-detail-field-label">Account Role</p>
+                            <p class="logs-detail-field-value" id="detailRole">Super Admin</p>
+                        </div>
+                    </div>
+                </section>
+                <!-- Entity Context Section -->
+                <section class="logs-detail-section">
+                    <h4 class="logs-detail-section-title">Entity Context</h4>
+                    <div class="logs-detail-context-box">
+                        <div class="logs-detail-context-row">
+                            <span class="logs-detail-field-label">Account Name</span>
+                            <span class="logs-detail-field-value" id="detailAccountName">Alex Mercer</span>
+                        </div>
+                        <div class="logs-detail-context-row">
+                            <span class="logs-detail-field-label">Target Entity Type</span>
+                            <span class="logs-detail-field-value" id="detailEntityType">Account</span>
+                        </div>
+                        <div class="logs-detail-context-row">
+                            <span class="logs-detail-field-label">Target Entity ID</span>
+                            <span class="logs-detail-field-value mono bold" id="detailEntityId">ACC-10492</span>
+                        </div>
+                        <div class="logs-detail-context-row">
+                            <span class="logs-detail-field-label">IP Address</span>
+                            <span class="logs-detail-field-value mono" id="detailIp">192.168.1.42</span>
+                        </div>
+                    </div>
+                </section>
+                <!-- System Trace JSON -->
+                <section class="logs-detail-section">
+                    <h4 class="logs-detail-section-title">System Trace (JSON)</h4>
+                    <div class="logs-detail-json-box">
+                        <pre id="detailJson">{
+  "log_id": "LOG-829104",
+  "actor": {
+    "name": "Alex Mercer",
+    "role": "SUPER_ADMIN"
+  },
+  "action": "LOCK_ACCOUNT",
+  "meta": {
+    "entity_type": "Account",
+    "entity_id": "ACC-10492",
+    "reason": "Suspicious login attempts detected"
+  }
+}</pre>
+                    </div>
+                </section>
+            </div>
+            <div class="logs-detail-footer">
+                <button class="logs-detail-print-btn">
+                    <span class="material-symbols-outlined">print</span> PRINT AUDIT TRAIL
+                </button>
+                <button class="logs-detail-flag-btn">FLAG FOR REVIEW</button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- JAVASCRIPT                                                   -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <script th:src="@{/js/admin/logs.js}"></script>
+    </div>
+</div>

@@ -51,6 +51,12 @@
                     <span>Utilities</span>
                 </a>
             </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'revenue' ? 'active' : ''}">
+                <a th:href="@{/admin/revenue}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Revenue Report</span>
+                </a>
+            </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'logs' ? 'active' : ''}">
                 <a th:href="@{/admin/logs}">
                     <i class="fa-solid fa-clock-rotate-left"></i>

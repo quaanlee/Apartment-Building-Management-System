@@ -1,4 +1,4 @@
-package com.quan.apartment_building_management_system.repository;
+﻿package com.quan.apartment_building_management_system.repository;
 
 import com.quan.apartment_building_management_system.entity.SystemLog;
 import org.springframework.data.domain.Page;
@@ -15,12 +15,12 @@ public interface SystemLogRepository extends JpaRepository<SystemLog, Long> {
     List<SystemLog> findByAccountAccountId(Integer accountId);
 
     @Query("SELECT s FROM SystemLog s LEFT JOIN s.account a LEFT JOIN a.role r LEFT JOIN a.profile p " +
-           "WHERE (:search IS NULL OR :search = '' OR " +
+           "WHERE (:search IS NULL OR :search = "" OR " +
            "       LOWER(a.username) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "       LOWER(p.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "       LOWER(s.action) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "       LOWER(s.entityType) LIKE LOWER(CONCAT('%', :search, '%'))) " +
-           "AND (:roleName IS NULL OR :roleName = '' OR :roleName = 'All Roles' OR " +
+           "AND (:roleName IS NULL OR :roleName = "" OR :roleName = 'All Roles' OR " +
            "     (:roleName = 'System' AND s.account IS NULL) OR " +
            "     (r.roleName = :roleName)) " +
            "AND (:fromDate IS NULL OR s.createdAt >= :fromDate) " +
@@ -30,4 +30,24 @@ public interface SystemLogRepository extends JpaRepository<SystemLog, Long> {
                                @Param("fromDate") LocalDateTime fromDate,
                                @Param("toDate") LocalDateTime toDate,
                                Pageable pageable);
+
+    Page<SystemLog> findByAccountAccountId(Integer accountId, Pageable pageable);
+
+    @Query("""
+        SELECT sl FROM SystemLog sl
+        LEFT JOIN FETCH sl.account a
+        LEFT JOIN FETCH a.role r
+        LEFT JOIN FETCH a.profile p
+        WHERE (:fromDate IS NULL OR sl.createdAt >= :fromDate)
+          AND (:toDate IS NULL OR sl.createdAt <= :toDate)
+          AND (:role IS NULL OR r.roleName = :role)
+          AND (:action IS NULL OR sl.action = :action)
+        ORDER BY sl.createdAt DESC
+    """)
+    Page<SystemLog> findFiltered(
+            @Param("fromDate") LocalDateTime fromDate,
+            @Param("toDate") LocalDateTime toDate,
+            @Param("role") String role,
+            @Param("action") String action,
+            Pageable pageable);
 }

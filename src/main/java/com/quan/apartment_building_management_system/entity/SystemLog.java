@@ -1,4 +1,4 @@
-package com.quan.apartment_building_management_system.entity;
+﻿package com.quan.apartment_building_management_system.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,6 +39,9 @@ public class SystemLog {
 
     @Column(name = "CreatedAt", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "Details", columnDefinition = "NVARCHAR(MAX)")
+    private String details = "{}";
 
     public SystemLog() {
     }
@@ -97,5 +100,13 @@ public class SystemLog {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
     }
 }
