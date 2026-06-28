@@ -490,6 +490,15 @@
         </div>
 
         <!-- Scripts -->
-        <script th:src="@{/js/admin/revenue.js}"></script>
+    <!-- Chart data from DB -->
+    <div id="barChartData" 
+         th:data-current="${barCurrentJson}" 
+         th:data-prev="${barPrevJson}" 
+         style="display:none;"></div>
+    <div id="donutChartData" 
+         th:data-labels="${donutLabels}" 
+         th:data-pcts="${donutPcts}" 
+         style="display:none;"></div>
+                <script th:src="@{/js/admin/revenue.js}"></script>
     </div>
 </div>

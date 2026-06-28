@@ -80,6 +80,62 @@ public class ManagerRevenueController {
         model.addAttribute("toDate",      toDateStr);
         model.addAttribute("revenueType", revenueType);
         model.addAttribute("status",      statusStr);
+        // Chart data
+        short currentYear = (short) LocalDate.now().getYear();
+        short prevYear = (short) (currentYear - 1);
+        List<Object[]> monthlyCurrent = billRepository.sumByYear(currentYear);
+        List<Object[]> monthlyPrev = billRepository.sumByYear(prevYear);
+
+        // Build 12-month arrays as JSON
+        java.math.BigDecimal[] currentMonthly = new java.math.BigDecimal[12];
+        java.math.BigDecimal[] prevMonthly = new java.math.BigDecimal[12];
+        for (int m = 0; m < 12; m++) {
+            currentMonthly[m] = java.math.BigDecimal.ZERO;
+            prevMonthly[m] = java.math.BigDecimal.ZERO;
+        }
+        for (Object[] row : monthlyCurrent) {
+            int month = ((Number) row[0]).intValue() - 1;
+            currentMonthly[month] = (java.math.BigDecimal) row[1];
+        }
+        for (Object[] row : monthlyPrev) {
+            int month = ((Number) row[0]).intValue() - 1;
+            prevMonthly[month] = (java.math.BigDecimal) row[1];
+        }
+
+        StringBuilder barCurrentJson = new StringBuilder("[");
+        StringBuilder barPrevJson = new StringBuilder("[");
+        for (int m = 0; m < 12; m++) {
+            if (m > 0) { barCurrentJson.append(","); barPrevJson.append(","); }
+            barCurrentJson.append(currentMonthly[m]);
+            barPrevJson.append(prevMonthly[m]);
+        }
+        barCurrentJson.append("]");
+        barPrevJson.append("]");
+        model.addAttribute("barCurrentJson", barCurrentJson.toString());
+        model.addAttribute("barPrevJson", barPrevJson.toString());
+
+        // Donut chart: revenue by service type
+        List<Object[]> typeData = billRepository.sumByServiceType(fromDate, toDate);
+        java.math.BigDecimal totalTypeSum = java.math.BigDecimal.ZERO;
+        for (Object[] row : typeData) {
+            totalTypeSum = totalTypeSum.add((java.math.BigDecimal) row[1]);
+        }
+
+        StringBuilder donutLabels = new StringBuilder();
+        StringBuilder donutPcts = new StringBuilder();
+        if (totalTypeSum.compareTo(java.math.BigDecimal.ZERO) > 0) {
+            for (Object[] row : typeData) {
+                String type = (String) row[0];
+                java.math.BigDecimal amount = (java.math.BigDecimal) row[1];
+                int pct = amount.multiply(java.math.BigDecimal.valueOf(100)).divide(totalTypeSum, java.math.RoundingMode.HALF_UP).intValue();
+                if (donutLabels.length() > 0) donutLabels.append(",");
+                if (donutPcts.length() > 0) donutPcts.append(",");
+                donutLabels.append(type);
+                donutPcts.append(pct);
+            }
+        }
+        model.addAttribute("donutLabels", donutLabels.toString());
+        model.addAttribute("donutPcts", donutPcts.toString());
 
         return "admin/revenue/list";
     }
@@ -155,4 +211,6 @@ public class ManagerRevenueController {
         };
     }
 }
+
+
 

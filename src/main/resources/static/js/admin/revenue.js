@@ -157,20 +157,22 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ============================================================
        2. BAR CHART — Monthly Revenue Trend
        ============================================================ */
-    var monthlyData = [
-        { month: 'Jan', current: 68, prev: 55 },
-        { month: 'Feb', current: 74, prev: 60 },
-        { month: 'Mar', current: 82, prev: 70 },
-        { month: 'Apr', current: 79, prev: 65 },
-        { month: 'May', current: 90, prev: 72 },
-        { month: 'Jun', current: 88, prev: 78 },
-        { month: 'Jul', current: 95, prev: 80 },
-        { month: 'Aug', current: 92, prev: 84 },
-        { month: 'Sep', current: 100, prev: 87 },
-        { month: 'Oct', current: 97, prev: 83 },
-        { month: 'Nov', current: 85, prev: 76 },
-        { month: 'Dec', current: 75, prev: 69 }
-    ];
+    var barDataEl = document.getElementById('barChartData');
+    var barMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var monthlyData = [];
+    if (barDataEl) {
+        try {
+            var cur = JSON.parse('[' + barDataEl.getAttribute('data-current').replace(/[\[\]]/g,'') + ']');
+            var prv = JSON.parse('[' + barDataEl.getAttribute('data-prev').replace(/[\[\]]/g,'') + ']');
+            for (var mi = 0; mi < 12; mi++) {
+                monthlyData.push({
+                    month: barMonths[mi],
+                    current: cur[mi] ? Math.round(cur[mi] / 1000000) : 0,
+                    prev: prv[mi] ? Math.round(prv[mi] / 1000000) : 0
+                });
+            }
+        } catch(e) { monthlyData = []; }
+    }
 
     var barChart = document.getElementById('monthlyBarChart');
     if (barChart) {
@@ -203,14 +205,23 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ============================================================
        3. DONUT CHART — Revenue by Type
        ============================================================ */
-    var donutData = [
-        { label: 'Rent',        pct: 48, color: '#451ebb' },
-        { label: 'Electricity', pct: 18, color: '#d97706' },
-        { label: 'Water',       pct: 10, color: '#2563eb' },
-        { label: 'Parking',     pct: 12, color: '#16a34a' },
-        { label: 'Service',     pct: 8,  color: '#be185d' },
-        { label: 'Penalty',     pct: 4,  color: '#b91c1c' }
-    ];
+    var donutColors = {
+        'RENT':'#451ebb', 'ELECTRICITY':'#d97706', 'WATER':'#2563eb',
+        'PARKING':'#16a34a', 'SERVICE':'#be185d', 'PENALTY':'#b91c1c'
+    };
+    var donutDataEl = document.getElementById('donutChartData');
+    var donutData = [];
+    if (donutDataEl) {
+        var labels = (donutDataEl.getAttribute('data-labels') || '').split(',');
+        var pcts = (donutDataEl.getAttribute('data-pcts') || '').split(',');
+        for (var di = 0; di < labels.length && di < pcts.length; di++) {
+            var lbl = labels[di].trim();
+            var pct = parseInt(pcts[di]) || 0;
+            if (lbl && pct > 0) {
+                donutData.push({ label: lbl, pct: pct, color: donutColors[lbl] || '#64748b' });
+            }
+        }
+    }
 
     var donutSvg    = document.getElementById('donutSvg');
     var donutLegend = document.getElementById('donutLegend');

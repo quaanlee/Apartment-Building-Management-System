@@ -10,7 +10,7 @@
             <div class="top-navbar">
                 <!-- Search bar targeting the main form -->
                 <div class="search-box-wrapper">
-                    <input type="text" form="filterForm" name="search" th:value="${search}" class="search-input" placeholder="Search by account, action, entity...">
+                    <input type="text" id="logSearchInput" form="filterForm" name="search" th:value="${search}" class="search-input" placeholder="Search by account, action, entity...">
                     <!-- Search Icon SVG -->
                     <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -71,105 +71,23 @@
             
             <!-- Filter Bar Container -->
             <div class="filter-bar">
-                <!-- From Date Trigger -->
+                <!-- From Date -->
                 <div class="filter-group">
                     <label class="filter-label">From Date</label>
-                    <button type="button" class="date-trigger-btn" id="fromDateBtn">
-                        <span style="display: flex; align-items: center; gap: 8px;">
-                            <!-- Calendar Icon SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-                            </svg>
-                            <span id="fromDateText">Select Date</span>
-                        </span>
-                        <!-- Chevron Down SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 12px; height: 12px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                        </svg>
-                    </button>
+                    <input type="date" name="fromDate" form="filterForm" class="filter-select" style="padding:10px 14px;"
+                           th:value="${fromDate}">
                 </div>
-                
-                <!-- To Date Trigger -->
+                <!-- To Date -->
                 <div class="filter-group">
                     <label class="filter-label">To Date</label>
-                    <button type="button" class="date-trigger-btn" id="toDateBtn">
-                        <span style="display: flex; align-items: center; gap: 8px;">
-                            <!-- Calendar Icon SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-                            </svg>
-                            <span id="toDateText">Select Date</span>
-                        </span>
-                        <!-- Chevron Down SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 12px; height: 12px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                        </svg>
-                    </button>
-                </div>
-                
-                <!-- Role Dropdown -->
-                <div class="filter-group">
-                    <label class="filter-label">User Role</label>
-                    <div class="select-wrapper">
-                        <select name="roleName" form="filterForm" onchange="resetPageAndSubmit()" class="filter-select">
-                            <option th:each="role : ${roles}" th:value="${role}" th:text="${role}" th:selected="${role == selectedRole}"></option>
-                        </select>
-                        <span class="select-arrow">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 12px; height: 12px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                            </svg>
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Apply Filters Button -->
-                <div class="filter-group">
-                    <button type="submit" form="filterForm" class="export-btn" style="background-color:#2563eb; padding:10px 20px; height:40px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
-                        </svg>
-                        Apply Filters
-                    </button>
+                    <input type="date" name="toDate" form="filterForm" class="filter-select" style="padding:10px 14px;"
+                           th:value="${toDate}">
                 </div>
                 <!-- Reset Filters Button -->
                 <div class="filter-group" th:if="${search != null && search != '' || selectedRole != 'All Roles' || fromDate != null || toDate != null}">
                     <button type="button" class="reset-filter-btn" onclick="clearAllFilters()">Clear Filters</button>
                 </div>
 
-                <!-- Shared Custom Calendar Popover Overlay -->
-                <div id="calendarPopover" class="calendar-popover">
-                    <div class="calendar-header">
-                        <button type="button" class="calendar-nav-btn" id="prevMonthBtn">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                            </svg>
-                        </button>
-                        <span class="calendar-month-year" id="monthYearTitle">October 2023</span>
-                        <button type="button" class="calendar-nav-btn" id="nextMonthBtn">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="calendar-grid-header">
-                        <span class="calendar-day-label">Su</span>
-                        <span class="calendar-day-label">Mo</span>
-                        <span class="calendar-day-label">Tu</span>
-                        <span class="calendar-day-label">We</span>
-                        <span class="calendar-day-label">Th</span>
-                        <span class="calendar-day-label">Fr</span>
-                        <span class="calendar-day-label">Sa</span>
-                    </div>
-                    <div class="calendar-days-grid" id="daysGrid">
-                        <!-- Rendered by JS -->
-                    </div>
-                    <div class="calendar-footer">
-                        <button type="button" class="calendar-btn-cancel" onclick="closeCalendar()">Cancel</button>
-                        <button type="button" class="calendar-btn-apply" onclick="applyCalendarDate()">Apply</button>
-                    </div>
-                </div>
-            </div>
-            
             <!-- Table Container -->
             <div class="table-container">
                 <table class="logs-table">
@@ -315,239 +233,17 @@
     </div>
 </div>
 
-<script>
-        // DOM Elements
-        const fromDateBtn = document.getElementById('fromDateBtn');
-        const toDateBtn = document.getElementById('toDateBtn');
-        const fromDateText = document.getElementById('fromDateText');
-        const toDateText = document.getElementById('toDateText');
-        
-        const hiddenFromDate = document.getElementById('hiddenFromDate');
-        const hiddenToDate = document.getElementById('hiddenToDate');
-        const hiddenPage = document.getElementById('hiddenPage');
-        
-        const calendarPopover = document.getElementById('calendarPopover');
-        const monthYearTitle = document.getElementById('monthYearTitle');
-        const prevMonthBtn = document.getElementById('prevMonthBtn');
-        const nextMonthBtn = document.getElementById('nextMonthBtn');
-        const daysGrid = document.getElementById('daysGrid');
-        
-        // Month Names
-        const monthNames = [
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ];
-        
-        const monthNamesShort = [
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        ];
-        
-        // Calendar Internal State
-        let activePicker = null; // 'from' or 'to'
-        let displayMonth = new Date().getMonth();
-        let displayYear = new Date().getFullYear();
-        let tempSelectedDate = null;
-        
-        // Helper to format date display (e.g. "Oct 24, 2023")
-        function formatDateToDisplayStr(dateStr) {
-            if (!dateStr || dateStr === 'null') return 'Select Date';
-            const parts = dateStr.split('-');
-            if (parts.length !== 3) return dateStr;
-            const year = parts[0];
-            const monthIdx = parseInt(parts[1], 10) - 1;
-            const day = parseInt(parts[2], 10);
-            return `${monthNamesShort[monthIdx]} ${day}, ${year}`;
-        }
-        
-        // Format Date to YYYY-MM-DD
-        function formatDateToISO(date) {
-            const y = date.getFullYear();
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const d = String(date.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
-        }
-        
-        // Initialize triggers display value on page load
-        if (hiddenFromDate.value) {
-            fromDateText.innerText = formatDateToDisplayStr(hiddenFromDate.value);
-        }
-        if (hiddenToDate.value) {
-            toDateText.innerText = formatDateToDisplayStr(hiddenToDate.value);
-        }
-        
-        // Open Calendar Popover
-        function openCalendar(pickerType, triggerBtn) {
-            activePicker = pickerType;
-            
-            // Positioning Popover directly beneath active button trigger
-            const rect = triggerBtn.getBoundingClientRect();
-            const parentRect = triggerBtn.offsetParent.getBoundingClientRect();
-            
-            calendarPopover.style.left = `${rect.left - parentRect.left}px`;
-            calendarPopover.style.top = `${rect.bottom - parentRect.top + 8}px`;
-            
-            // Set initial month/year based on hidden input value or current date
-            const dateVal = pickerType === 'from' ? hiddenFromDate.value : hiddenToDate.value;
-            let dateObj = new Date();
-            if (dateVal) {
-                const parts = dateVal.split('-');
-                if (parts.length === 3) {
-                    dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
-                }
-            }
-            
-            displayMonth = dateObj.getMonth();
-            displayYear = dateObj.getFullYear();
-            tempSelectedDate = dateObj;
-            
-            renderCalendar();
-            calendarPopover.classList.add('show');
-        }
-        
-        // Render Days in Month Grid
-        function renderCalendar() {
-            // Update Header
-            monthYearTitle.innerText = `${monthNames[displayMonth]} ${displayYear}`;
-            daysGrid.innerHTML = '';
-            
-            // 1st day of the display month
-            const firstDayOfMonth = new Date(displayYear, displayMonth, 1).getDay();
-            // Total days in display month
-            const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
-            
-            // Render blank cells for offset days
-            for (let i = 0; i < firstDayOfMonth; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.className = 'calendar-day-cell empty-day';
-                daysGrid.appendChild(emptyCell);
-            }
-            
-            // Render actual days
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayCell = document.createElement('button');
-                dayCell.type = 'button';
-                dayCell.className = 'calendar-day-cell';
-                dayCell.innerText = day;
-                
-                const currentCellDate = new Date(displayYear, displayMonth, day);
-                
-                // Highlight selected day
-                if (tempSelectedDate && 
-                    currentCellDate.getDate() === tempSelectedDate.getDate() && 
-                    currentCellDate.getMonth() === tempSelectedDate.getMonth() && 
-                    currentCellDate.getFullYear() === tempSelectedDate.getFullYear()) {
-                    dayCell.classList.add('selected-day');
-                }
-                
-                // Add select click handler
-                dayCell.addEventListener('click', () => {
-                    tempSelectedDate = currentCellDate;
-                    renderCalendar(); // Rerender to show highlights
-                });
-                
-                daysGrid.appendChild(dayCell);
-            }
-        }
-        
-        // Month Navigation handlers
-        prevMonthBtn.addEventListener('click', () => {
-            if (displayMonth === 0) {
-                displayMonth = 11;
-                displayYear--;
-            } else {
-                displayMonth--;
-            }
-            renderCalendar();
-        });
-        
-        nextMonthBtn.addEventListener('click', () => {
-            if (displayMonth === 11) {
-                displayMonth = 0;
-                displayYear++;
-            } else {
-                displayMonth++;
-            }
-            renderCalendar();
-        });
-        
-        // Close calendar popover
-        function closeCalendar() {
-            calendarPopover.classList.remove('show');
-            activePicker = null;
-        }
-        
-        // Apply Selected Date
-        function applyCalendarDate() {
-            if (tempSelectedDate) {
-                const isoStr = formatDateToISO(tempSelectedDate);
-                const displayStr = formatDateToDisplayStr(isoStr);
-                
-                if (activePicker === 'from') {
-                    hiddenFromDate.value = isoStr;
-                    fromDateText.innerText = displayStr;
-                } else if (activePicker === 'to') {
-                    hiddenToDate.value = isoStr;
-                    toDateText.innerText = displayStr;
-                }
-                
-                // Business logic check: If fromDate > toDate, swap them on client-side automatically
-                const fromVal = hiddenFromDate.value;
-                const toVal = hiddenToDate.value;
-                if (fromVal && toVal) {
-                    const fd = new Date(fromVal);
-                    const td = new Date(toVal);
-                    if (fd > td) {
-                        hiddenFromDate.value = toVal;
-                        hiddenToDate.value = fromVal;
-                        
-                        fromDateText.innerText = formatDateToDisplayStr(toVal);
-                        toDateText.innerText = formatDateToDisplayStr(fromVal);
-                    }
-                }
-                
-                // Submit Form
-                resetPageAndSubmit();
-            }
-            closeCalendar();
-        }
-        
-        // Click trigger buttons toggle opening
-        fromDateBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (calendarPopover.classList.contains('show') && activePicker === 'from') {
-                closeCalendar();
-            } else {
-                openCalendar('from', fromDateBtn);
-            }
-        });
-        
-        toDateBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (calendarPopover.classList.contains('show') && activePicker === 'to') {
-                closeCalendar();
-            } else {
-                openCalendar('to', toDateBtn);
-            }
-        });
-        
-        // Click outside closes calendar popover
-        document.addEventListener('click', (e) => {
-            if (!calendarPopover.contains(e.target) && e.target !== fromDateBtn && e.target !== toDateBtn && !fromDateBtn.contains(e.target) && !toDateBtn.contains(e.target)) {
-                closeCalendar();
-            }
-        });
-        
-        // Form Submit Helper: Reset Page when new filters are applied
+    <script>
+        // Form Submit Helper
         function resetPageAndSubmit() {
-            hiddenPage.value = 0;
+            document.getElementById('hiddenPage').value = 0;
             document.getElementById('filterForm').submit();
         }
-        
-        // Clear all filters action
+
+        // Clear all filters
         function clearAllFilters() {
-            hiddenFromDate.value = '';
-            hiddenToDate.value = '';
+            document.getElementById('hiddenFromDate').value = '';
+            document.getElementById('hiddenToDate').value = '';
             document.getElementById('logSearchInput').value = '';
             document.querySelector('select[name="roleName"]').value = 'All Roles';
             resetPageAndSubmit();
