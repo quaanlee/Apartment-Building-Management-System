@@ -930,3 +930,24 @@
 .cal-cancel:hover { background: var(--color-surface-low); }
 .cal-apply { background: var(--color-primary); color: white; border: none; font-family: 'Inter'; font-size: 13px; font-weight: 600; cursor: pointer; padding: 6px 18px; border-radius: 6px; transition: background 0.15s; }
 .cal-apply:hover { background: var(--color-primary-container); }
+
+/* -- Donut chart layout fix -- */
+.rev-chart-card:has(.rev-donut-wrapper) {
+    display: flex;
+    flex-direction: column;
+}
+.rev-donut-body {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex: 1;
+}
+.rev-donut-wrapper {
+    width: 160px;
+    flex-shrink: 0;
+    margin: 0;
+}
+.rev-donut-legend {
+    flex: 1;
+    gap: 10px;
+}
