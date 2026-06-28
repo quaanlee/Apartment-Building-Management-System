@@ -47,11 +47,12 @@ public class ManagerRevenueController {
             @RequestParam(value = "revenueType", required = false) String revenueType,
             @RequestParam(value = "status",      required = false) String statusStr,
             @RequestParam(value = "page",        defaultValue = "0") int page,
+            @RequestParam(value = "month", required = false) Integer month,
             Model model) {
-
         LocalDateTime fromDate = parseDate(fromDateStr, LocalDate.now().minusMonths(1).atStartOfDay());
         LocalDateTime toDate   = parseDate(toDateStr,   LocalDateTime.now());
         Byte statusByte = parseStatus(statusStr);
+        if (revenueType != null && revenueType.isBlank()) revenueType = null;
 
         BigDecimal totalRev     = billRepository.sumTotalByDateRange(fromDate, toDate);
         BigDecimal collected    = billRepository.sumCollectedByDateRange(fromDate, toDate);
@@ -63,7 +64,7 @@ public class ManagerRevenueController {
         model.addAttribute("outstanding",   VND_FMT.format(outstanding) + " VND");
         model.addAttribute("overdue",       VND_FMT.format(overdue) + " VND");
 
-        Page<Bill> billPage = billRepository.findBillsWithDetails(fromDate, toDate, statusByte,
+        Page<Bill> billPage = billRepository.findBillsWithDetails(fromDate, toDate, statusByte, revenueType,
                 PageRequest.of(page, PAGE_SIZE));
 
         List<RevenueRecordDTO> records = billPage.getContent().stream()
@@ -94,12 +95,12 @@ public class ManagerRevenueController {
             prevMonthly[m] = java.math.BigDecimal.ZERO;
         }
         for (Object[] row : monthlyCurrent) {
-            int month = ((Number) row[0]).intValue() - 1;
-            currentMonthly[month] = (java.math.BigDecimal) row[1];
+            int mth = ((Number) row[0]).intValue() - 1;
+            currentMonthly[mth] = (java.math.BigDecimal) row[1];
         }
         for (Object[] row : monthlyPrev) {
-            int month = ((Number) row[0]).intValue() - 1;
-            prevMonthly[month] = (java.math.BigDecimal) row[1];
+            int mth = ((Number) row[0]).intValue() - 1;
+            prevMonthly[mth] = (java.math.BigDecimal) row[1];
         }
 
         StringBuilder barCurrentJson = new StringBuilder("[");
@@ -111,6 +112,16 @@ public class ManagerRevenueController {
         }
         barCurrentJson.append("]");
         barPrevJson.append("]");
+        // If a specific month is selected, zero out other months in bar chart
+        if (month != null && month >= 1 && month <= 12) {
+            int m = month - 1;
+            for (int mi = 0; mi < 12; mi++) {
+                if (mi != m) {
+                    currentMonthly[mi] = java.math.BigDecimal.ZERO;
+                    prevMonthly[mi] = java.math.BigDecimal.ZERO;
+                }
+            }
+        }
         model.addAttribute("barCurrentJson", barCurrentJson.toString());
         model.addAttribute("barPrevJson", barPrevJson.toString());
 
@@ -137,6 +148,8 @@ public class ManagerRevenueController {
         model.addAttribute("donutLabels", donutLabels.toString());
         model.addAttribute("donutPcts", donutPcts.toString());
 
+        model.addAttribute("selectedMonth", month);
+        model.addAttribute("hasActiveFilters", (fromDateStr != null && !fromDateStr.isBlank()) || (toDateStr != null && !toDateStr.isBlank()) || (revenueType != null && !revenueType.isBlank()) || (statusStr != null && !statusStr.isBlank()));
         return "admin/revenue/list";
     }
 
@@ -211,6 +224,10 @@ public class ManagerRevenueController {
         };
     }
 }
+
+
+
+
 
 
 

@@ -1,6 +1,4 @@
 <form id="filterForm" method="get" th:action="@{/admin/system-logs}">
-    <input type="hidden" name="fromDate" id="hiddenFromDate" th:value="${fromDate}">
-    <input type="hidden" name="toDate" id="hiddenToDate" th:value="${toDate}">
     <input type="hidden" name="page" id="hiddenPage" th:value="${currentPage}">
 </form>
 <div th:replace="~{layout/admin/layout_admin :: admin-layout(~{::content}, 'logs')}">
@@ -257,6 +255,46 @@
     </div>
 </div>
 
+<!-- Details Modal -->
+<div id="detailsModal" class="modal-overlay" onclick="closeDetailsModalOnOverlay(event)">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 class="modal-title">Log Details <span id="modalLogId">#0</span></h3>
+            <button type="button" class="modal-close-x" onclick="closeDetailsModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:20px;height:20px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="details-grid">
+                <span class="details-label">Timestamp</span>
+                <span class="details-value" id="modalTimestamp">-</span>
+
+                <span class="details-label">Account</span>
+                <span class="details-value" id="modalAccount">-</span>
+
+                <span class="details-label">Role</span>
+                <span class="details-value" id="modalRole">-</span>
+
+                <span class="details-label">Action</span>
+                <span class="details-value" id="modalAction">-</span>
+
+                <span class="details-label">Entity Type</span>
+                <span class="details-value" id="modalEntityType">-</span>
+
+                <span class="details-label">Entity ID</span>
+                <span class="details-value" id="modalEntityId">-</span>
+
+                <span class="details-label">IP Address</span>
+                <span class="details-value" id="modalIpAddress">-</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn-close" onclick="closeDetailsModal()">Close</button>
+        </div>
+    </div>
+</div>
     <script>
         // Form Submit Helper
         function resetPageAndSubmit() {
@@ -266,12 +304,11 @@
 
         // Clear all filters
         function clearAllFilters() {
-            document.getElementById('hiddenFromDate').value = '';
-            document.getElementById('hiddenToDate').value = '';
+            document.querySelectorAll('input[name="fromDate"]').forEach(el => el.value = '');
+            document.querySelectorAll('input[name="toDate"]').forEach(el => el.value = '');
             document.getElementById('logSearchInput').value = '';
             document.querySelector('select[name="roleName"]').value = 'All Roles';
             resetPageAndSubmit();
-        }
     </script>
 <script>
         const detailsModal = document.getElementById('detailsModal');

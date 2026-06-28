@@ -177,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var barChart = document.getElementById('monthlyBarChart');
     if (barChart) {
         var maxVal = Math.max.apply(null, monthlyData.map(function(d){ return Math.max(d.current, d.prev); }));
+        if (maxVal === 0) maxVal = 1;
         monthlyData.forEach(function (d) {
             var group = document.createElement('div');
             group.className = 'rev-bar-group';
@@ -184,12 +185,12 @@ document.addEventListener('DOMContentLoaded', function () {
             var bCurrent = document.createElement('div');
             bCurrent.className = 'rev-bar current';
             bCurrent.style.height = (d.current / maxVal * 140) + 'px';
-            bCurrent.title = 'Current: ' + d.current + 'M ₫';
+            bCurrent.title = 'Current: ' + d.current + 'M ?';
 
             var bPrev = document.createElement('div');
             bPrev.className = 'rev-bar prev';
             bPrev.style.height = (d.prev / maxVal * 140) + 'px';
-            bPrev.title = 'Previous: ' + d.prev + 'M ₫';
+            bPrev.title = 'Previous: ' + d.prev + 'M ?';
 
             var label = document.createElement('span');
             label.className = 'rev-bar-label';

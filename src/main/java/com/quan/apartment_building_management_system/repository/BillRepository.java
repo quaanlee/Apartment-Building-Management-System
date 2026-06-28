@@ -50,10 +50,12 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
            "WHERE (:fromDate IS NULL OR b.createdDate >= :fromDate) " +
            "AND (:toDate IS NULL OR b.createdDate <= :toDate) " +
            "AND (:status IS NULL OR b.status = :status) " +
+           "AND (:revenueType IS NULL OR EXISTS (SELECT 1 FROM BillDetail bd JOIN bd.serviceItem si WHERE bd.bill.billId = b.billId AND si.serviceType = :revenueType)) " +
            "ORDER BY b.createdDate DESC")
     Page<Bill> findBillsWithDetails(@Param("fromDate") LocalDateTime fromDate,
                                     @Param("toDate") LocalDateTime toDate,
                                     @Param("status") Byte status,
+                                    @Param("revenueType") String revenueType,
                                     Pageable pageable);
 
     @Query("SELECT b.billMonth as month, SUM(b.totalAmount) as total FROM Bill b WHERE b.billYear = :year GROUP BY b.billMonth ORDER BY b.billMonth")
@@ -62,3 +64,5 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
     @Query("SELECT s.serviceType as type, SUM(bd.amount) as total FROM BillDetail bd JOIN bd.serviceItem s JOIN bd.bill b WHERE (:fromDate IS NULL OR b.createdDate >= :fromDate) AND (:toDate IS NULL OR b.createdDate <= :toDate) GROUP BY s.serviceType ORDER BY SUM(bd.amount) DESC")
     List<Object[]> sumByServiceType(@Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate);
 }
+
+
