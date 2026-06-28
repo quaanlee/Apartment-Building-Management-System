@@ -1,4 +1,4 @@
-﻿package com.quan.apartment_building_management_system.repository;
+package com.quan.apartment_building_management_system.repository;
 
 import com.quan.apartment_building_management_system.entity.Bill;
 import org.springframework.data.domain.Page;

@@ -1,4 +1,4 @@
-﻿package com.quan.apartment_building_management_system.controller.admin;
+package com.quan.apartment_building_management_system.controller.admin;
 
 import com.quan.apartment_building_management_system.dto.SystemLogDTO;
 import com.quan.apartment_building_management_system.entity.SystemLog;

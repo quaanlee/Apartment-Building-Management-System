@@ -1,4 +1,4 @@
-<div th:replace="~{layout/admin/layout :: admin-layout(~{::content}, 'revenue')}">
+<div th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'revenue')}">
     <div th:fragment="content">
         <!-- Load custom page styling -->
         <link rel="stylesheet" th:href="@{/css/admin/revenue.css}">
@@ -27,7 +27,7 @@
         <!-- ═══════════════════════════════════════════════════════════ -->
         <!-- FILTER BAR                                                   -->
         <!-- ═══════════════════════════════════════════════════════════ -->
-        <form method="get" th:action="@{/admin/revenue}" id="revFilterForm" class="rev-filter-bar">
+        <form method="get" th:action="@{/manager/revenue}" id="revFilterForm" class="rev-filter-bar">
             <!-- From Date -->
             <div class="rev-filter-group">
                 <label class="rev-filter-label">From Date</label>
@@ -110,7 +110,7 @@
 
             <div class="rev-filter-actions">
                 <button type="submit" class="rev-apply-btn">Apply Filters</button>
-                <a th:href="@{/admin/revenue}" class="rev-clear-btn">CLEAR ALL</a>
+                <a th:href="@{/manager/revenue}" class="rev-clear-btn">CLEAR ALL</a>
             </div>
         </form>
 
@@ -396,20 +396,20 @@
             <!-- Pagination -->
             <div class="rev-pagination-bar">
                 <span class="rev-pagination-info"
-                      th:text="${totalRecords != null ? 'Showing ' + ((${currentPage} - 1) * ${pageSize} + 1) + ' to ' + (${currentPage} * ${pageSize} < ${totalRecords} ? ${currentPage} * ${pageSize} : ${totalRecords}) + ' of ' + ${totalRecords} + ' records' : 'Showing 1 to 5 of 1,284 records'}">
+                      th:text="${totalRecords != null ? 'Showing ' + (currentPage * pageSize + 1) + ' to ' + ((currentPage + 1) * pageSize < totalRecords ? (currentPage + 1) * pageSize : totalRecords) + ' of ' + totalRecords + ' records' : 'Showing 1 to 5 of 1,284 records'}">
                     Showing 1 to 5 of 1,284 records
                 </span>
                 <div class="rev-pagination-controls">
-                    <a class="rev-page-btn" th:href="@{/admin/revenue(page=${currentPage - 1}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
-                       th:classappend="${currentPage <= 1 ? ' disabled' : ''}">&lt;</a>
-                    <span class="rev-page-btn active" th:text="${currentPage != null ? ${currentPage} : 1}">1</span>
-                    <a class="rev-page-btn" th:href="@{/admin/revenue(page=2)}">2</a>
-                    <a class="rev-page-btn" th:href="@{/admin/revenue(page=3)}">3</a>
+                    <a class="rev-page-btn" th:href="@{/manager/revenue(page=${currentPage - 1}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
+                       th:classappend="${currentPage <= 0 ? ' disabled' : ''}">&lt;</a>
+                    <span class="rev-page-btn active" th:text="${currentPage != null ? currentPage + 1 : 1}">1</span>
+                    <a class="rev-page-btn" th:href="@{/manager/revenue(page=${currentPage})}">2</a>
+                    <a class="rev-page-btn" th:href="@{/manager/revenue(page=${currentPage + 1})}">3</a>
                     <span class="rev-page-ellipsis">...</span>
-                    <a class="rev-page-btn" th:text="${totalPages != null ? ${totalPages} : '215'}"
-                       th:href="@{/admin/revenue(page=${totalPages})}">215</a>
-                    <a class="rev-page-btn" th:href="@{/admin/revenue(page=${currentPage + 1}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
-                       th:classappend="${currentPage >= totalPages ? ' disabled' : ''}">&gt;</a>
+                    <a class="rev-page-btn" th:text="${totalPages != null ? totalPages : '215'}"
+                       th:href="@{/manager/revenue(page=${totalPages - 1})}">215</a>
+                    <a class="rev-page-btn" th:href="@{/manager/revenue(page=${currentPage + 1}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
+                       th:classappend="${currentPage >= totalPages - 1 ? ' disabled' : ''}">&gt;</a>
                 </div>
             </div>
         </div>

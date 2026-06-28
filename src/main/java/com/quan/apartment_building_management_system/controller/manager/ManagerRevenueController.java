@@ -1,4 +1,4 @@
-﻿package com.quan.apartment_building_management_system.controller.admin;
+package com.quan.apartment_building_management_system.controller.manager;
 
 import com.quan.apartment_building_management_system.dto.RevenueRecordDTO;
 import com.quan.apartment_building_management_system.entity.Bill;
@@ -25,8 +25,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/admin/revenue")
-public class AdminRevenueController {
+@RequestMapping("/manager/revenue")
+public class ManagerRevenueController {
 
     private static final int PAGE_SIZE = 15;
     private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -35,7 +35,7 @@ public class AdminRevenueController {
 
     private final BillRepository billRepository;
 
-    public AdminRevenueController(BillRepository billRepository) {
+    public ManagerRevenueController(BillRepository billRepository) {
         this.billRepository = billRepository;
     }
 
@@ -53,7 +53,6 @@ public class AdminRevenueController {
         LocalDateTime toDate   = parseDate(toDateStr,   LocalDateTime.now());
         Byte statusByte = parseStatus(statusStr);
 
-        // ── Stats ──────────────────────────────────────────────────
         BigDecimal totalRev     = billRepository.sumTotalByDateRange(fromDate, toDate);
         BigDecimal collected    = billRepository.sumCollectedByDateRange(fromDate, toDate);
         BigDecimal outstanding  = billRepository.sumOutstandingByDateRange(fromDate, toDate);
@@ -64,7 +63,6 @@ public class AdminRevenueController {
         model.addAttribute("outstanding",   VND_FMT.format(outstanding) + " VND");
         model.addAttribute("overdue",       VND_FMT.format(overdue) + " VND");
 
-        // ── Transaction Records ────────────────────────────────────
         Page<Bill> billPage = billRepository.findBillsWithDetails(fromDate, toDate, statusByte,
                 PageRequest.of(page, PAGE_SIZE));
 
@@ -73,12 +71,11 @@ public class AdminRevenueController {
                 .collect(Collectors.toList());
 
         model.addAttribute("records", records);
-        model.addAttribute("currentPage", billPage.getNumber() + 1);
+        model.addAttribute("currentPage", billPage.getNumber());
         model.addAttribute("totalPages", billPage.getTotalPages());
         model.addAttribute("pageSize", PAGE_SIZE);
         model.addAttribute("totalRecords", billPage.getTotalElements());
 
-        // ── Preserve filters ───────────────────────────────────────
         model.addAttribute("fromDate",    fromDateStr);
         model.addAttribute("toDate",      toDateStr);
         model.addAttribute("revenueType", revenueType);
@@ -87,12 +84,10 @@ public class AdminRevenueController {
         return "admin/revenue/list";
     }
 
-    // ── helpers ──────────────────────────────────────────────────
-
     private RevenueRecordDTO toRecordDTO(Bill bill) {
         String aptNum = bill.getApartment() != null
-                ? bill.getApartment().getApartmentNumber() : "—";
-        String residentName = "—";
+                ? bill.getApartment().getApartmentNumber() : "\u2014";
+        String residentName = "\u2014";
         String initials = "?";
         if (bill.getApartment() != null && bill.getApartment().getResidentApartments() != null
                 && !bill.getApartment().getResidentApartments().isEmpty()) {
@@ -103,12 +98,12 @@ public class AdminRevenueController {
             }
         }
 
-        String type = "—";
+        String type = "\u2014";
         String note = "";
         if (bill.getBillDetails() != null && !bill.getBillDetails().isEmpty()) {
             var bd = bill.getBillDetails().get(0);
             type = Optional.ofNullable(bd.getServiceItem())
-                    .map(s -> s.getServiceType()).orElse("—");
+                    .map(s -> s.getServiceType()).orElse("\u2014");
             note = bd.getDescription() != null ? bd.getDescription() : "";
         }
 
@@ -123,20 +118,13 @@ public class AdminRevenueController {
         String invId = String.format("INV-%04d-%02d", bill.getBillYear(), bill.getBillMonth())
                 + "-" + String.format("%04d", bill.getBillId());
 
-        String dueDateStr  = bill.getDueDate() != null ? bill.getDueDate().format(DT_FMT) : "—";
+        String dueDateStr  = bill.getDueDate() != null ? bill.getDueDate().format(DT_FMT) : "\u2014";
         String paidDateStr = bill.getPaidDate() != null ? bill.getPaidDate().format(DT_FMT) : null;
 
         return new RevenueRecordDTO(
-                invId,
-                residentName,
-                initials,
-                aptNum,
-                type,
+                invId, residentName, initials, aptNum, type,
                 VND_FMT.format(bill.getTotalAmount()) + " VND",
-                statusLabel,
-                dueDateStr,
-                paidDateStr,
-                note
+                statusLabel, dueDateStr, paidDateStr, note
         );
     }
 
@@ -167,3 +155,4 @@ public class AdminRevenueController {
         };
     }
 }
+

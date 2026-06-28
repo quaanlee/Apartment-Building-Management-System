@@ -1,4 +1,4 @@
-﻿package com.quan.apartment_building_management_system.dto;
+package com.quan.apartment_building_management_system.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

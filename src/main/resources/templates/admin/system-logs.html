@@ -1,132 +1,12 @@
-<!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Logs - ABMS Admin</title>
-    <!-- Include Custom Stylesheet -->
-    <link rel="stylesheet" th:href="@{/css/system-logs.css}">
-    <!-- Google Fonts Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-
-    <!-- Main Form wrapping the workspace for simple form state submission -->
-    <form id="filterForm" method="get" th:action="@{/admin/system-logs}">
-        <!-- Hidden Inputs for Date Filters and Pagination -->
-        <input type="hidden" name="fromDate" id="hiddenFromDate" th:value="${fromDate}">
-        <input type="hidden" name="toDate" id="hiddenToDate" th:value="${toDate}">
-        <input type="hidden" name="page" id="hiddenPage" th:value="${currentPage}">
-    </form>
-
-    <div class="app-container">
-        
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-title">ABMS Admin</div>
-                <div class="sidebar-subtitle">Management Portal</div>
-            </div>
-            
-            <ul class="sidebar-menu">
-                <li class="menu-item">
-                    <a href="#">
-                        <span class="menu-icon">
-                            <!-- Dashboard Icon SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
-                            </svg>
-                        </span>
-                        Dashboard
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#">
-                        <span class="menu-icon">
-                            <!-- User Management SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A11.386 11.386 0 0 1 10.089 20c-2.202 0-4.277-.624-6.04-1.714V19.13c0-2.207 1.777-3.987 4.125-3.987h2.247c2.348 0 4.125 1.78 4.125 3.987v-.003ZM12 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM18.75 6.75a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-                            </svg>
-                        </span>
-                        User Management
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#">
-                        <span class="menu-icon">
-                            <!-- Building Management SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M2.25 21h1.5m18 0h-18M5.25 6h4.5m10.5 3v12m0-12v-3.75a1.5 1.5 0 0 0-1.5-1.5H8.25A1.5 1.5 0 0 0 6.75 3.45v13.8M5.25 9.75h4.5m-4.5 3h4.5m-4.5 3h4.5" />
-                            </svg>
-                        </span>
-                        Building Management
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#">
-                        <span class="menu-icon">
-                            <!-- Service Catalog SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-3.75 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                            </svg>
-                        </span>
-                        Service Catalog
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#">
-                        <span class="menu-icon">
-                            <!-- Pricing SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                        </span>
-                        Pricing
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#">
-                        <span class="menu-icon">
-                            <!-- Utilities SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A1.79 1.79 0 1 1 14.75 23.5l-5.83-5.83M11.42 15.17l2.49-2.49M11.42 15.17l-5.83 5.83A1.79 1.79 0 1 1 3.08 18.5l5.83-5.83M13.91 12.68l-2.49 2.49m2.49-2.49L21 6.83A1.79 1.79 0 1 0 18.5 4.33l-5.83 5.83m-1.25 1.25a2.25 2.25 0 1 1-3.18-3.18 2.25 2.25 0 0 1 3.18 3.18Z" />
-                            </svg>
-                        </span>
-                        Utilities
-                    </a>
-                </li>
-                <li class="menu-item active">
-                    <a th:href="@{/admin/system-logs}">
-                        <span class="menu-icon">
-                            <!-- System Logs SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.793 1.976 1.808M15 12h.008v.008H15V12Zm0 3h.008v.008H15V15Zm0 3h.008v.008H15V18ZM4.5 6h3.75v12H4.5V6Z" />
-                            </svg>
-                        </span>
-                        System Logs
-                    </a>
-                </li>
-            </ul>
-            
-            <div class="sidebar-footer">
-                <a href="#" class="logout-link">
-                    <span class="menu-icon">
-                        <!-- Logout SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-                        </svg>
-                    </span>
-                    Logout
-                </a>
-            </div>
-        </aside>
-        
-        <!-- Main Content Panel -->
-        <main class="main-content">
-            
-            <!-- Top Nav Bar -->
+<form id="filterForm" method="get" th:action="@{/admin/system-logs}">
+    <input type="hidden" name="fromDate" id="hiddenFromDate" th:value="${fromDate}">
+    <input type="hidden" name="toDate" id="hiddenToDate" th:value="${toDate}">
+    <input type="hidden" name="page" id="hiddenPage" th:value="${currentPage}">
+</form>
+<div th:replace="~{layout/admin/layout_admin :: admin-layout(~{::content}, 'logs')}">
+    <div th:fragment="content">
+        <link rel="stylesheet" th:href="@{/css/system-logs.css}">
+        <!-- Top Nav Bar -->
             <div class="top-navbar">
                 <!-- Search bar targeting the main form -->
                 <div class="search-box-wrapper">
@@ -242,6 +122,15 @@
                     </div>
                 </div>
 
+                <!-- Apply Filters Button -->
+                <div class="filter-group">
+                    <button type="submit" form="filterForm" class="export-btn" style="background-color:#2563eb; padding:10px 20px; height:40px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                        </svg>
+                        Apply Filters
+                    </button>
+                </div>
                 <!-- Reset Filters Button -->
                 <div class="filter-group" th:if="${search != null && search != '' || selectedRole != 'All Roles' || fromDate != null || toDate != null}">
                     <button type="button" class="reset-filter-btn" onclick="clearAllFilters()">Clear Filters</button>
@@ -318,10 +207,16 @@
                             
                             <!-- Account Full Name (Fallback to username or System Process if account is null) -->
                             <td>
-                                <strong th:if="${log.account == null}">System Process</strong>
+                                <strong th:if="${log.account == null}" class="text-role-system">System Process</strong>
                                 <span th:if="${log.account != null}" 
+                                      th:classappend="${log.account.role.roleName == 'Admin' ? 'text-role-admin' : 
+                                                       (log.account.role.roleName == 'Manager' ? 'text-role-manager' : 
+                                                       (log.account.role.roleName == 'Security Officer' ? 'text-role-security' : 
+                                                       (log.account.role.roleName == 'Resident' ? 'text-role-resident' : 
+                                                       (log.account.role.roleName == 'Maintenance Staff' ? 'text-role-maintenance' : 'text-role-default'))))}"
                                       th:text="${log.account.profile != null && log.account.profile.fullName != null ? log.account.profile.fullName : log.account.username}">
                                     Alex Mercer
+                                </span>
                                 </span>
                             </td>
                             
@@ -354,7 +249,11 @@
                                         th:data-entityid="${log.entityId}"
                                         th:data-ip="${log.ipAddress}"
                                         onclick="openDetailsModal(this)">
-                                    View Details
+                                    
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
                                 </button>
                             </td>
                         </tr>
@@ -413,56 +312,10 @@
                     </svg>
                 </a>
             </div>
-            
-        </main>
     </div>
+</div>
 
-    <!-- Log Details Modal Popup overlay -->
-    <div id="detailsModal" class="modal-overlay" onclick="closeDetailsModalOnOverlay(event)">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h3 class="modal-title">Chi tiết Nhật ký Hệ thống</h3>
-                <button type="button" class="modal-close-x" onclick="closeDetailsModal()">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="details-grid">
-                    <span class="details-label">Log ID</span>
-                    <span class="details-value" id="modalLogId">#128492</span>
-                    
-                    <span class="details-label">Thời gian</span>
-                    <span class="details-value" id="modalTimestamp">2023-10-31 14:22:11</span>
-                    
-                    <span class="details-label">Tài khoản</span>
-                    <span class="details-value" id="modalAccount">Alex Mercer</span>
-                    
-                    <span class="details-label">Vai trò</span>
-                    <span class="details-value" id="modalRole">Admin</span>
-                    
-                    <span class="details-label">Hành động</span>
-                    <span class="details-value" id="modalAction" style="font-weight: 600; color: #7c3aed;">LOGIN</span>
-                    
-                    <span class="details-label">Loại thực thể</span>
-                    <span class="details-value" id="modalEntityType">Account</span>
-                    
-                    <span class="details-label">ID thực thể</span>
-                    <span class="details-value" id="modalEntityId">12</span>
-                    
-                    <span class="details-label">Địa chỉ IP</span>
-                    <span class="details-value" id="modalIpAddress">192.168.1.100</span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="modal-btn-close" onclick="closeDetailsModal()">Đóng</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Calendar Javascript Logic -->
-    <script>
+<script>
         // DOM Elements
         const fromDateBtn = document.getElementById('fromDateBtn');
         const toDateBtn = document.getElementById('toDateBtn');
@@ -700,9 +553,7 @@
             resetPageAndSubmit();
         }
     </script>
-    
-    <!-- Modal Detail Javascript Logic -->
-    <script>
+<script>
         const detailsModal = document.getElementById('detailsModal');
         
         function openDetailsModal(btn) {
@@ -758,5 +609,5 @@
             alert('Xuất dữ liệu thành công! Bản xuất dữ liệu Excel (.xlsx) đã được chuẩn bị cho các bộ lọc hiện tại.');
         }
     </script>
-</body>
-</html>
+
+

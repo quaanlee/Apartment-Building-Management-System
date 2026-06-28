@@ -1,4 +1,4 @@
-﻿package com.quan.apartment_building_management_system.entity;
+package com.quan.apartment_building_management_system.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

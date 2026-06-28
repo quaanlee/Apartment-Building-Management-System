@@ -40,65 +40,36 @@ public class ServiceItem {
     @Column(name = "Status", nullable = false)
     private Boolean status = true;
 
+    @Column(name = "Description", length = 500)
+    private String description;
+
     @OneToMany(mappedBy = "serviceItem")
     private List<BillDetail> billDetails = new ArrayList<>();
 
     public ServiceItem() {
     }
 
-    public Integer getServiceId() {
-        return serviceId;
-    }
+    public Integer getServiceId() { return serviceId; }
+    public void setServiceId(Integer serviceId) { this.serviceId = serviceId; }
 
-    public void setServiceId(Integer serviceId) {
-        this.serviceId = serviceId;
-    }
+    public String getServiceName() { return serviceName; }
+    public void setServiceName(String serviceName) { this.serviceName = serviceName; }
 
-    public String getServiceName() {
-        return serviceName;
-    }
+    public String getServiceType() { return serviceType; }
+    public void setServiceType(String serviceType) { this.serviceType = serviceType; }
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
+    public BigDecimal getUnitPrice() { return unitPrice; }
+    public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
 
-    public String getServiceType() {
-        return serviceType;
-    }
+    public Unit getUnit() { return unit; }
+    public void setUnit(Unit unit) { this.unit = unit; }
 
-    public void setServiceType(String serviceType) {
-        this.serviceType = serviceType;
-    }
+    public Boolean getStatus() { return status; }
+    public void setStatus(Boolean status) { this.status = status; }
 
-    public BigDecimal getUnitPrice() {
-        return unitPrice;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setUnitPrice(BigDecimal unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public void setUnit(Unit unit) {
-        this.unit = unit;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
-    }
-
-    public List<BillDetail> getBillDetails() {
-        return billDetails;
-    }
-
-    public void setBillDetails(List<BillDetail> billDetails) {
-        this.billDetails = billDetails;
-    }
+    public List<BillDetail> getBillDetails() { return billDetails; }
+    public void setBillDetails(List<BillDetail> billDetails) { this.billDetails = billDetails; }
 }

@@ -855,3 +855,31 @@ body {
     background-color: #f1f5f9;
     color: #0f172a;
 }
+/* Role-based text colors for account names */
+.text-role-admin { color: #7c3aed; font-weight: 500; }
+.text-role-manager { color: #16a34a; font-weight: 500; }
+.text-role-security { color: #ea580c; font-weight: 500; }
+.text-role-resident { color: #2563eb; font-weight: 500; }
+.text-role-maintenance { color: #0891b2; font-weight: 500; }
+.text-role-system { color: #475569; font-weight: 500; }
+.text-role-default { color: #475569; font-weight: 500; }
+
+/* -- Admin Layout Compatibility Overrides ---------------- */
+/* Prevent system-logs.css from breaking admin layout grid */
+body {
+    display: block !important;
+    min-height: unset !important;
+}
+.app-container {
+    display: grid !important;
+    width: unset !important;
+}
+.sidebar {
+    position: sticky !important;
+    width: var(--sidebar-width, 260px) !important;
+    height: 100vh !important;
+}
+.main-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+}
