@@ -140,3 +140,4 @@ public class SystemLogServiceImpl implements SystemLogService {
                 PageRequest.of(page, size));
     }
 }
+
