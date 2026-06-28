@@ -548,8 +548,8 @@
         function clearAllFilters() {
             hiddenFromDate.value = '';
             hiddenToDate.value = '';
-            document.querySelector('.search-input').value = '';
-            document.querySelector('.filter-select').value = 'All Roles';
+            document.getElementById('logSearchInput').value = '';
+            document.querySelector('select[name="roleName"]').value = 'All Roles';
             resetPageAndSubmit();
         }
     </script>
