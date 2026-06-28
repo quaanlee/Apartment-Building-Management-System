@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/admin/layout :: admin-layout(~{::main}, 'building')}">
+<head>
+    <title th:text="${pageTitle}">Apartment Form</title>
+</head>
+<body>
+
+<main>
+    <!-- Link custom stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/building-management.css}">
+
+    <!-- Page Header Actions -->
+    <div class="detail-header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div class="detail-title" style="font-size: 24px; font-weight: 700; color: var(--text-primary);"
+             th:text="${pageTitle}">
+            Add New Unit
+        </div>
+        <a th:href="@{/admin/apartments}" class="cancel-btn" style="display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="form-wrapper" style="padding: 0; min-height: auto; background: none; display: flex; justify-content: center; align-items: flex-start;">
+        <div class="form-card" style="width: 100%; max-width: 600px; box-sizing: border-box;">
+            <h2 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">Apartment details</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">Enter apartment information below.</p>
+
+            <form th:action="@{${actionUrl}}" th:object="${apartment}" method="post">
+
+                <label>Apartment Number</label>
+                <input type="text" th:field="*{apartmentNumber}" required placeholder="e.g. A-101">
+
+                <label>Floor</label>
+                <input type="number" th:field="*{floor}" required min="1" placeholder="e.g. 1">
+
+                <label>Area (m²)</label>
+                <input type="number" step="0.01" th:field="*{area}" required min="1" placeholder="e.g. 75.5">
+
+                <label>Room Type</label>
+                <select th:field="*{roomType}" required>
+                    <option value="">Select room type</option>
+                    <option value="Studio">Studio</option>
+                    <option value="1 Bedroom">1 Bedroom</option>
+                    <option value="2 Bedrooms">2 Bedrooms</option>
+                    <option value="3 Bedrooms">3 Bedrooms</option>
+                    <option value="Penthouse">Penthouse</option>
+                </select>
+
+                <label>Status</label>
+                <select th:field="*{status}" required>
+                    <option value="0">Vacant</option>
+                    <option value="1">Occupied</option>
+                    <option value="2">Maintenance</option>
+                </select>
+
+                <label>Max Occupancy</label>
+                <input type="number" th:field="*{maxOccupancy}" required min="1" placeholder="e.g. 4">
+
+                <div class="form-actions" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                    <a th:href="@{/admin/apartments}" class="cancel-btn" style="border: 1px solid var(--border-color); text-align: center;">Cancel</a>
+                    <button type="submit" class="save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

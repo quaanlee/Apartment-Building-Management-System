@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/admin/layout :: admin-layout(~{::main}, 'building')}">
+<head>
+    <title>Building Management</title>
+</head>
+<body>
+
+<main>
+    <!-- Link custom stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/building-management.css}">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1>Building Management</h1>
+            <p>Monitor and manage the list of apartments in the building.</p>
+        </div>
+
+        <a th:href="@{/admin/apartments/add}" class="add-btn">
+            <i class="fa-solid fa-plus"></i> Add Unit
+        </a>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${successMessage}" class="alert success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert error" th:text="${errorMessage}"></div>
+
+    <!-- Filter Box -->
+    <div class="filter-box">
+        <select id="statusFilter">
+            <option value="all">All Status</option>
+            <option value="0">Vacant</option>
+            <option value="1">Occupied</option>
+            <option value="2">Maintenance</option>
+        </select>
+
+        <select id="floorFilter">
+            <option value="all">All Floors</option>
+            <option th:each="apartment : ${apartments}"
+                    th:value="${apartment.floor}"
+                    th:text="'Floor ' + ${apartment.floor}">
+            </option>
+        </select>
+
+        <span class="dot"></span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+        <table>
+            <thead>
+            <tr>
+                <th>Apartment Name</th>
+                <th>Floor</th>
+                <th>Room Type</th>
+                <th>Status</th>
+                <th>Max Occupancy</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="apartment : ${apartments}"
+                th:attr="data-status=${apartment.status}, data-floor=${apartment.floor}">
+
+                <td class="apt-name" th:text="${apartment.apartmentNumber}">A-101</td>
+                <td th:text="'Floor ' + ${apartment.floor}">Floor 1</td>
+                <td th:text="${apartment.roomType}">Studio</td>
+                <td>
+                    <span th:if="${apartment.status == 0}" class="badge vacant">Vacant</span>
+                    <span th:if="${apartment.status == 1}" class="badge occupied">Occupied</span>
+                    <span th:if="${apartment.status == 2}" class="badge maintenance">Maintenance</span>
+                </td>
+                <td th:text="${apartment.maxOccupancy}">4</td>
+                <td class="actions">
+                    <a th:href="@{/admin/apartments/edit/{id}(id=${apartment.apartmentId})}" title="Edit">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <a th:href="@{/admin/apartments/assign/{id}(id=${apartment.apartmentId})}" title="Assign Resident">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </a>
+                    <a th:href="@{/admin/apartments/detail/{id}(id=${apartment.apartmentId})}" title="View Detail">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <a th:href="@{/admin/apartments/delete/{id}(id=${apartment.apartmentId})}"
+                       onclick="return confirm('Are you sure you want to delete this apartment?')"
+                       title="Delete">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(apartments)}">
+                <td colspan="6" class="empty">No apartments found.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Filter Script -->
+    <script>
+        const statusFilter = document.getElementById("statusFilter");
+        const floorFilter = document.getElementById("floorFilter");
+
+        function filterRows() {
+            const selectedStatus = statusFilter.value;
+            const selectedFloor = floorFilter.value;
+            const rows = document.querySelectorAll("tbody tr[data-status]");
+
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute("data-status");
+                const rowFloor = row.getAttribute("data-floor");
+
+                const matchStatus = selectedStatus === "all" || selectedStatus === rowStatus;
+                const matchFloor = selectedFloor === "all" || selectedFloor === rowFloor;
+
+                row.style.display = matchStatus && matchFloor ? "" : "none";
+            });
+        }
+
+        statusFilter.addEventListener("change", filterRows);
+        floorFilter.addEventListener("change", filterRows);
+    </script>
+</main>
+
+</body>
+</html>
