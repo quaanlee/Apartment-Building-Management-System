@@ -31,7 +31,6 @@ public class AdminServiceController {
         this.unitService = unitService;
     }
 
-    // ── GET: Hiển thị danh sách dịch vụ ──────────────────────────────────────
     @GetMapping
     public String listServices(
             @RequestParam(value = "keyword", required = false) String keyword,
@@ -40,7 +39,6 @@ public class AdminServiceController {
 
         String searchKeyword = (keyword == null) ? "" : keyword.trim();
 
-        // Filtered list → DTO
         List<ServiceItem> filteredItems = serviceItemService.searchServices(searchKeyword, status);
         List<ServiceDTO> dtos = filteredItems.stream()
                 .map(ServiceDTO::new)
@@ -61,10 +59,9 @@ public class AdminServiceController {
         model.addAttribute("statusFilter",  status);
         model.addAttribute("units",         units);
 
-        return "admin/services/list";
+        return "admin/services/services";
     }
 
-    // ── POST: Tạo service mới từ modal ────────────────────────────────────────
     @PostMapping("/create")
     public String createService(
             @RequestParam("serviceName")                     String     serviceName,
@@ -84,14 +81,13 @@ public class AdminServiceController {
         newService.setUnitPrice(unitPrice);
         newService.setUnit(unitOpt.get());
         newService.setDescription(description != null ? description.trim() : "");
-        newService.setStatus(true); // mặc định ACTIVE khi tạo mới
+        newService.setStatus(true); // máº·c Ä‘á»‹nh ACTIVE khi táº¡o má»›i
 
         serviceItemService.save(newService);
 
         return "redirect:/admin/services?success=created";
     }
 
-    // ── GET: Lấy chi tiết service (JSON) cho modal edit ────────────────────────
     @GetMapping("/{serviceId}/details")
     @ResponseBody
     public ResponseEntity<ServiceDTO> getServiceDetails(@PathVariable Integer serviceId) {
@@ -102,7 +98,6 @@ public class AdminServiceController {
         return ResponseEntity.ok(new ServiceDTO(serviceOpt.get()));
     }
 
-    // ── POST: Cập nhật service ────────────────────────────────────────────────────
     @PostMapping("/update")
     public String updateService(
             @RequestParam("serviceId")                       Integer    serviceId,
@@ -132,7 +127,6 @@ public class AdminServiceController {
         return "redirect:/admin/services?success=updated";
     }
 
-    // ── POST: Toggle service lock/unlock ──────────────────────────────────────
     @PostMapping("/{serviceId}/toggle-status")
     public String toggleServiceStatus(
             @PathVariable Integer serviceId,

@@ -922,3 +922,95 @@
 .logs-detail-body::-webkit-scrollbar { width: 5px; }
 .logs-detail-body::-webkit-scrollbar-track { background: transparent; }
 .logs-detail-body::-webkit-scrollbar-thumb { background: var(--color-outline-variant); border-radius: 10px; }
+
+/* --- Role-based text colors for account name column --- */
+.logs-account-name.role-super-admin { color: var(--role-super-admin-text); }
+.logs-account-name.role-admin { color: var(--role-admin-text); }
+.logs-account-name.role-manager { color: var(--role-manager-text); }
+.logs-account-name.role-maintainer { color: var(--role-maintainer-text); }
+.logs-account-name.role-resident { color: var(--role-resident-text); }
+.logs-account-name.role-system { color: var(--role-system-text); }
+.logs-account-name.role-default { color: var(--color-secondary); }
+/* --- Search Input --- */
+.logs-search-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--color-surface-low);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 7px 12px;
+    cursor: text;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    gap: 8px;
+}
+.logs-search-wrapper:hover {
+    border-color: var(--color-outline);
+}
+.logs-search-wrapper:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(69,30,187,0.12);
+}
+.logs-search-icon {
+    font-size: 18px;
+    color: var(--color-secondary);
+    flex-shrink: 0;
+}
+.logs-search-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--color-on-surface);
+    width: 100%;
+    min-width: 160px;
+}
+.logs-search-input::placeholder {
+    color: var(--color-outline);
+}
+
+/* --- Action Badge Colors --- */
+.logs-action-badge.action-login {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+.logs-action-badge.action-logout {
+    background: #f1f5f9;
+    color: #475569;
+}
+.logs-action-badge.action-create_bill {
+    background: #dcfce7;
+    color: #15803d;
+}
+.logs-action-badge.action-lock_account {
+    background: #fce7f3;
+    color: #be185d;
+}
+.logs-action-badge.action-delete_booking {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+.logs-action-badge.action-cancel_booking {
+    background: #fff7ed;
+    color: #c2410c;
+}
+.logs-action-badge.action-update_permissions {
+    background: #ede7ff;
+    color: #4723be;
+}
+.logs-action-badge.action-daily_backup {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.role-security {
+    background: var(--role-maintainer-bg);
+    color: var(--role-maintainer-text);
+    border-color: var(--role-maintainer-border);
+}
+.logs-account-name.role-security { color: var(--role-maintainer-text); }
+.avatar-security {
+    background: var(--role-maintainer-bg);
+    color: var(--role-maintainer-text);
+    border-color: var(--role-maintainer-border);
+}

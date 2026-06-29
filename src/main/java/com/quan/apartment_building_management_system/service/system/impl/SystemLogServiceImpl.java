@@ -135,8 +135,8 @@ public class SystemLogServiceImpl implements SystemLogService {
 
     @Override
     public Page<SystemLog> findFiltered(LocalDateTime fromDate, LocalDateTime toDate,
-                                         String role, String action, int page, int size) {
-        return systemLogRepository.findFiltered(fromDate, toDate, role, action,
+                                         String role, String action, String search, int page, int size) {
+        return systemLogRepository.findFiltered(fromDate, toDate, role, action, search,
                 PageRequest.of(page, size));
     }
 }

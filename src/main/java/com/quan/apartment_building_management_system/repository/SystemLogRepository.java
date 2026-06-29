@@ -44,11 +44,17 @@ public interface SystemLogRepository extends JpaRepository<SystemLog, Long> {
            "  AND (:toDate IS NULL OR sl.createdAt <= :toDate) " +
            "  AND (:role IS NULL OR r.roleName = :role) " +
            "  AND (:action IS NULL OR sl.action = :action) " +
+           "  AND (:search IS NULL OR :search = '' OR " +
+           "       LOWER(a.username) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "       LOWER(p.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "       LOWER(sl.action) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "       LOWER(sl.entityType) LIKE LOWER(CONCAT('%', :search, '%'))) " +
            "ORDER BY sl.createdAt DESC")
     Page<SystemLog> findFiltered(
             @Param("fromDate") LocalDateTime fromDate,
             @Param("toDate") LocalDateTime toDate,
             @Param("role") String role,
             @Param("action") String action,
+            @Param("search") String search,
             Pageable pageable);
 }

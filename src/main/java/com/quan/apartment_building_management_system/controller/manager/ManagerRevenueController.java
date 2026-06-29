@@ -19,6 +19,7 @@ import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.Month;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -49,22 +50,29 @@ public class ManagerRevenueController {
             @RequestParam(value = "page",        defaultValue = "0") int page,
             @RequestParam(value = "month", required = false) Integer month,
             Model model) {
-        LocalDateTime fromDate = parseDate(fromDateStr, LocalDate.now().minusMonths(1).atStartOfDay());
-        LocalDateTime toDate   = parseDate(toDateStr,   LocalDateTime.now());
         Byte statusByte = parseStatus(statusStr);
         if (revenueType != null && revenueType.isBlank()) revenueType = null;
 
-        BigDecimal totalRev     = billRepository.sumTotalByDateRange(fromDate, toDate);
-        BigDecimal collected    = billRepository.sumCollectedByDateRange(fromDate, toDate);
-        BigDecimal outstanding  = billRepository.sumOutstandingByDateRange(fromDate, toDate);
-        BigDecimal overdue      = billRepository.sumOverdueByDateRange(fromDate, toDate);
+        // Extract year/month from dates
+        java.time.LocalDate fromParsed = parseLocalDate(fromDateStr, LocalDate.now().minusMonths(1));
+        java.time.LocalDate toParsed   = parseLocalDate(toDateStr,   LocalDate.now());
+        Integer fromYear = fromParsed.getYear();
+        Integer fromMonth = fromParsed.getMonthValue();
+        Integer toYear = toParsed.getYear();
+        Integer toMonth = toParsed.getMonthValue();
+
+        BigDecimal totalRev     = billRepository.sumTotalByDateRange(fromYear, fromMonth, toYear, toMonth, statusByte, revenueType);
+        BigDecimal collected    = billRepository.sumCollectedByDateRange(fromYear, fromMonth, toYear, toMonth, revenueType);
+        BigDecimal outstanding  = billRepository.sumOutstandingByDateRange(fromYear, fromMonth, toYear, toMonth, revenueType);
+        BigDecimal overdue      = billRepository.sumOverdueByDateRange(fromYear, fromMonth, toYear, toMonth, revenueType);
 
         model.addAttribute("totalRevenue",  VND_FMT.format(totalRev) + " VND");
         model.addAttribute("collected",     VND_FMT.format(collected) + " VND");
         model.addAttribute("outstanding",   VND_FMT.format(outstanding) + " VND");
         model.addAttribute("overdue",       VND_FMT.format(overdue) + " VND");
 
-        Page<Bill> billPage = billRepository.findBillsWithDetails(fromDate, toDate, statusByte, revenueType,
+        Byte monthByte = (month != null) ? month.byteValue() : null;
+        Page<Bill> billPage = billRepository.findBillsWithDetails(fromYear, fromMonth, toYear, toMonth, statusByte, revenueType, monthByte,
                 PageRequest.of(page, PAGE_SIZE));
 
         List<RevenueRecordDTO> records = billPage.getContent().stream()
@@ -82,51 +90,13 @@ public class ManagerRevenueController {
         model.addAttribute("revenueType", revenueType);
         model.addAttribute("status",      statusStr);
         // Chart data
-        short currentYear = (short) LocalDate.now().getYear();
-        short prevYear = (short) (currentYear - 1);
-        List<Object[]> monthlyCurrent = billRepository.sumByYear(currentYear);
-        List<Object[]> monthlyPrev = billRepository.sumByYear(prevYear);
 
-        // Build 12-month arrays as JSON
-        java.math.BigDecimal[] currentMonthly = new java.math.BigDecimal[12];
-        java.math.BigDecimal[] prevMonthly = new java.math.BigDecimal[12];
-        for (int m = 0; m < 12; m++) {
-            currentMonthly[m] = java.math.BigDecimal.ZERO;
-            prevMonthly[m] = java.math.BigDecimal.ZERO;
-        }
-        for (Object[] row : monthlyCurrent) {
-            int mth = ((Number) row[0]).intValue() - 1;
-            currentMonthly[mth] = (java.math.BigDecimal) row[1];
-        }
-        for (Object[] row : monthlyPrev) {
-            int mth = ((Number) row[0]).intValue() - 1;
-            prevMonthly[mth] = (java.math.BigDecimal) row[1];
-        }
 
-        StringBuilder barCurrentJson = new StringBuilder("[");
-        StringBuilder barPrevJson = new StringBuilder("[");
-        for (int m = 0; m < 12; m++) {
-            if (m > 0) { barCurrentJson.append(","); barPrevJson.append(","); }
-            barCurrentJson.append(currentMonthly[m]);
-            barPrevJson.append(prevMonthly[m]);
-        }
-        barCurrentJson.append("]");
-        barPrevJson.append("]");
-        // If a specific month is selected, zero out other months in bar chart
-        if (month != null && month >= 1 && month <= 12) {
-            int m = month - 1;
-            for (int mi = 0; mi < 12; mi++) {
-                if (mi != m) {
-                    currentMonthly[mi] = java.math.BigDecimal.ZERO;
-                    prevMonthly[mi] = java.math.BigDecimal.ZERO;
-                }
-            }
-        }
-        model.addAttribute("barCurrentJson", barCurrentJson.toString());
-        model.addAttribute("barPrevJson", barPrevJson.toString());
+
+
 
         // Donut chart: revenue by service type
-        List<Object[]> typeData = billRepository.sumByServiceType(fromDate, toDate);
+                List<Object[]> typeData = billRepository.sumByServiceType(fromYear, fromMonth, toYear, toMonth, statusByte, revenueType, monthByte);
         java.math.BigDecimal totalTypeSum = java.math.BigDecimal.ZERO;
         for (Object[] row : typeData) {
             totalTypeSum = totalTypeSum.add((java.math.BigDecimal) row[1]);
@@ -147,10 +117,26 @@ public class ManagerRevenueController {
         }
         model.addAttribute("donutLabels", donutLabels.toString());
         model.addAttribute("donutPcts", donutPcts.toString());
+        // Build bar chart data by type with percentages
+        StringBuilder barTypeLabels = new StringBuilder();
+        StringBuilder barTypePcts = new StringBuilder();
+        boolean firstBar = true;
+        for (Object[] row : typeData) {
+            if (!firstBar) { barTypeLabels.append(","); barTypePcts.append(","); }
+            firstBar = false;
+            barTypeLabels.append((String) row[0]);
+            java.math.BigDecimal amount = (java.math.BigDecimal) row[1];
+            int pct = totalTypeSum.compareTo(java.math.BigDecimal.ZERO) > 0
+                      ? amount.multiply(java.math.BigDecimal.valueOf(100)).divide(totalTypeSum, java.math.RoundingMode.HALF_UP).intValue()
+                      : 0;
+            barTypePcts.append(pct);
+        }
+        model.addAttribute("barTypeLabels", barTypeLabels.toString());
+        model.addAttribute("barTypePcts", barTypePcts.toString());
 
         model.addAttribute("selectedMonth", month);
         model.addAttribute("hasActiveFilters", (fromDateStr != null && !fromDateStr.isBlank()) || (toDateStr != null && !toDateStr.isBlank()) || (revenueType != null && !revenueType.isBlank()) || (statusStr != null && !statusStr.isBlank()));
-        return "admin/revenue/list";
+        return "manager/revenue/revenue_report";
     }
 
     private RevenueRecordDTO toRecordDTO(Bill bill) {
@@ -204,10 +190,10 @@ public class ManagerRevenueController {
         return (parts[0].substring(0, 1) + parts[parts.length - 1].substring(0, 1)).toUpperCase();
     }
 
-    private LocalDateTime parseDate(String str, LocalDateTime fallback) {
+    private LocalDate parseLocalDate(String str, LocalDate fallback) {
         if (str == null || str.isBlank()) return fallback;
         try {
-            return LocalDate.parse(str.trim()).atStartOfDay();
+            return LocalDate.parse(str.trim());
         } catch (Exception e) {
             return fallback;
         }
@@ -224,10 +210,4 @@ public class ManagerRevenueController {
         };
     }
 }
-
-
-
-
-
-
 

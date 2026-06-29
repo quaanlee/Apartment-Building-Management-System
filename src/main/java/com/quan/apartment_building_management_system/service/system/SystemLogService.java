@@ -29,5 +29,5 @@ public interface SystemLogService {
     Page<SystemLog> searchLogs(String search, String roleName, LocalDate fromDate, LocalDate toDate, Pageable pageable);
 
     Page<SystemLog> findFiltered(LocalDateTime fromDate, LocalDateTime toDate,
-                                  String role, String action, int page, int size);
+                                 String role, String action, String search, int page, int size);
 }

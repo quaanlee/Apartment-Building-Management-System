@@ -38,6 +38,7 @@ public class AdminLogController {
             @RequestParam(value = "toDate",    required = false) String toDateStr,
             @RequestParam(value = "userRole",  required = false) String userRole,
             @RequestParam(value = "action",    required = false) String action,
+            @RequestParam(value = "search",    required = false) String search,
             @RequestParam(value = "page",      defaultValue = "0") int page,
             Model model) {
 
@@ -48,6 +49,7 @@ public class AdminLogController {
                 fromDate, toDate,
                 (userRole != null && !userRole.isEmpty()) ? userRole : null,
                 (action != null && !action.isEmpty()) ? action : null,
+                (search != null && !search.isEmpty()) ? search : null,
                 page, PAGE_SIZE);
 
         List<SystemLogDTO> dtos = logPage.getContent().stream()
@@ -64,12 +66,13 @@ public class AdminLogController {
         model.addAttribute("toDate",    toDateStr);
         model.addAttribute("userRole",  userRole);
         model.addAttribute("action",    action);
+        model.addAttribute("search",    search);
 
         model.addAttribute("totalEvents",    formatNumber(logPage.getTotalElements()));
         model.addAttribute("securityAlerts", countByAction(logPage.getContent(), "LOCK_ACCOUNT"));
         model.addAttribute("storageUsed",    "1.2 GB");
 
-        return "admin/logs/list";
+        return "admin/logs/system_logs";
     }
 
     // ── helpers ────────────────────────────────────────────────

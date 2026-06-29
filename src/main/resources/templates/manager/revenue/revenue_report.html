@@ -1,560 +1,1103 @@
 <div th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'revenue')}">
+
     <div th:fragment="content">
+
         <!-- Load custom page styling -->
-        <link rel="stylesheet" th:href="@{/css/admin/revenue.css}">
+
+        <link rel="stylesheet" th:href="@{/css/manager/revenue.css}">
+
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
 
-        <!-- ═══════════════════════════════════════════════════════════ -->
+
+
+        <!-- *********************************************************** -->
+
         <!-- PAGE HEADER                                                  -->
-        <!-- ═══════════════════════════════════════════════════════════ -->
+
+        <!-- *********************************************************** -->
+
         <div class="rev-page-header">
+
             <div>
+
                 <h2 class="rev-page-title">Revenue Report</h2>
+
                 <p class="rev-page-subtitle">Financial overview and billing analytics for the apartment complex.</p>
+
             </div>
+
             <div class="rev-header-actions">
+
                 <button class="rev-btn-secondary" id="printReportBtn">
+
                     <span class="material-symbols-outlined">print</span>
+
                     PRINT REPORT
+
                 </button>
+
                 <button class="rev-btn-primary" id="exportRevenueBtn">
+
                     <span class="material-symbols-outlined">download</span>
+
                     EXPORT DATA
+
                 </button>
+
             </div>
+
         </div>
+
         <form method="get" th:action="@{/manager/revenue}" id="revFilterForm" class="rev-filter-bar">
+
         <input type="hidden" name="month" id="hiddenMonth" th:value="${selectedMonth}">
+
             <!-- From Date -->
+
             <div class="rev-filter-group">
+
                 <label class="rev-filter-label">From Date</label>
+
                 <div class="rev-date-wrapper" id="revFromWrapper">
+
                     <span class="material-symbols-outlined rev-date-icon">calendar_today</span>
+
                     <input type="text" id="revFromDisplay" class="rev-date-display"
+
                            th:value="${fromDate != null ? fromDate : ''}"
+
                            placeholder="Select date" readonly>
+
                     <input type="hidden" id="revFromDate" name="fromDate" th:value="${fromDate}">
+
                 </div>
+
                 <div class="rev-calendar-dropdown" id="revFromCal">
+
                     <div class="cal-header">
+
                         <button type="button" class="cal-nav" id="revFromPrev">&lt;</button>
+
                         <span class="cal-month-year" id="revFromMonthYear"></span>
+
                         <button type="button" class="cal-nav" id="revFromNext">&gt;</button>
+
                     </div>
+
                     <div class="cal-weekdays">
+
                         <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+
                     </div>
+
                     <div class="cal-days" id="revFromDays"></div>
+
                     <div class="cal-actions">
+
                         <button type="button" class="cal-cancel" id="revFromCancel">Cancel</button>
+
                         <button type="button" class="cal-apply" id="revFromApply">Apply</button>
+
                     </div>
+
                 </div>
+
             </div>
+
+
 
             <!-- To Date -->
+
             <div class="rev-filter-group">
+
                 <label class="rev-filter-label">To Date</label>
+
                 <div class="rev-date-wrapper" id="revToWrapper">
+
                     <span class="material-symbols-outlined rev-date-icon">calendar_today</span>
+
                     <input type="text" id="revToDisplay" class="rev-date-display"
+
                            th:value="${toDate != null ? toDate : ''}"
+
                            placeholder="Select date" readonly>
+
                     <input type="hidden" id="revToDate" name="toDate" th:value="${toDate}">
+
                 </div>
+
                 <div class="rev-calendar-dropdown" id="revToCal">
+
                     <div class="cal-header">
+
                         <button type="button" class="cal-nav" id="revToPrev">&lt;</button>
+
                         <span class="cal-month-year" id="revToMonthYear"></span>
+
                         <button type="button" class="cal-nav" id="revToNext">&gt;</button>
+
                     </div>
+
                     <div class="cal-weekdays">
+
                         <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+
                     </div>
+
                     <div class="cal-days" id="revToDays"></div>
+
                     <div class="cal-actions">
+
                         <button type="button" class="cal-cancel" id="revToCancel">Cancel</button>
+
                         <button type="button" class="cal-apply" id="revToApply">Apply</button>
+
                     </div>
+
                 </div>
+
             </div>
+
+
 
             <!-- Revenue Type -->
+
             <div class="rev-filter-group">
+
                 <label class="rev-filter-label">Revenue Type</label>
+
                 <select name="revenueType" class="rev-filter-select">
+
                     <option value="">All Types</option>
+
                     <option value="RENT" th:selected="${revenueType == 'RENT'}">Rent</option>
+
                     <option value="ELECTRICITY" th:selected="${revenueType == 'ELECTRICITY'}">Electricity</option>
+
                     <option value="WATER" th:selected="${revenueType == 'WATER'}">Water</option>
+
                     <option value="PARKING" th:selected="${revenueType == 'PARKING'}">Parking</option>
+
                     <option value="SERVICE" th:selected="${revenueType == 'SERVICE'}">Service Fee</option>
+
                     <option value="PENALTY" th:selected="${revenueType == 'PENALTY'}">Late Penalty</option>
+
                 </select>
+
             </div>
+
+
 
             <!-- Status -->
+
             <div class="rev-filter-group">
+
                 <label class="rev-filter-label">Status</label>
+
                 <select name="status" class="rev-filter-select">
+
                     <option value="">All Status</option>
+
                     <option value="PAID" th:selected="${status == 'PAID'}">Paid</option>
+
                     <option value="PENDING" th:selected="${status == 'PENDING'}">Pending</option>
+
                     <option value="OVERDUE" th:selected="${status == 'OVERDUE'}">Overdue</option>
+
                     <option value="CANCELLED" th:selected="${status == 'CANCELLED'}">Cancelled</option>
+
                 </select>
+
             </div>
+
+
 
             <div class="rev-filter-actions">
+
                 <button type="submit" class="rev-apply-btn">Apply Filters</button>
+
                 <a th:href="@{/manager/revenue}" class="rev-clear-btn">CLEAR ALL</a>
+
             </div>
+
         </form>
+
         <div class="rev-stats-grid">
+
             <!-- Total Revenue -->
+
             <div class="rev-stat-card">
+
                 <div class="rev-stat-header">
+
                     <span class="rev-stat-label">TOTAL REVENUE</span>
+
                     <div class="rev-stat-icon-wrap primary">
+
                         <span class="material-symbols-outlined">payments</span>
+
                     </div>
+
                 </div>
+
                 <div class="rev-stat-main">
-                    <span class="rev-stat-number" th:text="${totalRevenue != null ? totalRevenue : '2,847,500,000 ₫'}">2,847,500,000 ₫</span>
+
+                    <span class="rev-stat-number" th:text="${totalRevenue != null ? totalRevenue : '2,847,500,000  VND'}">2,847,500,000  VND</span>
+
                 </div>
+
                 <div class="rev-stat-footer">
+
                     <span class="rev-trend positive">
+
                         <span class="material-symbols-outlined">trending_up</span> +18.2%
+
                     </span>
+
                     <span class="rev-trend-label">vs last period</span>
+
                 </div>
+
             </div>
+
             <!-- Collected -->
+
             <div class="rev-stat-card">
+
                 <div class="rev-stat-header">
+
                     <span class="rev-stat-label">COLLECTED</span>
+
                     <div class="rev-stat-icon-wrap success">
+
                         <span class="material-symbols-outlined">check_circle</span>
+
                     </div>
+
                 </div>
+
                 <div class="rev-stat-main">
-                    <span class="rev-stat-number success" th:text="${collected != null ? collected : '2,412,300,000 ₫'}">2,412,300,000 ₫</span>
+
+                    <span class="rev-stat-number success" th:text="${collected != null ? collected : '2,412,300,000  VND'}">2,412,300,000  VND</span>
+
                 </div>
+
                 <div class="rev-stat-footer">
+
                     <span class="rev-trend positive">
+
                         <span class="material-symbols-outlined">trending_up</span> +12.4%
+
                     </span>
+
                     <span class="rev-trend-label">collection rate 84.7%</span>
+
                 </div>
+
             </div>
+
             <!-- Outstanding -->
+
             <div class="rev-stat-card">
+
                 <div class="rev-stat-header">
+
                     <span class="rev-stat-label">OUTSTANDING</span>
+
                     <div class="rev-stat-icon-wrap warning">
+
                         <span class="material-symbols-outlined">schedule</span>
+
                     </div>
+
                 </div>
+
                 <div class="rev-stat-main">
-                    <span class="rev-stat-number warning" th:text="${outstanding != null ? outstanding : '325,200,000 ₫'}">325,200,000 ₫</span>
+
+                    <span class="rev-stat-number warning" th:text="${outstanding != null ? outstanding : '325,200,000  VND'}">325,200,000  VND</span>
+
                 </div>
+
                 <div class="rev-stat-footer">
+
                     <span class="rev-trend negative">
+
                         <span class="material-symbols-outlined">trending_down</span> -3.1%
+
                     </span>
+
                     <span class="rev-trend-label">pending payments</span>
+
                 </div>
+
             </div>
+
             <!-- Overdue -->
+
             <div class="rev-stat-card">
+
                 <div class="rev-stat-header">
+
                     <span class="rev-stat-label">OVERDUE</span>
+
                     <div class="rev-stat-icon-wrap error">
+
                         <span class="material-symbols-outlined">warning</span>
+
                     </div>
+
                 </div>
+
                 <div class="rev-stat-main">
-                    <span class="rev-stat-number error" th:text="${overdue != null ? overdue : '110,000,000 ₫'}">110,000,000 ₫</span>
+
+                    <span class="rev-stat-number error" th:text="${overdue != null ? overdue : '110,000,000  VND'}">110,000,000  VND</span>
+
                 </div>
+
                 <div class="rev-stat-footer">
+
                     <span class="rev-trend negative">
+
                         <span class="material-symbols-outlined">trending_up</span> +2.8%
+
                     </span>
+
                     <span class="rev-trend-label">requires immediate action</span>
+
                 </div>
+
             </div>
+
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════ -->
+
+
+        <!-- *********************************************************** -->
+
         <!-- CHARTS ROW                                                   -->
-        <!-- ═══════════════════════════════════════════════════════════ -->
+
+        <!-- *********************************************************** -->
+
         <div class="rev-charts-row">
+
             <!-- Monthly Revenue Bar Chart -->
+
             <div class="rev-chart-card wide">
+
                 <div class="rev-chart-header">
+
                     <h3 class="rev-chart-title">Monthly Revenue Trend</h3>
+
                     <span class="rev-chart-subtitle">Current year vs Previous year</span>
+
                     <div class="rev-month-filter">
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == null ? 'active' : ''}" onclick="clearMonthFilter()">All</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 1 ? 'active' : ''}" onclick="setMonth(1)">Jan</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 2 ? 'active' : ''}" onclick="setMonth(2)">Feb</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 3 ? 'active' : ''}" onclick="setMonth(3)">Mar</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 4 ? 'active' : ''}" onclick="setMonth(4)">Apr</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 5 ? 'active' : ''}" onclick="setMonth(5)">May</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 6 ? 'active' : ''}" onclick="setMonth(6)">Jun</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 7 ? 'active' : ''}" onclick="setMonth(7)">Jul</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 8 ? 'active' : ''}" onclick="setMonth(8)">Aug</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 9 ? 'active' : ''}" onclick="setMonth(9)">Sep</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 10 ? 'active' : ''}" onclick="setMonth(10)">Oct</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 11 ? 'active' : ''}" onclick="setMonth(11)">Nov</button>
+
                         <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 12 ? 'active' : ''}" onclick="setMonth(12)">Dec</button>
+
                     </div>
+
                 </div>
+
                 <div class="rev-bar-chart" id="monthlyBarChart">
+
                     <!-- Bars generated by JS -->
+
                 </div>
+
                 <div class="rev-bar-legend">
+
                     <span class="rev-legend-dot primary"></span><span>Current Year</span>
+
                     <span class="rev-legend-dot light" style="margin-left:16px"></span><span>Previous Year</span>
+
                 </div>
+
             </div>
+
+
 
             <!-- Revenue by Type Donut -->
+
             <div class="rev-chart-card">
+
                 <div class="rev-chart-header">
+
                     <h3 class="rev-chart-title">Revenue by Type</h3>
+
                     <span class="rev-chart-subtitle">Percentage breakdown</span>
+
                 <div class="rev-donut-body">
+
                 <div class="rev-donut-wrapper">
+
                     <svg viewBox="0 0 200 200" class="rev-donut-svg" id="donutSvg">
+
                         <!-- Segments drawn by JS -->
+
                     </svg>
+
                     <div class="rev-donut-center">
+
                         <span class="rev-donut-total">100%</span>
+
                         <span class="rev-donut-label">Total</span>
+
                     </div>
+
                 </div>
+
                 <div class="rev-donut-legend" id="donutLegend">
+
                     <!-- Legend items drawn by JS -->
+
                 </div>
+
                 </div>
+
             </div>
+
         </div>
 
-        <!-- ═══════════════════════════════════════════════════════════ -->
-        <!-- ═══════════════════════════════════════════════════════════ -->
+
+
+        <!-- *********************************************************** -->
+
+        <!-- *********************************************************** -->
+
+
+
+
+
+
 
 
 
 
 
         <div class="rev-table-card">
+
             <div class="rev-table-header-row">
+
                 <h3 class="rev-table-title">Transaction Records</h3>
+
                 <span class="rev-table-count" th:text="${totalRecords != null ? totalRecords + ' records' : '1,284 records'}">1,284 records</span>
+
             </div>
+
             <div class="rev-table-wrapper">
+
                 <table class="rev-table">
+
                     <thead>
+
                         <tr>
+
                             <th>INVOICE ID</th>
+
                             <th>RESIDENT</th>
+
                             <th>UNIT</th>
+
                             <th class="rev-th-sortable" onclick="sortByType()">TYPE<span class="sort-icon">&#9650;</span></th>
+
                             <th>AMOUNT</th>
+
                             <th>STATUS</th>
+
                             <th>DUE DATE</th>
+
                             <th>PAID DATE</th>
+
                             <th class="text-right">DETAILS</th>
+
                         </tr>
+
                     </thead>
+
                     <tbody>
+
                         <!-- Thymeleaf loop -->
+
                         <tr class="rev-table-row" th:each="rec : ${records}"
+
                             th:data-invoiceid="${rec.invoiceId}"
+
                             th:data-resident="${rec.residentName}"
+
                             th:data-unit="${rec.unitId}"
+
                             th:data-type="${rec.revenueType}"
+
                             th:data-amount="${rec.amount}"
+
                             th:data-status="${rec.status}"
+
                             th:data-duedate="${rec.dueDate}"
+
                             th:data-paiddate="${rec.paidDate}"
+
                             th:data-note="${rec.note}">
+
                             <td class="rev-td-mono" th:text="${rec.invoiceId}">INV-0001</td>
+
                             <td>
+
                                 <div class="rev-resident-cell">
+
                                     <span class="text-role-default" th:text="${rec.residentName}">Nguyen Van A</span>
+
                                 </div>
+
                             </td>
+
                             <td class="rev-td-mono rev-td-center" th:text="${rec.unitId}">A-101</td>
+
                             <td>
+
                                 <span class="rev-type-badge"
+
                                       th:classappend="${rec.revenueType == 'RENT' ? ' type-rent' :
+
                                                        rec.revenueType == 'ELECTRICITY' ? ' type-electricity' :
+
                                                        rec.revenueType == 'WATER' ? ' type-water' :
+
                                                        rec.revenueType == 'PARKING' ? ' type-parking' :
+
                                                        rec.revenueType == 'SERVICE' ? ' type-service' :
+
                                                        rec.revenueType == 'PENALTY' ? ' type-penalty' : ''}"
+
                                       th:text="${rec.revenueType}">RENT</span>
+
                             </td>
-                            <td class="rev-td-amount" th:text="${rec.amount}">5,000,000 ₫</td>
+
+                            <td class="rev-td-amount" th:text="${rec.amount}">5,000,000  VND</td>
+
                             <td>
+
                                 <span class="rev-status-badge"
+
                                       th:classappend="${rec.status == 'PAID' ? ' status-paid' :
+
                                                        rec.status == 'PENDING' ? ' status-pending' :
+
                                                        rec.status == 'OVERDUE' ? ' status-overdue' :
+
                                                        rec.status == 'CANCELLED' ? ' status-cancelled' : ''}"
+
                                       th:text="${rec.status}">PAID</span>
+
                             </td>
+
                             <td class="rev-td-secondary rev-td-nowrap" th:text="${rec.dueDate}">2023-11-05</td>
-                            <td class="rev-td-secondary rev-td-nowrap" th:text="${rec.paidDate != null ? rec.paidDate : '—'}">2023-11-03</td>
+
+                            <td class="rev-td-secondary rev-td-nowrap" th:text="${rec.paidDate != null ? rec.paidDate : '-'}">2023-11-03</td>
+
                             <td class="text-right">
+
                                 <button class="rev-eye-btn" title="View Details"
+
                                         onclick="openRevDetail(this.closest('tr'))">
+
                                     <span class="material-symbols-outlined">visibility</span>
+
                                 </button>
+
                             </td>
+
                         </tr>
+
+
 
                         <!-- Demo rows for preview -->
-                        <tr class="rev-table-row" th:if="${(records == null or records.isEmpty()) and !hasActiveFilters}"
+
+                        <tr class="rev-table-row" th:if="${records == null or records.isEmpty()}"
+
                             data-invoiceid="INV-2310-001" data-resident="Nguyen Van A" data-unit="A-101"
-                            data-type="RENT" data-amount="5,000,000 ₫" data-status="PAID"
+
+                            data-type="RENT" data-amount="5,000,000  VND" data-status="PAID"
+
                             data-duedate="2023-11-05" data-paiddate="2023-11-03" data-note="Monthly rent payment">
+
                             <td class="rev-td-mono">INV-2310-001</td>
+
                             <td><div class="rev-resident-cell"><span class="text-role-default">Nguyen Van A</span></div></td>
+
                             <td class="rev-td-mono rev-td-center">A-101</td>
+
                             <td><span class="rev-type-badge type-rent">RENT</span></td>
-                            <td class="rev-td-amount">5,000,000 ₫</td>
+
+                            <td class="rev-td-amount">5,000,000  VND</td>
+
                             <td><span class="rev-status-badge status-paid">PAID</span></td>
+
                             <td class="rev-td-secondary rev-td-nowrap">2023-11-05</td>
+
                             <td class="rev-td-secondary rev-td-nowrap">2023-11-03</td>
+
                             <td class="text-right"><button class="rev-eye-btn" onclick="openRevDetail(this.closest('tr'))"><span class="material-symbols-outlined">visibility</span></button></td>
+
                         </tr>
-                        <tr class="rev-table-row" th:if="${(records == null or records.isEmpty()) and !hasActiveFilters}"
+
+                        <tr class="rev-table-row" th:if="${records == null or records.isEmpty()}"
+
                             data-invoiceid="INV-2310-002" data-resident="Tran Thi B" data-unit="B-205"
-                            data-type="ELECTRICITY" data-amount="850,000 ₫" data-status="PENDING"
+
+                            data-type="ELECTRICITY" data-amount="850,000  VND" data-status="PENDING"
+
                             data-duedate="2023-11-10" data-paiddate="" data-note="Electricity usage: 320 kWh">
+
                             <td class="rev-td-mono">INV-2310-002</td>
+
                             <td><div class="rev-resident-cell"><span class="text-role-default">Tran Thi B</span></div></td>
+
                             <td class="rev-td-mono rev-td-center">B-205</td>
+
                             <td><span class="rev-type-badge type-electricity">ELECTRICITY</span></td>
-                            <td class="rev-td-amount">850,000 ₫</td>
+
+                            <td class="rev-td-amount">850,000  VND</td>
+
                             <td><span class="rev-status-badge status-pending">PENDING</span></td>
+
                             <td class="rev-td-secondary rev-td-nowrap">2023-11-10</td>
-                            <td class="rev-td-secondary rev-td-nowrap">—</td>
+
+                            <td class="rev-td-secondary rev-td-nowrap">-"</td>
+
                             <td class="text-right"><button class="rev-eye-btn" onclick="openRevDetail(this.closest('tr'))"><span class="material-symbols-outlined">visibility</span></button></td>
+
                         </tr>
-                        <tr class="rev-table-row" th:if="${(records == null or records.isEmpty()) and !hasActiveFilters}"
+
+                        <tr class="rev-table-row" th:if="${records == null or records.isEmpty()}"
+
                             data-invoiceid="INV-2310-003" data-resident="Le Van C" data-unit="C-312"
-                            data-type="WATER" data-amount="320,000 ₫" data-status="PAID"
-                            data-duedate="2023-11-05" data-paiddate="2023-11-04" data-note="Water usage: 15 m³">
+
+                            data-type="WATER" data-amount="320,000  VND" data-status="PAID"
+
+                            data-duedate="2023-11-05" data-paiddate="2023-11-04" data-note="Water usage: 15 mÂ³">
+
                             <td class="rev-td-mono">INV-2310-003</td>
+
                             <td><div class="rev-resident-cell"><span class="text-role-default">Le Van C</span></div></td>
+
                             <td class="rev-td-mono rev-td-center">C-312</td>
+
                             <td><span class="rev-type-badge type-water">WATER</span></td>
-                            <td class="rev-td-amount">320,000 ₫</td>
+
+                            <td class="rev-td-amount">320,000  VND</td>
+
                             <td><span class="rev-status-badge status-paid">PAID</span></td>
+
                             <td class="rev-td-secondary rev-td-nowrap">2023-11-05</td>
+
                             <td class="rev-td-secondary rev-td-nowrap">2023-11-04</td>
+
                             <td class="text-right"><button class="rev-eye-btn" onclick="openRevDetail(this.closest('tr'))"><span class="material-symbols-outlined">visibility</span></button></td>
+
                         </tr>
-                        <tr class="rev-table-row" th:if="${(records == null or records.isEmpty()) and !hasActiveFilters}"
+
+                        <tr class="rev-table-row" th:if="${records == null or records.isEmpty()}"
+
                             data-invoiceid="INV-2310-004" data-resident="Pham Thi D" data-unit="A-214"
-                            data-type="PENALTY" data-amount="200,000 ₫" data-status="OVERDUE"
+
+                            data-type="PENALTY" data-amount="200,000  VND" data-status="OVERDUE"
+
                             data-duedate="2023-10-31" data-paiddate="" data-note="Late payment penalty - 15 days overdue">
+
                             <td class="rev-td-mono">INV-2310-004</td>
+
                             <td><div class="rev-resident-cell"><span class="text-role-default">Pham Thi D</span></div></td>
+
                             <td class="rev-td-mono rev-td-center">A-214</td>
+
                             <td><span class="rev-type-badge type-penalty">PENALTY</span></td>
-                            <td class="rev-td-amount">200,000 ₫</td>
+
+                            <td class="rev-td-amount">200,000  VND</td>
+
                             <td><span class="rev-status-badge status-overdue">OVERDUE</span></td>
+
                             <td class="rev-td-secondary rev-td-nowrap">2023-10-31</td>
-                            <td class="rev-td-secondary rev-td-nowrap">—</td>
+
+                            <td class="rev-td-secondary rev-td-nowrap">-"</td>
+
                             <td class="text-right"><button class="rev-eye-btn" onclick="openRevDetail(this.closest('tr'))"><span class="material-symbols-outlined">visibility</span></button></td>
+
                         </tr>
-                        <tr class="rev-table-row" th:if="${(records == null or records.isEmpty()) and !hasActiveFilters}"
+
+                        <tr class="rev-table-row" th:if="${records == null or records.isEmpty()}"
+
                             data-invoiceid="INV-2310-005" data-resident="Hoang Van E" data-unit="D-108"
-                            data-type="PARKING" data-amount="500,000 ₫" data-status="PAID"
+
+                            data-type="PARKING" data-amount="500,000  VND" data-status="PAID"
+
                             data-duedate="2023-11-01" data-paiddate="2023-10-30" data-note="Underground parking slot P-22">
+
                             <td class="rev-td-mono">INV-2310-005</td>
+
                             <td><div class="rev-resident-cell"><span class="text-role-default">Hoang Van E</span></div></td>
+
                             <td class="rev-td-mono rev-td-center">D-108</td>
+
                             <td><span class="rev-type-badge type-parking">PARKING</span></td>
-                            <td class="rev-td-amount">500,000 ₫</td>
+
+                            <td class="rev-td-amount">500,000  VND</td>
+
                             <td><span class="rev-status-badge status-paid">PAID</span></td>
+
                             <td class="rev-td-secondary rev-td-nowrap">2023-11-01</td>
+
                             <td class="rev-td-secondary rev-td-nowrap">2023-10-30</td>
+
                             <td class="text-right"><button class="rev-eye-btn" onclick="openRevDetail(this.closest('tr'))"><span class="material-symbols-outlined">visibility</span></button></td>
+
                         </tr>
-                        <tr class="rev-table-row" th:if="${(records == null or records.isEmpty()) and !hasActiveFilters}"
+
+                        <tr class="rev-table-row" th:if="${records == null or records.isEmpty()}"
+
                             data-invoiceid="INV-2310-006" data-resident="Vu Thi F" data-unit="B-401"
-                            data-type="SERVICE" data-amount="300,000 ₫" data-status="CANCELLED"
+
+                            data-type="SERVICE" data-amount="300,000  VND" data-status="CANCELLED"
+
                             data-duedate="2023-11-08" data-paiddate="" data-note="Cleaning service - cancelled by resident">
+
                             <td class="rev-td-mono">INV-2310-006</td>
+
                             <td><div class="rev-resident-cell"><span class="text-role-default">Vu Thi F</span></div></td>
+
                             <td class="rev-td-mono rev-td-center">B-401</td>
+
                             <td><span class="rev-type-badge type-service">SERVICE</span></td>
-                            <td class="rev-td-amount">300,000 ₫</td>
+
+                            <td class="rev-td-amount">300,000  VND</td>
+
                             <td><span class="rev-status-badge status-cancelled">CANCELLED</span></td>
+
                             <td class="rev-td-secondary rev-td-nowrap">2023-11-08</td>
-                            <td class="rev-td-secondary rev-td-nowrap">—</td>
+
+                            <td class="rev-td-secondary rev-td-nowrap">-"</td>
+
                             <td class="text-right"><button class="rev-eye-btn" onclick="openRevDetail(this.closest('tr'))"><span class="material-symbols-outlined">visibility</span></button></td>
+
                         </tr>
+
                     </tbody>
+
                 </table>
+
             </div>
+
+
 
             <div class="rev-pagination-bar">
+
                 <span class="rev-pagination-info"
+
                       th:text="${totalRecords != null ? 'Showing ' + (currentPage * pageSize + 1) + ' to ' + ((currentPage + 1) * pageSize < totalRecords ? (currentPage + 1) * pageSize : totalRecords) + ' of ' + totalRecords + ' records' : 'Showing 1 to 5 of 1,284 records'}">
+
                     Showing 1 to 5 of 1,284 records
+
                 </span>
+
                 <div class="rev-pagination-controls">
+
                     <a class="rev-page-btn" th:href="@{/manager/revenue(page=${currentPage - 1}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
-                       th:classappend="${currentPage <= 0 ? ' disabled' : ''}">&lt;</a>
-                    <a class="rev-page-btn" th:href="@{/manager/revenue(page=0, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
-                       th:classappend="${currentPage == 0 ? ' active' : ''}" th:text="1">1</a>
-                    <span class="rev-page-ellipsis" th:if="${currentPage > 2}">...</span>
-                    <th:block th:each="idx : ${#numbers.sequence(0, totalPages - 1)}">
-                        <a th:if="${idx > 0 && idx < totalPages - 1 && idx >= currentPage - 1 && idx <= currentPage + 1}"
-                           th:href="@{/manager/revenue(page=${idx}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
-                           class="rev-page-btn" th:classappend="${idx == currentPage ? ' active' : ''}"
-                           th:text="${idx + 1}">2</a>
-                    </th:block>
-                    <span class="rev-page-ellipsis" th:if="${currentPage < totalPages - 3}">...</span>
-                    <a class="rev-page-btn" th:if="${totalPages > 1}"
-                       th:href="@{/manager/revenue(page=${totalPages - 1}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
-                       th:classappend="${currentPage == totalPages - 1 ? ' active' : ''}"
-                       th:text="${totalPages}">215</a>
+
+                       th:classappend="${currentPage <= 0 ? ' disabled' : ''}">
+
+                        <span class="material-symbols-outlined" style="font-size:16px;">chevron_left</span>
+
+                    </a>
+
+                    <a class="rev-page-btn" th:each="idx : ${#numbers.sequence(0, totalPages - 1)}"
+
+                       th:href="@{/manager/revenue(page=${idx}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
+
+                       th:classappend="${idx == currentPage ? ' active' : ''}"
+
+                       th:text="${idx + 1}">1</a>
+
                     <a class="rev-page-btn" th:href="@{/manager/revenue(page=${currentPage + 1}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
-                       th:classappend="${currentPage >= totalPages - 1 ? ' disabled' : ''}">&gt;</a>
+
+                       th:classappend="${currentPage >= totalPages - 1 ? ' disabled' : ''}">
+
+                        <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
+
+                    </a>
+
                 </div>
-            </div>
+
             </div>
 
-        <!-- ═══════════════════════════════════════════════════════════ -->
+
+
+        <!-- *********************************************************** -->
+
         <script>
+
         let sortAscRevType = true;
+
         function sortByType() {
+
             const tbody = document.querySelector('.rev-table tbody');
+
             if (!tbody) return;
+
             const rows = Array.from(tbody.querySelectorAll('tr.rev-table-row'));
+
             const sortable = rows.filter(r => r.style.display !== 'none');
+
             if (sortable.length === 0) return;
+
             
+
             sortable.sort((a, b) => {
+
                 const typeA = (a.getAttribute('data-type') || '').toUpperCase();
+
                 const typeB = (b.getAttribute('data-type') || '').toUpperCase();
+
                 return sortAscRevType ? typeA.localeCompare(typeB) : typeB.localeCompare(typeA);
+
             });
+
             
+
             // Reorder rows
+
             sortable.forEach(r => tbody.appendChild(r));
+
             
+
             // Update sort icon AFTER toggling so it reflects current state
+
             sortAscRevType = !sortAscRevType;
+
             const th = document.querySelector('.rev-th-sortable');
+
             if (!th) return;
+
             const isAsc = !sortAscRevType;
+
             th.querySelector('.sort-icon').innerHTML = isAsc ? '&#9650;' : '&#9660;';
+
         }
+
         </script>
+
         <script>
+
         function setMonth(month) {
+
             document.getElementById('hiddenMonth').value = month;
+
             document.getElementById('revFilterForm').submit();
+
         }
+
         function clearMonthFilter() {
+
             document.getElementById('hiddenMonth').value = '';
+
             document.getElementById('revFilterForm').submit();
+
         }
+
         </script>
+
         <!-- INVOICE DETAIL DRAWER                                       -->
-        <!-- ═══════════════════════════════════════════════════════════ -->
+
+        <!-- *********************************************************** -->
+
         <div class="rev-modal-overlay" id="revDetailOverlay" onclick="closeRevDetail()"></div>
+
         <div class="rev-detail-panel" id="revDetailPanel">
+
             <div class="rev-detail-header">
+
                 <div>
+
                     <h3 class="rev-detail-title">Invoice Details</h3>
+
                     <p class="rev-detail-id" id="revDetailId">ID: INV-2310-001</p>
+
                 </div>
+
                 <button class="rev-detail-close" onclick="closeRevDetail()">
+
                     <span class="material-symbols-outlined">close</span>
+
                 </button>
+
             </div>
+
             <div class="rev-detail-body">
+
                 <section class="rev-detail-section">
+
                     <h4 class="rev-detail-section-title">Invoice Summary</h4>
+
                     <div class="rev-detail-grid">
+
                         <div>
+
                             <p class="rev-detail-label">Invoice ID</p>
+
                             <p class="rev-detail-value mono" id="revDetailInvId">INV-2310-001</p>
+
                         </div>
+
                         <div>
+
                             <p class="rev-detail-label">Amount</p>
-                            <p class="rev-detail-value bold primary" id="revDetailAmount">5,000,000 ₫</p>
+
+                            <p class="rev-detail-value bold primary" id="revDetailAmount">5,000,000  VND</p>
+
                         </div>
+
                         <div>
+
                             <p class="rev-detail-label">Revenue Type</p>
+
                             <p class="rev-detail-value bold" id="revDetailType">RENT</p>
+
                         </div>
+
                         <div>
+
                             <p class="rev-detail-label">Status</p>
+
                             <p class="rev-detail-value" id="revDetailStatus">PAID</p>
+
                         </div>
+
                     </div>
+
                 </section>
+
                 <section class="rev-detail-section">
+
                     <h4 class="rev-detail-section-title">Resident & Unit</h4>
+
                     <div class="rev-detail-context-box">
+
                         <div class="rev-detail-context-row">
+
                             <span class="rev-detail-label">Resident Name</span>
+
                             <span class="rev-detail-value" id="revDetailResident">Nguyen Van A</span>
+
                         </div>
+
                         <div class="rev-detail-context-row">
+
                             <span class="rev-detail-label">Unit</span>
+
                             <span class="rev-detail-value mono bold" id="revDetailUnit">A-101</span>
+
                         </div>
+
                         <div class="rev-detail-context-row">
+
                             <span class="rev-detail-label">Due Date</span>
+
                             <span class="rev-detail-value" id="revDetailDue">2023-11-05</span>
+
                         </div>
+
                         <div class="rev-detail-context-row">
+
                             <span class="rev-detail-label">Paid Date</span>
+
                             <span class="rev-detail-value" id="revDetailPaid">2023-11-03</span>
+
                         </div>
+
                     </div>
+
                 </section>
+
                 <section class="rev-detail-section">
+
                     <h4 class="rev-detail-section-title">Notes</h4>
+
                     <div class="rev-detail-note-box">
+
                         <p id="revDetailNote">Monthly rent payment</p>
+
                     </div>
+
                 </section>
+
             </div>
+
             <div class="rev-detail-footer">
+
                 <button class="rev-detail-print-btn">
+
                     <span class="material-symbols-outlined">print</span> PRINT INVOICE
+
                 </button>
+
                 <button class="rev-detail-action-btn" id="revDetailSendBtn">
+
                     <span class="material-symbols-outlined">send</span> SEND REMINDER
+
                 </button>
+
             </div>
+
         </div>
 
+
+
         <!-- Scripts -->
+
     <!-- Chart data from DB -->
-    <div id="barChartData" 
-         th:data-current="${barCurrentJson}" 
-         th:data-prev="${barPrevJson}" 
+
+    <div id="barTypeData" 
+         th:data-labels="${barTypeLabels}" 
+         th:data-pcts="${barTypePcts}" 
          style="display:none;"></div>
+
     <div id="donutChartData" 
+
          th:data-labels="${donutLabels}" 
+
          th:data-pcts="${donutPcts}" 
+
          style="display:none;"></div>
-                <script th:src="@{/js/admin/revenue.js}"></script>
+
+                <script th:src="@{/js/manager/revenue.js}"></script>
+
     </div>
+
 </div>
+
+
+
 
 

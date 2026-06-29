@@ -155,52 +155,75 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     /* ============================================================
-       2. BAR CHART — Monthly Revenue Trend
+       2. BAR CHART — Revenue by Type
        ============================================================ */
-    var barDataEl = document.getElementById('barChartData');
-    var barMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var monthlyData = [];
-    if (barDataEl) {
+    var barTypeEl = document.getElementById('barTypeData');
+    var barTypeLabels = [];
+    var barTypePcts = [];
+    if (barTypeEl) {
         try {
-            var cur = JSON.parse('[' + barDataEl.getAttribute('data-current').replace(/[\[\]]/g,'') + ']');
-            var prv = JSON.parse('[' + barDataEl.getAttribute('data-prev').replace(/[\[\]]/g,'') + ']');
-            for (var mi = 0; mi < 12; mi++) {
-                monthlyData.push({
-                    month: barMonths[mi],
-                    current: cur[mi] ? Math.round(cur[mi] / 1000000) : 0,
-                    prev: prv[mi] ? Math.round(prv[mi] / 1000000) : 0
-                });
-            }
-        } catch(e) { monthlyData = []; }
+            var lblStr = barTypeEl.getAttribute('data-labels') || '';
+            var pctStr = barTypeEl.getAttribute('data-pcts') || '';
+            barTypeLabels = lblStr ? lblStr.split(',') : [];
+            barTypePcts = pctStr ? pctStr.split(',') : [];
+        } catch(e) { barTypeLabels = []; barTypePcts = []; }
     }
 
     var barChart = document.getElementById('monthlyBarChart');
-    if (barChart) {
-        var maxVal = Math.max.apply(null, monthlyData.map(function(d){ return Math.max(d.current, d.prev); }));
-        if (maxVal === 0) maxVal = 1;
-        monthlyData.forEach(function (d) {
+    var barLegendEl = document.getElementById('barTypeLegend');
+    var barColors = {
+        'RENT':'#451ebb', 'ELECTRICITY':'#d97706', 'WATER':'#2563eb',
+        'PARKING':'#16a34a', 'SERVICE':'#be185d', 'PENALTY':'#b91c1c'
+    };
+
+    if (barChart && barTypeLabels.length > 0 && barTypeLabels.length === barTypePcts.length) {
+        barChart.innerHTML = '';
+        for (var bi = 0; bi < barTypeLabels.length; bi++) {
+            var lbl = barTypeLabels[bi];
+            var pct = parseInt(barTypePcts[bi]) || 0;
+            var color = barColors[lbl] || '#64748b';
+
             var group = document.createElement('div');
             group.className = 'rev-bar-group';
 
-            var bCurrent = document.createElement('div');
-            bCurrent.className = 'rev-bar current';
-            bCurrent.style.height = (d.current / maxVal * 140) + 'px';
-            bCurrent.title = 'Current: ' + d.current + 'M ?';
+            var bar = document.createElement('div');
+            bar.className = 'rev-bar type-bar';
+            bar.style.height = (pct / 100 * 130) + 'px';
+            bar.style.background = color;
+            bar.title = lbl + ': ' + pct + '%';
 
-            var bPrev = document.createElement('div');
-            bPrev.className = 'rev-bar prev';
-            bPrev.style.height = (d.prev / maxVal * 140) + 'px';
-            bPrev.title = 'Previous: ' + d.prev + 'M ?';
+            var pctLabel = document.createElement('span');
+            pctLabel.className = 'rev-bar-pct';
+            pctLabel.textContent = pct + '%';
+            
+            var lblSpan = document.createElement('span');
+            lblSpan.className = 'rev-bar-label';
+            lblSpan.textContent = lbl;
 
-            var label = document.createElement('span');
-            label.className = 'rev-bar-label';
-            label.textContent = d.month;
-
-            group.appendChild(bCurrent);
-            group.appendChild(bPrev);
-            group.appendChild(label);
+            group.appendChild(bar);
+            group.appendChild(pctLabel);
+            group.appendChild(lblSpan);
             barChart.appendChild(group);
-        });
+        }
+
+        // Generate legend
+        if (barLegendEl) {
+            barLegendEl.innerHTML = '';
+            for (var bi = 0; bi < barTypeLabels.length; bi++) {
+                var lbl = barTypeLabels[bi];
+                var color = barColors[lbl] || '#64748b';
+                var dot = document.createElement('span');
+                dot.className = 'rev-legend-dot';
+                dot.style.background = color;
+                var txt = document.createElement('span');
+                txt.textContent = lbl;
+                if (bi > 0) barLegendEl.appendChild(document.createTextNode(' '));
+                barLegendEl.appendChild(dot);
+                barLegendEl.appendChild(txt);
+            }
+        }
+    } else if (barChart) {
+        barChart.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--color-secondary);font-family:Inter,sans-serif;font-size:13px">No revenue data for selected filters</div>';
     }
 
     /* ============================================================
@@ -227,7 +250,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var donutSvg    = document.getElementById('donutSvg');
     var donutLegend = document.getElementById('donutLegend');
 
-    if (donutSvg) {
+    // Skip donut if no data
+    if (donutSvg && donutData.length > 0) {
         var cx = 100, cy = 100, r = 70, stroke = 26;
         var circumference = 2 * Math.PI * r;
         var offset = 0;
@@ -261,6 +285,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 '<span class="rev-donut-pct">' + seg.pct + '%</span>';
             donutLegend.appendChild(item);
         });
+    } else if (donutSvg) {
+        // Show placeholder when no data
+        var msg = document.createElement('div');
+        msg.style.textAlign = 'center';
+        msg.style.padding = '40px 0';
+        msg.style.color = 'var(--color-secondary)';
+        msg.style.fontFamily = 'Inter, sans-serif';
+        msg.style.fontSize = '13px';
+        msg.textContent = 'No revenue data for selected filters';
+        donutSvg.parentNode.appendChild(msg);
+        if (donutLegend) donutLegend.innerHTML = '<div style="text-align:center;color:var(--color-secondary);font-size:13px;padding:10px">No data</div>';
     }
 
     /* ============================================================
@@ -315,6 +350,17 @@ document.addEventListener('DOMContentLoaded', function () {
         exportBtn.addEventListener('click', function () {
             alert('Export Revenue Data — wire to /admin/revenue/export endpoint');
         });
+    } else if (donutSvg) {
+        // Show placeholder when no data
+        var msg = document.createElement('div');
+        msg.style.textAlign = 'center';
+        msg.style.padding = '40px 0';
+        msg.style.color = 'var(--color-secondary)';
+        msg.style.fontFamily = 'Inter, sans-serif';
+        msg.style.fontSize = '13px';
+        msg.textContent = 'No revenue data for selected filters';
+        donutSvg.parentNode.appendChild(msg);
+        if (donutLegend) donutLegend.innerHTML = '<div style="text-align:center;color:var(--color-secondary);font-size:13px;padding:10px">No data</div>';
     }
 
     var printBtn = document.getElementById('printReportBtn');
@@ -322,5 +368,16 @@ document.addEventListener('DOMContentLoaded', function () {
         printBtn.addEventListener('click', function () {
             window.print();
         });
+    } else if (donutSvg) {
+        // Show placeholder when no data
+        var msg = document.createElement('div');
+        msg.style.textAlign = 'center';
+        msg.style.padding = '40px 0';
+        msg.style.color = 'var(--color-secondary)';
+        msg.style.fontFamily = 'Inter, sans-serif';
+        msg.style.fontSize = '13px';
+        msg.textContent = 'No revenue data for selected filters';
+        donutSvg.parentNode.appendChild(msg);
+        if (donutLegend) donutLegend.innerHTML = '<div style="text-align:center;color:var(--color-secondary);font-size:13px;padding:10px">No data</div>';
     }
 });
