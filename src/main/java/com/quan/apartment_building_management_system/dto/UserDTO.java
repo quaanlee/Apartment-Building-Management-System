@@ -94,6 +94,9 @@ public class UserDTO {
     @Size(max = 100, message = "Occupation must not exceed 100 characters")
     private String occupation;
 
+    private Integer apartmentId;
+    private String apartmentNumber;
+
     // Default Constructor
     public UserDTO() {
     }
@@ -122,6 +125,11 @@ public class UserDTO {
             this.isHouseholdOwner = profile.getIsHouseholdOwner();
             this.residentStatus = profile.getResidentStatus();
             this.occupation = profile.getOccupation();
+
+            if (profile.getApartment() != null) {
+                this.apartmentId = profile.getApartment().getApartmentId();
+                this.apartmentNumber = profile.getApartment().getApartmentNumber();
+            }
 
             if (profile.getAccount() != null) {
                 this.accountId = profile.getAccount().getAccountId();
@@ -358,5 +366,21 @@ public class UserDTO {
 
     public void setOccupation(String occupation) {
         this.occupation = occupation;
+    }
+
+    public Integer getApartmentId() {
+        return apartmentId;
+    }
+
+    public void setApartmentId(Integer apartmentId) {
+        this.apartmentId = apartmentId;
+    }
+
+    public String getApartmentNumber() {
+        return apartmentNumber;
+    }
+
+    public void setApartmentNumber(String apartmentNumber) {
+        this.apartmentNumber = apartmentNumber;
     }
 }

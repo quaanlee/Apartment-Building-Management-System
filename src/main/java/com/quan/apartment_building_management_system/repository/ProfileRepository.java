@@ -18,7 +18,7 @@ public interface ProfileRepository extends JpaRepository<Profile, Integer> {
 
     Optional<Profile> findByCitizenId(String citizenId);
 
-    @Query("SELECT p FROM Profile p LEFT JOIN p.account a WHERE " +
+    @Query("SELECT p FROM Profile p LEFT JOIN FETCH p.account a LEFT JOIN FETCH a.role LEFT JOIN FETCH p.apartment WHERE " +
            "(:search IS NULL OR :search = '' OR LOWER(p.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.citizenId) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.email) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
            "(:roleId IS NULL OR a.role.roleId = :roleId) AND " +
            "(:status IS NULL OR a.status = :status)")
