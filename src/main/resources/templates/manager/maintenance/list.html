@@ -140,18 +140,25 @@
             </div>
 
             <!-- Pagination Controls -->
-            <div class="pagination-container" th:if="${totalPages > 1}" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-top: 1px solid #edf2f7; background: #fff; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
-                <div class="pagination-info" style="color: #718096; font-size: 14px;">
-                    Showing page <span th:text="${currentPage + 1}" style="font-weight: 600; color: #2d3748;">1</span> of <span th:text="${totalPages}" style="font-weight: 600; color: #2d3748;">1</span> (<span th:text="${totalItems}">0</span> total requests)
-                </div>
+            <!-- Pagination Controls -->
+            <div class="pagination-block" th:if="${totalPages > 1}">
                 <div class="pagination-buttons" style="display: flex; gap: 8px;">
                     <!-- Previous Button -->
-                    <button type="button" class="action-btn" th:disabled="${currentPage == 0}" th:onclick="'goToPage(' + (${currentPage - 1}) + ')'" style="background-color: #fff; border: 1px solid #e2e8f0; color: #4a5568; cursor: pointer; padding: 6px 12px; border-radius: 6px; font-weight: 500;">
-                        <i class="fa-solid fa-chevron-left"></i> Prev
+                    <button type="button" class="pagination-btn" th:disabled="${currentPage == 0}" th:onclick="'goToPage(' + (${currentPage - 1}) + ')'">
+                        <i class="fa-solid fa-chevron-left"></i>
                     </button>
+                    
+                    <!-- Page Numbers -->
+                    <button type="button" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                            th:onclick="'goToPage(' + ${i} + ')'" 
+                            th:text="${i + 1}"
+                            class="pagination-btn"
+                            th:classappend="${i == currentPage ? 'active' : ''}">
+                    </button>
+                    
                     <!-- Next Button -->
-                    <button type="button" class="action-btn" th:disabled="${currentPage + 1 == totalPages}" th:onclick="'goToPage(' + (${currentPage + 1}) + ')'" style="background-color: #fff; border: 1px solid #e2e8f0; color: #4a5568; cursor: pointer; padding: 6px 12px; border-radius: 6px; font-weight: 500;">
-                        Next <i class="fa-solid fa-chevron-right"></i>
+                    <button type="button" class="pagination-btn" th:disabled="${currentPage + 1 == totalPages}" th:onclick="'goToPage(' + (${currentPage + 1}) + ')'">
+                        <i class="fa-solid fa-chevron-right"></i>
                     </button>
                 </div>
             </div>
