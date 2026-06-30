@@ -50,4 +50,9 @@ public class ServiceItemServiceImpl implements ServiceItemService {
     public void deleteById(Integer id) {
         serviceItemRepository.deleteById(id);
     }
+
+    @Override
+    public List<ServiceItem> searchServices(String keyword, Boolean status) {
+        return serviceItemRepository.searchServices(keyword, status);
+    }
 }
