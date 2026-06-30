@@ -40,6 +40,9 @@ public class ServiceItem {
     @Column(name = "Status", nullable = false)
     private Boolean status = true;
 
+    @Column(name = "Description", length = 500)
+    private String description;
+
     @OneToMany(mappedBy = "serviceItem")
     private List<BillDetail> billDetails = new ArrayList<>();
 
@@ -92,6 +95,14 @@ public class ServiceItem {
 
     public void setStatus(Boolean status) {
         this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<BillDetail> getBillDetails() {
