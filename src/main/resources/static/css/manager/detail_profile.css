@@ -1,0 +1,389 @@
+/* Profile Details Screen Styling - Single Column Premium Layout */
+
+.detail-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.detail-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.detail-title .muted-text {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+}
+
+/* Single Column Container */
+.detail-main-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Top Summary Header Card */
+.profile-header-summary {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.avatar-wrapper {
+    flex-shrink: 0;
+}
+
+.large-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px rgba(88, 43, 232, 0.1);
+}
+
+.header-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.user-fullname {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.user-role-badge {
+    display: inline-block;
+    align-self: flex-start;
+    background-color: #F3F4F6;
+    color: var(--text-secondary);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Tabs Card */
+.tabs-card {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    min-height: 500px;
+}
+
+/* Subtabs Menu */
+.subtabs-menu {
+    display: flex;
+    background-color: #F9FAFB;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 24px;
+}
+
+.subtab-btn {
+    background: none;
+    border: none;
+    padding: 18px 24px;
+    font-family: var(--font-main);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.subtab-btn i {
+    font-size: 16px;
+}
+
+.subtab-btn:hover {
+    color: var(--primary-color);
+}
+
+.subtab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* Tab Panels */
+.subtabs-content {
+    padding: 32px;
+}
+
+.subtab-panel {
+    display: none;
+}
+
+.subtab-panel.active {
+    display: block;
+    animation: fadeIn 0.2s ease-out forwards;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--primary-light);
+    padding-bottom: 6px;
+}
+
+/* Info Grid Layout */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.info-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+}
+
+/* Account Status Indicator */
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-indicator.active {
+    background-color: #10B981;
+    box-shadow: 0 0 8px #10B981;
+}
+
+.status-indicator.inactive {
+    background-color: #EF4444;
+    box-shadow: 0 0 8px #EF4444;
+}
+
+/* Sub-Tables Styling */
+.sub-table-wrapper {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.sub-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.sub-table th {
+    background-color: #F9FAFB;
+    padding: 12px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sub-table td {
+    padding: 14px 18px;
+    font-size: 14px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sub-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.sub-table tbody tr:hover td {
+    background-color: #F9FAFB;
+}
+
+/* Household Owner Row Highlight */
+.sub-table tbody tr.household-owner-row {
+    background-color: #F0EDFE !important; /* Soft purple highlight */
+}
+
+.sub-table tbody tr.household-owner-row td {
+    color: var(--primary-color) !important;
+    border-bottom-color: rgba(88, 43, 232, 0.15);
+}
+
+.sub-table tbody tr.household-owner-row:hover td {
+    background-color: #E8E4FD !important;
+}
+
+.self-badge {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-left: 4px;
+}
+
+/* Relation Badges */
+.relation-badge {
+    display: inline-flex;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.relation-badge.owner {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    border: 1px solid rgba(88, 43, 232, 0.2);
+}
+
+.relation-badge.member {
+    background-color: #F3F4F6;
+    color: var(--text-secondary);
+}
+
+.owner-badge {
+    background-color: #FEF3C7;
+    color: #92400E;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.member-badge {
+    background-color: #E5E7EB;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.no-data {
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 24px !important;
+    font-weight: 500;
+}
+
+/* Banners */
+.no-apartment-banner {
+    background-color: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    color: #9B1C1C;
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 28px;
+}
+
+.no-apartment-banner i {
+    font-size: 18px;
+}
+
+/* Status Badges */
+.sub-status-badge {
+    display: inline-flex;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.sub-status-badge.approved {
+    background-color: #DEF7EC;
+    color: #03543F;
+}
+
+.sub-status-badge.pending {
+    background-color: #FEF3C7;
+    color: #92400E;
+}
+
+.sub-status-badge.rejected {
+    background-color: #FDE8E8;
+    color: #9B1C1C;
+}
+
+.sub-status-badge.info {
+    background-color: #E0F2FE;
+    color: #0369A1;
+}
+
+.sub-status-badge.neutral {
+    background-color: #F3F4F6;
+    color: #4B5563;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}

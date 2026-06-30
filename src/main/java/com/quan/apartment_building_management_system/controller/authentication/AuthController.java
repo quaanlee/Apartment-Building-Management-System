@@ -83,10 +83,10 @@ public class AuthController {
     @GetMapping("/admin/dashboard")
     public String adminDashboard(HttpSession session) {
         Account currentUser = (Account) session.getAttribute("currentUser");
-        if (currentUser == null || !("ADMIN".equalsIgnoreCase(currentUser.getRole().getRoleName())
-                || "MANAGER".equalsIgnoreCase(currentUser.getRole().getRoleName()))) {
-            return "redirect:/login";
-        }
+        if (currentUser == null) return "redirect:/login";
+        String role = currentUser.getRole().getRoleName().toUpperCase();
+        if ("MANAGER".equals(role)) return "redirect:/manager/utility-bookings";
+        if (!"ADMIN".equals(role)) return "redirect:/login";
         return "admin/dashboard";
     }
 
@@ -305,13 +305,12 @@ public class AuthController {
 
     private String getRedirectUrlForRole(Account account) {
         String roleName = account.getRole().getRoleName().toUpperCase();
-        if ("ADMIN".equals(roleName) || "MANAGER".equals(roleName)) {
-            return "redirect:/admin/dashboard";
-        } else if ("RESIDENT".equals(roleName)) {
-            return "redirect:/resident/dashboard";
-        } else if ("MAINTENANCE STAFF".equals(roleName)) {
-            return "redirect:/maintainer/dashboard";
-        }
-        return "redirect:/login";
+        return switch (roleName) {
+            case "ADMIN"             -> "redirect:/admin/users";
+            case "MANAGER"           -> "redirect:/manager/utility-bookings";
+            case "RESIDENT"          -> "redirect:/resident/dashboard";
+            case "MAINTENANCE STAFF" -> "redirect:/maintainer/dashboard";
+            default                  -> "redirect:/login";
+        };
     }
 }

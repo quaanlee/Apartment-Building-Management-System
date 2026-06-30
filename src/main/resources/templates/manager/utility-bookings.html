@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main-content}, 'bookings')}">
+<head>
+    <title>Utility Booking Management | ABMS Manager</title>
+</head>
+<body>
+
+<!--
+  IMPORTANT: The <div th:fragment="main-content"> is the content block
+  injected into the layout's <div th:replace="${content}">.
+  A <link> at the top of the fragment is valid HTML5 (flow content)
+  and will be correctly processed by the browser.
+-->
+<div th:fragment="main-content">
+
+    <!-- Page-specific CSS (loaded via fragment injection) -->
+    <link rel="stylesheet" th:href="@{/css/manager/utility_bookings.css}">
+
+    <!-- Hidden state bridge for JavaScript -->
+    <input type="hidden" id="ubTotalPages"  th:value="${totalPages}">
+    <input type="hidden" id="ubCurrentPage" th:value="${currentPage}">
+
+    <div class="ub-page">
+
+        <!-- ── Page Header ──────────────────────────────────────── -->
+        <div class="ub-header">
+            <h2>Utility Booking Management</h2>
+            <p>Overview and administration of community amenity reservations.</p>
+        </div>
+
+        <!-- ── Stat Cards ───────────────────────────────────────── -->
+        <div class="ub-stats-grid">
+            <div class="ub-stat-card">
+                <div class="ub-stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="ub-stat-label">Total Bookings</div>
+                <div class="ub-stat-value" id="ubStatTotal" th:text="${stats.totalBookings}">0</div>
+                <div class="ub-stat-sub">All time records</div>
+            </div>
+            <div class="ub-stat-card">
+                <div class="ub-stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                <div class="ub-stat-label">Pending Approvals</div>
+                <div class="ub-stat-value" id="ubStatPending" th:text="${stats.pendingApprovals}">0</div>
+                <div class="ub-stat-sub">Awaiting your review</div>
+            </div>
+            <div class="ub-stat-card">
+                <div class="ub-stat-icon"><i class="fas fa-calendar-day"></i></div>
+                <div class="ub-stat-label">Today's Schedule</div>
+                <div class="ub-stat-value" id="ubStatToday" th:text="${stats.todaySchedule}">0</div>
+                <div class="ub-stat-sub">Ongoing &amp; Upcoming</div>
+            </div>
+        </div>
+
+        <!-- ── Filter Bar ────────────────────────────────────────── -->
+        <div class="ub-filter-bar">
+
+            <!-- Search by resident name -->
+            <div class="ub-search-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text"
+                       id="ubSearch"
+                       class="ub-search-input"
+                       placeholder="Search residents..."
+                       th:value="${filter.residentName}">
+            </div>
+
+            <!-- Start Time date picker -->
+            <div class="ub-date-wrap">
+                <button class="ub-date-btn" id="ubStartTimeBtn" data-for="ubStartTimePicker">
+                    <i class="fas fa-calendar"></i>
+                    <span id="ubStartTimeLabel" data-default="Start Time">Start Time</span>
+                    <i class="fas fa-chevron-down" style="font-size:10px"></i>
+                </button>
+                <div class="ub-date-picker" id="ubStartTimePicker">
+                    <div class="ub-date-picker-row">
+                        <div>
+                            <label>From</label>
+                            <input type="date" id="ubStartTimeFrom" th:value="${filter.startTimeFrom}">
+                        </div>
+                        <div>
+                            <label>To</label>
+                            <input type="date" id="ubStartTimeTo" th:value="${filter.startTimeTo}">
+                        </div>
+                    </div>
+                    <div class="ub-date-actions">
+                        <button class="ub-date-cancel">Clear</button>
+                        <button class="ub-date-apply">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Created At date picker -->
+            <div class="ub-date-wrap">
+                <button class="ub-date-btn" id="ubCreatedAtBtn" data-for="ubCreatedAtPicker">
+                    <i class="fas fa-clock"></i>
+                    <span id="ubCreatedAtLabel" data-default="Created At">Created At</span>
+                    <i class="fas fa-chevron-down" style="font-size:10px"></i>
+                </button>
+                <div class="ub-date-picker" id="ubCreatedAtPicker">
+                    <div class="ub-date-picker-row">
+                        <div>
+                            <label>From</label>
+                            <input type="date" id="ubCreatedAtFrom" th:value="${filter.createdAtFrom}">
+                        </div>
+                        <div>
+                            <label>To</label>
+                            <input type="date" id="ubCreatedAtTo" th:value="${filter.createdAtTo}">
+                        </div>
+                    </div>
+                    <div class="ub-date-actions">
+                        <button class="ub-date-cancel">Clear</button>
+                        <button class="ub-date-apply">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Status filter -->
+            <select id="ubBookingStatus" class="ub-filter-select">
+                <option value="">Booking Status: All</option>
+                <option value="0" th:selected="${filter.bookingStatus != null && filter.bookingStatus == 0}">Pending</option>
+                <option value="1" th:selected="${filter.bookingStatus != null && filter.bookingStatus == 1}">Approved</option>
+                <option value="2" th:selected="${filter.bookingStatus != null && filter.bookingStatus == 2}">Rejected</option>
+                <option value="3" th:selected="${filter.bookingStatus != null && filter.bookingStatus == 3}">Cancelled</option>
+            </select>
+
+            <!-- Payment Status filter -->
+            <select id="ubPaymentStatus" class="ub-filter-select">
+                <option value="">Payment Status: All</option>
+                <option value="paid"   th:selected="${'paid'.equals(filter.paymentStatus)}">Paid</option>
+                <option value="unpaid" th:selected="${'unpaid'.equals(filter.paymentStatus)}">Unpaid</option>
+            </select>
+
+            <!-- Utility filter -->
+            <select id="ubUtility" class="ub-filter-select">
+                <option value="">Utility: All</option>
+                <option th:each="u : ${utilities}"
+                        th:value="${u.utilityId}"
+                        th:text="${u.utilityName}"
+                        th:selected="${filter.utilityId != null && filter.utilityId == u.utilityId}">
+                </option>
+            </select>
+
+        </div><!-- end filter bar -->
+
+        <!-- ── Table ─────────────────────────────────────────────── -->
+        <div class="ub-table-card">
+            <div class="ub-table-wrap">
+
+                <!-- Loading overlay -->
+                <div class="ub-loading-overlay" id="ubLoading">
+                    <div class="ub-spinner"></div>
+                </div>
+
+                <table class="ub-table">
+                    <thead>
+                        <tr>
+                            <th>Resident Name</th>
+                            <th>Created At</th>
+                            <th>Utility</th>
+                            <th>Start Time</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Payment Status</th>
+                            <th style="text-align:right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ubTableBody">
+
+                        <!-- Empty state -->
+                        <th:block th:if="${bookings.empty}">
+                            <tr>
+                                <td colspan="8">
+                                    <div class="ub-empty-state">
+                                        <i class="fas fa-calendar-times"></i>
+                                        <p>No bookings found matching your filters.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </th:block>
+
+                        <!-- Table rows (SSR) -->
+                        <th:block th:each="b : ${bookings}">
+                            <tr th:data-id="${b.bookingId}">
+                                <td>
+                                    <div class="ub-resident-cell">
+                                        <div class="ub-avatar" th:text="${b.initials}">??</div>
+                                        <span class="ub-resident-name" th:text="${b.residentName}">—</span>
+                                    </div>
+                                </td>
+                                <td th:text="${b.createdAt}">—</td>
+                                <td><span class="ub-utility-chip" th:text="${b.utilityName}">—</span></td>
+                                <td th:text="${b.startTime}">—</td>
+                                <td th:text="${b.durationHours + (b.durationHours == 1 ? ' Hour' : ' Hours')}">—</td>
+                                <td>
+                                    <span th:class="'ub-status-badge ' + (
+                                          b.bookingStatus == 0 ? 'ub-status-pending' :
+                                          b.bookingStatus == 1 ? 'ub-status-approved' :
+                                          b.bookingStatus == 2 ? 'ub-status-rejected' :
+                                          'ub-status-cancelled')"
+                                          th:text="${b.bookingStatus == 0 ? 'Pending' :
+                                                     b.bookingStatus == 1 ? 'Approved' :
+                                                     b.bookingStatus == 2 ? 'Rejected' : 'Cancelled'}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:class="'ub-payment-pill ' + (b.paymentStatus == 'Paid' ? 'ub-payment-paid' : 'ub-payment-unpaid')"
+                                          th:text="${b.paymentStatus}">Unpaid</span>
+                                </td>
+                                <td>
+                                    <div class="ub-actions">
+                                        <!-- Pending: Approve + Reject + View -->
+                                        <th:block th:if="${b.bookingStatus == 0}">
+                                            <button class="ub-btn ub-btn-approve"
+                                                    th:data-action="approve"
+                                                    th:data-id="${b.bookingId}">Approve</button>
+                                            <button class="ub-btn ub-btn-reject"
+                                                    th:data-action="reject"
+                                                    th:data-id="${b.bookingId}">Reject</button>
+                                        </th:block>
+                                        <!-- Approved or Rejected: Cancel + View -->
+                                        <th:block th:if="${b.bookingStatus == 1 || b.bookingStatus == 2}">
+                                            <button class="ub-btn ub-btn-cancel"
+                                                    th:data-action="cancel"
+                                                    th:data-id="${b.bookingId}">Cancel</button>
+                                        </th:block>
+                                        <!-- All: View -->
+                                        <button class="ub-btn ub-btn-view"
+                                                th:data-action="view"
+                                                th:data-id="${b.bookingId}">View</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </th:block>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table footer -->
+            <div class="ub-table-footer">
+                <span id="ubShowingInfo">
+                    Showing <span th:text="${bookings.size()}">0</span> of
+                    <span th:text="${totalElements}">0</span> bookings
+                </span>
+                <div class="ub-pagination" id="ubPagination">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+        </div><!-- end table card -->
+
+    </div><!-- end ub-page -->
+
+    <!-- ── Detail Modal ──────────────────────────────────────────── -->
+    <div class="ub-modal-overlay" id="ubDetailOverlay">
+        <div class="ub-modal ub-detail-modal">
+            <!-- Content injected dynamically by JS -->
+        </div>
+    </div>
+
+    <!-- ── Confirm Modal ─────────────────────────────────────────── -->
+    <div class="ub-modal-overlay" id="ubConfirmOverlay">
+        <div class="ub-modal ub-confirm-modal">
+            <!-- Content injected dynamically by JS -->
+        </div>
+    </div>
+
+    <script th:src="@{/js/manager/utility_bookings.js}"></script>
+
+</div><!-- end th:fragment="main-content" -->
+
+</body>
+</html>

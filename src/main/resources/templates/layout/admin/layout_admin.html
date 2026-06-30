@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="admin-layout(content, activeTab)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABMS Admin Panel</title>
+    <!-- CSS File -->
+    <link rel="stylesheet" th:href="@{/css/layout/layout_admin.css}">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h1>ABMS Admin</h1>
+                <p>Management Portal</p>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="sidebar-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
+                    <a th:href="@{/admin/dashboard}">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'users' ? 'active' : ''}">
+                    <a th:href="@{/admin/users}">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>User Management</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'building' ? 'active' : ''}">
+                    <a th:href="@{/admin/building}">
+                        <i class="fa-solid fa-building"></i>
+                        <span>Building Management</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'services' ? 'active' : ''}">
+                    <a th:href="@{/admin/services}">
+                        <i class="fa-solid fa-cubes"></i>
+                        <span>Service Catalog</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'utilities' ? 'active' : ''}">
+                    <a th:href="@{/admin/utilities}">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                        <span>Utilities</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'logs' ? 'active' : ''}">
+                    <a th:href="@{/admin/logs}">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>System Logs</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a th:href="@{/logout}" class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Panel (Header + Main Content) -->
+        <div class="main-panel">
+            
+            <!-- Header Section -->
+            <header class="header">
+                <!-- Search Bar -->
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" class="search-input" placeholder="Search by text...">
+                </div>
+                
+                <!-- Action Controls -->
+                <div class="header-actions">
+                    <button class="icon-btn" title="Settings">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+                    
+                    <div class="user-profile-trigger">
+                        <div class="user-avatar-placeholder">A</div>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Main Page Content Insertion -->
+            <main class="content-container">
+                <div th:replace="${content}">
+                    <!-- Page content will be injected here -->
+                </div>
+            </main>
+            
+        </div>
+        
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Toast message data bridge for external layout_admin.js script -->
+    <div id="toastMessageData"
+         th:if="${message != null}"
+         th:data-message="${message}" 
+         th:data-type="${messageType != null ? messageType : 'success'}" 
+         style="display: none;"></div>
+
+    <script th:src="@{/js/layout/layout_admin.js}"></script>
+</body>
+</html>
