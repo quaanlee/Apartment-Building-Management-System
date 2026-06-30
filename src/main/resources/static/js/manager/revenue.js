@@ -2,8 +2,7 @@
    REVENUE REPORT - JavaScript
    Features:
    - Custom calendar date pickers (from/to)
-   - Bar chart (monthly trend)
-   - Donut chart (revenue by type)
+   - Bar chart (revenue by type)
    - Invoice detail drawer (slide-in)
    ================================================================ */
 
@@ -227,78 +226,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* ============================================================
-       3. DONUT CHART — Revenue by Type
-       ============================================================ */
-    var donutColors = {
-        'RENT':'#451ebb', 'ELECTRICITY':'#d97706', 'WATER':'#2563eb',
-        'PARKING':'#16a34a', 'SERVICE':'#be185d', 'PENALTY':'#b91c1c'
-    };
-    var donutDataEl = document.getElementById('donutChartData');
-    var donutData = [];
-    if (donutDataEl) {
-        var labels = (donutDataEl.getAttribute('data-labels') || '').split(',');
-        var pcts = (donutDataEl.getAttribute('data-pcts') || '').split(',');
-        for (var di = 0; di < labels.length && di < pcts.length; di++) {
-            var lbl = labels[di].trim();
-            var pct = parseInt(pcts[di]) || 0;
-            if (lbl && pct > 0) {
-                donutData.push({ label: lbl, pct: pct, color: donutColors[lbl] || '#64748b' });
-            }
-        }
-    }
-
-    var donutSvg    = document.getElementById('donutSvg');
-    var donutLegend = document.getElementById('donutLegend');
-
-    // Skip donut if no data
-    if (donutSvg && donutData.length > 0) {
-        var cx = 100, cy = 100, r = 70, stroke = 26;
-        var circumference = 2 * Math.PI * r;
-        var offset = 0;
-
-        donutData.forEach(function (seg) {
-            var dashLen = (seg.pct / 100) * circumference;
-            var gap     = circumference - dashLen;
-
-            var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            circle.setAttribute('cx', cx);
-            circle.setAttribute('cy', cy);
-            circle.setAttribute('r', r);
-            circle.setAttribute('fill', 'none');
-            circle.setAttribute('stroke', seg.color);
-            circle.setAttribute('stroke-width', stroke);
-            circle.setAttribute('stroke-dasharray', dashLen + ' ' + gap);
-            circle.setAttribute('stroke-dashoffset', -offset * circumference / 100);
-            circle.style.transition = 'stroke-dashoffset 0.4s ease';
-            donutSvg.appendChild(circle);
-
-            offset += seg.pct;
-
-            // Legend item
-            var item = document.createElement('div');
-            item.className = 'rev-donut-legend-item';
-            item.innerHTML =
-                '<div class="rev-donut-legend-left">' +
-                '<span class="rev-donut-dot" style="background:' + seg.color + '"></span>' +
-                '<span>' + seg.label + '</span>' +
-                '</div>' +
-                '<span class="rev-donut-pct">' + seg.pct + '%</span>';
-            donutLegend.appendChild(item);
-        });
-    } else if (donutSvg) {
-        // Show placeholder when no data
-        var msg = document.createElement('div');
-        msg.style.textAlign = 'center';
-        msg.style.padding = '40px 0';
-        msg.style.color = 'var(--color-secondary)';
-        msg.style.fontFamily = 'Inter, sans-serif';
-        msg.style.fontSize = '13px';
-        msg.textContent = 'No revenue data for selected filters';
-        donutSvg.parentNode.appendChild(msg);
-        if (donutLegend) donutLegend.innerHTML = '<div style="text-align:center;color:var(--color-secondary);font-size:13px;padding:10px">No data</div>';
-    }
-
-    /* ============================================================
        4. DETAIL DRAWER
        ============================================================ */
     var revOverlay = document.getElementById('revDetailOverlay');
@@ -350,34 +277,11 @@ document.addEventListener('DOMContentLoaded', function () {
         exportBtn.addEventListener('click', function () {
             alert('Export Revenue Data — wire to /admin/revenue/export endpoint');
         });
-    } else if (donutSvg) {
-        // Show placeholder when no data
-        var msg = document.createElement('div');
-        msg.style.textAlign = 'center';
-        msg.style.padding = '40px 0';
-        msg.style.color = 'var(--color-secondary)';
-        msg.style.fontFamily = 'Inter, sans-serif';
-        msg.style.fontSize = '13px';
-        msg.textContent = 'No revenue data for selected filters';
-        donutSvg.parentNode.appendChild(msg);
-        if (donutLegend) donutLegend.innerHTML = '<div style="text-align:center;color:var(--color-secondary);font-size:13px;padding:10px">No data</div>';
-    }
 
     var printBtn = document.getElementById('printReportBtn');
     if (printBtn) {
         printBtn.addEventListener('click', function () {
             window.print();
         });
-    } else if (donutSvg) {
-        // Show placeholder when no data
-        var msg = document.createElement('div');
-        msg.style.textAlign = 'center';
-        msg.style.padding = '40px 0';
-        msg.style.color = 'var(--color-secondary)';
-        msg.style.fontFamily = 'Inter, sans-serif';
-        msg.style.fontSize = '13px';
-        msg.textContent = 'No revenue data for selected filters';
-        donutSvg.parentNode.appendChild(msg);
-        if (donutLegend) donutLegend.innerHTML = '<div style="text-align:center;color:var(--color-secondary);font-size:13px;padding:10px">No data</div>';
     }
 });

@@ -18,35 +18,11 @@
 
         <div class="rev-page-header">
 
-            <div>
-
-                <h2 class="rev-page-title">Revenue Report</h2>
+            <h2 class="rev-page-title">Revenue Report</h2>
 
                 <p class="rev-page-subtitle">Financial overview and billing analytics for the apartment complex.</p>
 
             </div>
-
-            <div class="rev-header-actions">
-
-                <button class="rev-btn-secondary" id="printReportBtn">
-
-                    <span class="material-symbols-outlined">print</span>
-
-                    PRINT REPORT
-
-                </button>
-
-                <button class="rev-btn-primary" id="exportRevenueBtn">
-
-                    <span class="material-symbols-outlined">download</span>
-
-                    EXPORT DATA
-
-                </button>
-
-            </div>
-
-        </div>
 
         <form method="get" th:action="@{/manager/revenue}" id="revFilterForm" class="rev-filter-bar">
 
@@ -246,19 +222,7 @@
 
                 </div>
 
-                <div class="rev-stat-footer">
-
-                    <span class="rev-trend positive">
-
-                        <span class="material-symbols-outlined">trending_up</span> +18.2%
-
-                    </span>
-
-                    <span class="rev-trend-label">vs last period</span>
-
                 </div>
-
-            </div>
 
             <!-- Collected -->
 
@@ -282,19 +246,7 @@
 
                 </div>
 
-                <div class="rev-stat-footer">
-
-                    <span class="rev-trend positive">
-
-                        <span class="material-symbols-outlined">trending_up</span> +12.4%
-
-                    </span>
-
-                    <span class="rev-trend-label">collection rate 84.7%</span>
-
                 </div>
-
-            </div>
 
             <!-- Outstanding -->
 
@@ -318,19 +270,7 @@
 
                 </div>
 
-                <div class="rev-stat-footer">
-
-                    <span class="rev-trend negative">
-
-                        <span class="material-symbols-outlined">trending_down</span> -3.1%
-
-                    </span>
-
-                    <span class="rev-trend-label">pending payments</span>
-
                 </div>
-
-            </div>
 
             <!-- Overdue -->
 
@@ -354,19 +294,7 @@
 
                 </div>
 
-                <div class="rev-stat-footer">
-
-                    <span class="rev-trend negative">
-
-                        <span class="material-symbols-outlined">trending_up</span> +2.8%
-
-                    </span>
-
-                    <span class="rev-trend-label">requires immediate action</span>
-
                 </div>
-
-            </div>
 
         </div>
 
@@ -374,138 +302,12 @@
 
         <!-- *********************************************************** -->
 
-        <!-- CHARTS ROW                                                   -->
-
-        <!-- *********************************************************** -->
-
-        <div class="rev-charts-row">
-
-            <!-- Monthly Revenue Bar Chart -->
-
-            <div class="rev-chart-card wide">
-
-                <div class="rev-chart-header">
-
-                    <h3 class="rev-chart-title">Monthly Revenue Trend</h3>
-
-                    <span class="rev-chart-subtitle">Current year vs Previous year</span>
-
-                    <div class="rev-month-filter">
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == null ? 'active' : ''}" onclick="clearMonthFilter()">All</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 1 ? 'active' : ''}" onclick="setMonth(1)">Jan</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 2 ? 'active' : ''}" onclick="setMonth(2)">Feb</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 3 ? 'active' : ''}" onclick="setMonth(3)">Mar</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 4 ? 'active' : ''}" onclick="setMonth(4)">Apr</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 5 ? 'active' : ''}" onclick="setMonth(5)">May</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 6 ? 'active' : ''}" onclick="setMonth(6)">Jun</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 7 ? 'active' : ''}" onclick="setMonth(7)">Jul</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 8 ? 'active' : ''}" onclick="setMonth(8)">Aug</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 9 ? 'active' : ''}" onclick="setMonth(9)">Sep</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 10 ? 'active' : ''}" onclick="setMonth(10)">Oct</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 11 ? 'active' : ''}" onclick="setMonth(11)">Nov</button>
-
-                        <button type="button" class="rev-month-btn" th:classappend="${selectedMonth == 12 ? 'active' : ''}" onclick="setMonth(12)">Dec</button>
-
-                    </div>
-
-                </div>
-
-                <div class="rev-bar-chart" id="monthlyBarChart">
-
-                    <!-- Bars generated by JS -->
-
-                </div>
-
-                <div class="rev-bar-legend">
-
-                    <span class="rev-legend-dot primary"></span><span>Current Year</span>
-
-                    <span class="rev-legend-dot light" style="margin-left:16px"></span><span>Previous Year</span>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- Revenue by Type Donut -->
-
-            <div class="rev-chart-card">
-
-                <div class="rev-chart-header">
-
-                    <h3 class="rev-chart-title">Revenue by Type</h3>
-
-                    <span class="rev-chart-subtitle">Percentage breakdown</span>
-
-                <div class="rev-donut-body">
-
-                <div class="rev-donut-wrapper">
-
-                    <svg viewBox="0 0 200 200" class="rev-donut-svg" id="donutSvg">
-
-                        <!-- Segments drawn by JS -->
-
-                    </svg>
-
-                    <div class="rev-donut-center">
-
-                        <span class="rev-donut-total">100%</span>
-
-                        <span class="rev-donut-label">Total</span>
-
-                    </div>
-
-                </div>
-
-                <div class="rev-donut-legend" id="donutLegend">
-
-                    <!-- Legend items drawn by JS -->
-
-                </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- *********************************************************** -->
-
-        <!-- *********************************************************** -->
-
-
-
-
-
-
-
-
-
-
-
-        <div class="rev-table-card">
-
+        
+<div class="rev-charts-row">
+<div class="rev-table-card">
             <div class="rev-table-header-row">
-
                 <h3 class="rev-table-title">Transaction Records</h3>
-
                 <span class="rev-table-count" th:text="${totalRecords != null ? totalRecords + ' records' : '1,284 records'}">1,284 records</span>
-
             </div>
 
             <div class="rev-table-wrapper">
@@ -850,83 +652,6 @@
 
                 </div>
 
-            </div>
-
-
-
-        <!-- *********************************************************** -->
-
-        <script>
-
-        let sortAscRevType = true;
-
-        function sortByType() {
-
-            const tbody = document.querySelector('.rev-table tbody');
-
-            if (!tbody) return;
-
-            const rows = Array.from(tbody.querySelectorAll('tr.rev-table-row'));
-
-            const sortable = rows.filter(r => r.style.display !== 'none');
-
-            if (sortable.length === 0) return;
-
-            
-
-            sortable.sort((a, b) => {
-
-                const typeA = (a.getAttribute('data-type') || '').toUpperCase();
-
-                const typeB = (b.getAttribute('data-type') || '').toUpperCase();
-
-                return sortAscRevType ? typeA.localeCompare(typeB) : typeB.localeCompare(typeA);
-
-            });
-
-            
-
-            // Reorder rows
-
-            sortable.forEach(r => tbody.appendChild(r));
-
-            
-
-            // Update sort icon AFTER toggling so it reflects current state
-
-            sortAscRevType = !sortAscRevType;
-
-            const th = document.querySelector('.rev-th-sortable');
-
-            if (!th) return;
-
-            const isAsc = !sortAscRevType;
-
-            th.querySelector('.sort-icon').innerHTML = isAsc ? '&#9650;' : '&#9660;';
-
-        }
-
-        </script>
-
-        <script>
-
-        function setMonth(month) {
-
-            document.getElementById('hiddenMonth').value = month;
-
-            document.getElementById('revFilterForm').submit();
-
-        }
-
-        function clearMonthFilter() {
-
-            document.getElementById('hiddenMonth').value = '';
-
-            document.getElementById('revFilterForm').submit();
-
-        }
-
-        </script>
 
         <!-- INVOICE DETAIL DRAWER                                       -->
 
@@ -1075,21 +800,6 @@
 
 
         <!-- Scripts -->
-
-    <!-- Chart data from DB -->
-
-    <div id="barTypeData" 
-         th:data-labels="${barTypeLabels}" 
-         th:data-pcts="${barTypePcts}" 
-         style="display:none;"></div>
-
-    <div id="donutChartData" 
-
-         th:data-labels="${donutLabels}" 
-
-         th:data-pcts="${donutPcts}" 
-
-         style="display:none;"></div>
 
                 <script th:src="@{/js/manager/revenue.js}"></script>
 

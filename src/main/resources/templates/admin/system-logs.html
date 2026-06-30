@@ -1,0 +1,371 @@
+<form id="filterForm" method="get" th:action="@{/admin/system-logs}">
+    <input type="hidden" name="page" id="hiddenPage" th:value="${currentPage}">
+</form>
+<div th:replace="~{layout/admin/layout_admin :: admin-layout(~{::content}, 'logs')}">
+    <div th:fragment="content">
+        <link rel="stylesheet" th:href="@{/css/system-logs.css}">
+        <!-- Top Nav Bar -->
+            <div class="top-navbar">
+                <!-- Search bar targeting the main form -->
+                <div class="search-box-wrapper">
+                    <input type="text" id="logSearchInput" form="filterForm" name="search" th:value="${search}" class="search-input" placeholder="Search by account, action, entity...">
+                    <!-- Search Icon SVG -->
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="nav-actions">
+                    <button type="button" class="icon-btn" title="Thông báo">
+                        <!-- Bell SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                        </svg>
+                    </button>
+                    <button type="button" class="icon-btn" title="Cài đặt">
+                        <!-- Gear SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.645-.869L9.594 3.94ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                        </svg>
+                    </button>
+                    <!-- Export Button triggers Javascript to export data -->
+                    <button type="button" class="export-btn" onclick="exportLogs()">
+                        <!-- Export SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                        </svg>
+                        EXPORT DATA
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Cards Row -->
+            <div class="stats-grid">
+                <!-- Total Events -->
+                <div class="stats-card">
+                    <div class="stats-info">
+                        <span class="stats-title">Total Events</span>
+                        <!-- Display total Elements from page object -->
+                        <span class="stats-value" th:text="${#numbers.formatInteger(totalElements, 1, 'COMMA')}">128,492</span>
+                    </div>
+                    <div class="stats-icon-box">
+                        <!-- Log Icon SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 22px; height: 22px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Date Swapped Warning Alert -->
+            <div class="alert-warning" th:if="${dateSwapped}">
+                <!-- Alert Icon SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width: 18px; height: 18px; flex-shrink: 0;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+                <span><strong>Lưu ý:</strong> Ngày bắt đầu đã được tự động đảo ngược vì lớn hơn ngày kết thúc để hiển thị dữ liệu nhật ký chính xác nhất.</span>
+            </div>
+            
+            <!-- Filter Bar Container -->
+            <div class="filter-bar">
+                <!-- From Date -->
+                <div class="filter-group">
+                    <label class="filter-label">From Date</label>
+                    <input type="date" name="fromDate" form="filterForm" class="filter-select" style="padding:10px 14px;"
+                           th:value="${fromDate}">
+                </div>
+                <!-- To Date -->
+                <div class="filter-group">
+                    <label class="filter-label">To Date</label>
+                    <input type="date" name="toDate" form="filterForm" class="filter-select" style="padding:10px 14px;"
+                           th:value="${toDate}">
+                </div>
+                <!-- Reset Filters Button -->
+                <div class="filter-group" th:if="${search != null && search != '' || selectedRole != 'All Roles' || fromDate != null || toDate != null}">
+                    <button type="button" class="reset-filter-btn" onclick="clearAllFilters()">Clear Filters</button>
+                </div>
+                <!-- Role Dropdown -->
+                <div class="filter-group">
+                    <label class="filter-label">User Role</label>
+                    <div class="select-wrapper">
+                        <select name="roleName" form="filterForm" onchange="resetPageAndSubmit()" class="filter-select">
+                            <option th:each="role : ${roles}" th:value="${role}" th:text="${role}" th:selected="${role == selectedRole}"></option>
+                        </select>
+                        <span class="select-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 12px; height: 12px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                <!-- Apply Filters Button -->
+                <div class="filter-group">
+                    <button type="submit" form="filterForm" class="export-btn" style="background-color:#2563eb; padding:10px 20px; height:40px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                        </svg>
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-container">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>Created At</th>
+                            <th>Role</th>
+                            <th>Account Name</th>
+                            <th>Action</th>
+                            <th>Entity Type</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through logs using Thymeleaf -->
+                        <tr th:each="log : ${logs}">
+                            <!-- Created At Date Formatting -->
+                            <td th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2023-10-31 14:22:11</td>
+                            
+                            <!-- Role Badge (System Process, Admin, Manager, Security Officer, Resident, Maintenance Staff) -->
+                            <td>
+                                <th:block th:if="${log.account == null}">
+                                    <span class="badge badge-role-system">System</span>
+                                </th:block>
+                                <th:block th:if="${log.account != null}">
+                                    <span class="badge" 
+                                          th:classappend="${log.account.role.roleName == 'Admin' ? 'badge-role-admin' : 
+                                                           (log.account.role.roleName == 'Manager' ? 'badge-role-manager' : 
+                                                           (log.account.role.roleName == 'Security Officer' ? 'badge-role-security' : 'badge-role-default'))}"
+                                          th:text="${log.account.role.roleName}">
+                                        Admin
+                                    </span>
+                                </th:block>
+                            </td>
+                            
+                            <!-- Account Full Name (Fallback to username or System Process if account is null) -->
+                            <td>
+                                <strong th:if="${log.account == null}" class="text-role-system">System Process</strong>
+                                <span th:if="${log.account != null}" 
+                                      th:classappend="${log.account.role.roleName == 'Admin' ? 'text-role-admin' : 
+                                                       (log.account.role.roleName == 'Manager' ? 'text-role-manager' : 
+                                                       (log.account.role.roleName == 'Security Officer' ? 'text-role-security' : 
+                                                       (log.account.role.roleName == 'Resident' ? 'text-role-resident' : 
+                                                       (log.account.role.roleName == 'Maintenance Staff' ? 'text-role-maintenance' : 'text-role-default'))))}"
+                                      th:text="${log.account.profile != null && log.account.profile.fullName != null ? log.account.profile.fullName : log.account.username}">
+                                    Alex Mercer
+                                </span>
+                                </span>
+                            </td>
+                            
+                            <!-- Action Badge -->
+                            <td>
+                                <span class="badge-action" 
+                                      th:classappend="${log.action == 'LOGIN' ? 'action-login' : 
+                                                       (log.action == 'CREATE_BILL' ? 'action-create-bill' : 
+                                                       (log.action == 'LOCK_ACCOUNT' ? 'action-lock-account' : 
+                                                       (log.action == 'CANCEL_BOOKING' ? 'action-cancel-booking' : 
+                                                       (log.action == 'UPDATE_PERMISSIONS' ? 'action-update-permissions' : 'action-default'))))}"
+                                      th:text="${log.action}">
+                                    LOGIN
+                                </span>
+                            </td>
+                            
+                            <!-- Entity Type -->
+                            <td th:text="${log.entityType}">Account</td>
+                            
+                            <!-- Action links -->
+                            <td>
+                                <!-- Pass details dynamically through data attributes for modern JS modal -->
+                                <button type="button" class="view-details-link"
+                                        th:data-id="${log.systemLogId}"
+                                        th:data-timestamp="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}"
+                                        th:data-role="${log.account == null ? 'System' : log.account.role.roleName}"
+                                        th:data-account="${log.account == null ? 'System Process' : (log.account.profile != null ? log.account.profile.fullName : log.account.username)}"
+                                        th:data-action="${log.action}"
+                                        th:data-entitytype="${log.entityType}"
+                                        th:data-entityid="${log.entityId}"
+                                        th:data-ip="${log.ipAddress}"
+                                        onclick="openDetailsModal(this)">
+                                    
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
+                                </button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Empty State if no logs found -->
+                        <tr th:if="${logs.empty}">
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 48px; height: 48px; display: inline-block;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                                    </svg>
+                                    <p>Không tìm thấy nhật ký hệ thống nào khớp với bộ lọc.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination Section -->
+            <div class="pagination-wrapper" th:if="${totalPages > 1}">
+                <!-- Previous Page Button -->
+                <a th:href="@{/admin/system-logs(page=${currentPage - 1}, size=${pageSize}, search=${search}, roleName=${selectedRole}, fromDate=${fromDate}, toDate=${toDate})}"
+                   class="pagination-btn" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                </a>
+
+                <!-- First Page -->
+                <a th:href="@{/admin/system-logs(page=0, size=${pageSize}, search=${search}, roleName=${selectedRole}, fromDate=${fromDate}, toDate=${toDate})}"
+                   class="pagination-btn" th:classappend="${currentPage == 0} ? 'active' : ''" th:text="1">1</a>
+
+                <!-- Ellipsis if current page is far from beginning -->
+                <span class="pagination-ellipsis" th:if="${currentPage > 2}">...</span>
+
+                <!-- Middle Page Numbers -->
+                <th:block th:each="idx : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a th:if="${idx > 0 && idx < totalPages - 1 && idx >= currentPage - 1 && idx <= currentPage + 1}"
+                       th:href="@{/admin/system-logs(page=${idx}, size=${pageSize}, search=${search}, roleName=${selectedRole}, fromDate=${fromDate}, toDate=${toDate})}"
+                       class="pagination-btn" th:classappend="${idx == currentPage} ? 'active' : ''" th:text="${idx + 1}">2</a>
+                </th:block>
+
+                <!-- Ellipsis if current page is far from end -->
+                <span class="pagination-ellipsis" th:if="${currentPage < totalPages - 3}">...</span>
+
+                <!-- Last Page (only if totalPages > 1) -->
+                <a th:href="@{/admin/system-logs(page=${totalPages - 1}, size=${pageSize}, search=${search}, roleName=${selectedRole}, fromDate=${fromDate}, toDate=${toDate})}"
+                   class="pagination-btn" th:classappend="${currentPage == totalPages - 1} ? 'active' : ''" th:text="${totalPages}">10</a>
+
+                <!-- Next Page Button -->
+                <a th:href="@{/admin/system-logs(page=${currentPage + 1}, size=${pageSize}, search=${search}, roleName=${selectedRole}, fromDate=${fromDate}, toDate=${toDate})}"
+                   class="pagination-btn" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                </a>
+            </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div id="detailsModal" class="modal-overlay" onclick="closeDetailsModalOnOverlay(event)">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 class="modal-title">Log Details <span id="modalLogId">#0</span></h3>
+            <button type="button" class="modal-close-x" onclick="closeDetailsModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:20px;height:20px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="details-grid">
+                <span class="details-label">Timestamp</span>
+                <span class="details-value" id="modalTimestamp">-</span>
+
+                <span class="details-label">Account</span>
+                <span class="details-value" id="modalAccount">-</span>
+
+                <span class="details-label">Role</span>
+                <span class="details-value" id="modalRole">-</span>
+
+                <span class="details-label">Action</span>
+                <span class="details-value" id="modalAction">-</span>
+
+                <span class="details-label">Entity Type</span>
+                <span class="details-value" id="modalEntityType">-</span>
+
+                <span class="details-label">Entity ID</span>
+                <span class="details-value" id="modalEntityId">-</span>
+
+                <span class="details-label">IP Address</span>
+                <span class="details-value" id="modalIpAddress">-</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn-close" onclick="closeDetailsModal()">Close</button>
+        </div>
+    </div>
+</div>
+    <script>
+        // Form Submit Helper
+        function resetPageAndSubmit() {
+            document.getElementById('hiddenPage').value = 0;
+            document.getElementById('filterForm').submit();
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            document.querySelectorAll('input[name="fromDate"]').forEach(el => el.value = '');
+            document.querySelectorAll('input[name="toDate"]').forEach(el => el.value = '');
+            document.getElementById('logSearchInput').value = '';
+            document.querySelector('select[name="roleName"]').value = 'All Roles';
+            resetPageAndSubmit();
+    </script>
+<script>
+        const detailsModal = document.getElementById('detailsModal');
+        
+        function openDetailsModal(btn) {
+            // Read dataset attributes
+            const id = btn.getAttribute('data-id');
+            const timestamp = btn.getAttribute('data-timestamp');
+            const accountName = btn.getAttribute('data-account');
+            const role = btn.getAttribute('data-role');
+            const action = btn.getAttribute('data-action');
+            const entityType = btn.getAttribute('data-entitytype');
+            const entityId = btn.getAttribute('data-entityid');
+            const ip = btn.getAttribute('data-ip');
+            
+            // Populate modal elements
+            document.getElementById('modalLogId').innerText = `#${id}`;
+            document.getElementById('modalTimestamp').innerText = timestamp;
+            document.getElementById('modalAccount').innerText = accountName;
+            document.getElementById('modalRole').innerText = role;
+            
+            const actionEl = document.getElementById('modalAction');
+            actionEl.innerText = action;
+            
+            // Add custom action color styling class to action in modal
+            actionEl.className = 'details-value';
+            if (action === 'LOGIN') actionEl.style.color = '#2563eb';
+            else if (action === 'CREATE_BILL') actionEl.style.color = '#16a34a';
+            else if (action === 'LOCK_ACCOUNT') actionEl.style.color = '#dc2626';
+            else if (action === 'CANCEL_BOOKING') actionEl.style.color = '#ea580c';
+            else if (action === 'UPDATE_PERMISSIONS') actionEl.style.color = '#7c3aed';
+            else actionEl.style.color = '#475569';
+            
+            document.getElementById('modalEntityType').innerText = entityType ? entityType : 'None';
+            document.getElementById('modalEntityId').innerText = entityId ? entityId : 'N/A';
+            document.getElementById('modalIpAddress').innerText = ip ? ip : 'Unknown';
+            
+            // Show modal with animation classes
+            detailsModal.classList.add('show');
+        }
+        
+        function closeDetailsModal() {
+            detailsModal.classList.remove('show');
+        }
+        
+        function closeDetailsModalOnOverlay(e) {
+            if (e.target === detailsModal) {
+                closeDetailsModal();
+            }
+        }
+        
+        // Export Logs Handler
+        function exportLogs() {
+            // Simulated export notification
+            alert('Xuất dữ liệu thành công! Bản xuất dữ liệu Excel (.xlsx) đã được chuẩn bị cho các bộ lọc hiện tại.');
+        }
+    </script>
+        }
+        </div>
+
