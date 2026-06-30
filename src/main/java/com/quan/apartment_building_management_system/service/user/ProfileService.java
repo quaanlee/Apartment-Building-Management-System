@@ -18,4 +18,6 @@ public interface ProfileService {
     Profile save(Profile profile);
 
     void deleteById(Integer id);
+
+    List<Profile> findActiveMaintenanceStaffs();
 }

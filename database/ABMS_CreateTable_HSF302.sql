@@ -138,7 +138,6 @@ CREATE TABLE Service (
                          UnitPrice   DECIMAL(18,2)   NOT NULL         DEFAULT 0,
                          UnitID      INT             NOT NULL,
                          Status      BIT             NOT NULL         DEFAULT 1,
-                         Description NVARCHAR(500)   NULL,                   -- Mô tả chi tiết dịch vụ
 
                          CONSTRAINT FK_Service_Unit FOREIGN KEY (UnitID) REFERENCES Unit(UnitID)
 );
@@ -197,7 +196,7 @@ CREATE TABLE UtilityBooking (
                                 Status          TINYINT         NOT NULL         DEFAULT 0,  -- 0: PENDING | 1: APPROVED | 2: REJECTED | 3: CANCELED
                                 ApprovedBy      INT             NULL,
                                 CreatedAt       DATETIME        NOT NULL         DEFAULT GETDATE(),
-                                CancelledAt      DATETIME        NULL,
+                                CanceledAt      DATETIME        NULL,
                                 CancelReason    NVARCHAR(255)   NULL,
 
                                 CONSTRAINT FK_Booking_Profile       FOREIGN KEY (ProfileID)      REFERENCES Profile(ProfileID),

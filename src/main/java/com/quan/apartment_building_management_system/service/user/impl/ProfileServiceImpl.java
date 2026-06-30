@@ -50,4 +50,9 @@ public class ProfileServiceImpl implements ProfileService {
     public void deleteById(Integer id) {
         profileRepository.deleteById(id);
     }
+
+    @Override
+    public List<Profile> findActiveMaintenanceStaffs() {
+        return profileRepository.findActiveMaintenanceStaffs();
+    }
 }

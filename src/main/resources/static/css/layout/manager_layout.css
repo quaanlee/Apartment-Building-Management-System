@@ -1,0 +1,18 @@
+/* secondary styling for manager layout */
+.toast-msg {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 12px 20px;
+    border-radius: 6px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+.toast-success { background-color: #10b981; }
+.toast-error { background-color: #ef4444; }
+.toast-hide { opacity: 0; transform: translateY(-20px); pointer-events: none; }
