@@ -257,21 +257,6 @@
 }
 .rev-calendar-dropdown.open { display: block; }
 
-.rev-chart-title {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--color-on-surface);
-    margin: 0;
-}
-
-.rev-chart-subtitle {
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    color: var(--color-secondary);
-    margin: 0;
-}
-
 @keyframes calFadeIn {
     from { opacity: 0; transform: translateY(-6px); }
     to   { opacity: 1; transform: translateY(0); }
