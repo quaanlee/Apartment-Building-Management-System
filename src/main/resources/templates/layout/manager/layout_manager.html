@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="manager-layout(content, activeTab)">
 <head>
     <meta charset="UTF-8">
@@ -44,17 +44,22 @@
                         <i class="fa-solid fa-file-invoice-dollar"></i>
                         <span>Billing & Payments</span>
                     </a>
-                </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'maintenance' ? 'active' : ''}">
                 <li class="sidebar-item" th:classappend="${activeTab == 'revenue' ? 'active' : ''}">
                     <a th:href="@{/manager/revenue}">
                         <i class="fa-solid fa-chart-line"></i>
                         <span>Revenue Report</span>
                     </a>
                 </li>
-                    <a th:href="@{#}">
+                <li class="sidebar-item" th:classappend="${activeTab == 'maintenance-requests' ? 'active' : ''}">
+                    <a th:href="@{/manager/maintenance/requests}">
                         <i class="fa-solid fa-screwdriver-wrench"></i>
-                        <span>Maintenance</span>
+                        <span>Maintenance Requests</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'maintenance-status' ? 'active' : ''}">
+                    <a th:href="@{/manager/maintenance/status}">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <span>Maintenance Status</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'bookings' ? 'active' : ''}">
@@ -137,5 +142,7 @@
     <script th:src="@{/js/layout/layout_manager.js}"></script>
 </body>
 </html>
+
+
 
 

@@ -1,0 +1,185 @@
+﻿<div th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'maintenance-requests')}">
+
+    <div th:fragment="content">
+
+        <link rel="stylesheet" th:href="@{/css/manager/maintenance.css}">
+
+        <div class="mt-page-header">
+            <div>
+                <h2 class="mt-page-title">Maintenance Requests</h2>
+                <p class="mt-page-subtitle">Manage resident maintenance requests and work orders.</p>
+            </div>
+            <button class="mt-btn-primary" onclick="openCreateModal()">
+                <i class="fa-solid fa-plus"></i> New Request
+            </button>
+        </div>
+
+        <form method="get" th:action="@{/manager/maintenance/requests}" class="mt-filter-bar">
+            <div class="mt-filter-group">
+                <label class="mt-filter-label">Status</label>
+                <select name="status" class="mt-filter-select">
+                    <option value="">All Status</option>
+                    <option value="0" th:selected="${selectedStatus == 0}">Pending</option>
+                    <option value="1" th:selected="${selectedStatus == 1}">In Progress</option>
+                    <option value="2" th:selected="${selectedStatus == 2}">Done</option>
+                    <option value="3" th:selected="${selectedStatus == 3}">Rejected</option>
+                </select>
+            </div>
+            <div class="mt-filter-group">
+                <label class="mt-filter-label">Apartment</label>
+                <select name="apartmentId" class="mt-filter-select">
+                    <option value="">All Apartments</option>
+                    <option th:each="apt : ${apartments}" th:value="${apt.apartmentId}" th:text="${apt.apartmentNumber}" th:selected="${selectedApartmentId == apt.apartmentId}"></option>
+                </select>
+            </div>
+            <div class="mt-filter-group">
+                <label class="mt-filter-label">From Date</label>
+                <input type="date" name="fromDate" class="mt-filter-select" th:value="${fromDate}">
+            </div>
+            <div class="mt-filter-group">
+                <label class="mt-filter-label">To Date</label>
+                <input type="date" name="toDate" class="mt-filter-select" th:value="${toDate}">
+            </div>
+            <div class="mt-filter-actions">
+                <button type="submit" class="mt-apply-btn">Apply</button>
+                <a th:href="@{/manager/maintenance/requests}" class="mt-clear-btn">Clear</a>
+            </div>
+        </form>
+
+        <div class="mt-table-card">
+            <div class="mt-table-wrapper">
+                <table class="mt-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Resident</th>
+                            <th>Apartment</th>
+                            <th>Title</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="mt-table-row" th:each="req : ${requests}"
+                            th:data-id="${req.requestId}"
+                            th:data-resident="${req.residentName}"
+                            th:data-apartment="${req.apartmentNumber}"
+                            th:data-title="${req.title}"
+                            th:data-description="${req.description}"
+                            th:data-image="${req.imageUrl}"
+                            th:data-date="${req.requestDate != null ? #temporals.format(req.requestDate, 'yyyy-MM-dd HH:mm') : ''}"
+                            th:data-status="${req.status}">
+                            <td class="mt-td-mono" th:text="${req.requestId}">1</td>
+                            <td><div class="mt-resident-cell"><span th:text="${req.residentName}">Tenant</span></div></td>
+                            <td class="mt-td-mono" th:text="${req.apartmentNumber}">A-101</td>
+                            <td th:text="${req.title}">Water leak</td>
+                            <td class="mt-td-secondary" th:text="${req.requestDate != null ? #temporals.format(req.requestDate, 'yyyy-MM-dd') : ''}">2026-06-28</td>
+                            <td>
+                                <span class="mt-status-badge"
+                                      th:classappend="${req.status == 0 ? ' status-pending' :
+                                                       req.status == 1 ? ' status-progress' :
+                                                       req.status == 2 ? ' status-done' :
+                                                       req.status == 3 ? ' status-rejected' : ''}"
+                                      th:text="${req.status == 0 ? 'Pending' :
+                                                req.status == 1 ? 'In Progress' :
+                                                req.status == 2 ? 'Done' :
+                                                req.status == 3 ? 'Rejected' : 'Unknown'}">Pending</span>
+                            </td>
+                            <td class="text-right">
+                                <button class="mt-eye-btn" onclick="openReqDetail(this.closest('tr'))">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(requests)}">
+                            <td colspan="7" style="text-align:center;padding:40px;color:var(--color-secondary);font-size:14px;">No maintenance requests found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Create Request Modal -->
+        <div class="mt-modal-overlay" id="createModalOverlay" onclick="closeCreateModal()"></div>
+        <div class="mt-modal" id="createModal">
+            <div class="mt-modal-header">
+                <h3>New Maintenance Request</h3>
+                <button class="mt-modal-close" onclick="closeCreateModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form method="post" th:action="@{/manager/maintenance/requests/create}" enctype="multipart/form-data">
+                <div class="mt-modal-body">
+                    <div class="mt-form-group">
+                        <label>Apartment</label>
+                        <select name="apartmentId" required class="mt-form-control">
+                            <option value="">Select Apartment</option>
+                            <option th:each="apt : ${apartments}" th:value="${apt.apartmentId}" th:text="${apt.apartmentNumber}"></option>
+                        </select>
+                    </div>
+                    <div class="mt-form-group">
+                        <label>Title</label>
+                        <input type="text" name="title" required class="mt-form-control" placeholder="e.g. Water leak">
+                    </div>
+                    <div class="mt-form-group">
+                        <label>Description</label>
+                        <textarea name="description" rows="4" class="mt-form-control" placeholder="Describe the issue..."></textarea>
+                    </div>
+                    <div class="mt-form-group">
+                        <label>Image (optional)</label>
+                        <input type="file" name="image" accept="image/*" class="mt-form-control" onchange="previewImage(event)">
+                        <div class="mt-image-preview" id="imagePreview"></div>
+                    </div>
+                </div>
+                <div class="mt-modal-footer">
+                    <button type="button" class="mt-btn-secondary" onclick="closeCreateModal()">Cancel</button>
+                    <button type="submit" class="mt-btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Detail Drawer -->
+        <div class="mt-modal-overlay" id="reqDetailOverlay" onclick="closeReqDetail()"></div>
+        <div class="mt-detail-panel" id="reqDetailPanel">
+            <div class="mt-detail-header">
+                <div>
+                    <h3 class="mt-detail-title">Request Details</h3>
+                    <p class="mt-detail-id" id="reqDetailId">ID: #1</p>
+                </div>
+                <button class="mt-detail-close" onclick="closeReqDetail()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="mt-detail-body">
+                <section class="mt-detail-section">
+                    <h4 class="mt-detail-section-title">Resident & Unit</h4>
+                    <div class="mt-detail-grid">
+                        <div><p class="mt-detail-label">Resident</p><p class="mt-detail-value" id="reqDetailResident">-</p></div>
+                        <div><p class="mt-detail-label">Apartment</p><p class="mt-detail-value" id="reqDetailApartment">-</p></div>
+                    </div>
+                </section>
+                <section class="mt-detail-section">
+                    <h4 class="mt-detail-section-title">Request Info</h4>
+                    <div class="mt-detail-grid">
+                        <div style="grid-column:span 2"><p class="mt-detail-label">Title</p><p class="mt-detail-value" id="reqDetailTitle">-</p></div>
+                        <div style="grid-column:span 2"><p class="mt-detail-label">Description</p><p class="mt-detail-value" id="reqDetailDesc">-</p></div>
+                        <div style="grid-column:span 2"><p class="mt-detail-label">Date</p><p class="mt-detail-value" id="reqDetailDate">-</p></div>
+                        <div style="grid-column:span 2"><p class="mt-detail-label">Status</p><p class="mt-detail-value" id="reqDetailStatus">-</p></div>
+                    </div>
+                    <div class="mt-detail-image-wrap" id="reqDetailImageWrap" style="display:none;margin-top:12px;">
+                        <p class="mt-detail-label">Image</p>
+                        <img id="reqDetailImage" style="max-width:100%;border-radius:8px;margin-top:4px;">
+                    </div>
+                </section>
+            </div>
+            <div class="mt-detail-footer" id="reqDetailActions">
+                <form method="post" th:action="@{/manager/maintenance/requests/{id}/approve(id=${requestId})}" id="approveForm" style="display:inline">
+                    <button type="submit" class="mt-btn-approve"><i class="fa-solid fa-check"></i> Approve</button>
+                </form>
+                <form method="post" th:action="@{/manager/maintenance/requests/{id}/reject(id=${requestId})}" id="rejectForm" style="display:inline">
+                    <button type="submit" class="mt-btn-reject"><i class="fa-solid fa-xmark"></i> Reject</button>
+                </form>
+            </div>
+        </div>
+
+        <script th:src="@{/js/manager/maintenance.js}"></script>
+    </div>
+
+</div>

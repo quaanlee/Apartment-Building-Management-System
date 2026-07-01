@@ -1,0 +1,164 @@
+﻿<div th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'maintenance-status')}">
+
+    <div th:fragment="content">
+
+        <link rel="stylesheet" th:href="@{/css/manager/maintenance.css}">
+
+        <div class="mt-page-header">
+            <div>
+                <h2 class="mt-page-title">Maintenance Status</h2>
+                <p class="mt-page-subtitle">Track progress of maintenance tasks and work orders.</p>
+            </div>
+        </div>
+
+        <div class="mt-stats-grid">
+
+            <div class="mt-stat-card">
+                <div class="mt-stat-header"><span class="mt-stat-label">TOTAL TASKS</span><div class="mt-stat-icon-wrap primary"><i class="fa-solid fa-list-check"></i></div></div>
+                <div class="mt-stat-main"><span class="mt-stat-number" th:text="${totalTasks}">0</span></div>
+            </div>
+
+            <div class="mt-stat-card">
+                <div class="mt-stat-header"><span class="mt-stat-label">IN PROGRESS</span><div class="mt-stat-icon-wrap warning"><i class="fa-solid fa-spinner"></i></div></div>
+                <div class="mt-stat-main"><span class="mt-stat-number warning" th:text="${inProgressCount}">0</span></div>
+            </div>
+
+            <div class="mt-stat-card">
+                <div class="mt-stat-header"><span class="mt-stat-label">COMPLETED</span><div class="mt-stat-icon-wrap success"><i class="fa-solid fa-check-circle"></i></div></div>
+                <div class="mt-stat-main"><span class="mt-stat-number success" th:text="${completedCount}">0</span></div>
+            </div>
+
+
+        <form method="get" th:action="@{/manager/maintenance/status}" class="mt-filter-bar">
+            <div class="mt-filter-group">
+                <label class="mt-filter-label">Status</label>
+                <select name="status" class="mt-filter-select">
+                    <option value="">All Status</option>
+                    <option value="1" th:selected="${selectedStatus == 1}">Pending</option>
+                    <option value="2" th:selected="${selectedStatus == 2}">In Progress</option>
+                    <option value="3" th:selected="${selectedStatus == 3}">Done</option>
+                    
+                </select>
+            </div>
+            <div class="mt-filter-group">
+                <label class="mt-filter-label">From Date</label>
+                <input type="date" name="fromDate" class="mt-filter-select" th:value="${fromDate}">
+            </div>
+            <div class="mt-filter-group">
+                <label class="mt-filter-label">To Date</label>
+                <input type="date" name="toDate" class="mt-filter-select" th:value="${toDate}">
+            </div>
+            <div class="mt-filter-actions">
+                <button type="submit" class="mt-apply-btn">Apply</button>
+                <a th:href="@{/manager/maintenance/status}" class="mt-clear-btn">Clear</a>
+            </div>
+        </form>
+
+        <div class="mt-table-card">
+            <div class="mt-table-wrapper">
+                <table class="mt-table">
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Title</th>
+                            <th>Staff</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th>Progress</th>
+                            <th class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="mt-table-row" th:each="t : ${tasks}"
+                            th:data-taskid="${t.taskId}"
+                            th:data-requestid="${t.requestId}"
+                            th:data-title="${t.requestTitle}"
+                            th:data-description="${t.requestDescription}"
+                            th:data-image="${t.requestImageUrl}"
+                            th:data-apartment="${t.apartmentNumber}"
+                            th:data-resident="${t.residentName}"
+                            th:data-staff="${t.staffName}"
+                            th:data-deadline="${t.deadline != null ? #temporals.format(t.deadline, 'yyyy-MM-dd') : '-'}"
+                            th:data-progress="${t.progressPercent}"
+                            th:data-status="${t.status}">
+                            <td class="mt-td-mono" th:text="${t.requestId}">1</td>
+                            <td th:text="${t.requestTitle}">Water leak</td>
+                            <td th:text="${t.staffName ?: 'Unassigned'}">-</td>
+                            <td class="mt-td-secondary" th:text="${t.deadline != null ? #temporals.format(t.deadline, 'yyyy-MM-dd') : '-'}">2026-07-05</td>
+                            <td>
+                                <span class="mt-status-badge"
+                                      th:classappend="${t.status == 1 ? ' status-pending' :
+                                                       t.status == 2 ? ' status-progress' :
+                                                       t.status == 3 ? ' status-done' :
+                                                t.status == 3 ? 'Done' :}"
+                                      th:text="${t.status == 1 ? 'Pending' :
+                                                t.status == 2 ? 'In Progress' :
+                                                t.status == 3 ? 'Done' : '-'}">Pending</span>
+                                <div class="mt-progress-wrap">
+                                    <div class="mt-progress-bar">
+                                        <div class="mt-progress-fill" th:style="${'width:' + (t.progressPercent != null ? t.progressPercent : 0) + '%'}"
+                                             th:classappend="${t.progressPercent != null && t.progressPercent >= 80 ? ' fill-green' :
+                                                              t.progressPercent != null && t.progressPercent >= 50 ? ' fill-yellow' : ' fill-red'}"></div>
+                                    </div>
+                                    <span class="mt-progress-text" th:text="${t.progressPercent != null ? t.progressPercent + '%' : '0%'}">0%</span>
+                                </div>
+                            </td>
+                            <td class="text-right">
+                                <button class="mt-eye-btn" onclick="openTaskDetail(this.closest('tr'))">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(tasks)}">
+                            <td colspan="7" style="text-align:center;padding:40px;color:var(--color-secondary);font-size:14px;">No maintenance tasks found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Detail Drawer -->
+        <div class="mt-modal-overlay" id="taskDetailOverlay" onclick="closeTaskDetail()"></div>
+        <div class="mt-detail-panel" id="taskDetailPanel">
+            <div class="mt-detail-header">
+                <div>
+                    <h3 class="mt-detail-title">Task Details</h3>
+                    <p class="mt-detail-id" id="taskDetailId">Request ID: #1</p>
+                </div>
+                <button class="mt-detail-close" onclick="closeTaskDetail()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="mt-detail-body">
+                <section class="mt-detail-section">
+                    <h4 class="mt-detail-section-title">Request Info</h4>
+                    <div class="mt-detail-grid">
+                        <div style="grid-column:span 2"><p class="mt-detail-label">Title</p><p class="mt-detail-value" id="taskDetailTitle">-</p></div>
+                        <div style="grid-column:span 2"><p class="mt-detail-label">Description</p><p class="mt-detail-value" id="taskDetailDesc">-</p></div>
+                        <div><p class="mt-detail-label">Resident</p><p class="mt-detail-value" id="taskDetailResident">-</p></div>
+                        <div><p class="mt-detail-label">Apartment</p><p class="mt-detail-value" id="taskDetailApt">-</p></div>
+                    </div>
+                    <div class="mt-detail-image-wrap" id="taskDetailImageWrap" style="display:none;margin-top:8px;">
+                        <img id="taskDetailImage" style="max-width:100%;border-radius:8px;">
+                    </div>
+                </section>
+                <section class="mt-detail-section">
+                    <h4 class="mt-detail-section-title">Task Info</h4>
+                    <div class="mt-detail-grid">
+                        <div><p class="mt-detail-label">Staff</p><p class="mt-detail-value" id="taskDetailStaff">-</p></div>
+                        <div><p class="mt-detail-label">Deadline</p><p class="mt-detail-value" id="taskDetailDeadline">-</p></div>
+                        <div style="grid-column:span 2"><p class="mt-detail-label">Status</p><p class="mt-detail-value" id="taskDetailStatus">-</p></div>
+                        <div style="grid-column:span 2"><p class="mt-detail-label">Progress</p><p class="mt-detail-value" id="taskDetailProgress">0%</p></div>
+                    </div>
+                </section>
+                <section class="mt-detail-section" id="taskReportsSection">
+                    <h4 class="mt-detail-section-title">Progress Reports</h4>
+                    <div id="taskReportsList">
+                        <p style="color:var(--color-secondary);font-size:13px;">No reports yet.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <script th:src="@{/js/manager/maintenance.js}"></script>
+    </div>
+
+</div>

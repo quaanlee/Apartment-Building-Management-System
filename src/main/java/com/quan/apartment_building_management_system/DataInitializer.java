@@ -24,6 +24,9 @@ public class DataInitializer implements CommandLineRunner {
     private final ResidentApartmentRepository residentApartmentRepository;
     private final BillRepository billRepository;
     private final BillDetailRepository billDetailRepository;
+    private final MaintenanceRequestRepository requestRepo;
+    private final MaintenanceTaskRepository taskRepo;
+    private final MaintenanceReportRepository reportRepo;
 
     public DataInitializer(RoleRepository roleRepository,
                            AccountRepository accountRepository,
@@ -34,7 +37,10 @@ public class DataInitializer implements CommandLineRunner {
                            ApartmentRepository apartmentRepository,
                            ResidentApartmentRepository residentApartmentRepository,
                            BillRepository billRepository,
-                           BillDetailRepository billDetailRepository) {
+                           BillDetailRepository billDetailRepository,
+                           MaintenanceRequestRepository requestRepo,
+                           MaintenanceTaskRepository taskRepo,
+                           MaintenanceReportRepository reportRepo) {
         this.roleRepository = roleRepository;
         this.accountRepository = accountRepository;
         this.profileRepository = profileRepository;
@@ -45,6 +51,9 @@ public class DataInitializer implements CommandLineRunner {
         this.residentApartmentRepository = residentApartmentRepository;
         this.billRepository = billRepository;
         this.billDetailRepository = billDetailRepository;
+        this.requestRepo = requestRepo;
+        this.taskRepo = taskRepo;
+        this.reportRepo = reportRepo;
     }
 
     @Override
@@ -260,6 +269,75 @@ public class DataInitializer implements CommandLineRunner {
                 }
                 log.setCreatedAt(LocalDateTime.of(2026, 6, 15, 8, 0, 0).plusHours(i * 7).plusMinutes(i * 13));
                 systemLogRepository.save(log);
+            }
+        }
+
+        // 8. Initialize Maintenance Requests
+        if (requestRepo.count() == 0) {
+            List<Apartment> apts = apartmentRepository.findAll();
+            List<Profile> profiles = profileRepository.findAll();
+            Account admin = accountRepository.findAll().stream().filter(a -> a.getUsername().equals("alex.mercer")).findFirst().orElse(null);
+            if (apts.isEmpty() || profiles.isEmpty()) return;
+
+            String[][] reqData = {
+                {"Water leak in bathroom", "Water leaking from ceiling in master bathroom", "0", "0"},
+                {"Electrical outlet not working", "Living room outlet stopped working after storm", "1", "1"},
+                {"Broken window", "Living room window cracked, needs replacement", "0", "2"},
+                {"AC not cooling", "Air conditioner not cooling properly, temperature stays at 28C", "2", "3"},
+                {"Door handle loose", "Main door handle is loose and needs tightening", "0", "4"},
+                {"Pest control needed", "Cockroaches spotted in kitchen, need fumigation", "3", "5"},
+            };
+
+            for (String[] row : reqData) {
+                int idxApt = Integer.parseInt(row[3]);
+                if (idxApt >= apts.size()) continue;
+                Apartment apt = apts.get(idxApt);
+                Profile pf = profiles.get(idxApt % profiles.size());
+
+                MaintenanceRequest req = new MaintenanceRequest();
+                req.setProfile(pf);
+                req.setApartment(apt);
+                req.setTitle(row[0]);
+                req.setDescription(row[1]);
+                req.setRequestDate(LocalDateTime.now().minusDays(idxApt * 2));
+                req.setStatus(Byte.parseByte(row[2]));
+                requestRepo.save(req);
+            }
+        }
+
+        // 9. Initialize MaintenanceTasks + Reports
+        if (taskRepo.count() == 0) {
+            List<MaintenanceRequest> requests = requestRepo.findAll();
+            Account admin = accountRepository.findAll().stream().filter(a -> a.getUsername().equals("alex.mercer")).findFirst().orElse(null);
+            List<Account> allAccounts = accountRepository.findAll();
+
+            for (MaintenanceRequest req : requests) {
+                if (req.getStatus() == 0 || req.getStatus() == 3) continue;
+
+                MaintenanceTask task = new MaintenanceTask();
+                task.setMaintenanceRequest(req);
+                task.setStaff(allAccounts.get(req.getRequestId() % allAccounts.size()));
+                task.setAssignedBy(admin);
+                task.setAssignedDate(req.getRequestDate());
+                task.setDeadline(req.getRequestDate().plusDays(7));
+                task.setStatus(req.getStatus() == 2 ? (byte) 3 : (byte) 2);
+                taskRepo.save(task);
+
+                if (task.getStatus() == 3) {
+                    MaintenanceReport rpt = new MaintenanceReport();
+                    rpt.setMaintenanceTask(task);
+                    rpt.setReportContent("Fixed the issue. All good now.");
+                    rpt.setProgressPercent((byte) 100);
+                    rpt.setCreatedAt(task.getAssignedDate().plusDays(3));
+                    reportRepo.save(rpt);
+                } else {
+                    MaintenanceReport rpt = new MaintenanceReport();
+                    rpt.setMaintenanceTask(task);
+                    rpt.setReportContent("Initial inspection completed. Parts ordered.");
+                    rpt.setProgressPercent((byte) 50);
+                    rpt.setCreatedAt(task.getAssignedDate().plusDays(1));
+                    reportRepo.save(rpt);
+                }
             }
         }
     }
