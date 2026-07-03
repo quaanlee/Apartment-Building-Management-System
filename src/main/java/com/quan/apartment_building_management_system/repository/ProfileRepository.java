@@ -19,6 +19,7 @@ public interface ProfileRepository extends JpaRepository<Profile, Integer> {
 
     Optional<Profile> findByCitizenId(String citizenId);
 
+
     List<Profile> findByApartmentApartmentId(Integer apartmentId);
 
     @Query("SELECT p FROM Profile p LEFT JOIN FETCH p.account a LEFT JOIN FETCH a.role LEFT JOIN FETCH p.apartment WHERE " +

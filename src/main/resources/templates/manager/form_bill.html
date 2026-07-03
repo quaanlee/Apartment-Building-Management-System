@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'billing')}">
+<head>
+    <title>Generate Monthly Bill - ABMS</title>
+</head>
+<body>
+
+<main class="billing-page">
+    <div class="page-header">
+        <div>
+            <h2>Generate Monthly Service Bill</h2>
+            <p>Set billing period, enter usage quantities, and include approved amenity bookings.</p>
+        </div>
+        <a th:href="@{/manager/bills}" class="billing-btn secondary">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Bills
+        </a>
+    </div>
+
+    <div th:if="${message}" class="alert" th:classappend="${messageType == 'error'} ? ' alert-danger' : ' alert-success'" th:text="${message}">
+        Alert message
+    </div>
+
+    <div class="bill-form-layout">
+        <section class="billing-card">
+            <form th:action="@{/manager/bills/generate}" th:object="${billDto}" method="post" id="billGenForm">
+                <div class="form-grid">
+                    <div class="billing-field">
+                        <label for="apartmentId">Apartment *</label>
+                        <select th:field="*{apartmentId}" id="apartmentId" required onchange="updateBookingPreview()">
+                            <option value="">Select apartment</option>
+                            <option th:each="apt : ${apartments}"
+                                    th:value="${apt.apartmentId}"
+                                    th:text="${apt.apartmentNumber} + ' (' + ${@managerBillController.getOwnerName(apt)} + ')'"></option>
+                        </select>
+                        <span th:if="${#fields.hasErrors('apartmentId')}" th:errors="*{apartmentId}" class="form-error">Error</span>
+                    </div>
+
+                    <div class="billing-field">
+                        <label for="billingMonth">Billing Month *</label>
+                        <select th:field="*{month}" id="billingMonth" required onchange="updateBookingPreview()">
+                            <option th:each="m : ${#numbers.sequence(1, 12)}"
+                                    th:value="${m}"
+                                    th:text="${m}">1</option>
+                        </select>
+                        <span th:if="${#fields.hasErrors('month')}" th:errors="*{month}" class="form-error">Error</span>
+                    </div>
+
+                    <div class="billing-field">
+                        <label for="billingYear">Billing Year *</label>
+                        <input type="number" th:field="*{year}" id="billingYear" required onchange="updateBookingPreview()">
+                        <span th:if="${#fields.hasErrors('year')}" th:errors="*{year}" class="form-error">Error</span>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Standard Services &amp; Usage Quantities</h3>
+                <div class="service-list">
+                    <div th:each="service : ${services}" class="service-row">
+                        <div>
+                            <input type="hidden" name="serviceIds" th:value="${service.serviceId}">
+                            <strong th:text="${service.serviceName}">Management Fee</strong>
+                            <small th:text="${service.serviceType}">Monthly fee</small>
+                        </div>
+
+                        <div class="numeric" th:text="'$' + ${#numbers.formatDecimal(service.unitPrice, 1, 2)} + ' / ' + ${service.unit.unitName}">
+                            $50.00 / Month
+                        </div>
+
+                        <div class="billing-field">
+                            <label th:for="'qty-' + ${service.serviceId}">Quantity</label>
+                            <input th:id="'qty-' + ${service.serviceId}" type="number" name="quantities" min="0" step="0.01" value="0.00" class="qty-input" th:data-price="${service.unitPrice}" oninput="recalculateTotal()">
+                        </div>
+
+                        <div class="billing-field">
+                            <label th:for="'desc-' + ${service.serviceId}">Note</label>
+                            <input th:id="'desc-' + ${service.serviceId}" type="text" name="descriptions" placeholder="Optional note">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="billing-actions form-footer">
+                    <a th:href="@{/manager/bills}" class="billing-btn secondary">Cancel</a>
+                    <button type="submit" class="billing-btn primary">
+                        <i class="fa-solid fa-square-plus"></i>
+                        Generate Bill Now
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <aside class="summary-stack">
+            <section class="summary-card">
+                <h3>Live Price Calculation</h3>
+                <div class="summary-line">
+                    <span>Standard Services</span>
+                    <strong id="servicesTotal">$0.00</strong>
+                </div>
+                <div class="summary-line">
+                    <span>Amenity Bookings</span>
+                    <strong id="bookingsTotal">$0.00</strong>
+                </div>
+                <div class="summary-line total">
+                    <span>Estimated Total</span>
+                    <strong id="grandTotal">$0.00</strong>
+                </div>
+            </section>
+
+            <section class="summary-card">
+                <h3>Amenity Bookings Included</h3>
+                <p class="muted-text summary-note">Approved bookings for the selected apartment and billing period are fetched automatically.</p>
+                <div id="bookingListContainer" class="booking-list">
+                    <div class="booking-preview-empty">Select an apartment to preview utility bookings.</div>
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <script th:inline="javascript">
+        let bookingSum = 0;
+
+        function setBookingEmpty(message) {
+            document.getElementById("bookingListContainer").innerHTML = `<div class="booking-preview-empty">${message}</div>`;
+        }
+
+        function updateBookingPreview() {
+            const apartmentId = document.getElementById("apartmentId").value;
+            const month = document.getElementById("billingMonth").value;
+            const year = document.getElementById("billingYear").value;
+            const container = document.getElementById("bookingListContainer");
+
+            if (!apartmentId || !month || !year) {
+                setBookingEmpty("Select an apartment to preview utility bookings.");
+                bookingSum = 0;
+                document.getElementById("bookingsTotal").innerText = "$0.00";
+                recalculateTotal();
+                return;
+            }
+
+            container.innerHTML = `<div class="booking-preview-loading"><i class="fa-solid fa-spinner fa-spin"></i> Fetching bookings...</div>`;
+
+            fetch(`/manager/bills/generate/preview?apartmentId=${apartmentId}&month=${month}&year=${year}`)
+                .then(response => response.json())
+                .then(data => {
+                    container.innerHTML = "";
+                    bookingSum = 0;
+
+                    if (data.length === 0) {
+                        setBookingEmpty("No utility bookings found for this period.");
+                    } else {
+                        data.forEach(item => {
+                            const priceMatch = item.match(/\$([0-9.]+)/);
+                            const label = item.split(": $")[0];
+                            const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
+                            bookingSum += price;
+
+                            container.innerHTML += `
+                                <div class="booking-preview-item">
+                                    <span>${label}</span>
+                                    <strong>$${price.toFixed(2)}</strong>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    document.getElementById("bookingsTotal").innerText = `$${bookingSum.toFixed(2)}`;
+                    recalculateTotal();
+                })
+                .catch(err => {
+                    console.error("Error fetching bookings:", err);
+                    container.innerHTML = `<div class="booking-preview-error">Failed to load bookings.</div>`;
+                    bookingSum = 0;
+                    document.getElementById("bookingsTotal").innerText = "$0.00";
+                    recalculateTotal();
+                });
+        }
+
+        function recalculateTotal() {
+            let serviceSum = 0;
+            const qtyInputs = document.querySelectorAll(".qty-input");
+
+            qtyInputs.forEach(input => {
+                const qty = parseFloat(input.value) || 0;
+                const price = parseFloat(input.getAttribute("data-price")) || 0;
+                serviceSum += qty * price;
+            });
+
+            document.getElementById("servicesTotal").innerText = `$${serviceSum.toFixed(2)}`;
+            document.getElementById("grandTotal").innerText = `$${(serviceSum + bookingSum).toFixed(2)}`;
+        }
+
+        document.getElementById("billGenForm").addEventListener("submit", function(e) {
+            let serviceSum = 0;
+            const qtyInputs = document.querySelectorAll(".qty-input");
+
+            qtyInputs.forEach(input => {
+                const qty = parseFloat(input.value) || 0;
+                const price = parseFloat(input.getAttribute("data-price")) || 0;
+                serviceSum += qty * price;
+            });
+
+            const total = serviceSum + bookingSum;
+            if (total <= 0) {
+                e.preventDefault();
+                alert("Cannot generate a bill with a total amount of $0.00 or less. Please enter quantity for at least one service or select an apartment with pending amenity bookings.");
+            }
+        });
+    </script>
+</main>
+
+</body>
+</html>

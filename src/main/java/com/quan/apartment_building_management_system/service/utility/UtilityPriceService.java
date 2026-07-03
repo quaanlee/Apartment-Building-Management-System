@@ -1,12 +1,10 @@
 package com.quan.apartment_building_management_system.service.utility;
 
 import com.quan.apartment_building_management_system.entity.UtilityPrice;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
 public interface UtilityPriceService {
 
     List<UtilityPrice> findAll();
@@ -14,6 +12,8 @@ public interface UtilityPriceService {
     Optional<UtilityPrice> findById(Integer id);
 
     List<UtilityPrice> findByUtilityId(Integer utilityId);
+
+    Optional<UtilityPrice> findByUtilityIdAndUnitId(Integer utilityId, Integer unitId);
 
     UtilityPrice save(UtilityPrice utilityPrice);
 

@@ -35,6 +35,11 @@ public class UtilityPriceServiceImpl implements UtilityPriceService {
     }
 
     @Override
+    public Optional<UtilityPrice> findByUtilityIdAndUnitId(Integer utilityId, Integer unitId) {
+        return utilityPriceRepository.findByUtilityUtilityIdAndUnitUnitId(utilityId, unitId);
+    }
+
+    @Override
     @Transactional
     public UtilityPrice save(UtilityPrice utilityPrice) {
         return utilityPriceRepository.save(utilityPrice);
