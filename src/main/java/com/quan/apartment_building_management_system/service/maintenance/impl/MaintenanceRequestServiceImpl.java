@@ -8,6 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @Transactional(readOnly = true)
@@ -49,5 +52,10 @@ public class MaintenanceRequestServiceImpl implements MaintenanceRequestService 
     @Transactional
     public void deleteById(Integer id) {
         maintenanceRequestRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<MaintenanceRequest> searchRequests(String keyword, Byte status, LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable) {
+        return maintenanceRequestRepository.searchRequests(keyword, status, fromDate, toDate, pageable);
     }
 }

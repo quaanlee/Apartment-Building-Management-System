@@ -275,7 +275,7 @@ img {
     right: 0;
     width: 60%;
     height: 100%;
-    background-image: url('../../image/primary-img-homepage.jpg'); /* Local primary image */
+    background-image: url('../../images/homepage/primary-img-homepage.jpg'); /* Local primary image */
     background-size: cover;
     background-position: center;
     z-index: -1;
@@ -374,7 +374,7 @@ img {
     width: 100%;
     height: 380px;
     object-fit: cover;
-    background-image: url('../../image/foreign-img-homepage.png'); /* Local interior room image */
+    background-image: url('../../images/homepage/foreign-img-homepage.png'); /* Local interior room image */
     background-size: cover;
     background-position: center;
 }
@@ -495,7 +495,7 @@ img {
     width: 100%;
     height: 380px;
     object-fit: cover;
-    background-image: url('../../image/primary-img-homepage.jpg'); /* Local primary image */
+    background-image: url('../../images/homepage/primary-img-homepage.jpg'); /* Local primary image */
     background-size: cover;
     background-position: center;
 }

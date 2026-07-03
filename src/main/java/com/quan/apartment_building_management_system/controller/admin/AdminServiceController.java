@@ -1,13 +1,18 @@
 package com.quan.apartment_building_management_system.controller.admin;
 
-import com.quan.apartment_building_management_system.dto.ServiceDTO;
+import com.quan.apartment_building_management_system.dto.service.ServiceDTO;
+import com.quan.apartment_building_management_system.dto.service.ServiceCreateDTO;
+import com.quan.apartment_building_management_system.dto.service.ServiceUpdateDTO;
 import com.quan.apartment_building_management_system.entity.ServiceItem;
 import com.quan.apartment_building_management_system.entity.Unit;
 import com.quan.apartment_building_management_system.service.utility.ServiceItemService;
 import com.quan.apartment_building_management_system.service.utility.UnitService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,23 +74,25 @@ public class AdminServiceController {
     // ── POST: Tạo service mới từ modal ────────────────────────────────────────
     @PostMapping("/create")
     public String createService(
-            @RequestParam("serviceName")                     String     serviceName,
-            @RequestParam("serviceType")                     String     serviceType,
-            @RequestParam("unitPrice")                       BigDecimal unitPrice,
-            @RequestParam("unitId")                          Integer    unitId,
-            @RequestParam(value = "description", required = false) String description) {
+            @Valid @ModelAttribute ServiceCreateDTO createDTO,
+            BindingResult bindingResult) {
 
-        Optional<Unit> unitOpt = unitService.findById(unitId);
+        if (bindingResult.hasErrors()) {
+            String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            return "redirect:/admin/services?error=" + URLEncoder.encode(errorMsg, StandardCharsets.UTF_8);
+        }
+
+        Optional<Unit> unitOpt = unitService.findById(createDTO.getUnitId());
         if (unitOpt.isEmpty()) {
             return "redirect:/admin/services?error=unit_not_found";
         }
 
         ServiceItem newService = new ServiceItem();
-        newService.setServiceName(serviceName.trim());
-        newService.setServiceType(serviceType.trim().toUpperCase());
-        newService.setUnitPrice(unitPrice);
+        newService.setServiceName(createDTO.getServiceName().trim());
+        newService.setServiceType(createDTO.getServiceType().trim().toUpperCase());
+        newService.setUnitPrice(createDTO.getUnitPrice());
         newService.setUnit(unitOpt.get());
-        newService.setDescription(description != null ? description.trim() : "");
+        newService.setDescription(createDTO.getDescription() != null ? createDTO.getDescription().trim() : "");
         newService.setStatus(true); // mặc định ACTIVE khi tạo mới
 
         serviceItemService.save(newService);
@@ -105,27 +114,29 @@ public class AdminServiceController {
     // ── POST: Cập nhật service ────────────────────────────────────────────────────
     @PostMapping("/update")
     public String updateService(
-            @RequestParam("serviceId")                       Integer    serviceId,
-            @RequestParam("serviceName")                     String     serviceName,
-            @RequestParam("unitPrice")                       BigDecimal unitPrice,
-            @RequestParam("unitId")                          Integer    unitId,
-            @RequestParam(value = "description", required = false) String description) {
+            @Valid @ModelAttribute ServiceUpdateDTO updateDTO,
+            BindingResult bindingResult) {
 
-        Optional<ServiceItem> serviceOpt = serviceItemService.findById(serviceId);
+        if (bindingResult.hasErrors()) {
+            String errorMsg = bindingResult.getAllErrors().get(0).getDefaultMessage();
+            return "redirect:/admin/services?error=" + URLEncoder.encode(errorMsg, StandardCharsets.UTF_8);
+        }
+
+        Optional<ServiceItem> serviceOpt = serviceItemService.findById(updateDTO.getServiceId());
         if (serviceOpt.isEmpty()) {
             return "redirect:/admin/services?error=service_not_found";
         }
 
-        Optional<Unit> unitOpt = unitService.findById(unitId);
+        Optional<Unit> unitOpt = unitService.findById(updateDTO.getUnitId());
         if (unitOpt.isEmpty()) {
             return "redirect:/admin/services?error=unit_not_found";
         }
 
         ServiceItem service = serviceOpt.get();
-        service.setServiceName(serviceName.trim());
-        service.setUnitPrice(unitPrice);
+        service.setServiceName(updateDTO.getServiceName().trim());
+        service.setUnitPrice(updateDTO.getUnitPrice());
         service.setUnit(unitOpt.get());
-        service.setDescription(description != null ? description.trim() : "");
+        service.setDescription(updateDTO.getDescription() != null ? updateDTO.getDescription().trim() : "");
 
         serviceItemService.save(service);
 

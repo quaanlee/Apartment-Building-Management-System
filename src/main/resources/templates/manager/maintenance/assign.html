@@ -1,0 +1,124 @@
+<div th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'maintenance')}">
+    <div th:fragment="content">
+        <!-- Load custom page styling -->
+        <link rel="stylesheet" th:href="@{/css/manager/maintenance/maintenance.css}">
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- BREADCRUMB / BACK LINK                                       -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="back-link-row">
+            <a th:href="@{/manager/maintenance}" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Maintenance Requests</span>
+            </a>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- INCIDENT DETAIL CARD                                         -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="request-details-card">
+            <div class="card-header">
+                <i class="fa-solid fa-circle-info header-icon"></i>
+                <h3>Request Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="detail-row">
+                    <span class="detail-label">Request Title</span>
+                    <span class="detail-value title-value" th:text="${request.title}">Leaking Water Pipe</span>
+                </div>
+                
+                <div class="detail-row-grid">
+                    <div class="detail-row">
+                        <span class="detail-label">Apartment</span>
+                        <span class="detail-value" th:text="${request.apartment != null ? request.apartment.apartmentNumber : 'Unassigned'}">Apt A-101</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Resident Name</span>
+                        <span class="detail-value" th:text="${request.profile != null ? request.profile.fullName : 'N/A'}">Nguyen Van A</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Reported On</span>
+                        <span class="detail-value" th:text="${#temporals.format(request.requestDate, 'dd/MM/yyyy HH:mm')}">29/06/2026 14:20</span>
+                    </div>
+                </div>
+
+                <div class="detail-row full-width">
+                    <span class="detail-label">Description</span>
+                    <div class="detail-description-box" th:text="${request.description}">Detailed issue goes here.</div>
+                </div>
+
+                <div class="detail-row full-width" th:if="${request.imageUrl != null and !request.imageUrl.isEmpty()}">
+                    <span class="detail-label">Attached Photo</span>
+                    <div class="attached-image-box">
+                        <img th:src="${request.imageUrl}" alt="Incident Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- AVAILABLE STAFF TABLE SECTION                                -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="staff-assignment-section">
+            <div class="section-header">
+                <div class="section-header-left">
+                    <h3 class="section-title">Available Maintenance Staff</h3>
+                    <p class="section-subtitle">Select a technician to assign to this request. Busy staff are currently handling active incomplete tasks.</p>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Work Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="staff : ${staffs}">
+                            <td>
+                                <div class="staff-name-cell">
+                                    <div class="staff-avatar-circle" th:text="${#strings.substring(staff.profile.fullName, 0, 1)}">W</div>
+                                    <span th:text="${staff.profile.fullName}">Worker A</span>
+                                </div>
+                            </td>
+                            <td>
+                                <!-- Work Status Badge -->
+                                <span th:if="${staff.workStatus == 'available'}" class="status-badge completed">AVAILABLE</span>
+                                <span th:if="${staff.workStatus == 'busy'}" class="status-badge pending">BUSY</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons-group" style="display: flex; gap: 10px; align-items: center; justify-content: flex-end;">
+                                    <!-- Confirm Form Submit -->
+                                    <form th:action="@{/manager/maintenance/{reqId}/assign/{staffId}(reqId=${request.requestId}, staffId=${staff.profile.profileId})}" 
+                                          method="post" 
+                                          th:data-staff-name="${staff.profile.fullName}"
+                                          onsubmit="return confirm('Are you sure you want to assign ' + this.getAttribute('data-staff-name') + ' to this request?');" 
+                                          style="margin: 0;">
+                                        <button type="submit" class="action-btn" style="background-color: #38a169; color: #ffffff; padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                            <i class="fa-solid fa-check-double"></i>
+                                            <span>Assign</span>
+                                        </button>
+                                    </form>
+                                    
+                                    <a href="#" class="action-btn" style="background-color: #edf2f7; color: #4a5568; padding: 8px 14px; border-radius: 6px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                        <i class="fa-solid fa-user-gear"></i>
+                                        <span>View Profile</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(staffs)}">
+                            <td colspan="3" style="text-align: center; color: #a0aec0; padding: 24px;">
+                                No active maintenance staff registered.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,6 +1,6 @@
 package com.quan.apartment_building_management_system.service.user.impl;
 
-import com.quan.apartment_building_management_system.dto.UserDTO;
+import com.quan.apartment_building_management_system.dto.user.UserDTO;
 import com.quan.apartment_building_management_system.entity.Account;
 import com.quan.apartment_building_management_system.entity.Profile;
 import com.quan.apartment_building_management_system.entity.Role;
@@ -69,7 +69,10 @@ public class ProfileServiceImpl implements ProfileService {
     public Page<UserDTO> findFiltered(String search, Integer roleId, Boolean status, Pageable pageable) {
         return profileRepository.findFiltered(search, roleId, status, pageable).map(UserDTO::new);
     }
-
+    @Override
+    public List<Profile> findActiveMaintenanceStaffs() {
+        return profileRepository.findActiveMaintenanceStaffs();
+    }
     @Override
     @Transactional
     public UserDTO saveUserDTO(UserDTO userDto) {

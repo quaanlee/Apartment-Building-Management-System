@@ -30,4 +30,6 @@ public interface ProfileRepository extends JpaRepository<Profile, Integer> {
                                @Param("roleId") Integer roleId, 
                                @Param("status") Boolean status, 
                                Pageable pageable);
+    @Query("SELECT p FROM Profile p JOIN p.account a JOIN a.role r WHERE r.roleName = 'MAINTENANCE_STAFF' AND a.status = true")
+    List<Profile> findActiveMaintenanceStaffs();
 }

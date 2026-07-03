@@ -1,0 +1,562 @@
+<div th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'maintenance')}">
+    <div th:fragment="content">
+        <!-- Load custom page styling -->
+        <link rel="stylesheet" th:href="@{/css/manager/maintenance/maintenance.css}">
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- PAGE HEADER                                                  -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="page-title-row">
+            <div class="page-title-left">
+                <h2 class="page-title">Maintenance Requests</h2>
+                <p class="page-subtitle">Coordinate repair requests, assign technical staff, and monitor completion progress.</p>
+            </div>
+        </div>
+
+        <!-- Toast Notification (success / error) -->
+        <div id="toastMsg" class="toast-msg" th:if="${message != null}"
+             th:classappend="${messageType == 'success' ? ' toast-success' : ' toast-error'}">
+            <i th:class="${messageType == 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation'}"></i>
+            <span th:text="${message}">Action completed successfully!</span>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- STATISTICS CARDS                                            -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon pending">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Pending Requests</span>
+                    <span class="stat-value" th:text="${pendingRequests}">0</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon assigned">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Active Tasks</span>
+                    <span class="stat-value" th:text="${activeRequests}">0</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon completed">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Completed Tasks</span>
+                    <span class="stat-value" th:text="${completedRequests}">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- FILTER & SEARCH ROW                                         -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="filter-row">
+            <!-- Search by text -->
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" th:value="${keyword}"
+                       placeholder="Search by Title, Resident Name, or Apartment...">
+            </div>
+
+            <!-- Filter by Date -->
+            <div class="date-filter-wrapper" style="display: flex; gap: 8px; align-items: center; margin-left: auto;">
+                <input type="date" id="fromDate" class="form-input" th:value="${fromDate}" style="width: auto; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; transition: border-color 0.2s;" title="From Date">
+                <span style="color: #718096; font-weight: 500;">-</span>
+                <input type="date" id="toDate" class="form-input" th:value="${toDate}" style="width: auto; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; transition: border-color 0.2s;" title="To Date">
+            </div>
+
+            <!-- Filter by status -->
+            <div class="status-filter-wrapper">
+                <select id="statusFilter" class="status-select">
+                    <option value="" th:selected="${statusFilter == null}">All Statuses</option>
+                    <option value="0" th:selected="${statusFilter == 0}">Pending</option>
+                    <option value="1" th:selected="${statusFilter == 1}">Assigned</option>
+                    <option value="2" th:selected="${statusFilter == 2}">Completed</option>
+                </select>
+                <i class="fa-solid fa-filter select-chevron"></i>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- REQUESTS LIST TABLE                                         -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="table-container">
+            <table class="data-table" th:if="${!#lists.isEmpty(requests)}">
+                <thead>
+                    <tr>
+                        <th>Request Title</th>
+                        <th>Apartment</th>
+                        <th>Resident Name</th>
+                        <th>Report Date</th>
+                        <th>Assign Status</th>
+                        <th>Work Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="req : ${requests}">
+                        <td th:text="${req.title}" style="font-weight: 600;">Leaking Water Pipe</td>
+                        <td th:text="${req.apartment != null ? req.apartment.apartmentNumber : 'Unassigned'}">Apt A-101</td>
+                        <td th:text="${req.profile != null ? req.profile.fullName : 'N/A'}">Nguyen Van A</td>
+                        <td th:text="${#temporals.format(req.requestDate, 'dd/MM/yyyy HH:mm')}">29/06/2026 14:20</td>
+                        <td>
+                            <!-- Status Badges -->
+                            <span th:if="${req.status == 0}" class="status-badge pending">PENDING</span>
+                            <span th:if="${req.status == 1}" class="status-badge assigned">ASSIGNED</span>
+                            <span th:if="${req.status == 2}" class="status-badge completed">COMPLETED</span>
+                        </td>
+                        <td>
+                            <!-- Work Status: Completed vs Incomplete -->
+                            <span th:if="${req.status == 2 or (req.maintenanceTask != null and req.maintenanceTask.status == 0)}" class="status-badge completed">COMPLETED</span>
+                            <span th:if="${req.status != 2 and (req.maintenanceTask == null or req.maintenanceTask.status != 0)}" class="status-badge pending">INCOMPLETE</span>
+                        </td>
+                        <td>
+                            <!-- Actions Buttons -->
+                            <a th:if="${req.status == 0}" th:href="@{/manager/maintenance/{id}/assign(id=${req.requestId})}" class="action-btn assign-link" style="text-decoration: none;">
+                                <i class="fa-solid fa-user-plus"></i>
+                                <span>Assign Staff</span>
+                            </a>
+                            <button th:if="${req.status == 1 or req.status == 2}" class="action-btn view-btn" type="button"
+                                    th:onclick="'openViewProgressModal(' + ${req.requestId} + ')'">
+                                <i class="fa-solid fa-eye"></i>
+                                <span>View Progress</span>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Empty State -->
+            <div class="no-results-card" th:if="${#lists.isEmpty(requests)}">
+                <i class="fa-solid fa-clipboard-question"></i>
+                <h3>No requests found</h3>
+                <p>No maintenance requests match your filter options.</p>
+            </div>
+
+            <!-- Pagination Controls -->
+            <!-- Pagination Controls -->
+            <div class="pagination-block" th:if="${totalPages > 1}">
+                <div class="pagination-buttons" style="display: flex; gap: 8px;">
+                    <!-- Previous Button -->
+                    <button type="button" class="pagination-btn" th:disabled="${currentPage == 0}" th:onclick="'goToPage(' + (${currentPage - 1}) + ')'">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    
+                    <!-- Page Numbers -->
+                    <button type="button" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                            th:onclick="'goToPage(' + ${i} + ')'" 
+                            th:text="${i + 1}"
+                            class="pagination-btn"
+                            th:classappend="${i == currentPage ? 'active' : ''}">
+                    </button>
+                    
+                    <!-- Next Button -->
+                    <button type="button" class="pagination-btn" th:disabled="${currentPage + 1 == totalPages}" th:onclick="'goToPage(' + (${currentPage + 1}) + ')'">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- ASSIGN STAFF MODAL                                          -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="assignStaffModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modalTitle">Assign Maintenance Staff</h3>
+                    <button class="modal-close-btn" id="closeAssignModalBtn" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <form id="assignStaffForm" th:action="@{/manager/maintenance/assign}" method="post">
+                    <div class="modal-body">
+                        <!-- Request Details Info (Non-editable) -->
+                        <div class="form-group">
+                            <label class="form-label">Incident Request</label>
+                            <input type="text" id="assignRequestTitleDisplay" class="form-input" readonly style="background-color: #f7fafc; font-weight: 600;">
+                            <input type="hidden" id="assignRequestId" name="requestId">
+                        </div>
+
+                        <!-- Staff Dropdown Selection -->
+                        <div class="form-group">
+                            <label class="form-label" for="staffId">Select Maintenance Staff</label>
+                            <select id="staffId" name="staffId" class="form-select" required>
+                                <option value="" disabled selected>Select a technician...</option>
+                                <option th:each="staff : ${staffs}"
+                                        th:value="${staff.profileId}"
+                                        th:text="${staff.fullName}">Worker A (Plumber)</option>
+                            </select>
+                        </div>
+
+                        <!-- Deadline Datepicker -->
+                        <div class="form-group">
+                            <label class="form-label" for="deadline">Completion Deadline</label>
+                            <input type="datetime-local" id="deadline" name="deadline" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="modal-cancel-btn" id="cancelAssignModalBtn">Cancel</button>
+                        <button type="submit" class="modal-submit-btn">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Confirm Assignment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- VIEW PROGRESS MODAL                                         -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="viewProgressModal" role="dialog" aria-modal="true" aria-labelledby="progressModalTitle">
+            <div class="modal-box" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="progressModalTitle">Task Progress Details</h3>
+                    <button class="modal-close-btn" id="closeProgressModalBtn" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Incident summary -->
+                    <div class="detail-row">
+                        <span class="detail-label">Title</span>
+                        <span class="detail-value" id="detailTitle">Title here</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Resident</span>
+                        <span class="detail-value" id="detailResident">Resident Name</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Apartment</span>
+                        <span class="detail-value" id="detailApartment">Apt A-101</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Reported On</span>
+                        <span class="detail-value" id="detailDate">29/06/2026</span>
+                    </div>
+                    <div class="detail-row" style="flex-direction: column; margin-bottom: 16px;">
+                        <span class="detail-label" style="margin-bottom: 6px;">Description</span>
+                        <span class="detail-value" id="detailDescription" style="padding: 10px; background: #f8fafc; border-radius: 6px; display: block; border: 1px solid #edf2f7;">Detailed issue goes here.</span>
+                    </div>
+
+                    <!-- Image preview (if exists) -->
+                    <div class="image-preview-box" id="detailImageBox" style="display: none;"></div>
+
+                    <!-- Task Assignment Section -->
+                    <div id="taskDetailsSection" style="margin-top: 20px; border-top: 1px solid #edf2f7; padding-top: 16px;">
+                        <h4 class="progress-header">Work Assignment</h4>
+                        <div class="detail-row">
+                            <span class="detail-label">Assigned Staff</span>
+                            <span class="detail-value" id="detailStaff" style="font-weight: 600;">Technician Name</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Deadline</span>
+                            <span class="detail-value" id="detailDeadline">Deadline Date</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Task Status</span>
+                            <span class="detail-value">
+                                <span class="status-badge assigned" id="detailTaskStatus">ASSIGNED</span>
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Work Status</span>
+                            <span class="detail-value">
+                                <span class="status-badge" id="detailWorkStatus" style="background: #e2e8f0; color: #4a5568;">AVAILABLE</span>
+                            </span>
+                        </div>
+
+                        <!-- Progress report list -->
+                        <div class="progress-timeline">
+                            <h4 class="progress-header">Activity Progress Reports</h4>
+                            <div class="timeline-list" id="timelineList">
+                                <!-- Appended dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-cancel-btn" id="closeProgressModalFooterBtn">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- JAVASCRIPT LOGIC                                             -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <script th:inline="javascript">
+            document.addEventListener("DOMContentLoaded", function () {
+                /* ── Search & filter wiring ── */
+                const searchInput = document.getElementById("searchInput");
+                const statusFilter = document.getElementById("statusFilter");
+                const fromDateInput = document.getElementById("fromDate");
+                const toDateInput = document.getElementById("toDate");
+
+                if (searchInput) {
+                    searchInput.addEventListener("keypress", function (e) {
+                        if (e.key === "Enter") triggerSearchFilter();
+                    });
+                }
+                if (statusFilter) {
+                    statusFilter.addEventListener("change", triggerSearchFilter);
+                }
+                if (fromDateInput) {
+                    fromDateInput.addEventListener("change", triggerSearchFilter);
+                }
+                if (toDateInput) {
+                    toDateInput.addEventListener("change", triggerSearchFilter);
+                }
+
+                function showToast(msg, type) {
+                    let toast = document.getElementById("jsToastMsg");
+                    if (!toast) {
+                        toast = document.createElement("div");
+                        toast.id = "jsToastMsg";
+                        toast.className = "toast-msg";
+                        // Position it below the header (header is usually ~70px)
+                        toast.style.top = "80px";
+                        document.body.appendChild(toast);
+                    }
+                    
+                    toast.className = "toast-msg " + (type === "success" ? "toast-success" : "toast-error");
+                    const iconClass = type === "success" ? "fa-circle-check" : "fa-circle-exclamation";
+                    toast.innerHTML = '<i class="fa-solid ' + iconClass + '"></i><span>' + msg + '</span>';
+                    
+                    // Auto-hide after 4s
+                    setTimeout(() => {
+                        toast.classList.add("toast-hide");
+                    }, 4000);
+                }
+
+                function validateDates(fd, td) {
+                    if (fd !== "" && td !== "") {
+                        if (new Date(fd) > new Date(td)) {
+                            showToast("From Date must be less than or equal to To Date.", "error");
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+                function triggerSearchFilter() {
+                    const kw = searchInput ? encodeURIComponent(searchInput.value.trim()) : "";
+                    const st = statusFilter ? statusFilter.value : "";
+                    const fd = fromDateInput ? fromDateInput.value : "";
+                    const td = toDateInput ? toDateInput.value : "";
+                    
+                    if (!validateDates(fd, td)) return;
+                    
+                    let url = "/manager/maintenance?keyword=" + kw;
+                    if (st !== "") url += "&status=" + st;
+                    if (fd !== "") url += "&fromDate=" + fd;
+                    if (td !== "") url += "&toDate=" + td;
+                    window.location.href = url;
+                }
+
+                window.goToPage = function(pageNumber) {
+                    const kw = searchInput ? encodeURIComponent(searchInput.value.trim()) : "";
+                    const st = statusFilter ? statusFilter.value : "";
+                    const fd = fromDateInput ? fromDateInput.value : "";
+                    const td = toDateInput ? toDateInput.value : "";
+                    
+                    if (!validateDates(fd, td)) return;
+                    
+                    let url = "/manager/maintenance?page=" + pageNumber;
+                    if (kw !== "") url += "&keyword=" + kw;
+                    if (st !== "") url += "&status=" + st;
+                    if (fd !== "") url += "&fromDate=" + fd;
+                    if (td !== "") url += "&toDate=" + td;
+                    window.location.href = url;
+                };
+
+                /* ── Assign Staff Modal Logic ── */
+                const assignModal = document.getElementById("assignStaffModal");
+                const closeAssignBtn = document.getElementById("closeAssignModalBtn");
+                const cancelAssignBtn = document.getElementById("cancelAssignModalBtn");
+                const assignForm = document.getElementById("assignStaffForm");
+
+                document.querySelectorAll(".assign-btn").forEach(btn => {
+                    btn.addEventListener("click", function () {
+                        const requestId = this.getAttribute("data-request-id");
+                        const requestTitle = this.getAttribute("data-request-title");
+
+                        document.getElementById("assignRequestId").value = requestId;
+                        document.getElementById("assignRequestTitleDisplay").value = requestTitle;
+
+                        // Set a default deadline (e.g. 24 hours from now)
+                        const now = new Date();
+                        now.setDate(now.getDate() + 1); // add 24 hours
+                        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                        document.getElementById("deadline").value = now.toISOString().slice(0, 16);
+
+                        openAssignModal();
+                    });
+                });
+
+                function openAssignModal() {
+                    assignModal.classList.add("is-open");
+                    document.body.classList.add("modal-open");
+                }
+
+                function closeAssignModal() {
+                    assignModal.classList.remove("is-open");
+                    document.body.classList.remove("modal-open");
+                    assignForm.reset();
+                }
+
+                if (closeAssignBtn) closeAssignBtn.addEventListener("click", closeAssignModal);
+                if (cancelAssignBtn) cancelAssignBtn.addEventListener("click", closeAssignModal);
+
+                /* ── View Progress Modal Logic (AJAX calls) ── */
+                const progressModal = document.getElementById("viewProgressModal");
+                const closeProgressBtn = document.getElementById("closeProgressModalBtn");
+                const closeProgressFooterBtn = document.getElementById("closeProgressModalFooterBtn");
+
+                window.openViewProgressModal = function(requestId) {
+                    fetch('/manager/maintenance/' + requestId + '/details')
+                        .then(response => {
+                            if (!response.ok) throw new Error("Network response not ok");
+                            return response.json();
+                        })
+                        .then(data => {
+                            document.getElementById("detailTitle").textContent = data.title;
+                            document.getElementById("detailDescription").textContent = data.description;
+                            document.getElementById("detailResident").textContent = data.residentName;
+                            document.getElementById("detailApartment").textContent = data.apartmentNumber;
+
+                            // Parse date formats nicely
+                            if (data.requestDate && data.requestDate !== 'N/A') {
+                                const parsedDate = new Date(data.requestDate);
+                                document.getElementById("detailDate").textContent = parsedDate.toLocaleString('vi-VN');
+                            } else {
+                                document.getElementById("detailDate").textContent = 'N/A';
+                            }
+
+                            // Image preview
+                            const imgBox = document.getElementById("detailImageBox");
+                            if (data.imageUrl) {
+                                imgBox.innerHTML = '<img src="' + data.imageUrl + '" alt="Incident Image">';
+                                imgBox.style.display = 'flex';
+                            } else {
+                                imgBox.style.display = 'none';
+                                imgBox.innerHTML = '';
+                            }
+
+                            // Task details
+                            const taskSection = document.getElementById("taskDetailsSection");
+                            const timeline = document.getElementById("timelineList");
+                            timeline.innerHTML = '';
+
+                            if (data.task) {
+                                document.getElementById("detailStaff").textContent = data.task.staffName;
+
+                                if (data.task.deadline && data.task.deadline !== 'N/A') {
+                                    const parsedDl = new Date(data.task.deadline);
+                                    document.getElementById("detailDeadline").textContent = parsedDl.toLocaleString('vi-VN');
+                                } else {
+                                    document.getElementById("detailDeadline").textContent = 'N/A';
+                                }
+
+                                const badge = document.getElementById("detailTaskStatus");
+                                badge.className = "status-badge";
+                                if (data.task.status === 1) {
+                                    badge.textContent = "ASSIGNED";
+                                    badge.classList.add("assigned");
+                                } else if (data.task.status === 2) {
+                                    badge.textContent = "IN PROGRESS";
+                                    badge.classList.add("assigned"); // keep blue
+                                } else if (data.task.status === 3) {
+                                    badge.textContent = "COMPLETED";
+                                    badge.classList.add("completed");
+                                }
+
+                                const workBadge = document.getElementById("detailWorkStatus");
+                                workBadge.className = "status-badge";
+                                if (data.task.workStatus === 'busy') {
+                                    workBadge.textContent = "BUSY";
+                                    workBadge.style.background = "#fff5f5";
+                                    workBadge.style.color = "#e53e3e";
+                                    workBadge.style.border = "1px solid #fed7d7";
+                                } else {
+                                    workBadge.textContent = "AVAILABLE";
+                                    workBadge.style.background = "#f0fff4";
+                                    workBadge.style.color = "#38a169";
+                                    workBadge.style.border = "1px solid #c6f6d5";
+                                }
+
+                                // Reports list
+                                if (data.task.reports && data.task.reports.length > 0) {
+                                    data.task.reports.forEach(report => {
+                                        const item = document.createElement("div");
+                                        item.className = "timeline-item";
+                                        
+                                        let reportDateStr = 'N/A';
+                                        if (report.createdAt && report.createdAt !== 'N/A') {
+                                            reportDateStr = new Date(report.createdAt).toLocaleString('vi-VN');
+                                        }
+
+                                        item.innerHTML = `
+                                            <div class="timeline-content">
+                                                <strong>Progress: ${report.progressPercent}%</strong><br>
+                                                <span>${report.reportContent}</span>
+                                            </div>
+                                            <div class="timeline-meta">${reportDateStr}</div>
+                                        `;
+                                        timeline.appendChild(item);
+                                    });
+                                } else {
+                                    timeline.innerHTML = '<p style="color: #a0aec0; font-size: 13px; margin: 0;">No progress reports submitted yet by technician.</p>';
+                                }
+
+                                taskSection.style.display = 'block';
+                            } else {
+                                taskSection.style.display = 'none';
+                            }
+
+                            progressModal.classList.add("is-open");
+                            document.body.classList.add("modal-open");
+                        })
+                        .catch(err => {
+                            console.error("Error fetching progress details:", err);
+                        });
+                };
+
+                function closeProgressModal() {
+                    progressModal.classList.remove("is-open");
+                    document.body.classList.remove("modal-open");
+                }
+
+                if (closeProgressBtn) closeProgressBtn.addEventListener("click", closeProgressModal);
+                if (closeProgressFooterBtn) closeProgressFooterBtn.addEventListener("click", closeProgressModal);
+
+                /* Overlay and Escape close controls */
+                window.addEventListener("click", function (e) {
+                    if (e.target === assignModal) closeAssignModal();
+                    if (e.target === progressModal) closeProgressModal();
+                });
+
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Escape") {
+                        closeAssignModal();
+                        closeProgressModal();
+                    }
+                });
+
+                /* Auto-dismiss toast msg */
+                const toast = document.getElementById("toastMsg");
+                if (toast) {
+                    setTimeout(() => {
+                        toast.classList.add("toast-hide");
+                    }, 4000);
+                }
+            });
+        </script>
+    </div>
+</div>

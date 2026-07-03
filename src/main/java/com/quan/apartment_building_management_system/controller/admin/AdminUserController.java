@@ -1,6 +1,6 @@
 package com.quan.apartment_building_management_system.controller.admin;
 
-import com.quan.apartment_building_management_system.dto.UserDTO;
+import com.quan.apartment_building_management_system.dto.user.UserDTO;
 import com.quan.apartment_building_management_system.entity.Account;
 import com.quan.apartment_building_management_system.entity.Profile;
 import com.quan.apartment_building_management_system.entity.Role;

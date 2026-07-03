@@ -1,6 +1,6 @@
 package com.quan.apartment_building_management_system.service.user;
 
-import com.quan.apartment_building_management_system.dto.UserDTO;
+import com.quan.apartment_building_management_system.dto.user.UserDTO;
 import com.quan.apartment_building_management_system.entity.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +23,6 @@ public interface ProfileService {
     void deleteById(Integer id);
 
     Page<UserDTO> findFiltered(String search, Integer roleId, Boolean status, Pageable pageable);
-
+    List<Profile> findActiveMaintenanceStaffs();
     UserDTO saveUserDTO(UserDTO userDto);
 }
