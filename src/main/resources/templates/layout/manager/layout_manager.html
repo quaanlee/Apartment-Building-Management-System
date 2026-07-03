@@ -6,6 +6,7 @@
     <title>ABMS Manager Portal</title>
     <!-- CSS File -->
     <link rel="stylesheet" th:href="@{/css/layout/manager_layout.css}">
+    <link rel="stylesheet" th:href="@{/css/manager/bills.css}">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -39,8 +40,8 @@
                         <span>Apartments</span>
                     </a>
                 </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'billing' ? 'active' : ''}">
-                    <a th:href="@{#}">
+                <li class="sidebar-item" th:classappend="${activeTab == 'billing' || activeTab == 'bills' || activeTab == 'payment-status' ? 'active' : ''}">
+                    <a th:href="@{/manager/bills}">
                         <i class="fa-solid fa-file-invoice-dollar"></i>
                         <span>Billing & Payments</span>
                     </a>
@@ -57,10 +58,10 @@
                         <span>Amenity Bookings</span>
                     </a>
                 </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'service & utility' ? 'active' : ''}">
-                    <a th:href="@{#}">
+                <li class="sidebar-item" th:classappend="${activeTab == 'service_utility' ? 'active' : ''}">
+                    <a th:href="@{/manager/services}">
                         <i class="fas fa-briefcase"></i>
-                        <span>Service & Utility</span>
+                        <span>Service &amp; Utility</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'vehicles' ? 'active' : ''}">

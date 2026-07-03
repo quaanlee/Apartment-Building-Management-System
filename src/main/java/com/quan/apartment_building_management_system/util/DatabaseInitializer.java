@@ -64,6 +64,8 @@ public class DatabaseInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
+        initializeOrUpdateUtilities();
+
         if (roleRepository.count() > 0) {
             return; // Already initialized
         }
@@ -471,6 +473,116 @@ public class DatabaseInitializer implements CommandLineRunner {
             detail2.setDescription("Parking Fee");
             detail2.setAmount(new BigDecimal("10.00"));
             billDetailRepository.save(detail2);
+        }
+    }
+
+    private void initializeOrUpdateUtilities() {
+        // Fetch units
+        Unit hourUnit = unitRepository.findByUnitName("Hour").orElse(null);
+        Unit turnUnit = unitRepository.findByUnitName("Turn").orElse(null);
+
+        // 1. Gym / Modern Fitness Center
+        Utility gym = utilityRepository.findByUtilityName("Gym")
+                .orElseGet(() -> utilityRepository.findByUtilityName("Modern Fitness Center").orElse(null));
+        if (gym != null) {
+            gym.setUtilityName("Modern Fitness Center");
+            gym.setDescription("Phòng tập Gym hiện đại với đầy đủ trang thiết bị fitness, cardio và tạ.");
+            utilityRepository.save(gym);
+        } else {
+            gym = new Utility();
+            gym.setUtilityName("Modern Fitness Center");
+            gym.setDescription("Phòng tập Gym hiện đại với đầy đủ trang thiết bị fitness, cardio và tạ.");
+            gym.setStatus(true);
+            gym = utilityRepository.save(gym);
+        }
+
+        // 2. Swimming / Rooftop Infinity Pool
+        Utility swimming = utilityRepository.findByUtilityName("Swimming")
+                .orElseGet(() -> utilityRepository.findByUtilityName("Rooftop Infinity Pool").orElse(null));
+        if (swimming != null) {
+            swimming.setUtilityName("Rooftop Infinity Pool");
+            swimming.setDescription("Bể bơi vô cực trên tầng thượng tòa nhà, có khu vực cho trẻ em và người lớn.");
+            utilityRepository.save(swimming);
+        } else {
+            swimming = new Utility();
+            swimming.setUtilityName("Rooftop Infinity Pool");
+            swimming.setDescription("Bể bơi vô cực trên tầng thượng tòa nhà, có khu vực cho trẻ em và người lớn.");
+            swimming.setStatus(true);
+            swimming = utilityRepository.save(swimming);
+        }
+
+        // 3. Club Lounge
+        Utility lounge = utilityRepository.findByUtilityName("Club Lounge").orElse(null);
+        if (lounge != null) {
+            lounge.setDescription("Phòng sinh hoạt chung cao cấp dành cho cư dân hội họp hoặc tiếp khách.");
+            utilityRepository.save(lounge);
+        } else {
+            lounge = new Utility();
+            lounge.setUtilityName("Club Lounge");
+            lounge.setDescription("Phòng sinh hoạt chung cao cấp dành cho cư dân hội họp hoặc tiếp khách.");
+            lounge.setStatus(true);
+            lounge = utilityRepository.save(lounge);
+        }
+
+        // 4. Private Cinema Room
+        Utility cinema = utilityRepository.findByUtilityName("Private Cinema Room").orElse(null);
+        if (cinema == null) {
+            cinema = new Utility();
+            cinema.setUtilityName("Private Cinema Room");
+            cinema.setDescription("Phòng chiếu phim gia đình riêng tư với hệ thống âm thanh vòm đỉnh cao.");
+            cinema.setStatus(false); // MAINTENANCE
+            cinema = utilityRepository.save(cinema);
+        }
+        // Seed Price for Cinema
+        if (cinema != null && hourUnit != null && utilityPriceRepository.findByUtilityUtilityIdAndUnitUnitId(cinema.getUtilityId(), hourUnit.getUnitId()).isEmpty()) {
+            UtilityPrice price = new UtilityPrice();
+            price.setUtility(cinema);
+            price.setUnit(hourUnit);
+            price.setPrice(new BigDecimal("12.00"));
+            utilityPriceRepository.save(price);
+        }
+        // Seed Resource for Cinema
+        if (cinema != null && utilityResourceRepository.findByUtilityUtilityId(cinema.getUtilityId()).isEmpty()) {
+            UtilityResource res = new UtilityResource();
+            res.setUtility(cinema);
+            res.setResourceName("Premium Theater Screen");
+            res.setLocation("Tầng 1 - Block B");
+            res.setStatus(false); // Maintenance
+            utilityResourceRepository.save(res);
+        }
+
+        // 5. Sky Garden & BBQ Area
+        Utility garden = utilityRepository.findByUtilityName("Sky Garden & BBQ Area").orElse(null);
+        if (garden == null) {
+            garden = new Utility();
+            garden.setUtilityName("Sky Garden & BBQ Area");
+            garden.setDescription("Khu vườn trên mây thoáng mát kết hợp khu vực bếp nướng BBQ gia đình.");
+            garden.setStatus(true);
+            garden = utilityRepository.save(garden);
+        }
+        // Seed Price for Garden
+        if (garden != null && turnUnit != null && utilityPriceRepository.findByUtilityUtilityIdAndUnitUnitId(garden.getUtilityId(), turnUnit.getUnitId()).isEmpty()) {
+            UtilityPrice price = new UtilityPrice();
+            price.setUtility(garden);
+            price.setUnit(turnUnit);
+            price.setPrice(new BigDecimal("20.00"));
+            utilityPriceRepository.save(price);
+        }
+        // Seed Resource for Garden
+        if (garden != null && utilityResourceRepository.findByUtilityUtilityId(garden.getUtilityId()).isEmpty()) {
+            UtilityResource res1 = new UtilityResource();
+            res1.setUtility(garden);
+            res1.setResourceName("BBQ Grill Pavilion A");
+            res1.setLocation("Tầng thượng - Block A");
+            res1.setStatus(true);
+            utilityResourceRepository.save(res1);
+
+            UtilityResource res2 = new UtilityResource();
+            res2.setUtility(garden);
+            res2.setResourceName("BBQ Grill Pavilion B");
+            res2.setLocation("Tầng thượng - Block A");
+            res2.setStatus(true);
+            utilityResourceRepository.save(res2);
         }
     }
 }

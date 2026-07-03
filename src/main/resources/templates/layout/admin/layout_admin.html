@@ -33,12 +33,7 @@
                         <span>User Management</span>
                     </a>
                 </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'bills' || activeTab == 'payment-status' ? 'active' : ''}">
-                    <a th:href="@{/admin/bills}">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                        <span>Bill Management</span>
-                    </a>
-                </li>
+
                 <li class="sidebar-item" th:classappend="${activeTab == 'building' ? 'active' : ''}">
                     <a th:href="@{/admin/building}">
                         <i class="fa-solid fa-building"></i>

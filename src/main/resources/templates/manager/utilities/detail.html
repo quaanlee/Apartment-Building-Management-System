@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'service_utility')}" lang="en">
+<head>
+</head>
+<body>
+
+<main class="utility-container">
+    <link rel="stylesheet" th:href="@{/css/manager/utilities.css}">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav">
+        <a th:href="@{/manager/dashboard}">Dashboard</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <a th:href="@{/manager/utilities}">Service &amp; Utility</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span th:text="${utility.utilityName}">Modern Fitness Center</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="detail-header">
+        <div class="header-left">
+            <div class="title-badge-row">
+                <h1 th:text="${utility.utilityName}">Modern Fitness Center</h1>
+                <span th:class="${utility.status} ? 'badge-status active' : 'badge-status maintenance'"
+                      th:text="${utility.status} ? 'Active' : 'Maintenance'">Active</span>
+            </div>
+            <p class="subtitle-text" th:text="${utility.description}">State-of-the-art gym with cardio equipment, weights, and studio space.</p>
+        </div>
+        <div class="header-right">
+            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+               class="btn-back-list">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Image Gallery -->
+    <div class="gallery-grid">
+        <div class="gallery-main">
+            <img th:src="${utility.imageUrl}" alt="Main Facility View">
+        </div>
+        <div class="gallery-side">
+            <div class="side-img-box">
+                <img th:src="${utility.imageUrl}" alt="Facility View 2" class="gallery-img-soft">
+            </div>
+            <div class="side-img-box">
+                <img th:src="${utility.imageUrl}" alt="Facility View 3" class="gallery-img-muted">
+            </div>
+        </div>
+    </div>
+
+    <!-- Facility Overview -->
+    <div class="overview-section">
+        <h3>Facility Overview</h3>
+        <p th:text="${utility.description}">
+            State-of-the-art gym with cardio equipment, weights, and studio space.
+        </p>
+        <div class="location-box">
+            <i class="fa-solid fa-location-dot"></i>
+            <span th:text="${utility.location}">Floor 2, Block A</span>
+        </div>
+    </div>
+
+    <!-- Database Entities Info Grid -->
+    <div class="operations-grid detail-operations-grid">
+        <!-- Resources Card (from Database) -->
+        <div class="info-card">
+            <h4>PHYSICAL RESOURCES &amp; LOCATIONS</h4>
+            <div class="resources-list">
+                <div class="resource-row" th:each="res : ${utility.utilityResources}">
+                    <div class="resource-meta">
+                        <span class="resource-name" th:text="${res.resourceName}">Main Gym Hall</span>
+                        <span class="resource-location"><i class="fa-solid fa-location-dot"></i> <span th:text="${res.location}">Floor 2, Block A</span></span>
+                    </div>
+                    <form th:action="@{/manager/utilities/resources/toggle-status/{id}(id=${res.resourceId}, query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" style="display:inline; margin: 0;">
+                        <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer; font-family: inherit;">
+                            <span th:class="${res.status} ? 'badge-status active' : 'badge-status maintenance'" 
+                                  th:text="${res.status} ? 'Ready' : 'Maintenance'" 
+                                  style="font-size: 11px; padding: 4px 8px; transition: all 0.2s ease-in-out; display: inline-block;"
+                                  onmouseover="this.style.opacity='0.8'; this.style.transform='scale(1.05)'"
+                                  onmouseout="this.style.opacity='1'; this.style.transform='scale(1)'"
+                                  th:title="${res.status ? 'Click to set Maintenance' : 'Click to set Ready'}">Ready</span>
+                        </button>
+                    </form>
+                </div>
+                <div th:if="${#lists.isEmpty(utility.utilityResources)}" class="utility-empty-state">
+                    No physical resources registered for this utility.
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Card (from Database) -->
+        <div class="info-card">
+            <h4>BILLING RATES</h4>
+            <div class="rates-list">
+                <div class="rate-row" th:each="price : ${utility.utilityPrices}">
+                    <span class="rate-name" th:text="'Rate (' + ${price.unit.unitName} + ')'">Rate (Hour)</span>
+                    <span class="price-value" th:text="'$' + ${#numbers.formatDecimal(price.price, 1, 2)}">$5.00</span>
+                </div>
+                <div th:if="${#lists.isEmpty(utility.utilityPrices)}" class="utility-empty-state">
+                    No pricing configurations defined.
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

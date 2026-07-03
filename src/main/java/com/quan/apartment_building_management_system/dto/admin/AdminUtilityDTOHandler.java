@@ -49,6 +49,16 @@ public class AdminUtilityDTOHandler {
                     .map(this::toUtilityResourceDTO)
                     .toList());
         }
+        if (entity.getUtilityPrices() != null) {
+            dto.setUtilityPrices(entity.getUtilityPrices().stream()
+                    .map(p -> new UtilityDTO.Price(
+                            p.getUtilityPriceId(),
+                            null,
+                            toUnitDTO(p.getUnit()),
+                            p.getPrice()
+                    ))
+                    .toList());
+        }
         return dto;
     }
 

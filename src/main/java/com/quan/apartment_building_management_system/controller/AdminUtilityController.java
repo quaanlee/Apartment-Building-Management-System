@@ -46,12 +46,28 @@ public class AdminUtilityController {
 
     @GetMapping
     public String listUtilities(@RequestParam(value = "query", required = false) String query,
+                                @RequestParam(value = "status", required = false) String status,
+                                @RequestParam(value = "statusFilter", required = false) String statusFilter,
                                 @RequestParam(value = "page", defaultValue = "1") int page,
                                 @RequestParam(value = "size", defaultValue = "5") int size,
                                 @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
                                 @RequestParam(value = "priceQuery", required = false) String priceQuery,
                                 Model model) {
         List<Utility> allUtilities = utilityService.searchUtilities(query);
+
+        String activeStatus = "all";
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            activeStatus = statusFilter;
+        } else if (status != null && !status.isEmpty()) {
+            activeStatus = status;
+        }
+
+        // Apply status filter
+        if ("active".equalsIgnoreCase(activeStatus)) {
+            allUtilities = allUtilities.stream().filter(Utility::getStatus).toList();
+        } else if ("maintenance".equalsIgnoreCase(activeStatus)) {
+            allUtilities = allUtilities.stream().filter(u -> !u.getStatus()).toList();
+        }
 
         int totalItems = allUtilities.size();
         int totalPages = dtoHandler.calculateTotalPages(totalItems, size);
@@ -85,6 +101,7 @@ public class AdminUtilityController {
 
         model.addAttribute("utilities", paginatedUtilities);
         model.addAttribute("query", query);
+        model.addAttribute("statusFilter", activeStatus);
         model.addAttribute("priceQuery", priceQuery);
         model.addAttribute("currentPage", validPage);
         model.addAttribute("totalPages", totalPages);
@@ -102,16 +119,65 @@ public class AdminUtilityController {
         return "admin/utilities";
     }
 
+    @GetMapping("/{id}")
+    public String viewUtilityDetails(@PathVariable("id") Integer id,
+                                     @RequestParam(value = "query", required = false) String query,
+                                     @RequestParam(value = "status", required = false) String status,
+                                     @RequestParam(value = "statusFilter", required = false) String statusFilter,
+                                     @RequestParam(value = "page", defaultValue = "1") int page,
+                                     @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+                                     @RequestParam(value = "priceQuery", required = false) String priceQuery,
+                                     Model model,
+                                     RedirectAttributes redirectAttributes) {
+        Utility utility = utilityService.findById(id).orElse(null);
+        if (utility == null) {
+            redirectAttributes.addFlashAttribute("message", "Utility not found.");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/admin/utilities";
+        }
+        UtilityDTO dto = dtoHandler.toUtilityDTO(utility, true);
+        model.addAttribute("utility", dto);
+        model.addAttribute("query", query);
+
+        String activeStatus = "all";
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            activeStatus = statusFilter;
+        } else if (status != null && !status.isEmpty()) {
+            activeStatus = status;
+        }
+        model.addAttribute("statusFilter", activeStatus);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("currentPricePage", pricePage);
+        model.addAttribute("priceQuery", priceQuery);
+        return "admin/utility_detail";
+    }
+
     @PostMapping("/save")
-    public String saveUtility(@ModelAttribute("newUtility") UtilityDTO utilityDTO, RedirectAttributes redirectAttributes) {
+    public String saveUtility(@ModelAttribute("newUtility") UtilityDTO utilityDTO,
+                              @RequestParam(value = "query", required = false) String query,
+                              @RequestParam(value = "statusFilter", required = false) String statusFilter,
+                              @RequestParam(value = "page", defaultValue = "1") int page,
+                              @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+                              @RequestParam(value = "priceQuery", required = false) String priceQuery,
+                              RedirectAttributes redirectAttributes) {
         if (utilityDTO.getUtilityName() == null || utilityDTO.getUtilityName().trim().isEmpty() || utilityDTO.getUtilityName().trim().length() > 100) {
             redirectAttributes.addFlashAttribute("message", "Utility name must not be empty and must be under 100 characters.");
             redirectAttributes.addFlashAttribute("messageType", "error");
+            redirectAttributes.addAttribute("query", query);
+            redirectAttributes.addAttribute("statusFilter", statusFilter);
+            redirectAttributes.addAttribute("page", page);
+            redirectAttributes.addAttribute("pricePage", pricePage);
+            redirectAttributes.addAttribute("priceQuery", priceQuery);
             return "redirect:/admin/utilities";
         }
         if (utilityDTO.getDescription() == null || utilityDTO.getDescription().trim().isEmpty() || utilityDTO.getDescription().trim().length() > 100) {
             redirectAttributes.addFlashAttribute("message", "Description must not be empty and must be under 100 characters.");
             redirectAttributes.addFlashAttribute("messageType", "error");
+            redirectAttributes.addAttribute("query", query);
+            redirectAttributes.addAttribute("statusFilter", statusFilter);
+            redirectAttributes.addAttribute("page", page);
+            redirectAttributes.addAttribute("pricePage", pricePage);
+            redirectAttributes.addAttribute("priceQuery", priceQuery);
             return "redirect:/admin/utilities";
         }
 
@@ -130,17 +196,33 @@ public class AdminUtilityController {
             redirectAttributes.addFlashAttribute("message", "New utility added successfully!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         }
+        redirectAttributes.addAttribute("query", query);
+        redirectAttributes.addAttribute("statusFilter", statusFilter);
+        redirectAttributes.addAttribute("page", page);
+        redirectAttributes.addAttribute("pricePage", pricePage);
+        redirectAttributes.addAttribute("priceQuery", priceQuery);
         return "redirect:/admin/utilities";
     }
 
     @PostMapping("/toggle-status/{id}")
-    public String toggleStatus(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+    public String toggleStatus(@PathVariable("id") Integer id,
+                               @RequestParam(value = "query", required = false) String query,
+                               @RequestParam(value = "statusFilter", required = false) String statusFilter,
+                               @RequestParam(value = "page", defaultValue = "1") int page,
+                               @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+                               @RequestParam(value = "priceQuery", required = false) String priceQuery,
+                               RedirectAttributes redirectAttributes) {
         utilityService.findById(id).ifPresent(u -> {
             u.setStatus(!u.getStatus());
             utilityService.save(u);
             redirectAttributes.addFlashAttribute("message", "Utility status updated successfully!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         });
+        redirectAttributes.addAttribute("query", query);
+        redirectAttributes.addAttribute("statusFilter", statusFilter);
+        redirectAttributes.addAttribute("page", page);
+        redirectAttributes.addAttribute("pricePage", pricePage);
+        redirectAttributes.addAttribute("priceQuery", priceQuery);
         return "redirect:/admin/utilities";
     }
 
@@ -149,15 +231,30 @@ public class AdminUtilityController {
                               @RequestParam("resourceName") String resourceName,
                               @RequestParam("resourceLocation") String location,
                               @RequestParam(value = "status", defaultValue = "true") Boolean status,
+                              @RequestParam(value = "query", required = false) String query,
+                              @RequestParam(value = "statusFilter", required = false) String statusFilter,
+                              @RequestParam(value = "page", defaultValue = "1") int page,
+                              @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+                              @RequestParam(value = "priceQuery", required = false) String priceQuery,
                               RedirectAttributes redirectAttributes) {
         if (resourceName == null || resourceName.trim().isEmpty() || resourceName.trim().length() > 100) {
             redirectAttributes.addFlashAttribute("message", "Resource name must not be empty and must be under 100 characters.");
             redirectAttributes.addFlashAttribute("messageType", "error");
+            redirectAttributes.addAttribute("query", query);
+            redirectAttributes.addAttribute("statusFilter", statusFilter);
+            redirectAttributes.addAttribute("page", page);
+            redirectAttributes.addAttribute("pricePage", pricePage);
+            redirectAttributes.addAttribute("priceQuery", priceQuery);
             return "redirect:/admin/utilities";
         }
         if (location == null || location.trim().isEmpty() || location.trim().length() > 100) {
             redirectAttributes.addFlashAttribute("message", "Resource location must not be empty and must be under 100 characters.");
             redirectAttributes.addFlashAttribute("messageType", "error");
+            redirectAttributes.addAttribute("query", query);
+            redirectAttributes.addAttribute("statusFilter", statusFilter);
+            redirectAttributes.addAttribute("page", page);
+            redirectAttributes.addAttribute("pricePage", pricePage);
+            redirectAttributes.addAttribute("priceQuery", priceQuery);
             return "redirect:/admin/utilities";
         }
 
@@ -171,6 +268,11 @@ public class AdminUtilityController {
             redirectAttributes.addFlashAttribute("message", "New resource added successfully!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         });
+        redirectAttributes.addAttribute("query", query);
+        redirectAttributes.addAttribute("statusFilter", statusFilter);
+        redirectAttributes.addAttribute("page", page);
+        redirectAttributes.addAttribute("pricePage", pricePage);
+        redirectAttributes.addAttribute("priceQuery", priceQuery);
         return "redirect:/admin/utilities";
     }
 
@@ -178,6 +280,11 @@ public class AdminUtilityController {
     public String managePricing(@RequestParam("utilityId") Integer utilityId,
                                 @RequestParam("unitId") Integer unitId,
                                 @RequestParam("price") BigDecimal price,
+                                @RequestParam(value = "query", required = false) String query,
+                                @RequestParam(value = "statusFilter", required = false) String statusFilter,
+                                @RequestParam(value = "page", defaultValue = "1") int page,
+                                @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+                                @RequestParam(value = "priceQuery", required = false) String priceQuery,
                                 RedirectAttributes redirectAttributes) {
         utilityService.findById(utilityId).ifPresent(utility -> {
             unitService.findById(unitId).ifPresent(unit -> {
@@ -194,25 +301,59 @@ public class AdminUtilityController {
                 redirectAttributes.addFlashAttribute("messageType", "success");
             });
         });
+        redirectAttributes.addAttribute("query", query);
+        redirectAttributes.addAttribute("statusFilter", statusFilter);
+        redirectAttributes.addAttribute("page", page);
+        redirectAttributes.addAttribute("pricePage", pricePage);
+        redirectAttributes.addAttribute("priceQuery", priceQuery);
         return "redirect:/admin/utilities";
     }
 
     @PostMapping("/delete-pricing/{id}")
-    public String deletePricing(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+    public String deletePricing(@PathVariable("id") Integer id,
+                                @RequestParam(value = "query", required = false) String query,
+                                @RequestParam(value = "statusFilter", required = false) String statusFilter,
+                                @RequestParam(value = "page", defaultValue = "1") int page,
+                                @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+                                @RequestParam(value = "priceQuery", required = false) String priceQuery,
+                                RedirectAttributes redirectAttributes) {
         utilityPriceService.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "Pricing configuration deleted successfully!");
         redirectAttributes.addFlashAttribute("messageType", "success");
+        redirectAttributes.addAttribute("query", query);
+        redirectAttributes.addAttribute("statusFilter", statusFilter);
+        redirectAttributes.addAttribute("page", page);
+        redirectAttributes.addAttribute("pricePage", pricePage);
+        redirectAttributes.addAttribute("priceQuery", priceQuery);
         return "redirect:/admin/utilities";
     }
 
     @PostMapping("/resources/toggle-status/{id}")
-    public String toggleResourceStatus(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+    public String toggleResourceStatus(@PathVariable("id") Integer id,
+                                       @RequestParam(value = "query", required = false) String query,
+                                       @RequestParam(value = "statusFilter", required = false) String statusFilter,
+                                       @RequestParam(value = "page", defaultValue = "1") int page,
+                                       @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+                                       @RequestParam(value = "priceQuery", required = false) String priceQuery,
+                                       RedirectAttributes redirectAttributes) {
+        final Integer[] utilityIdHolder = new Integer[1];
         utilityResourceService.findById(id).ifPresent(r -> {
             r.setStatus(!r.getStatus());
             utilityResourceService.save(r);
+            if (r.getUtility() != null) {
+                utilityIdHolder[0] = r.getUtility().getUtilityId();
+            }
             redirectAttributes.addFlashAttribute("message", "Resource status updated successfully!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         });
+        redirectAttributes.addAttribute("query", query);
+        redirectAttributes.addAttribute("statusFilter", statusFilter);
+        redirectAttributes.addAttribute("page", page);
+        redirectAttributes.addAttribute("pricePage", pricePage);
+        redirectAttributes.addAttribute("priceQuery", priceQuery);
+        if (utilityIdHolder[0] != null) {
+            return "redirect:/admin/utilities/" + utilityIdHolder[0];
+        }
         return "redirect:/admin/utilities";
     }
 }

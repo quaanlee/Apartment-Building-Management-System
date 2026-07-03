@@ -1,4 +1,4 @@
-package com.quan.apartment_building_management_system.controller.admin;
+package com.quan.apartment_building_management_system.controller.manager;
 
 import com.quan.apartment_building_management_system.entity.*;
 import com.quan.apartment_building_management_system.repository.PaymentMethodRepository;
@@ -25,8 +25,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/admin/bills")
-public class AdminBillController {
+@RequestMapping("/manager/bills")
+public class ManagerBillController {
 
     private final BillService billService;
     private final BillDetailService billDetailService;
@@ -37,14 +37,14 @@ public class AdminBillController {
     private final AccountService accountService;
     private final PaymentMethodRepository paymentMethodRepository;
 
-    public AdminBillController(BillService billService,
-                               BillDetailService billDetailService,
-                               ApartmentService apartmentService,
-                               ServiceItemService serviceItemService,
-                               UtilityBookingService utilityBookingService,
-                               PaymentService paymentService,
-                               AccountService accountService,
-                               PaymentMethodRepository paymentMethodRepository) {
+    public ManagerBillController(BillService billService,
+                                 BillDetailService billDetailService,
+                                 ApartmentService apartmentService,
+                                 ServiceItemService serviceItemService,
+                                 UtilityBookingService utilityBookingService,
+                                 PaymentService paymentService,
+                                 AccountService accountService,
+                                 PaymentMethodRepository paymentMethodRepository) {
         this.billService = billService;
         this.billDetailService = billDetailService;
         this.apartmentService = apartmentService;
@@ -99,9 +99,9 @@ public class AdminBillController {
         model.addAttribute("status", status);
         model.addAttribute("month", month);
         model.addAttribute("year", year);
-        model.addAttribute("activeTab", "bills");
+        model.addAttribute("activeTab", "billing"); // Using activeTab "billing" to align with layout_manager.html
 
-        return "admin/list_bills";
+        return "manager/list_bills";
     }
 
     // 2. View Payment Status & Monitor Dashboard
@@ -158,9 +158,9 @@ public class AdminBillController {
         model.addAttribute("totalOverdue", totalOverdue);
         model.addAttribute("search", search);
         model.addAttribute("status", status);
-        model.addAttribute("activeTab", "payment-status");
+        model.addAttribute("activeTab", "billing"); // Using activeTab "billing" to align with layout_manager.html
 
-        return "admin/payment_status";
+        return "manager/payment_status";
     }
 
     // 3. Show Generate Bill Form
@@ -177,8 +177,8 @@ public class AdminBillController {
         model.addAttribute("apartments", apartments);
         model.addAttribute("services", services);
         model.addAttribute("billDto", new BillDTO());
-        model.addAttribute("activeTab", "bills");
-        return "admin/form_bill";
+        model.addAttribute("activeTab", "billing"); // Using activeTab "billing" to align with layout_manager.html
+        return "manager/form_bill";
     }
 
     // 4. Retrieve utility bookings and pending billing items for an apartment via AJAX (helper)
@@ -218,8 +218,8 @@ public class AdminBillController {
 
             model.addAttribute("apartments", apartments);
             model.addAttribute("services", services);
-            model.addAttribute("activeTab", "bills");
-            return "admin/form_bill";
+            model.addAttribute("activeTab", "billing");
+            return "manager/form_bill";
         }
 
         Integer apartmentId = billDto.getApartmentId();
@@ -243,8 +243,8 @@ public class AdminBillController {
 
             model.addAttribute("apartments", apartments);
             model.addAttribute("services", services);
-            model.addAttribute("activeTab", "bills");
-            return "admin/form_bill";
+            model.addAttribute("activeTab", "billing");
+            return "manager/form_bill";
         }
 
         Apartment apartment = aptOpt.get();
@@ -267,8 +267,8 @@ public class AdminBillController {
 
             model.addAttribute("apartments", apartments);
             model.addAttribute("services", services);
-            model.addAttribute("activeTab", "bills");
-            return "admin/form_bill";
+            model.addAttribute("activeTab", "billing");
+            return "manager/form_bill";
         }
 
         // Fetch Manager/Admin account to set as creator
@@ -279,7 +279,49 @@ public class AdminBillController {
         if (creator == null) {
             redirectAttributes.addFlashAttribute("message", "No manager or admin account found to sign the bill.");
             redirectAttributes.addFlashAttribute("messageType", "error");
-            return "redirect:/admin/bills/generate";
+            return "redirect:/manager/bills/generate";
+        }
+
+        // Pre-calculate total to prevent generating <= 0 bills
+        BigDecimal preCalculatedTotal = BigDecimal.ZERO;
+        if (serviceIds != null) {
+            for (int i = 0; i < serviceIds.size(); i++) {
+                Integer serviceId = serviceIds.get(i);
+                BigDecimal qty = (quantities != null && quantities.size() > i) ? quantities.get(i) : BigDecimal.ZERO;
+                if (qty != null && qty.compareTo(BigDecimal.ZERO) > 0) {
+                    Optional<ServiceItem> serviceOpt = serviceItemService.findById(serviceId);
+                    if (serviceOpt.isPresent()) {
+                        ServiceItem item = serviceOpt.get();
+                        preCalculatedTotal = preCalculatedTotal.add(qty.multiply(item.getUnitPrice()));
+                    }
+                }
+            }
+        }
+        List<UtilityBooking> bookings = getMonthBookings(apartment, month, year);
+        if (bookings != null) {
+            for (UtilityBooking booking : bookings) {
+                if (booking.getTotalPrice() != null) {
+                    preCalculatedTotal = preCalculatedTotal.add(booking.getTotalPrice());
+                }
+            }
+        }
+
+        if (preCalculatedTotal.compareTo(BigDecimal.ZERO) <= 0) {
+            model.addAttribute("message", "Cannot generate a bill with a total amount of $0.00 or less.");
+            model.addAttribute("messageType", "error");
+            
+            List<Apartment> apartments = apartmentService.findAll().stream()
+                    .filter(a -> a.getStatus() == 1)
+                    .collect(Collectors.toList());
+            
+            List<ServiceItem> services = serviceItemService.findAll().stream()
+                    .filter(s -> s.getStatus() && !"Utility Booking".equals(s.getServiceName()))
+                    .collect(Collectors.toList());
+
+            model.addAttribute("apartments", apartments);
+            model.addAttribute("services", services);
+            model.addAttribute("activeTab", "billing");
+            return "manager/form_bill";
         }
 
         // Create the Bill
@@ -348,7 +390,7 @@ public class AdminBillController {
 
         redirectAttributes.addFlashAttribute("message", "Bill generated successfully for Apartment " + apartment.getApartmentNumber() + " ($" + totalAmount + ")");
         redirectAttributes.addFlashAttribute("messageType", "success");
-        return "redirect:/admin/bills";
+        return "redirect:/manager/bills";
     }
 
     // 6. View Bill Detail Modal / Drawer
@@ -356,13 +398,13 @@ public class AdminBillController {
     public String showBillDetail(@PathVariable("id") Integer id, Model model) {
         Optional<Bill> billOpt = billService.findById(id);
         if (billOpt.isEmpty()) {
-            return "redirect:/admin/bills";
+            return "redirect:/manager/bills";
         }
         Bill bill = billOpt.get();
         model.addAttribute("bill", bill);
         model.addAttribute("ownerName", getOwnerName(bill.getApartment()));
-        model.addAttribute("activeTab", "bills");
-        return "admin/detail_bill";
+        model.addAttribute("activeTab", "billing");
+        return "manager/detail_bill";
     }
 
     // 7. Manually Toggle Payment Status (Paid / Unpaid)
@@ -413,7 +455,7 @@ public class AdminBillController {
                 redirectAttributes.addFlashAttribute("messageType", "success");
             }
         }
-        return "redirect:/admin/bills";
+        return "redirect:/manager/bills";
     }
 
     // Helper: Find approved bookings for an apartment's residents
