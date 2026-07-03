@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features | ABM System</title>
+    <!-- CSS link -->
+    <link rel="stylesheet" th:href="@{/css/home-page/home-page.css}">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- Embed Header -->
+    <div th:replace="~{home-page/layout :: header('features')}"></div>
+
+    <main class="page-wrapper">
+        
+        <section class="features-hero">
+            <div class="section-container">
+                <div class="features-hero-grid">
+                    <div class="features-hero-content">
+                        <span class="badge-pill">Redefining Modern Living</span>
+                        <h1 class="hero-heading">Elevating Every <span>Living Experience</span></h1>
+                        <p class="hero-subtext">
+                            Streamline your property management with an authoritative platform designed for clarity, efficiency, and prestige. Experience the future of residential logistics.
+                        </p>
+                    </div>
+                    <div class="features-hero-image-wrapper">
+                        <div class="features-hero-image"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Features Section -->
+        <section class="features-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2>System Features</h2>
+                    <p>Explore our comprehensive suite of tools designed to streamline every aspect of modern property management and resident engagement.</p>
+                </div>
+                
+                <div class="features-grid">
+                    <!-- Feature 1 -->
+                    <div class="feature-large-card">
+                        <div class="card-image-box">
+                            <i data-lucide="shield-alert"></i>
+                        </div>
+                        <h3>Unrivaled Security</h3>
+                        <p>Advanced access control, visitor logging, and 24/7 digital surveillance integration to keep your residents and assets safe.</p>
+                    </div>
+                    
+                    <!-- Feature 2 -->
+                    <div class="feature-large-card">
+                        <div class="card-image-box">
+                            <i data-lucide="cpu"></i>
+                        </div>
+                        <h3>Total Efficiency</h3>
+                        <p>Automate rent collection, maintenance requests, and financial reporting to reduce operational overhead and eliminate manual errors.</p>
+                    </div>
+                    
+                    <!-- Feature 3 -->
+                    <div class="feature-large-card">
+                        <div class="card-image-box">
+                            <i data-lucide="messages-square"></i>
+                        </div>
+                        <h3>Living Community</h3>
+                        <p>Centralized resident portal for seamless communication, facility bookings, and event management to foster a connected environment.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Embed Footer -->
+    <div th:replace="~{home-page/layout :: footer}"></div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -49,5 +50,15 @@ public class ServiceItemServiceImpl implements ServiceItemService {
     @Transactional
     public void deleteById(Integer id) {
         serviceItemRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ServiceItem> searchServices(String keyword, Boolean status) {
+        return serviceItemRepository.findAll().stream()
+                .filter(s -> keyword == null || keyword.isEmpty() ||
+                        s.getServiceName().toLowerCase().contains(keyword.toLowerCase()) ||
+                        (s.getServiceType() != null && s.getServiceType().toLowerCase().contains(keyword.toLowerCase())))
+                .filter(s -> status == null || s.getStatus().equals(status))
+                .collect(Collectors.toList());
     }
 }

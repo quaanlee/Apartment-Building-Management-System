@@ -62,6 +62,9 @@ public class UtilityBooking {
     @Column(name = "CancelReason", length = 255)
     private String cancelReason;
 
+    @Column(name = "PaymentStatus", nullable = false)
+    private Boolean paymentStatus = false;
+
     @OneToMany(mappedBy = "booking")
     private List<BillDetail> billDetails = new ArrayList<>();
 
@@ -162,6 +165,14 @@ public class UtilityBooking {
 
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
+    }
+
+    public Boolean getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(Boolean paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     public List<BillDetail> getBillDetails() {

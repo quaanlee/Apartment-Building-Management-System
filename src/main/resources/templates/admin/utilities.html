@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'utilities')}" lang="en">
+<head>
+</head>
+<body>
+
+<!-- Main Content Area -->
+<main class="utility-container">
+    <link rel="stylesheet" th:href="@{/css/admin/utilities.css}">
+
+    <!-- Title Section -->
+    <div class="main-header">
+        <div class="title-section">
+            <h2>Utility Management</h2>
+            <p>View and manage all available amenities in your resident community.</p>
+        </div>
+
+        <button class="btn-primary" onclick="openAddUtilityModal()">
+            <i class="fas fa-plus"></i> Add Utility
+        </button>
+    </div>
+
+    <!-- KPI Stats Row -->
+    <div class="stats-row">
+        <!-- Total Utilities -->
+        <div class="stats-card card-1">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Total Utilities</div>
+                <div class="stats-card-value" th:text="${totalUtilities}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+        </div>
+        <!-- Active Utilities -->
+        <div class="stats-card card-2">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Active Utilities</div>
+                <div class="stats-card-value" th:text="${activeUtilities}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+        </div>
+        <!-- Total Resources -->
+        <div class="stats-card card-3">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Total Resources</div>
+                <div class="stats-card-value" th:text="${totalResources}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-cubes"></i>
+            </div>
+        </div>
+        <!-- Pricing Tiers -->
+        <div class="stats-card card-4">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Pricing Configurations</div>
+                <div class="stats-card-value" th:text="${totalPricing}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-tags"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Bar Card -->
+    <div class="filter-bar-card">
+        <div class="filter-left">
+            <span class="filter-label">Status:</span>
+            <div class="status-select-container">
+                <select id="statusFilter" class="status-select" onchange="filterByStatus()">
+                    <option value="all" th:selected="${statusFilter == 'all'}">All</option>
+                    <option value="active" th:selected="${statusFilter == 'active'}">Active</option>
+                    <option value="maintenance" th:selected="${statusFilter == 'maintenance'}">Maintenance</option>
+                </select>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+        </div>
+        <div class="filter-right">
+            <button id="gridViewBtn" class="view-toggle-btn" title="Grid View" onclick="setViewMode('grid')"><i class="fa-solid fa-grip"></i></button>
+            <button id="listViewBtn" class="view-toggle-btn active" title="List View" onclick="setViewMode('list')"><i class="fa-solid fa-list-ul"></i></button>
+        </div>
+    </div>
+
+    <!-- Utilities Cards List -->
+    <div class="utility-cards-list">
+        <div class="utility-card" th:each="util : ${utilities}">
+            <!-- Left: Facility Image with status badge on it -->
+            <div class="card-image-box">
+                <img th:src="${util.imageUrl}" alt="Utility Image">
+                <span th:class="${util.status} ? 'badge-on-image active' : 'badge-on-image maintenance'"
+                      th:text="${util.status} ? 'ACTIVE' : 'MAINTENANCE'">ACTIVE</span>
+            </div>
+
+            <!-- Middle: Details & Admin Actions -->
+            <div class="card-details-box">
+                <h3 th:text="${util.utilityName}">Rooftop Infinity Pool</h3>
+                <div class="location-row">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span th:text="${util.location}">Floor 25, North Wing</span>
+                </div>
+                <div class="card-actions-row">
+                    <a th:href="@{/admin/utilities/{id}(id=${util.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" class="btn-detail-link">Details</a>
+
+                    <button class="icon-action-btn" th:onclick="openEditUtilityModal([[${util.utilityId}]], [[${util.utilityName}]], [[${util.description}]], [[${util.status}]])" title="Edit Utility">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <form th:action="@{/admin/utilities/toggle-status/{id}(id=${util.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" style="display:inline;">
+                        <button type="submit" class="icon-action-btn toggle-lock" th:classappend="${util.status} ? 'active' : 'inactive'" title="Toggle Lock Status">
+                            <i th:class="${util.status} ? 'fas fa-lock-open' : 'fas fa-lock'"></i>
+                        </button>
+                    </form>
+
+                    <!-- Add Resource context trigger -->
+                    <button class="icon-action-btn add-resource" th:onclick="openAddResourceModal([[${util.utilityId}]], [[${util.utilityName}]])" title="Add Resource">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Bookings stats -->
+            <div class="card-stats-box">
+                <span class="stats-number" th:text="${util.bookingsPerMonth}">142</span>
+                <span class="stats-label">Bookings/month</span>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(utilities)}" style="padding: 40px; text-align: center; color: var(--text-secondary); background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-top: 16px;">
+            No utilities found matching selected search or status criteria.
+        </div>
+    </div>
+
+    <!-- Pagination Row -->
+    <div class="pagination-container-row" th:if="${totalPages > 1}">
+        <span class="pagination-info" th:text="'Showing page ' + ${currentPage} + ' of ' + ${totalPages}">Showing page 1 of 3</span>
+        <div class="pagination-pages-box">
+            <a th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage - 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+               class="page-nav-btn" th:classappend="${currentPage == 1} ? 'disabled'"><i class="fa-solid fa-chevron-left"></i></a>
+
+            <a th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+               th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${pageNum}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+               class="page-num-btn"
+               th:classappend="${currentPage == pageNum} ? 'active'"
+               th:text="${pageNum}">1</a>
+
+            <a th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage + 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+               class="page-nav-btn" th:classappend="${currentPage == totalPages} ? 'disabled'"><i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+    </div>
+
+    <!-- Pricing Configurations Header -->
+    <div class="main-header" style="margin-top: 56px;">
+        <div class="title-section">
+            <h2>Pricing Configurations</h2>
+            <p>Define billing price structures and units for each utility.</p>
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <form th:action="@{/admin/utilities}" method="GET" style="display: flex; gap: 8px; margin: 0; align-items: center;">
+                <input type="hidden" name="query" th:value="${query}">
+                <input type="hidden" name="status" th:value="${statusFilter}">
+                <input type="hidden" name="page" th:value="${currentPage}">
+                <input type="text" name="priceQuery" th:value="${priceQuery}" placeholder="Search pricing..."
+                       style="padding: 10px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: var(--font-main); font-size: 14px; outline: none; min-width: 200px; color: var(--text-primary); background-color: var(--white);"
+                       onfocus="this.style.borderColor='var(--primary-color)'" onblur="this.style.borderColor='var(--border-color)'">
+                <button type="submit" class="btn-primary" style="padding: 10px 14px; background-color: var(--primary-color); border: none; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); cursor: pointer; color: var(--white);">
+                    <i class="fas fa-search"></i>
+                </button>
+                <a th:if="${priceQuery != null && !priceQuery.isEmpty()}" th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage})}"
+                   class="btn-secondary" style="padding: 10px 12px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: var(--white); color: var(--text-secondary); height: 38px; box-sizing: border-box;">
+                    <i class="fas fa-times"></i>
+                </a>
+            </form>
+            <button class="btn-primary" onclick="openConfigurePricingModal()">
+                <i class="fas fa-plus"></i> Configure Price
+            </button>
+        </div>
+    </div>
+
+    <!-- Pricing Configurations Table -->
+    <div class="pricing-table-card" style="margin-top: 16px;">
+        <div class="pricing-table-header">
+            <div>Utility</div>
+            <div>Unit</div>
+            <div>Price</div>
+            <div style="text-align: right;">Actions</div>
+        </div>
+
+        <div class="pricing-table-row" th:each="price : ${utilityPrices}">
+            <div class="pricing-meta">
+                <h3 th:text="${price.utility.utilityName}">Gym</h3>
+            </div>
+            <div th:text="${price.unit.unitName}">hour</div>
+            <div class="price-amount" th:text="'$' + ${#numbers.formatDecimal(price.price, 1, 2)}">$0.00</div>
+
+            <div class="pricing-actions">
+                <button class="icon-action-btn" th:onclick="openEditPricingModal([[${price.utility.utilityId}]], [[${price.unit.unitId}]], [[${price.price}]])" title="Edit Price">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+                <form th:action="@{/admin/utilities/delete-pricing/{id}(id=${price.utilityPriceId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" style="display:inline;">
+                    <button type="submit" class="icon-action-btn" style="color: #ef4444;" title="Delete Price" onclick="return confirm('Are you sure you want to delete this pricing configuration?')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(utilityPrices)}" style="padding: 40px; text-align: center; color: var(--text-secondary);">
+            No pricing configurations defined. Click "Configure Price" to add one.
+        </div>
+    </div>
+
+    <!-- Pricing Pagination Row -->
+    <div class="pagination-container-row" th:if="${totalPricePages > 1}" style="margin-top: 16px;">
+        <span class="pagination-info" th:text="'Showing page ' + ${currentPricePage} + ' of ' + ${totalPricePages}">Showing page 1 of 3</span>
+        <div class="pagination-pages-box">
+            <a th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage - 1}, priceQuery=${priceQuery})}"
+               class="page-nav-btn" th:classappend="${currentPricePage == 1} ? 'disabled'"><i class="fa-solid fa-chevron-left"></i></a>
+
+            <a th:each="pageNum : ${#numbers.sequence(1, totalPricePages)}"
+               th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${pageNum}, priceQuery=${priceQuery})}"
+               class="page-num-btn"
+               th:classappend="${currentPricePage == pageNum} ? 'active'"
+               th:text="${pageNum}">1</a>
+
+            <a th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage + 1}, priceQuery=${priceQuery})}"
+               class="page-nav-btn" th:classappend="${currentPricePage == totalPricePages} ? 'disabled'"><i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Add/Edit Utility Modal -->
+    <div class="modal-overlay" id="utilityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="utilityModalTitle">Add New Utility</h3>
+                <button class="modal-close" onclick="closeModal('utilityModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <form th:action="@{/admin/utilities/save(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST">
+                <input type="hidden" name="utilityId" id="utilityIdField">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="utilityNameField">Utility Name</label>
+                        <input type="text" name="utilityName" id="utilityNameField" class="form-control" placeholder="e.g. Gym, Swimming Pool" maxlength="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="utilityDescField">Description</label>
+                        <textarea name="description" id="utilityDescField" class="form-control" placeholder="e.g. Fitness and wellness facility..." maxlength="100" required></textarea>
+                    </div>
+                    <div class="form-group" style="display: none;">
+                        <label for="utilityStatusField">Status</label>
+                        <select name="status" id="utilityStatusField" class="form-control">
+                            <option value="true">Active</option>
+                            <option value="false">Stopped</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('utilityModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Resource Modal -->
+    <div class="modal-overlay" id="resourceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="resourceTitle">Add Resource</h3>
+                <button class="modal-close" onclick="closeModal('resourceModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <form th:action="@{/admin/utilities/add-resource(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST">
+                <input type="hidden" name="utilityId" id="resourceUtilityId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="resourceName">Resource Name</label>
+                        <input type="text" name="resourceName" id="resourceName" class="form-control" placeholder="e.g. Main Training Hall" maxlength="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceLocation">Location</label>
+                        <input type="text" name="resourceLocation" id="resourceLocation" class="form-control" placeholder="e.g. Floor 1, Outdoor" maxlength="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceStatus">Status</label>
+                        <select name="status" id="resourceStatus" class="form-control">
+                            <option value="true">Ready</option>
+                            <option value="false">Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('resourceModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Resource</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Pricing Modal -->
+    <div class="modal-overlay" id="pricingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="pricingTitle">Configure Pricing</h3>
+                <button class="modal-close" onclick="closeModal('pricingModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <form th:action="@{/admin/utilities/manage-pricing(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="pricingUtilityId">Select Utility</label>
+                        <select name="utilityId" id="pricingUtilityId" class="form-control">
+                            <option th:each="util : ${allUtilities}" th:value="${util.utilityId}" th:text="${util.utilityName}">Gym</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pricingUnitId">Pricing Unit</label>
+                        <select name="unitId" id="pricingUnitId" class="form-control">
+                            <option th:each="unit : ${allUnits}" th:value="${unit.unitId}" th:text="${unit.unitName}">hour</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pricingPrice">Price ($)</label>
+                        <input type="number" name="price" id="pricingPrice" step="0.01" min="0" class="form-control" placeholder="0.00" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('pricingModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Pricing</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function filterByStatus() {
+            const status = document.getElementById("statusFilter").value;
+            const searchInput = document.querySelector(".search-input");
+            const query = searchInput ? searchInput.value.trim() : "";
+            window.location.href = "/admin/utilities?status=" + status + "&query=" + encodeURIComponent(query);
+        }
+
+        function setViewMode(mode) {
+            const container = document.querySelector(".utility-cards-list");
+            const gridBtn = document.getElementById("gridViewBtn");
+            const listBtn = document.getElementById("listViewBtn");
+            if (!container || !gridBtn || !listBtn) return;
+
+            if (mode === "grid") {
+                container.classList.add("grid-view");
+                gridBtn.classList.add("active");
+                listBtn.classList.remove("active");
+                localStorage.setItem("utilityViewMode", "grid");
+            } else {
+                container.classList.remove("grid-view");
+                gridBtn.classList.remove("active");
+                listBtn.classList.add("active");
+                localStorage.setItem("utilityViewMode", "list");
+            }
+        }
+
+        // Global search wiring
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.querySelector(".search-input");
+            const queryFromModel = /*[[${query}]]*/ '';
+            const statusFromModel = /*[[${statusFilter}]]*/ 'all';
+
+            if (searchInput) {
+                searchInput.value = queryFromModel || "";
+                searchInput.placeholder = "Search utilities...";
+                searchInput.addEventListener("keypress", function (e) {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        const kw = encodeURIComponent(searchInput.value.trim());
+                        window.location.href = "/admin/utilities?status=" + statusFromModel + "&query=" + kw;
+                    }
+                });
+            }
+
+            // Restore saved view mode preference
+            const savedMode = localStorage.getItem("utilityViewMode") || "list";
+            setViewMode(savedMode);
+        });
+
+        // Modals Functions
+        function openAddUtilityModal() {
+            document.getElementById("utilityModalTitle").innerText = "Add New Utility";
+            document.getElementById("utilityIdField").value = "";
+            document.getElementById("utilityNameField").value = "";
+            document.getElementById("utilityDescField").value = "";
+            document.getElementById("utilityStatusField").value = "true";
+            showModal("utilityModal");
+        }
+
+        function openEditUtilityModal(id, name, desc, status) {
+            document.getElementById("utilityModalTitle").innerText = "Edit Utility";
+            document.getElementById("utilityIdField").value = id;
+            document.getElementById("utilityNameField").value = name;
+            document.getElementById("utilityDescField").value = desc;
+            document.getElementById("utilityStatusField").value = status ? "true" : "false";
+            showModal("utilityModal");
+        }
+
+        function openAddResourceModal(utilityId, utilityName) {
+            document.getElementById("resourceTitle").innerText = "Add Resource for " + utilityName;
+            document.getElementById("resourceUtilityId").value = utilityId;
+            document.getElementById("resourceName").value = "";
+            document.getElementById("resourceLocation").value = "";
+            document.getElementById("resourceStatus").value = "true";
+            showModal("resourceModal");
+        }
+
+        function openConfigurePricingModal() {
+            document.getElementById("pricingTitle").innerText = "Configure Pricing";
+            document.getElementById("pricingUtilityId").disabled = false;
+            document.getElementById("pricingUnitId").disabled = false;
+            document.getElementById("pricingPrice").value = "";
+            showModal("pricingModal");
+        }
+
+        function openEditPricingModal(utilityId, unitId, price) {
+            document.getElementById("pricingTitle").innerText = "Edit Pricing Configuration";
+            const utilitySelect = document.getElementById("pricingUtilityId");
+            const unitSelect = document.getElementById("pricingUnitId");
+            utilitySelect.value = utilityId;
+            unitSelect.value = unitId;
+            utilitySelect.disabled = true; // disable key fields on edit
+            unitSelect.disabled = true;
+            document.getElementById("pricingPrice").value = price;
+            
+            // Add temp hidden inputs so form submit still gets these values
+            let form = document.querySelector("#pricingModal form");
+            // clean old temp hidden inputs
+            form.querySelectorAll(".temp-hidden").forEach(el => el.remove());
+            
+            let h1 = document.createElement("input");
+            h1.type = "hidden";
+            h1.name = "utilityId";
+            h1.value = utilityId;
+            h1.className = "temp-hidden";
+            form.appendChild(h1);
+
+            let h2 = document.createElement("input");
+            h2.type = "hidden";
+            h2.name = "unitId";
+            h2.value = unitId;
+            h2.className = "temp-hidden";
+            form.appendChild(h2);
+
+            showModal("pricingModal");
+        }
+
+        function showModal(id) {
+            document.getElementById(id).classList.add("active");
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove("active");
+        }
+        /*]]>*/
+    </script>
+</main>
+</body>
+</html>

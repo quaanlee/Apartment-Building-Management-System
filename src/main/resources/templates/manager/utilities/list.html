@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'service_utility')}" lang="en">
+<head>
+</head>
+<body>
+
+<!-- Main Content Area -->
+<main class="utility-container">
+    <link rel="stylesheet" th:href="@{/css/manager/utilities/utilities.css}">
+
+    <!-- Title Section -->
+    <div class="main-header">
+        <div class="title-section">
+            <h2>Service &amp; Utility Management</h2>
+            <p>View facility availability, resource status, and pricing configurations.</p>
+        </div>
+        <div class="title-right">
+            <!-- Read-only view for Manager -->
+        </div>
+    </div>
+
+    <!-- Navigation Tab Bar -->
+    <div class="utility-tabs">
+        <a th:href="@{/manager/services}" class="tab-item">Services Catalog</a>
+        <a th:href="@{/manager/utilities}" class="tab-item active">Utilities &amp; Amenities</a>
+    </div>
+
+    <!-- KPI Stats Row -->
+    <div class="stats-row">
+        <!-- Total Utilities -->
+        <div class="stats-card card-1">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Total Utilities</div>
+                <div class="stats-card-value" th:text="${totalUtilities}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+        </div>
+        <!-- Active Utilities -->
+        <div class="stats-card card-2">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Active Utilities</div>
+                <div class="stats-card-value" th:text="${activeUtilities}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+        </div>
+        <!-- Total Resources -->
+        <div class="stats-card card-3">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Total Resources</div>
+                <div class="stats-card-value" th:text="${totalResources}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-cubes"></i>
+            </div>
+        </div>
+        <!-- Pricing Tiers -->
+        <div class="stats-card card-4">
+            <div class="stats-card-content">
+                <div class="stats-card-label">Pricing Configurations</div>
+                <div class="stats-card-value" th:text="${totalPricing}">0</div>
+            </div>
+            <div class="stats-card-icon-wrapper">
+                <i class="fa-solid fa-tags"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Bar Card -->
+    <div class="filter-bar-card">
+        <div class="filter-left">
+            <span class="filter-label">Status:</span>
+            <div class="status-select-container">
+                <select id="statusFilter" class="status-select" onchange="filterByStatus()">
+                    <option value="all" th:selected="${statusFilter == 'all'}">All</option>
+                    <option value="active" th:selected="${statusFilter == 'active'}">Active</option>
+                    <option value="maintenance" th:selected="${statusFilter == 'maintenance'}">Maintenance</option>
+                </select>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+        </div>
+        <div class="filter-right">
+            <button id="gridViewBtn" class="view-toggle-btn" title="Grid View" onclick="setViewMode('grid')"><i class="fa-solid fa-grip"></i></button>
+            <button id="listViewBtn" class="view-toggle-btn active" title="List View" onclick="setViewMode('list')"><i class="fa-solid fa-list-ul"></i></button>
+        </div>
+    </div>
+
+    <!-- Utilities Cards List -->
+    <div class="utility-cards-list">
+        <div class="utility-card" th:each="util : ${utilities}">
+            <!-- Left: Facility Image with status badge on it -->
+            <div class="card-image-box">
+                <img th:src="${util.imageUrl}" alt="Utility Image">
+                <span th:class="${util.status} ? 'badge-on-image active' : 'badge-on-image maintenance'"
+                      th:text="${util.status} ? 'ACTIVE' : 'MAINTENANCE'">ACTIVE</span>
+            </div>
+
+            <!-- Middle: Details -->
+            <div class="card-details-box">
+                <h3 th:text="${util.utilityName}">Rooftop Infinity Pool</h3>
+                <div class="location-row">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span th:text="${util.location}">Floor 25, North Wing</span>
+                </div>
+                <div class="card-actions-row">
+                    <a th:href="@{/manager/utilities/{id}(id=${util.utilityId}, query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" class="btn-detail-link">Details</a>
+                </div>
+            </div>
+
+            <!-- Right: Bookings stats -->
+            <div class="card-stats-box">
+                <span class="stats-number" th:text="${util.bookingsPerMonth}">142</span>
+                <span class="stats-label">Bookings/month</span>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(utilities)}" class="utility-list-empty">
+            No utilities found matching selected search or status criteria.
+        </div>
+    </div>
+
+    <!-- Pagination Row -->
+    <div class="pagination-container-row" th:if="${totalPages > 1}">
+        <span class="pagination-info" th:text="'Showing page ' + ${currentPage} + ' of ' + ${totalPages}">Showing page 1 of 3</span>
+        <div class="pagination-pages-box">
+            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage - 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+               class="page-nav-btn" th:classappend="${currentPage == 1} ? 'disabled'"><i class="fa-solid fa-chevron-left"></i></a>
+
+            <a th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+               th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${pageNum}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+               class="page-num-btn"
+               th:classappend="${currentPage == pageNum} ? 'active'"
+               th:text="${pageNum}">1</a>
+
+            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage + 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+               class="page-nav-btn" th:classappend="${currentPage == totalPages} ? 'disabled'"><i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+    </div>
+
+    <!-- Pricing Configurations Header -->
+    <div class="main-header pricing-section-header">
+        <div class="title-section">
+            <h2>Pricing Configurations</h2>
+            <p>View billing price structures and units for each utility.</p>
+        </div>
+
+        <div class="price-search-row">
+            <form th:action="@{/manager/utilities}" method="GET" class="price-search-form">
+                <input type="hidden" name="query" th:value="${query}">
+                <input type="hidden" name="status" th:value="${statusFilter}">
+                <input type="hidden" name="page" th:value="${currentPage}">
+                <input type="text" name="priceQuery" th:value="${priceQuery}" placeholder="Search pricing..."
+                       class="price-search-input">
+                <button type="submit" class="price-search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+                <a th:if="${priceQuery != null && !priceQuery.isEmpty()}" th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage})}"
+                   class="price-clear-btn">
+                    <i class="fas fa-times"></i>
+                </a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pricing Configurations Table -->
+    <div class="pricing-table-card pricing-table-spaced">
+        <div class="pricing-table-header">
+            <div>Utility</div>
+            <div>Unit</div>
+            <div>Price</div>
+        </div>
+
+        <div class="pricing-table-row" th:each="price : ${utilityPrices}">
+            <div class="pricing-meta">
+                <h3 th:text="${price.utility.utilityName}">Gym</h3>
+            </div>
+            <div th:text="${price.unit.unitName}">hour</div>
+            <div class="price-amount" th:text="'$' + ${#numbers.formatDecimal(price.price, 1, 2)}">$0.00</div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(utilityPrices)}" class="utility-empty-state">
+            No pricing configurations defined.
+        </div>
+    </div>
+
+    <!-- Pricing Pagination Row -->
+    <div class="pagination-container-row pagination-spaced" th:if="${totalPricePages > 1}">
+        <span class="pagination-info" th:text="'Showing page ' + ${currentPricePage} + ' of ' + ${totalPricePages}">Showing page 1 of 3</span>
+        <div class="pagination-pages-box">
+            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage - 1}, priceQuery=${priceQuery})}"
+               class="page-nav-btn" th:classappend="${currentPricePage == 1} ? 'disabled'"><i class="fa-solid fa-chevron-left"></i></a>
+
+            <a th:each="pageNum : ${#numbers.sequence(1, totalPricePages)}"
+               th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${pageNum}, priceQuery=${priceQuery})}"
+               class="page-num-btn"
+               th:classappend="${currentPricePage == pageNum} ? 'active'"
+               th:text="${pageNum}">1</a>
+
+            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage + 1}, priceQuery=${priceQuery})}"
+               class="page-nav-btn" th:classappend="${currentPricePage == totalPricePages} ? 'disabled'"><i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+    </div>
+</main>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    function filterByStatus() {
+        const status = document.getElementById("statusFilter").value;
+        const searchInput = document.querySelector(".search-input");
+        const query = searchInput ? searchInput.value.trim() : "";
+        window.location.href = "/manager/utilities?status=" + status + "&query=" + encodeURIComponent(query);
+    }
+
+    function setViewMode(mode) {
+        const container = document.querySelector(".utility-cards-list");
+        const gridBtn = document.getElementById("gridViewBtn");
+        const listBtn = document.getElementById("listViewBtn");
+        if (!container || !gridBtn || !listBtn) return;
+
+        if (mode === "grid") {
+            container.classList.add("grid-view");
+            gridBtn.classList.add("active");
+            listBtn.classList.remove("active");
+            localStorage.setItem("utilityViewMode", "grid");
+        } else {
+            container.classList.remove("grid-view");
+            gridBtn.classList.remove("active");
+            listBtn.classList.add("active");
+            localStorage.setItem("utilityViewMode", "list");
+        }
+    }
+
+    // Global search wiring
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.querySelector(".search-input");
+        const queryFromModel = /*[[${query}]]*/ '';
+        const statusFromModel = /*[[${statusFilter}]]*/ 'all';
+
+        if (searchInput) {
+            searchInput.value = queryFromModel || "";
+            searchInput.placeholder = "Search utilities...";
+            searchInput.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    const kw = encodeURIComponent(searchInput.value.trim());
+                    window.location.href = "/manager/utilities?status=" + statusFromModel + "&query=" + kw;
+                }
+            });
+        }
+
+        // Restore saved view mode preference
+        const savedMode = localStorage.getItem("utilityViewMode") || "list";
+        setViewMode(savedMode);
+    });
+    /*]]>*/
+</script>
+
+</body>
+</html>

@@ -1,7 +1,9 @@
 package com.quan.apartment_building_management_system.service.maintenance;
 
+import com.quan.apartment_building_management_system.dto.maintenance.StaffWorkStatusDTO;
 import com.quan.apartment_building_management_system.entity.MaintenanceTask;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,4 +20,10 @@ public interface MaintenanceTaskService {
     MaintenanceTask save(MaintenanceTask maintenanceTask);
 
     void deleteById(Integer id);
+
+    MaintenanceTask assignTask(Integer requestId, Integer staffProfileId, LocalDateTime deadline, Integer managerAccountId);
+
+    List<StaffWorkStatusDTO> getActiveMaintenanceStaffWithWorkStatus();
+
+    String getStaffWorkStatus(Integer accountId);
 }

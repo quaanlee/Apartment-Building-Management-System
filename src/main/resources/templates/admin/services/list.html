@@ -1,4 +1,4 @@
-<div th:replace="~{layout/admin/layout :: admin-layout(~{::content}, 'services')}">
+<div th:replace="~{layout/admin/layout_admin :: admin-layout(~{::content}, 'services')}">
     <div th:fragment="content">
         <!-- Load custom page styling -->
         <link rel="stylesheet" th:href="@{/css/admin/services.css}">
@@ -25,7 +25,9 @@
              th:classappend="${param.success != null ? ' toast-success' : ' toast-error'}">
             <i th:class="${param.success != null ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation'}"></i>
             <span th:if="${param.success != null}">Service created successfully!</span>
-            <span th:if="${param.error != null}">Error: Unit not found. Please try again.</span>
+            <span th:if="${param.error != null}" 
+                  th:text="${#strings.equals(param.error[0], 'unit_not_found') ? 'Error: Unit not found. Please try again.' : 
+                           (#strings.equals(param.error[0], 'service_not_found') ? 'Error: Service not found. Please try again.' : param.error[0])}">Error: Unit not found. Please try again.</span>
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════ -->
@@ -54,7 +56,7 @@
 
                 <!-- Card header: icon + status/type -->
                 <div class="service-card-header">
-                    <div th:class="'service-icon-box type-' + ${#strings.toLowerCase(service.serviceType)}">
+                    <div th:class="|service-icon-box type-${#strings.toLowerCase(service.serviceType)}|">
                         <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'electricity')}" class="fa-solid fa-bolt"></i>
                         <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'water')}" class="fa-solid fa-droplet"></i>
                         <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'cleaning')}" class="fa-solid fa-broom"></i>

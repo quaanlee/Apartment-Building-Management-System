@@ -109,6 +109,9 @@ public class Profile {
     @OneToMany(mappedBy = "profile")
     private List<MaintenanceRequest> maintenanceRequests = new ArrayList<>();
 
+    @OneToMany(mappedBy = "profile")
+    private List<SalesContract> salesContracts = new ArrayList<>();
+
     public Profile() {
     }
 
@@ -334,5 +337,13 @@ public class Profile {
 
     public void setMaintenanceRequests(List<MaintenanceRequest> maintenanceRequests) {
         this.maintenanceRequests = maintenanceRequests;
+    }
+
+    public List<SalesContract> getSalesContracts() {
+        return salesContracts;
+    }
+
+    public void setSalesContracts(List<SalesContract> salesContracts) {
+        this.salesContracts = salesContracts;
     }
 }

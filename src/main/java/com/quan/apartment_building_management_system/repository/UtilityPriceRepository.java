@@ -8,4 +8,6 @@ import java.util.List;
 public interface UtilityPriceRepository extends JpaRepository<UtilityPrice, Integer> {
 
     List<UtilityPrice> findByUtilityUtilityId(Integer utilityId);
+
+    java.util.Optional<UtilityPrice> findByUtilityUtilityIdAndUnitUnitId(Integer utilityId, Integer unitId);
 }

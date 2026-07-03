@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | ABM System</title>
+    <!-- Style link -->
+    <link rel="stylesheet" th:href="@{/css/auth/login.css}">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+
+<body>
+
+    <main class="login-wrapper">
+        <div class="login-container">
+
+            <!-- Left panel: Branding -->
+            <div class="brand-panel">
+                <a th:href="@{/}" class="brand-title" style="text-decoration: none; color: inherit; display: inline-block;">ABM System</a>
+                <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+                    <h1 class="brand-heading">Elevating Every Living Experience.</h1>
+                    <p class="brand-description">
+                        Access your property management tools with ease. Security and simplicity, redefined for modern
+                        residents.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right panel: Form -->
+            <div class="form-panel">
+                <a th:href="@{/}" class="back-home-link">
+                    <i data-lucide="arrow-left"></i>
+                    <span>Back to Homepage</span>
+                </a>
+
+                <div class="form-header">
+                    <h2 class="form-title">Sign In</h2>
+                    <p class="form-subtitle">Enter your credentials to access your portal</p>
+                </div>
+
+                <form th:action="@{/login}" method="POST">
+
+                    <!-- Email Address Field -->
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <div class="input-container">
+                            <i data-lucide="mail" class="input-icon"></i>
+                            <input type="email" id="email" name="username" class="form-input"
+                                placeholder="name@example.com" required autocomplete="email"
+                                pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}"
+                                title="Please enter a valid email address (e.g. name@example.com)">
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group" style="margin-bottom: 0.75rem;">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-container">
+                            <i data-lucide="lock" class="input-icon"></i>
+                            <input type="password" id="password" name="password" class="form-input"
+                                placeholder="••••••••••••" required autocomplete="current-password">
+                            <button type="button" id="password-toggle" class="password-toggle"
+                                aria-label="Toggle password visibility">
+                                <i data-lucide="eye" id="toggle-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Forgot Password Link -->
+                    <a th:href="@{/forgot-password}" class="forgot-password">Forgot password?</a>
+
+                    <!-- Error Alert -->
+                    <div th:if="${error}" class="alert alert-danger">
+                        <i data-lucide="alert-circle" class="alert-icon"></i>
+                        <span th:text="${error}">Invalid email or password. Please try again.</span>
+                    </div>
+
+                    <!-- Success Alert -->
+                    <div th:if="${success}" class="alert alert-success">
+                        <i data-lucide="check-circle" class="alert-icon"></i>
+                        <span th:text="${success}">Password changed successfully.</span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-submit">Sign In Now</button>
+                </form>
+
+                <div class="divider"></div>
+
+                <div class="support-link">
+                    Need help? <a th:href="@{/support}">Contact Support</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="login-footer">
+        <a th:href="@{/privacy}" class="footer-link">Privacy Policy</a>
+        <a th:href="@{/terms}" class="footer-link">Terms of Service</a>
+        <a th:href="@{/contact}" class="footer-link">Contact Us</a>
+    </footer>
+
+    <!-- Lucide Initialization & Password Toggle Logic -->
+    <script th:src="@{/js/auth/login.js}"></script>
+</body>
+
+</html>

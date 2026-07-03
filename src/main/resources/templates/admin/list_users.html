@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'users')}">
+<head>
+    <title>User Management - ABMS</title>
+</head>
+<body>
+
+<main>
+    <!-- Link custom stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/admin/users.css}">
+
+    <!-- Top Summary Block -->
+    <div class="page-header">
+        <h2>User Management</h2>
+        <p>Directory of residents and staff aligned.</p>
+    </div>
+
+    <!-- Statistics Cards Row -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-card-title">Total Users</div>
+            <div class="stat-card-value" th:text="${totalUsers}">0</div>
+            <i class="fa-solid fa-users stat-card-icon"></i>
+        </div>
+        <div class="stat-card" style="background: linear-gradient(135deg, #818CF8 0%, #6366F1 100%);">
+            <div class="stat-card-title">Total Residents</div>
+            <div class="stat-card-value" th:text="${totalResidents}">0</div>
+            <i class="fa-solid fa-house-user stat-card-icon"></i>
+        </div>
+        <div class="stat-card" style="background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);">
+            <div class="stat-card-title">Total Managers</div>
+            <div class="stat-card-value" th:text="${totalManagers}">0</div>
+            <i class="fa-solid fa-user-tie stat-card-icon"></i>
+        </div>
+        <div class="stat-card" style="background: linear-gradient(135deg, #C084FC 0%, #A855F7 100%);">
+            <div class="stat-card-title">Total Maintenance</div>
+            <div class="stat-card-value" th:text="${totalMaintenance}">0</div>
+            <i class="fa-solid fa-screwdriver-wrench stat-card-icon"></i>
+        </div>
+    </div>
+
+    <!-- Filter Component Block -->
+    <div class="filter-section">
+        <form th:action="@{/admin/users}" method="get" class="filter-form">
+            <!-- Retain current search value if it exists -->
+            <input type="hidden" name="search" th:value="${search}">
+            
+            <div class="filter-group" style="max-width: 250px;">
+                <label for="roleId">Role</label>
+                <select name="roleId" id="roleId" class="filter-select" onchange="this.form.submit()">
+                    <option value="">All Roles</option>
+                    <option th:each="r : ${roles}" 
+                            th:value="${r.roleId}" 
+                            th:text="${r.roleName}"
+                            th:selected="${roleId == r.roleId}">Role Name</option>
+                </select>
+            </div>
+            
+            <div class="filter-group" style="max-width: 250px;">
+                <label for="status">Security Status</label>
+                <select name="status" id="status" class="filter-select" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    <option value="true" th:selected="${status == true}">Active / Unlocked</option>
+                    <option value="false" th:selected="${status == false}">Locked</option>
+                </select>
+            </div>
+
+            <!-- Dynamic Search input synchronizes with the Header search bar or acts as alternative submit -->
+            <noscript>
+                <button type="submit" class="btn-add-user" style="margin-left: 0;">Apply</button>
+            </noscript>
+            
+            <a th:href="@{/admin/users/create}" class="btn-add-user">
+                <i class="fa-solid fa-user-plus"></i>
+                Add New User
+            </a>
+        </form>
+    </div>
+
+    <!-- Users Table Card -->
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>User Profile</th>
+                        <th>Role</th>
+                        <th>Account Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${users}">
+                        <td>
+                            <div class="profile-cell">
+                                <img th:if="${user.avatarUrl != null}" th:src="${user.avatarUrl}" class="profile-avatar" alt="Avatar">
+                                <div th:if="${user.avatarUrl == null}" class="profile-avatar" 
+                                     th:text="${#strings.substring(user.fullName, 0, 1) + (#strings.contains(user.fullName, ' ') ? #strings.substring(user.fullName, #strings.indexOf(user.fullName, ' ') + 1, #strings.indexOf(user.fullName, ' ') + 2) : '')}">
+                                </div>
+                                <div class="profile-info">
+                                    <span class="profile-name" th:text="${user.fullName}">Full Name</span>
+                                    <span class="profile-username" th:text="${user.username != null ? user.username : 'no_account'}">@username</span>
+                                </div>
+                             </div>
+                         </td>
+                         <td>
+                             <span class="role-text" th:text="${user.roleName != null ? user.roleName : 'N/A'}">Role</span>
+                         </td>
+                         <td>
+                             <span th:if="${user.accountId != null}">
+                                 <span th:if="${user.accountStatus == true}" class="status-unlocked">Unlocked</span>
+                                 <span th:if="${user.accountStatus == false}" class="status-locked">
+                                     Locked <span th:if="${user.lockedUntil != null}" th:text="'until ' + ${#temporals.format(user.lockedUntil, 'yyyy-MM-dd HH:mm')}">until date</span>
+                                 </span>
+                             </span>
+                             <span th:if="${user.accountId == null}" class="status-locked" style="color: var(--text-secondary);">No Account</span>
+                         </td>
+                         <td style="text-align: right;">
+                             <div class="actions-cell" style="justify-content: flex-end;">
+                                 <a th:href="@{/admin/users/edit/{id}(id=${user.profileId})}" class="action-icon-btn" title="Edit Profile">
+                                     <i class="fa-solid fa-pencil"></i>
+                                 </a>
+                                 <a th:href="@{/admin/users/detail/{id}(id=${user.profileId})}" class="action-icon-btn" title="View Profile">
+                                     <i class="fa-solid fa-eye"></i>
+                                 </a>
+                                 <form th:if="${user.accountId != null}" th:action="@{/admin/users/{id}/toggle-lock(id=${user.accountId})}" method="post" style="display:inline;"
+                                       th:onclick="return confirm('Are you sure you want to lock/unlock [[${user.fullName}]]?')">
+                                     <button type="submit" class="action-icon-btn lock-btn" th:classappend="${user.accountStatus == false ? 'locked' : ''}" 
+                                             th:title="${user.accountStatus == true ? 'Lock Account' : 'Unlock Account'}">
+                                         <i class="fa-solid" th:classappend="${user.accountStatus == true ? 'fa-lock-open' : 'fa-lock'}"></i>
+                                     </button>
+                                 </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(users)}">
+                        <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 32px;">
+                            No users found.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-bar" th:if="${totalPages > 1}">
+            <a th:href="@{/admin/users(page=${currentPage - 1}, search=${search}, roleId=${roleId}, status=${status})}" 
+               class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            
+            <span th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:href="@{/admin/users(page=${pageNum}, search=${search}, roleId=${roleId}, status=${status})}" 
+                   class="page-link" th:classappend="${pageNum == currentPage ? 'active' : ''}" 
+                   th:text="${pageNum + 1}">1</a>
+            </span>
+            
+            <a th:href="@{/admin/users(page=${currentPage + 1}, search=${search}, roleId=${roleId}, status=${status})}" 
+               class="page-link" th:classappend="${currentPage >= totalPages - 1 ? 'disabled' : ''}">
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Link layout header search bar to table form filtering dynamically -->
+    <script th:src="@{/js/admin/users.js}"></script>
+</main>
+
+</body>
+</html>

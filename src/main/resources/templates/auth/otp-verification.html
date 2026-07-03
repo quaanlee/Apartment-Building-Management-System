@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification | ABM System</title>
+    <!-- Style link -->
+    <link rel="stylesheet" th:href="@{/css/auth/login.css}">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <main class="login-wrapper">
+        <div class="login-container">
+
+            <!-- Left panel: Branding & Security Info -->
+            <div class="brand-panel" style="justify-content: space-between;">
+                <div>
+                    <div class="brand-title">ABM System</div>
+                    <h1 class="brand-heading">Security Verification</h1>
+                    <p class="brand-description" style="margin-bottom: 2rem;">
+                        Please enter the OTP code sent to your email to continue the authentication process. We are committed to
+                        protecting the safety of your resident account.
+                    </p>
+                </div>
+
+                <!-- Highlight Card at the bottom left -->
+                <div class="security-card">
+                    <i data-lucide="shield" class="security-card-icon"></i>
+                    <div class="security-card-content">
+                        <div class="security-card-title">2-Layer Security System</div>
+                        <div class="security-card-desc">This verification code will expire in 2 minutes to ensure absolute security.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right panel: OTP Inputs -->
+            <div class="form-panel">
+                <div class="form-header">
+                    <h2 class="form-title">OTP Verification</h2>
+                    <p class="form-subtitle">Enter the 6-digit code sent to <strong th:text="${obfuscatedEmail}">le***@gmail.com</strong></p>
+                </div>
+
+                <form id="otpForm" th:action="@{/forgot-password/verify}" method="POST">
+                    
+                    <!-- 6-digit OTP Inputs -->
+                    <div class="otp-container">
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d" required autocomplete="off" inputmode="numeric" />
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d" required autocomplete="off" inputmode="numeric" />
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d" required autocomplete="off" inputmode="numeric" />
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d" required autocomplete="off" inputmode="numeric" />
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d" required autocomplete="off" inputmode="numeric" />
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d" required autocomplete="off" inputmode="numeric" />
+                    </div>
+                    
+                    <!-- Hidden field to combine inputs -->
+                    <input type="hidden" name="otp" id="otp-merged" required />
+
+                    <!-- Countdown Timer -->
+                    <div class="timer-container">
+                        <i data-lucide="clock" class="timer-icon"></i>
+                        <span>Code expires in: <strong id="timer-display">02:00</strong></span>
+                    </div>
+
+                    <!-- Error Alert -->
+                    <div th:if="${error}" class="alert alert-danger">
+                        <i data-lucide="alert-circle" class="alert-icon"></i>
+                        <span th:text="${error}">Invalid or expired verification code.</span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="btn-verify" class="btn-submit" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <span>Verify</span>
+                        <i data-lucide="check-circle" style="width: 1.1rem; height: 1.1rem;"></i>
+                    </button>
+                </form>
+
+                <!-- Resend code container -->
+                <div class="resend-container">
+                    Didn't receive the code? 
+                    <form th:action="@{/forgot-password/resend}" method="POST" style="display: inline;">
+                        <button type="submit" id="btn-resend" class="resend-btn">Resend Code</button>
+                    </form>
+                </div>
+
+                <div class="divider" style="margin-top: 1rem;"></div>
+
+                <!-- Back link -->
+                <div class="back-link-container">
+                    <a th:href="@{/login}" class="back-link">
+                        <i data-lucide="arrow-left" class="back-link-icon"></i>
+                        <span>Back to login page</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="login-footer">
+        <a th:href="@{/privacy}" class="footer-link">Privacy Policy</a>
+        <a th:href="@{/terms}" class="footer-link">Terms of Service</a>
+        <a th:href="@{/contact}" class="footer-link">Contact Us</a>
+    </footer>
+
+    <script th:inline="javascript">
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // OTP inputs auto-focus logic
+        const inputs = document.querySelectorAll('.otp-input');
+        const mergedInput = document.getElementById('otp-merged');
+        const form = document.getElementById('otpForm');
+
+        function updateMerged() {
+            const code = Array.from(inputs).map(inp => inp.value).join('');
+            mergedInput.value = code;
+        }
+
+        // Focus first input on page load
+        if (inputs.length > 0) {
+            inputs[0].focus();
+        }
+
+        // Clear all inputs and reset focus if there's an error from the previous submit
+        /*[# th:if="${error}"]*/
+        inputs.forEach(input => input.value = '');
+        mergedInput.value = '';
+        if (inputs.length > 0) {
+            inputs[0].focus();
+        }
+        /*[/]*/
+
+        inputs.forEach((input, index) => {
+            // Focus next input when input is filled (numeric only)
+            input.addEventListener('input', (e) => {
+                // Instantly remove non-numeric characters
+                input.value = input.value.replace(/\D/g, '');
+                if (input.value && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                updateMerged();
+            });
+
+            // Focus previous input on backspace
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace') {
+                    if (!input.value && index > 0) {
+                        inputs[index - 1].focus();
+                    } else {
+                        input.value = '';
+                    }
+                    updateMerged();
+                }
+            });
+
+            // Capture clipboard pasting
+            input.addEventListener('paste', (e) => {
+                const data = e.clipboardData.getData('text').trim();
+                if (data.length === 6 && /^\d+$/.test(data)) {
+                    inputs.forEach((inp, idx) => {
+                        inp.value = data[idx];
+                    });
+                    inputs[inputs.length - 1].focus();
+                    updateMerged();
+                }
+                e.preventDefault();
+            });
+        });
+
+        // 2-minute countdown timer logic
+        let secondsLeft = /*[[${remainingSeconds}]]*/ 120;
+        const timerDisplay = document.getElementById('timer-display');
+        const btnVerify = document.getElementById('btn-verify');
+        const btnResend = document.getElementById('btn-resend');
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(secondsLeft / 60);
+            const seconds = secondsLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Run countdown
+        updateTimerDisplay();
+        const intervalId = setInterval(() => {
+            secondsLeft--;
+            if (secondsLeft <= 0) {
+                secondsLeft = 0;
+                clearInterval(intervalId);
+                btnVerify.disabled = true;
+                btnVerify.style.opacity = '0.6';
+                btnVerify.style.cursor = 'not-allowed';
+                timerDisplay.textContent = '00:00';
+            } else {
+                updateTimerDisplay();
+            }
+        }, 1000);
+    </script>
+</body>
+
+</html>

@@ -34,6 +34,9 @@ public class MaintenanceReport {
     @Column(name = "CreatedAt", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @OneToMany(mappedBy = "report")
+    private java.util.List<MaintenanceReportImage> images = new java.util.ArrayList<>();
+
     public MaintenanceReport() {
     }
 
@@ -75,5 +78,13 @@ public class MaintenanceReport {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<MaintenanceReportImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<MaintenanceReportImage> images) {
+        this.images = images;
     }
 }

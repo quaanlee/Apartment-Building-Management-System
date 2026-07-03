@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Layout Fragments</title>
+</head>
+<body>
+
+    <!-- Header Fragment -->
+    <header th:fragment="header(activeTab)" class="home-header">
+        <div class="header-container">
+            <a th:href="@{/about}" class="logo">
+                <i data-lucide="building-2"></i>
+                <span>ABM System</span>
+            </a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li>
+                        <a th:href="@{/features}" class="nav-link" th:classappend="${activeTab == 'features'} ? 'active' : ''">Features</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/about}" class="nav-link" th:classappend="${activeTab == 'about'} ? 'active' : ''">About Us</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/contact}" class="nav-link" th:classappend="${activeTab == 'contact'} ? 'active' : ''">Contact</a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a th:href="@{/login}" class="btn-login">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Footer Fragment -->
+    <footer th:fragment="footer" class="home-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="footer-logo">ABM System</div>
+                <div class="footer-copy">© 2024 Elevate Living. All rights reserved.</div>
+            </div>
+            
+            <div class="footer-nav">
+                <a th:href="@{/privacy}" class="footer-link">Privacy Policy</a>
+                <a th:href="@{/terms}" class="footer-link">Terms of Service</a>
+                <a th:href="@{/help}" class="footer-link">Help Center</a>
+                <a th:href="@{/support}" class="footer-link">Support</a>
+            </div>
+            
+            <div class="footer-actions">
+                <button class="footer-icon-btn" aria-label="Language">
+                    <i data-lucide="globe"></i>
+                </button>
+                <button class="footer-icon-btn" aria-label="Share">
+                    <i data-lucide="share-2"></i>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

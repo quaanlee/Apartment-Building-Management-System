@@ -13,6 +13,8 @@ public interface UtilityPriceService {
 
     List<UtilityPrice> findByUtilityId(Integer utilityId);
 
+    Optional<UtilityPrice> findByUtilityIdAndUnitId(Integer utilityId, Integer unitId);
+
     UtilityPrice save(UtilityPrice utilityPrice);
 
     void deleteById(Integer id);

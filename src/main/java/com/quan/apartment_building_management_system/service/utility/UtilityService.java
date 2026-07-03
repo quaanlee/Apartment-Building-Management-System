@@ -16,4 +16,6 @@ public interface UtilityService {
     Utility save(Utility utility);
 
     void deleteById(Integer id);
+
+    List<Utility> searchUtilities(String query);
 }
