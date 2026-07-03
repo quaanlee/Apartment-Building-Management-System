@@ -504,3 +504,23 @@ tr:hover td {
         font-size: 12px;
     }
 }
+
+/* ============ VALIDATION STYLING ============ */
+.error-text {
+    color: #EF4444;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 4px;
+    display: block;
+}
+
+.form-card input.is-invalid,
+.form-card select.is-invalid {
+    border-color: #EF4444 !important;
+    background-color: #FEF2F2 !important;
+}
+
+.form-card input.is-invalid:focus,
+.form-card select.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+}

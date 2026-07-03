@@ -6,8 +6,10 @@ import com.quan.apartment_building_management_system.entity.ResidentApartment;
 import com.quan.apartment_building_management_system.repository.ProfileRepository;
 import com.quan.apartment_building_management_system.repository.ResidentApartmentRepository;
 import com.quan.apartment_building_management_system.service.apartment.ApartmentService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -53,14 +55,24 @@ public class ApartmentController {
     }
 
     @PostMapping("/save")
-    public String saveApartment(@ModelAttribute Apartment apartment,
+    public String saveApartment(@Valid @ModelAttribute("apartment") Apartment apartment,
+                                BindingResult bindingResult,
+                                Model model,
                                 RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("pageTitle", "Add New Unit");
+            model.addAttribute("actionUrl", "/admin/apartments/save");
+            return "admin/apartment-form";
+        }
 
         Optional<Apartment> existing = apartmentService.findByApartmentNumber(apartment.getApartmentNumber());
 
         if (existing.isPresent()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Apartment number already exists!");
-            return "redirect:/admin/apartments/add";
+            bindingResult.rejectValue("apartmentNumber", "duplicate", "Apartment number already exists!");
+            model.addAttribute("pageTitle", "Add New Unit");
+            model.addAttribute("actionUrl", "/admin/apartments/save");
+            return "admin/apartment-form";
         }
 
         if (apartment.getStatus() == null) {
@@ -94,7 +106,9 @@ public class ApartmentController {
 
     @PostMapping("/update/{id}")
     public String updateApartment(@PathVariable Integer id,
-                                  @ModelAttribute Apartment apartment,
+                                  @Valid @ModelAttribute("apartment") Apartment apartment,
+                                  BindingResult bindingResult,
+                                  Model model,
                                   RedirectAttributes redirectAttributes) {
 
         Optional<Apartment> currentApartment = apartmentService.findById(id);
@@ -104,11 +118,19 @@ public class ApartmentController {
             return "redirect:/admin/apartments";
         }
 
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("pageTitle", "Edit Unit");
+            model.addAttribute("actionUrl", "/admin/apartments/update/" + id);
+            return "admin/apartment-form";
+        }
+
         Optional<Apartment> duplicate = apartmentService.findByApartmentNumber(apartment.getApartmentNumber());
 
         if (duplicate.isPresent() && !duplicate.get().getApartmentId().equals(id)) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Apartment number already exists!");
-            return "redirect:/admin/apartments/edit/" + id;
+            bindingResult.rejectValue("apartmentNumber", "duplicate", "Apartment number already exists!");
+            model.addAttribute("pageTitle", "Edit Unit");
+            model.addAttribute("actionUrl", "/admin/apartments/update/" + id);
+            return "admin/apartment-form";
         }
 
         Apartment updateApartment = currentApartment.get();

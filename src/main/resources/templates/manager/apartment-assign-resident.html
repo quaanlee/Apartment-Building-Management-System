@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout/manager/layout :: manager-layout(~{::#main-content}, 'apartments')}"
+      th:with="pageTitle='Resident Assignment'">
+<head>
+    <title>Resident Assignment</title>
+</head>
+<body>
+<div id="main-content">
+    <!-- Link custom stylesheets and scripts -->
+    <link rel="stylesheet" th:href="@{/css/building-management.css}">
+    <link rel="stylesheet" th:href="@{/css/manager/apartment-assign-resident.css}">
+
+    <div class="assign-container">
+        <!-- Header -->
+        <div class="header-actions">
+            <div>
+                <h1 style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin: 0;">Resident Assignment</h1>
+                <p style="color: var(--text-secondary); font-size: 14px; margin: 4px 0 0 0;">Assign a resident to apartment <span th:text="${apartment.apartmentNumber}">A-101</span></p>
+            </div>
+            <div>
+                <a th:href="@{/manager/apartments/{id}(id=${apartment.apartmentId})}" class="reset-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Detail
+                </a>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div th:if="${successMessage}" class="alert success">
+            <i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}">Success!</span>
+        </div>
+        <div th:if="${errorMessage}" class="alert error">
+            <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}">Error!</span>
+        </div>
+
+        <!-- 1. Apartment Overview Card -->
+        <div class="apt-info-card">
+            <h2 class="apt-info-title">
+                <i class="fa-solid fa-building" style="color: var(--primary-color);"></i> Apartment Overview
+            </h2>
+            <div class="apt-grid">
+                <div class="apt-field">
+                    <span class="field-label">Apartment Number</span>
+                    <span class="field-value" th:text="${apartment.apartmentNumber}">A-405</span>
+                </div>
+                <div class="apt-field">
+                    <span class="field-label">Floor</span>
+                    <span class="field-value" th:text="${apartment.floor}">4</span>
+                </div>
+                <div class="apt-field">
+                    <span class="field-label">Room Type</span>
+                    <span class="field-value" th:text="${apartment.roomType}">3 Bedrooms</span>
+                </div>
+                <div class="apt-field">
+                    <span class="field-label">Area</span>
+                    <span class="field-value" th:text="${apartment.area + ' m²'}">78.00 m²</span>
+                </div>
+                <div class="apt-field">
+                    <span class="field-label">Status</span>
+                    <span class="field-value">
+                        <span th:if="${apartment.status == 0}" class="badge vacant">Vacant</span>
+                        <span th:if="${apartment.status == 1}" class="badge occupied">Occupied</span>
+                        <span th:if="${apartment.status == 2}" class="badge maintenance">Maintenance</span>
+                    </span>
+                </div>
+                <div class="apt-field">
+                    <span class="field-label">Occupancy</span>
+                    <span class="field-value">
+                        <span th:text="${apartment.currentOccupancy}">3</span> / <span th:text="${apartment.maxOccupancy}">6</span> Persons
+                        <span style="font-size: 11px; font-weight: normal; color: var(--text-secondary);">
+                            (Available: <span th:text="${apartment.availableSlots}">3</span>)
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning Alert if Apartment is Full -->
+        <div th:if="${!hasAvailableSlot}" class="alert error" style="margin-bottom: 24px;">
+            <i class="fa-solid fa-triangle-exclamation"></i> 
+            <span><strong>Apartment is Full!</strong> The maximum occupancy of <strong th:text="${apartment.maxOccupancy}"></strong> residents has been reached. Please move out some residents before assigning new ones.</span>
+        </div>
+
+        <!-- 2. Search Box -->
+        <div class="search-container" th:if="${hasAvailableSlot}">
+            <form th:action="@{/manager/apartments/{id}/assign-resident(id=${apartment.apartmentId})}" method="get" class="search-form">
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" name="search" class="search-input" th:value="${search}" placeholder="Search resident by name, phone number, email...">
+                </div>
+                <button type="submit" class="search-btn">
+                    <i class="fa-solid fa-filter"></i> Search
+                </button>
+                <a th:href="@{/manager/apartments/{id}/assign-resident(id=${apartment.apartmentId})}" class="reset-btn">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </a>
+            </form>
+        </div>
+
+        <!-- 3. Residents List Card -->
+        <div class="residents-card" th:if="${hasAvailableSlot}">
+            <table class="residents-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Move-in Date</th>
+                        <th style="width: 120px; text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="resident : ${residents}">
+                        <td>
+                            <span class="resident-name" th:text="${resident.fullName}">Nguyen Van A</span>
+                        </td>
+                        <td th:text="${resident.phoneNumber != null ? resident.phoneNumber : '-'}">0912345678</td>
+                        <td th:text="${resident.email != null ? resident.email : '-'}">a@example.com</td>
+                        <td>
+                            <input type="date" name="moveInDate" 
+                                   th:form="'assignForm-' + ${resident.profileId}" 
+                                   class="date-input" 
+                                   th:value="${resident.moveInDate != null ? #temporals.format(resident.moveInDate, 'yyyy-MM-dd') : #temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" 
+                                   required>
+                        </td>
+                        <td style="text-align: center;">
+                            <form th:id="'assignForm-' + ${resident.profileId}"
+                                  th:action="@{/manager/apartments/{id}/assign-resident(id=${apartment.apartmentId})}" 
+                                  method="post" 
+                                  class="assign-resident-form"
+                                  th:data-resident-name="${resident.fullName}"
+                                  th:data-apartment-number="${apartment.apartmentNumber}"
+                                  style="margin: 0; display: inline-block;">
+                                <input type="hidden" name="profileId" th:value="${resident.profileId}">
+                                <input type="hidden" name="isHouseholdOwner" value="false">
+                                <button type="submit" class="btn-assign-row">
+                                    <i class="fa-solid fa-user-plus"></i> Assign
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(residents)}">
+                        <td colspan="5">
+                            <div class="no-data-placeholder">
+                                <i class="fa-solid fa-user-slash"></i>
+                                <p style="margin: 0;">No available residents found matching search criteria.</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Pagination controls -->
+            <div class="pagination-container" th:if="${totalPages > 0}">
+                <div class="pagination-info">
+                    Showing <span th:text="${currentPage * size + 1}">1</span> to 
+                    <span th:text="${(currentPage + 1) * size > totalItems ? totalItems : (currentPage + 1) * size}">5</span> of 
+                    <span th:text="${totalItems}">10</span> residents
+                </div>
+                <div class="pagination-controls">
+                    <!-- Previous Page -->
+                    <a th:href="@{/manager/apartments/{id}/assign-resident(id=${apartment.apartmentId}, search=${search}, page=${currentPage - 1})}"
+                       class="page-link-custom" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <i class="fa-solid fa-angle-left"></i>
+                    </a>
+                    
+                    <!-- Page Numbers -->
+                    <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                       th:href="@{/manager/apartments/{id}/assign-resident(id=${apartment.apartmentId}, search=${search}, page=${i})}"
+                       class="page-link-custom" 
+                       th:classappend="${currentPage == i} ? 'active'"
+                       th:text="${i + 1}">
+                        1
+                    </a>
+                    
+                    <!-- Next Page -->
+                    <a th:href="@{/manager/apartments/{id}/assign-resident(id=${apartment.apartmentId}, search=${search}, page=${currentPage + 1})}"
+                       class="page-link-custom" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                        <i class="fa-solid fa-angle-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Script -->
+    <script th:src="@{/js/manager/apartment-assign-resident.js}"></script>
+</div>
+</body>
+</html>
