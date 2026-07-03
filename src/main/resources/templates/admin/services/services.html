@@ -1,0 +1,714 @@
+<div th:replace="~{layout/admin/layout_admin :: admin-layout(~{::content}, 'services')}">
+    <div th:fragment="content">
+        <!-- Load custom page styling -->
+        <link rel="stylesheet" th:href="@{/css/admin/services.css}">
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- PAGE HEADER                                                  -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="page-title-row">
+            <div class="page-title-left">
+                <h2 class="page-title">Service Catalog &amp; Pricing</h2>
+                <p class="page-subtitle">Manage utility types, service rates, and regional pricing policies.</p>
+            </div>
+            <div class="page-title-right">
+                <!-- Opens the Add New Service modal -->
+                <button class="add-service-btn" id="openModalBtn">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Add New Service</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Toast notification (success / error) -->
+        <div id="toastMsg" class="toast-msg" th:if="${param.success != null or param.error != null}"
+             th:classappend="${param.success != null ? ' toast-success' : ' toast-error'}">
+            <i th:class="${param.success != null ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation'}"></i>
+            <span th:if="${param.success != null}">Service created successfully!</span>
+            <span th:if="${param.error != null}">Error: Unit not found. Please try again.</span>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- STATISTICS CARDS                                            -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="stat-label">TOTAL SERVICES</span>
+                    <span class="stat-value" th:text="${totalServices}">15</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="stat-label">ACTIVE SERVICES</span>
+                    <span class="stat-value" th:text="${activeServices}">12</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- SERVICES GRID                                               -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="services-grid">
+            <div class="service-card" th:each="service : ${services}">
+
+                <!-- Card header: icon + status/type -->
+                <div class="service-card-header">
+                    <div th:class="'service-icon-box type-' + ${#strings.toLowerCase(service.serviceType)}">
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'electricity')}" class="fa-solid fa-bolt"></i>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'water')}" class="fa-solid fa-droplet"></i>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'cleaning')}" class="fa-solid fa-broom"></i>
+                        <span th:if="${#strings.equalsIgnoreCase(service.serviceType, 'parking')}" class="parking-letter">P</span>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'management')}" class="fa-solid fa-building-circle-check"></i>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'internet')}" class="fa-solid fa-wifi"></i>
+                        <i th:if="${!#strings.equalsIgnoreCase(service.serviceType, 'electricity') and
+                                     !#strings.equalsIgnoreCase(service.serviceType, 'water') and
+                                     !#strings.equalsIgnoreCase(service.serviceType, 'cleaning') and
+                                     !#strings.equalsIgnoreCase(service.serviceType, 'parking') and
+                                     !#strings.equalsIgnoreCase(service.serviceType, 'management') and
+                                     !#strings.equalsIgnoreCase(service.serviceType, 'internet')}"
+                           class="fa-solid fa-cube"></i>
+                    </div>
+
+                    <div class="service-meta-right">
+                        <span th:class="${service.status ? 'status-badge active' : 'status-badge locked'}"
+                              th:text="${service.status ? 'ACTIVE' : 'LOCKED'}">ACTIVE</span>
+                        <span class="service-type-label"
+                              th:classappend="'label-' + ${#strings.toLowerCase(service.serviceType)}"
+                              th:text="${#strings.toUpperCase(service.serviceType)}">ELECTRICITY</span>
+                    </div>
+                </div>
+
+                <!-- Service name -->
+                <h3 class="service-name" th:text="${service.serviceName}">General Grid Supply</h3>
+
+                <!-- Pricing details -->
+                <div class="pricing-details">
+                    <div class="pricing-row">
+                        <span class="detail-label">Unit Price</span>
+                        <span class="detail-value" th:text="'$' + ${#numbers.formatDecimal(service.unitPrice, 1, 2)}">$0.18</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span class="detail-label">Unit Name</span>
+                        <span class="detail-value" th:text="${service.unitName}">kWh</span>
+                    </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="card-actions">
+                    <button class="edit-btn" type="button"
+                            th:data-service-id="${service.serviceId}"
+                            th:data-service-name="${service.serviceName}"
+                            th:data-unit-price="${service.unitPrice}"
+                            th:data-unit-id="${service.unitId}"
+                            th:data-description="${service.description}">
+                        <i class="fa-solid fa-pen"></i>
+                        <span>Edit Service</span>
+                    </button>
+                    <button class="lock-btn" type="button"
+                            th:class="${service.status ? 'lock-btn action-lock' : 'lock-btn action-unlock'}"
+                            th:data-service-id="${service.serviceId}"
+                            th:data-service-name="${service.serviceName}"
+                            th:data-is-locked="${!service.status}">
+                        <i th:class="${service.status ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open'}"></i>
+                        <span th:text="${service.status ? 'Lock' : 'Unlock'}">Lock</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="no-results-card" th:if="${#lists.isEmpty(services)}">
+            <i class="fa-solid fa-box-open"></i>
+            <h3>No services found</h3>
+            <p>Try adjusting your search keyword or status filter.</p>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- ADD NEW SERVICE MODAL                                       -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="addServiceModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-box">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modalTitle">Add New Service</h3>
+                    <button class="modal-close-btn" id="closeModalBtn" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body — Form -->
+                <form id="createServiceForm" th:action="@{/admin/services/create}" method="post" novalidate>
+                    <div class="modal-body">
+
+                        <!-- Service Name -->
+                        <div class="form-group">
+                            <label class="form-label" for="serviceName">Service Name</label>
+                            <input type="text" id="serviceName" name="serviceName"
+                                   class="form-input" placeholder="e.g. Solar Grid Feed"
+                                   required maxlength="100">
+                            <span class="field-error" id="serviceNameError"></span>
+                        </div>
+
+                        <!-- Service Type -->
+                        <div class="form-group">
+                            <label class="form-label" for="serviceType">Service Type</label>
+                            <input type="text" id="serviceType" name="serviceType"
+                                   class="form-input" placeholder="e.g. Renewable Energy"
+                                   required maxlength="50">
+                            <span class="field-error" id="serviceTypeError"></span>
+                        </div>
+
+                        <!-- Unit Price -->
+                        <div class="form-group">
+                            <label class="form-label" for="unitPrice">Unit Price ($)</label>
+                            <input type="number" id="unitPrice" name="unitPrice"
+                                   class="form-input" placeholder="0.00"
+                                   min="0" step="0.01" value="0.00" required>
+                            <span class="field-error" id="unitPriceError"></span>
+                        </div>
+
+                        <!-- Unit dropdown (populated from model) -->
+                        <div class="form-group">
+                            <label class="form-label" for="unitId">Unit</label>
+                            <div class="select-wrapper">
+                                <select id="unitId" name="unitId" class="form-select" required>
+                                    <option value="" disabled selected>Select a unit...</option>
+                                    <option th:each="unit : ${units}"
+                                            th:value="${unit.unitId}"
+                                            th:text="${unit.unitName}">kWh</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down select-chevron"></i>
+                            </div>
+                            <span class="field-error" id="unitIdError"></span>
+                        </div>
+
+                        <!-- Description (optional) -->
+                        <div class="form-group">
+                            <label class="form-label" for="description">Description</label>
+                            <textarea id="description" name="description"
+                                      class="form-textarea"
+                                      placeholder="Describe the service coverage and terms..."
+                                      rows="4" maxlength="500"></textarea>
+                        </div>
+
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="modal-cancel-btn" id="cancelModalBtn">Cancel</button>
+                        <button type="submit" class="modal-submit-btn" id="createServiceBtn">
+                            <i class="fa-solid fa-check"></i>
+                            Create Service
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- EDIT SERVICE MODAL                                          -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="editServiceModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+            <div class="modal-box">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h3 class="modal-title" id="editModalTitle">Edit Service Details</h3>
+                    <button class="modal-close-btn" id="closeEditModalBtn" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body — Form -->
+                <form id="editServiceForm" th:action="@{/admin/services/update}" method="post" novalidate>
+                    <div class="modal-body">
+
+                        <!-- Important Notice Banner -->
+                        <div class="edit-notice-banner">
+                            <div class="edit-notice-icon">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </div>
+                            <div class="edit-notice-text">
+                                <strong>IMPORTANT NOTICE</strong>
+                                <span>Any modifications to the unit price or structure will be applied only to future billing cycles starting from the next calendar month. Existing invoices remain unaffected.</span>
+                            </div>
+                        </div>
+
+                        <!-- Service ID (hidden) -->
+                        <input type="hidden" id="editServiceId" name="serviceId" value="">
+
+                        <!-- Service Name -->
+                        <div class="form-group">
+                            <label class="form-label" for="editServiceName">Service Name</label>
+                            <input type="text" id="editServiceName" name="serviceName"
+                                   class="form-input" required maxlength="100">
+                            <span class="field-error" id="editServiceNameError"></span>
+                        </div>
+
+                        <!-- Unit Price + Unit Type — 2 column row -->
+                        <div class="form-row-2col">
+                            <div class="form-group">
+                                <label class="form-label" for="editUnitPrice">Unit Price</label>
+                                <div class="input-prefix-wrapper">
+                                    <span class="input-prefix">$</span>
+                                    <input type="number" id="editUnitPrice" name="unitPrice"
+                                           class="form-input has-prefix" min="0" step="0.01" required>
+                                </div>
+                                <span class="field-error" id="editUnitPriceError"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="editUnitId">Unit Type</label>
+                                <div class="select-wrapper">
+                                    <select id="editUnitId" name="unitId" class="form-select" required>
+                                        <option value="" disabled selected>Select...</option>
+                                        <option th:each="unit : ${units}"
+                                                th:value="${unit.unitId}"
+                                                th:text="${unit.unitName}">Month</option>
+                                    </select>
+                                    <i class="fa-solid fa-chevron-down select-chevron"></i>
+                                </div>
+                                <span class="field-error" id="editUnitIdError"></span>
+                            </div>
+                        </div>
+
+
+                        <!-- Description -->
+                        <div class="form-group">
+                            <label class="form-label" for="editDescription">Description</label>
+                            <textarea id="editDescription" name="description"
+                                      class="form-textarea"
+                                      placeholder="Describe the service coverage and terms..."
+                                      rows="4" maxlength="500"></textarea>
+                        </div>
+
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="modal-cancel-btn" id="cancelEditModalBtn">Cancel</button>
+                        <button type="submit" class="modal-submit-btn">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- LOCK SERVICE CONFIRMATION MODAL                             -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="lockServiceModal" role="dialog" aria-modal="true" aria-labelledby="lockModalTitle">
+            <div class="modal-box lock-confirmation-modal">
+
+                <!-- Modal Header with icon -->
+                <div class="lock-modal-header">
+                    <div class="lock-icon-box">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <h3 class="modal-title" id="lockModalTitle">Lock Service</h3>
+                    <button class="modal-close-btn" id="closeLockModalBtn" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body lock-modal-body">
+                    <div class="lock-info-box">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <p>Locking this service will prevent new billings from being generated. Current active subscriptions will remain unaffected until the next billing cycle.</p>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="modal-cancel-btn" id="cancelLockModalBtn">Cancel</button>
+                    <button type="button" class="modal-submit-btn lock-confirm-btn" id="confirmLockBtn">
+                        <i class="fa-solid fa-lock"></i>
+                        Lock Service
+                    </button>
+                </div>
+
+                <!-- Hidden fields for data -->
+                <input type="hidden" id="lockServiceId" value="">
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- UNLOCK SERVICE CONFIRMATION MODAL                           -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="modal-overlay" id="unlockServiceModal" role="dialog" aria-modal="true" aria-labelledby="unlockModalTitle">
+            <div class="modal-box unlock-confirmation-modal">
+
+                <!-- Modal Header with icon -->
+                <div class="unlock-modal-header">
+                    <div class="unlock-icon-box">
+                        <i class="fa-solid fa-lock-open"></i>
+                    </div>
+                    <h3 class="modal-title" id="unlockModalTitle">Unlock Service</h3>
+                    <button class="modal-close-btn" id="closeUnlockModalBtn" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body unlock-modal-body">
+                    <div class="unlock-info-box">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <p>Unlocking this service will allow new billings to be generated starting from the current cycle. Please ensure the pricing is up to date.</p>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="modal-cancel-btn" id="cancelUnlockModalBtn">Cancel</button>
+                    <button type="button" class="modal-submit-btn unlock-confirm-btn" id="confirmUnlockBtn">
+                        <i class="fa-solid fa-lock-open"></i>
+                        Unlock Service
+                    </button>
+                </div>
+
+                <!-- Hidden fields for data -->
+                <input type="hidden" id="unlockServiceId" value="">
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- JAVASCRIPT                                                  -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            document.addEventListener("DOMContentLoaded", function () {
+
+                /* ── Search & filter wiring ── */
+                const searchInput    = document.querySelector(".search-input");
+                const keywordFromModel = /*[[${keyword}]]*/ '';
+                const statusFromModel  = /*[[${statusFilter}]]*/ null;
+
+                if (searchInput) {
+                    searchInput.value       = keywordFromModel || "";
+                    searchInput.placeholder = "Search services or rates...";
+                    searchInput.addEventListener("keypress", function (e) {
+                        if (e.key === "Enter") triggerFilter();
+                    });
+                }
+
+                const searchWrapper = document.querySelector(".search-wrapper");
+                if (searchWrapper && !document.getElementById("statusFilterSelect")) {
+                    const selectWrapper = document.createElement("div");
+                    selectWrapper.className = "filter-dropdown-wrapper";
+
+                    const isAll    = (statusFromModel === null);
+                    const isActive = (statusFromModel === true);
+                    const isLocked = (statusFromModel === false);
+
+                    selectWrapper.innerHTML = `
+                    <div class="status-select-container">
+                        <select id="statusFilterSelect" class="status-select">
+                            <option value="" ${isAll ? "selected" : ""}>All Status</option>
+                            <option value="true" ${isActive ? "selected" : ""}>Active</option>
+                            <option value="false" ${isLocked ? "selected" : ""}>Locked</option>
+                        </select>
+                        <i class="fa-solid fa-filter select-icon"></i>
+                    </div>`;
+
+                    searchWrapper.parentNode.insertBefore(selectWrapper, searchWrapper.nextSibling);
+                    document.getElementById("statusFilterSelect")
+                        .addEventListener("change", triggerFilter);
+                }
+
+                function triggerFilter() {
+                    const kw = searchInput ? encodeURIComponent(searchInput.value.trim()) : "";
+                    const st = document.getElementById("statusFilterSelect")?.value ?? "";
+                    let url  = "/admin/services?keyword=" + kw;
+                    if (st !== "") url += "&status=" + st;
+                    window.location.href = url;
+                }
+
+                /* ── Modal logic ── */
+                const modal       = document.getElementById("addServiceModal");
+                const openBtn     = document.getElementById("openModalBtn");
+                const closeBtn    = document.getElementById("closeModalBtn");
+                const cancelBtn   = document.getElementById("cancelModalBtn");
+                const form        = document.getElementById("createServiceForm");
+
+                function openModal() {
+                    modal.classList.add("is-open");
+                    document.body.classList.add("modal-open");
+                    document.getElementById("serviceName").focus();
+                }
+
+                function closeModal() {
+                    modal.classList.remove("is-open");
+                    document.body.classList.remove("modal-open");
+                    form.reset();
+                    clearErrors();
+                }
+
+                if (openBtn)  openBtn.addEventListener("click",  openModal);
+                if (closeBtn) closeBtn.addEventListener("click", closeModal);
+                if (cancelBtn)cancelBtn.addEventListener("click",closeModal);
+
+                // Close on overlay click
+                modal.addEventListener("click", function (e) {
+                    if (e.target === modal) closeModal();
+                });
+
+                // Close on Escape key
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
+                });
+
+                /* ── Client-side validation ── */
+                function clearErrors() {
+                    document.querySelectorAll(".field-error").forEach(el => el.textContent = "");
+                    document.querySelectorAll(".form-input, .form-select").forEach(el => el.classList.remove("input-error"));
+                }
+
+                function showError(fieldId, errorId, msg) {
+                    const field = document.getElementById(fieldId);
+                    const err   = document.getElementById(errorId);
+                    if (field) field.classList.add("input-error");
+                    if (err)   err.textContent = msg;
+                }
+
+                if (form) {
+                    form.addEventListener("submit", function (e) {
+                        clearErrors();
+                        let valid = true;
+
+                        const name  = document.getElementById("serviceName").value.trim();
+                        const type  = document.getElementById("serviceType").value.trim();
+                        const price = parseFloat(document.getElementById("unitPrice").value);
+                        const unit  = document.getElementById("unitId").value;
+
+                        if (!name)  { showError("serviceName", "serviceNameError", "Service name is required."); valid = false; }
+                        if (!type)  { showError("serviceType", "serviceTypeError", "Service type is required."); valid = false; }
+                        if (isNaN(price) || price < 0) { showError("unitPrice", "unitPriceError", "Price must be ≥ 0."); valid = false; }
+                        if (!unit)  { showError("unitId", "unitIdError", "Please select a unit."); valid = false; }
+
+                        if (!valid) e.preventDefault();
+                    });
+                }
+
+                /* ── Auto-dismiss toast ── */
+                const toast = document.getElementById("toastMsg");
+                if (toast) {
+                    setTimeout(() => { toast.classList.add("toast-hide"); }, 3500);
+                }
+
+                /* ── Edit Service Modal Logic ── */
+                const editModal    = document.getElementById("editServiceModal");
+                const editForm     = document.getElementById("editServiceForm");
+                const closeEditBtn = document.getElementById("closeEditModalBtn");
+                const cancelEditBtn= document.getElementById("cancelEditModalBtn");
+
+                // Attach edit button handlers — use inline data-* (no AJAX needed)
+                document.querySelectorAll(".edit-btn").forEach(btn => {
+                    btn.addEventListener("click", function () {
+                        const d = this.dataset;
+                        populateEditForm({
+                            serviceId:   d.serviceId,
+                            serviceName: d.serviceName,
+                            unitPrice:   d.unitPrice,
+                            unitId:      d.unitId,
+                            description: d.description || ""
+                        });
+                        openEditModal();
+                    });
+                });
+
+                // Populate the edit form with service data
+                function populateEditForm(service) {
+                    document.getElementById("editServiceId").value    = service.serviceId   || "";
+                    document.getElementById("editServiceName").value  = service.serviceName || "";
+                    document.getElementById("editUnitPrice").value    = service.unitPrice   || "0.00";
+                    document.getElementById("editUnitId").value       = service.unitId      || "";
+                    document.getElementById("editDescription").value  = service.description || "";
+                }
+
+                // Modal control functions
+                function openEditModal() {
+                    editModal.classList.add("is-open");
+                    document.body.classList.add("modal-open");
+                    document.getElementById("editServiceName").focus();
+                }
+
+                function closeEditModal() {
+                    editModal.classList.remove("is-open");
+                    document.body.classList.remove("modal-open");
+                    editForm.reset();
+                    clearEditErrors();
+                }
+
+                if (closeEditBtn) closeEditBtn.addEventListener("click", closeEditModal);
+                if (cancelEditBtn) cancelEditBtn.addEventListener("click", closeEditModal);
+
+                // Close on overlay click
+                editModal.addEventListener("click", function (e) {
+                    if (e.target === editModal) closeEditModal();
+                });
+
+                // Close on Escape key
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Escape" && editModal.classList.contains("is-open")) closeEditModal();
+                });
+
+                // Clear errors
+                function clearEditErrors() {
+                    document.querySelectorAll("#editServiceModal .field-error").forEach(el => el.textContent = "");
+                    document.querySelectorAll("#editServiceModal .form-input, #editServiceModal .form-select").forEach(el => el.classList.remove("input-error"));
+                }
+
+                // Form validation
+                if (editForm) {
+                    editForm.addEventListener("submit", function (e) {
+                        clearEditErrors();
+                        let valid = true;
+
+                        const name  = document.getElementById("editServiceName").value.trim();
+                        const price = parseFloat(document.getElementById("editUnitPrice").value);
+                        const unit  = document.getElementById("editUnitId").value;
+
+                        if (!name)  { showEditError("editServiceName", "editServiceNameError", "Service name is required."); valid = false; }
+                        if (isNaN(price) || price < 0) { showEditError("editUnitPrice", "editUnitPriceError", "Price must be ≥ 0."); valid = false; }
+                        if (!unit)  { showEditError("editUnitId", "editUnitIdError", "Please select a unit."); valid = false; }
+
+                        if (!valid) e.preventDefault();
+                    });
+                }
+
+                function showEditError(fieldId, errorId, msg) {
+                    const field = document.getElementById(fieldId);
+                    const err   = document.getElementById(errorId);
+                    if (field) field.classList.add("input-error");
+                    if (err)   err.textContent = msg;
+                }
+
+                /* ── Lock Service Modal Logic ── */
+                const lockModal = document.getElementById("lockServiceModal");
+                const closeLockBtn = document.getElementById("closeLockModalBtn");
+                const cancelLockBtn = document.getElementById("cancelLockModalBtn");
+                const confirmLockBtn = document.getElementById("confirmLockBtn");
+                const lockServiceIdField = document.getElementById("lockServiceId");
+
+                /* ── Unlock Service Modal Logic ── */
+                const unlockModal = document.getElementById("unlockServiceModal");
+                const closeUnlockBtn = document.getElementById("closeUnlockModalBtn");
+                const cancelUnlockBtn = document.getElementById("cancelUnlockModalBtn");
+                const confirmUnlockBtn = document.getElementById("confirmUnlockBtn");
+                const unlockServiceIdField = document.getElementById("unlockServiceId");
+
+                // Attach lock button handlers
+                document.querySelectorAll(".lock-btn").forEach(btn => {
+                    btn.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        const serviceId = this.getAttribute("data-service-id");
+                        const serviceName = this.getAttribute("data-service-name");
+                        const isLocked = this.getAttribute("data-is-locked") === "true";
+
+                        if (!isLocked) {
+                            // Service is active - show lock confirmation modal
+                            lockServiceIdField.value = serviceId;
+                            openLockModal();
+                        } else {
+                            // Service is locked - show unlock confirmation modal
+                            unlockServiceIdField.value = serviceId;
+                            openUnlockModal();
+                        }
+                    });
+                });
+
+                // Lock Modal control functions
+                function openLockModal() {
+                    lockModal.classList.add("is-open");
+                    document.body.classList.add("modal-open");
+                }
+
+                function closeLockModal() {
+                    lockModal.classList.remove("is-open");
+                    document.body.classList.remove("modal-open");
+                    lockServiceIdField.value = "";
+                }
+
+                if (closeLockBtn) closeLockBtn.addEventListener("click", closeLockModal);
+                if (cancelLockBtn) cancelLockBtn.addEventListener("click", closeLockModal);
+
+                // Close on overlay click
+                lockModal.addEventListener("click", function (e) {
+                    if (e.target === lockModal) closeLockModal();
+                });
+
+                // Close on Escape key
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Escape" && lockModal.classList.contains("is-open")) closeLockModal();
+                });
+
+                // Confirm lock
+                if (confirmLockBtn) {
+                    confirmLockBtn.addEventListener("click", function() {
+                        const serviceId = lockServiceIdField.value;
+                        if (serviceId) {
+                            toggleServiceLock(serviceId, true);
+                        }
+                    });
+                }
+
+                // Unlock Modal control functions
+                function openUnlockModal() {
+                    unlockModal.classList.add("is-open");
+                    document.body.classList.add("modal-open");
+                }
+
+                function closeUnlockModal() {
+                    unlockModal.classList.remove("is-open");
+                    document.body.classList.remove("modal-open");
+                    unlockServiceIdField.value = "";
+                }
+
+                if (closeUnlockBtn) closeUnlockBtn.addEventListener("click", closeUnlockModal);
+                if (cancelUnlockBtn) cancelUnlockBtn.addEventListener("click", closeUnlockModal);
+
+                // Close on overlay click
+                unlockModal.addEventListener("click", function (e) {
+                    if (e.target === unlockModal) closeUnlockModal();
+                });
+
+                // Close on Escape key
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Escape" && unlockModal.classList.contains("is-open")) closeUnlockModal();
+                });
+
+                // Confirm unlock
+                if (confirmUnlockBtn) {
+                    confirmUnlockBtn.addEventListener("click", function() {
+                        const serviceId = unlockServiceIdField.value;
+                        if (serviceId) {
+                            toggleServiceLock(serviceId, false);
+                        }
+                    });
+                }
+
+                // Toggle service lock/unlock
+                function toggleServiceLock(serviceId, shouldLock) {
+                    const form = document.createElement("form");
+                    form.method = "POST";
+                    form.action = "/admin/services/" + serviceId + "/toggle-status";
+
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "lock";
+                    input.value = shouldLock ? "true" : "false";
+
+                    form.appendChild(input);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+            /*]]>*/
+        </script>
+    </div>
+</div>

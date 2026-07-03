@@ -35,6 +35,9 @@ public class Utility {
     @OneToMany(mappedBy = "utility")
     private List<UtilityResource> utilityResources = new ArrayList<>();
 
+    @OneToMany(mappedBy = "utility")
+    private List<UtilityImage> utilityImages = new ArrayList<>();
+
     public Utility() {
     }
 
@@ -84,5 +87,13 @@ public class Utility {
 
     public void setUtilityResources(List<UtilityResource> utilityResources) {
         this.utilityResources = utilityResources;
+    }
+
+    public List<UtilityImage> getUtilityImages() {
+        return utilityImages;
+    }
+
+    public void setUtilityImages(List<UtilityImage> utilityImages) {
+        this.utilityImages = utilityImages;
     }
 }

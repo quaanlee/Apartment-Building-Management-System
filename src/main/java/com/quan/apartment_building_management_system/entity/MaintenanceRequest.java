@@ -45,6 +45,9 @@ public class MaintenanceRequest {
     @OneToOne(mappedBy = "maintenanceRequest", fetch = FetchType.LAZY)
     private MaintenanceTask maintenanceTask;
 
+    @OneToMany(mappedBy = "request")
+    private java.util.List<MaintenanceRequestImage> images = new java.util.ArrayList<>();
+
     public MaintenanceRequest() {
     }
 
@@ -110,5 +113,13 @@ public class MaintenanceRequest {
 
     public void setMaintenanceTask(MaintenanceTask maintenanceTask) {
         this.maintenanceTask = maintenanceTask;
+    }
+
+    public java.util.List<MaintenanceRequestImage> getImages() {
+        return images;
+    }
+
+    public void setImages(java.util.List<MaintenanceRequestImage> images) {
+        this.images = images;
     }
 }

@@ -1,0 +1,249 @@
+<div th:replace="~{layout/admin/layout_admin :: admin-layout(~{::content}, 'logs')}">
+    <div th:fragment="content">
+        <!-- Load custom page styling -->
+        <link rel="stylesheet" th:href="@{/css/admin/logs.css}">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
+
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- PAGE HEADER                                                  -->
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <div class="logs-page-header">
+            <h2 class="logs-page-title">System Logs</h2>
+            <button class="logs-export-btn" id="exportBtn">
+                <span class="material-symbols-outlined">download</span>
+                EXPORT DATA
+            </button>
+        </div>
+
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- STATS CARDS                                                 -->
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <div class="logs-stats-grid">
+            <div class="logs-stat-card">
+                <div class="logs-stat-header">
+                    <span class="logs-stat-label">TOTAL EVENTS</span>
+                    <span class="material-symbols-outlined logs-stat-icon primary">analytics</span>
+                </div>
+                <div class="logs-stat-value-row">
+                    <span class="logs-stat-number" th:text="${totalEvents != null ? totalEvents : '0'}">0</span>
+                </div>
+            </div>
+            <div class="logs-stat-card">
+                <div class="logs-stat-header">
+                    <span class="logs-stat-label">RESIDENT LOGS</span>
+                    <span class="material-symbols-outlined logs-stat-icon" style="color: #6366f1;">person</span>
+                </div>
+                <div class="logs-stat-value-row">
+                    <span class="logs-stat-number" th:text="${residentLogs != null ? residentLogs : '0'}">0</span>
+                </div>
+            </div>
+            <div class="logs-stat-card">
+                <div class="logs-stat-header">
+                    <span class="logs-stat-label">MANAGER LOGS</span>
+                    <span class="material-symbols-outlined logs-stat-icon" style="color: #f59e0b;">manage_accounts</span>
+                </div>
+                <div class="logs-stat-value-row">
+                    <span class="logs-stat-number" th:text="${managerLogs != null ? managerLogs : '0'}">0</span>
+                </div>
+            </div>
+            <div class="logs-stat-card">
+                <div class="logs-stat-header">
+                    <span class="logs-stat-label">MAINTENANCE LOGS</span>
+                    <span class="material-symbols-outlined logs-stat-icon" style="color: #10b981;">build</span>
+                </div>
+                <div class="logs-stat-value-row">
+                    <span class="logs-stat-number" th:text="${maintenanceLogs != null ? maintenanceLogs : '0'}">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- FILTER BAR                                                   -->
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <form method="get" th:action="@{/admin/logs}" id="filterForm" class="logs-filter-bar">
+            <!-- Search -->
+            <div class="logs-filter-group">
+                <label class="logs-filter-label">Search</label>
+                <div class="logs-search-wrapper">
+                    <span class="material-symbols-outlined logs-search-icon">search</span>
+                    <input type="text" name="search" id="searchInput" class="logs-search-input"
+                           th:value="${search != null ? search : ''}"
+                           placeholder="Search by name, action...">
+                </div>
+            </div>
+
+            <!-- From Date -->
+            <div class="logs-filter-group">
+                <label class="logs-filter-label">From Date</label>
+                <div class="logs-date-input-wrapper" id="fromDateWrapper">
+                    <span class="material-symbols-outlined logs-date-icon">calendar_today</span>
+                    <input type="text" id="fromDateDisplay" class="logs-date-display"
+                           th:value="${fromDate != null ? fromDate : ''}"
+                           placeholder="Select date" readonly>
+                    <input type="hidden" id="fromDate" name="fromDate" th:value="${fromDate}">
+                </div>
+                <!-- Calendar Picker -->
+                <div class="logs-calendar-dropdown" id="fromCalendar">
+                    <div class="cal-header">
+                        <button type="button" class="cal-nav" id="fromPrev">&lt;</button>
+                        <span class="cal-month-year" id="fromMonthYear"></span>
+                        <button type="button" class="cal-nav" id="fromNext">&gt;</button>
+                    </div>
+                    <div class="cal-weekdays">
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                    </div>
+                    <div class="cal-days" id="fromDays"></div>
+                    <div class="cal-actions">
+                        <button type="button" class="cal-cancel" id="fromCancel">Cancel</button>
+                        <button type="button" class="cal-apply" id="fromApply">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- To Date -->
+            <div class="logs-filter-group">
+                <label class="logs-filter-label">To Date</label>
+                <div class="logs-date-input-wrapper" id="toDateWrapper">
+                    <span class="material-symbols-outlined logs-date-icon">calendar_today</span>
+                    <input type="text" id="toDateDisplay" class="logs-date-display"
+                           th:value="${toDate != null ? toDate : ''}"
+                           placeholder="Select date" readonly>
+                    <input type="hidden" id="toDate" name="toDate" th:value="${toDate}">
+                </div>
+                <div class="logs-calendar-dropdown" id="toCalendar">
+                    <div class="cal-header">
+                        <button type="button" class="cal-nav" id="toPrev">&lt;</button>
+                        <span class="cal-month-year" id="toMonthYear"></span>
+                        <button type="button" class="cal-nav" id="toNext">&gt;</button>
+                    </div>
+                    <div class="cal-weekdays">
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                    </div>
+                    <div class="cal-days" id="toDays"></div>
+                    <div class="cal-actions">
+                        <button type="button" class="cal-cancel" id="toCancel">Cancel</button>
+                        <button type="button" class="cal-apply" id="toApply">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Role -->
+            <div class="logs-filter-group">
+                <label class="logs-filter-label">User Role</label>
+                <select name="userRole" id="userRoleSelect" class="logs-filter-select">
+                    <option value="" th:selected="${userRole == null or userRole == ''}">All Roles</option>
+                    <option value="Security Officer" th:selected="${userRole == 'Security Officer'}">Security Officer</option>
+                    <option value="Admin" th:selected="${userRole == 'Admin'}">Admin</option>
+                    <option value="Manager" th:selected="${userRole == 'Manager'}">Manager</option>
+                    <option value="Maintenance Staff" th:selected="${userRole == 'Maintenance Staff'}">Maintenance Staff</option>
+                    <option value="Resident" th:selected="${userRole == 'Resident'}">Resident</option>
+                    <option value="System" th:selected="${userRole == 'System'}">System</option>
+                </select>
+            </div>
+
+            <!-- Action Type -->
+            <div class="logs-filter-group">
+                <label class="logs-filter-label">Action</label>
+                <select name="action" id="actionSelect" class="logs-filter-select">
+                    <option value="" th:selected="${action == null or action == ''}">All Actions</option>
+                    <option value="LOGIN" th:selected="${action == 'LOGIN'}">LOGIN</option>
+                    <option value="LOGOUT" th:selected="${action == 'LOGOUT'}">LOGOUT</option>
+                    <option value="CREATE_BILL" th:selected="${action == 'CREATE_BILL'}">CREATE_BILL</option>
+                    <option value="LOCK_ACCOUNT" th:selected="${action == 'LOCK_ACCOUNT'}">LOCK_ACCOUNT</option>
+                    <option value="DELETE_BOOKING" th:selected="${action == 'DELETE_BOOKING'}">DELETE_BOOKING</option>
+                    <option value="AUTO_BACKUP" th:selected="${action == 'AUTO_BACKUP'}">AUTO_BACKUP</option>
+                    <option value="UPDATE_PERMISSIONS" th:selected="${action == 'UPDATE_PERMISSIONS'}">UPDATE_PERMISSIONS</option>
+                    <option value="CANCEL_BOOKING" th:selected="${action == 'CANCEL_BOOKING'}">CANCEL_BOOKING</option>
+                </select>
+            </div>
+
+            <div class="logs-filter-actions">
+                <button type="submit" class="logs-apply-btn">Apply Filters</button>
+                <a th:href="@{/admin/logs}" class="logs-clear-btn">CLEAR ALL FILTERS</a>
+            </div>
+        </form>
+
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- DATA TABLE                                                   -->
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <div class="logs-table-card">
+            <div class="logs-table-wrapper">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>ACCOUNT NAME</th>
+                            <th>ROLE</th>
+                            <th>ACTION</th>
+                            <th>TARGET ENTITY</th>
+                            <th>CREATED AT</th>
+                            <th class="text-right">DETAILS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Thymeleaf loop: th:each="log : ${logs}" -->
+                        <tr class="logs-table-row" th:each="log : ${logs}">
+                            <td>
+                                <span class="logs-account-name"
+                                      th:classappend="${log.role == 'Admin' ? ' role-admin' :
+                                                       log.role == 'Manager' ? ' role-manager' :
+                                                       log.role == 'Security Officer' ? ' role-security' : log.role == 'Maintenance Staff' ? ' role-maintainer' :
+                                                       log.role == 'Resident' ? ' role-resident' :
+                                                       log.role == 'System' ? ' role-system' : ' role-default'}"
+                                      th:text="${log.accountName}">Alex Mercer</span>
+                            </td>
+                            <td>
+                                <span class="logs-role-badge"
+                                      th:classappend="${log.role == 'Admin' ? ' role-admin' :
+                                                       log.role == 'Manager' ? ' role-manager' :
+                                                       log.role == 'Security Officer' ? ' role-security' : log.role == 'Maintenance Staff' ? ' role-maintainer' :
+                                                       log.role == 'Resident' ? ' role-resident' :
+                                                       log.role == 'System' ? ' role-system' : ' role-default'}"
+                                      th:text="${log.role}">Admin</span>
+                            </td>
+                            <td>
+                                <span class="logs-action-badge" th:classappend="${log.action == 'LOGIN' ? ' action-login' : log.action == 'LOGOUT' ? ' action-logout' : log.action == 'CREATE_BILL' ? ' action-create_bill' : log.action == 'LOCK_ACCOUNT' ? ' action-lock_account' : log.action == 'DELETE_BOOKING' ? ' action-delete_booking' : log.action == 'CANCEL_BOOKING' ? ' action-cancel_booking' : log.action == 'UPDATE_PERMISSIONS' ? ' action-update_permissions' : log.action == 'DAILY_BACKUP' ? ' action-daily_backup' : ''}" th:text="${log.action}">LOGIN</span>
+                            </td>
+                            <td class="logs-td-secondary" th:text="${log.entityType}">Account</td>
+                            <td class="logs-td-secondary logs-td-nowrap" th:text="${log.createdAt}">2023-10-31 14:23:11</td>
+                            <td class="text-right">
+                                <a class="logs-eye-btn" title="View Details" style="text-decoration: none;" th:href="@{/admin/logs/detail/{id}(id=${log.logId})}">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr class="logs-table-row" th:if="${logs == null or logs.isEmpty()}">
+                            <td colspan="6" class="text-center">No logs found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="logs-pagination-bar">
+                <span class="logs-pagination-info"
+                      th:text="${totalLogs != null ? 'Showing ' + ((currentPage - 1) * pageSize + 1) + ' to ' + (currentPage * pageSize < totalLogs ? currentPage * pageSize : totalLogs) + ' of ' + totalLogs + ' entries' : 'Showing 1 to 5 of 128,492 entries'}">
+                    Showing 1 to 5 of 128,492 entries
+                </span>
+                                    <div class="logs-pagination-controls">
+                        <a class="logs-page-btn" th:href="@{/admin/logs(page=${currentPage - 2}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}"
+                           th:classappend="${currentPage <= 1 ? ' disabled' : ''}">&lt;</a>
+                        <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+                            <a th:if="${i == currentPage}" class="logs-page-btn active" th:text="${i}"
+                               th:href="@{/admin/logs(page=${i - 1}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}">1</a>
+                            <a th:if="${i != currentPage}" class="logs-page-btn" th:text="${i}"
+                               th:href="@{/admin/logs(page=${i - 1}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}">2</a>
+                        </th:block>
+                        <a class="logs-page-btn" th:href="@{/admin/logs(page=${currentPage}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}"
+                           th:classappend="${currentPage >= totalPages ? ' disabled' : ''}">&gt;</a>
+                    </div>
+            </div>
+        </div>
+
+
+
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- JAVASCRIPT                                                   -->
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <script th:src="@{/js/admin/logs.js}"></script>
+    </div>
+</div>

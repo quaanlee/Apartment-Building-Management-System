@@ -73,6 +73,15 @@ public class Apartment {
     @OneToMany(mappedBy = "apartment")
     private List<MaintenanceRequest> maintenanceRequests = new ArrayList<>();
 
+    @OneToMany(mappedBy = "apartment")
+    private List<ApartmentImage> apartmentImages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "apartment")
+    private List<ApartmentPriceHistory> priceHistories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "apartment")
+    private List<SalesContract> salesContracts = new ArrayList<>();
+
     public Apartment() {
     }
 
@@ -162,5 +171,29 @@ public class Apartment {
 
     public void setMaintenanceRequests(List<MaintenanceRequest> maintenanceRequests) {
         this.maintenanceRequests = maintenanceRequests;
+    }
+
+    public List<ApartmentImage> getApartmentImages() {
+        return apartmentImages;
+    }
+
+    public void setApartmentImages(List<ApartmentImage> apartmentImages) {
+        this.apartmentImages = apartmentImages;
+    }
+
+    public List<ApartmentPriceHistory> getPriceHistories() {
+        return priceHistories;
+    }
+
+    public void setPriceHistories(List<ApartmentPriceHistory> priceHistories) {
+        this.priceHistories = priceHistories;
+    }
+
+    public List<SalesContract> getSalesContracts() {
+        return salesContracts;
+    }
+
+    public void setSalesContracts(List<SalesContract> salesContracts) {
+        this.salesContracts = salesContracts;
     }
 }
