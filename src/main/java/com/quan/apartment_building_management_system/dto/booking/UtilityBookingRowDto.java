@@ -14,7 +14,7 @@ public class UtilityBookingRowDto {
     private String startTime;         // e.g. "Oct 12, 2024 · 16:00"
     private String endTime;
     private long durationHours;
-    private Byte bookingStatus;       // 0=Pending | 1=Approved | 2=Rejected | 3=Cancelled
+    private Integer bookingStatus;       // 0=Pending | 1=Approved | 2=Rejected | 3=Cancelled
     private String paymentStatus;     // "Paid" | "Unpaid"
     private String approvedByName;
 
@@ -22,7 +22,7 @@ public class UtilityBookingRowDto {
 
     public UtilityBookingRowDto(Integer bookingId, String residentName, String initials,
                                  String createdAt, String utilityName, String startTime,
-                                 String endTime, long durationHours, Byte bookingStatus,
+                                 String endTime, long durationHours, Integer bookingStatus,
                                  String paymentStatus, String approvedByName) {
         this.bookingId = bookingId;
         this.residentName = residentName;
@@ -61,8 +61,8 @@ public class UtilityBookingRowDto {
     public long getDurationHours() { return durationHours; }
     public void setDurationHours(long durationHours) { this.durationHours = durationHours; }
 
-    public Byte getBookingStatus() { return bookingStatus; }
-    public void setBookingStatus(Byte bookingStatus) { this.bookingStatus = bookingStatus; }
+    public Integer getBookingStatus() { return bookingStatus; }
+    public void setBookingStatus(Integer bookingStatus) { this.bookingStatus = bookingStatus; }
 
     public String getPaymentStatus() { return paymentStatus; }
     public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::#main-content}, 'apartments')}"
+      th:with="pageTitle='Edit Apartment Status'">
+<head>
+    <title>Edit Apartment Status</title>
+</head>
+<body>
+<div id="main-content">
+    <!-- Load Bootstrap 5 since this page relies on Bootstrap classes -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        #main-content { font-family: 'Inter', sans-serif; }
+        .form-card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); max-width: 600px; margin: 0 auto; }
+        .status-option { padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s; }
+        .status-option:hover { border-color: #582BE8; background: #f8f9fc; }
+        .status-option:has(input:checked) { border-color: #582BE8; background: #F0EDFE; }
+
+        /* Override Bootstrap blue with Manager brand purple (#582BE8) */
+        .text-primary { color: #582BE8 !important; }
+        .bg-primary { background-color: #582BE8 !important; }
+        .btn-primary { background-color: #582BE8 !important; border-color: #582BE8 !important; }
+        .btn-primary:hover, .btn-primary:focus, .btn-primary:active { background-color: #4a22c9 !important; border-color: #4a22c9 !important; }
+    </style>
+
+    <!-- Page Actions -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="text-muted mb-0">Edit Status</h5>
+        <div>
+            <a th:href="@{/manager/apartments/{id}(id=${apartment.apartmentId})}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <h5 class="fw-bold text-primary mb-3">
+            Apartment: <span th:text="${apartment.apartmentNumber}"></span>
+        </h5>
+
+        <form th:action="@{/manager/apartments/{id}/update-status(id=${apartment.apartmentId})}" method="post">
+            <div class="mb-3">
+                <label class="fw-bold">New Status</label>
+                <div class="status-option">
+                    <input class="form-check-input" type="radio" name="status" value="0" id="statusAvailable" th:checked="${apartment.status == 0}">
+                    <label class="form-check-label" for="statusAvailable">
+                        <span class="badge bg-success">Available</span>
+                        <small class="text-muted d-block">Apartment is ready for new residents</small>
+                    </label>
+                </div>
+                <div class="status-option">
+                    <input class="form-check-input" type="radio" name="status" value="1" id="statusOccupied" th:checked="${apartment.status == 1}">
+                    <label class="form-check-label" for="statusOccupied">
+                        <span class="badge bg-primary">Occupied</span>
+                        <small class="text-muted d-block">Apartment has residents living in</small>
+                    </label>
+                </div>
+                <div class="status-option">
+                    <input class="form-check-input" type="radio" name="status" value="2" id="statusMaintenance" th:checked="${apartment.status == 2}">
+                    <label class="form-check-label" for="statusMaintenance">
+                        <span class="badge bg-warning text-dark">Maintenance</span>
+                        <small class="text-muted d-block">Apartment is under maintenance</small>
+                    </label>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <span th:if="${apartment.currentOccupancy > 0}">
+                        This apartment currently has <strong th:text="${apartment.currentOccupancy}"></strong>
+                        residents. Setting status to "Available" will not remove them.
+                    </span>
+                <span th:unless="${apartment.currentOccupancy > 0}">
+                        This apartment currently has no residents.
+                    </span>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end">
+                <a th:href="@{/manager/apartments/{id}(id=${apartment.apartmentId})}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Status</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

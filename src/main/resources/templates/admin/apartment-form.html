@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/admin/layout :: admin-layout(~{::main}, 'building')}">
+<head>
+    <title th:text="${pageTitle}">Apartment Form</title>
+</head>
+<body>
+
+<main>
+    <!-- Link custom stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/manager/apartment/building-management.css}">
+
+    <!-- Page Header Actions -->
+    <div class="detail-header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div class="detail-title" style="font-size: 24px; font-weight: 700; color: var(--text-primary);"
+             th:text="${pageTitle}">
+            Add New Unit
+        </div>
+        <a th:href="@{/admin/apartments}" class="cancel-btn" style="display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="form-wrapper" style="padding: 0; min-height: auto; background: none; display: flex; justify-content: center; align-items: flex-start;">
+        <div class="form-card" style="width: 100%; max-width: 600px; box-sizing: border-box;">
+            <h2 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">Apartment details</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">Enter apartment information below.</p>
+
+            <div th:if="${errorMessage}" class="alert error" th:text="${errorMessage}"></div>
+
+            <form th:action="@{${actionUrl}}" th:object="${apartment}" method="post" novalidate>
+
+                <label>Apartment Number</label>
+                <input type="text" th:field="*{apartmentNumber}" required placeholder="e.g. A-101"
+                       th:classappend="${#fields.hasErrors('apartmentNumber')} ? 'is-invalid'">
+                <span id="apartmentNumber-error" class="error-text"
+                      th:text="${#fields.hasErrors('apartmentNumber')} ? ${#fields.firstError('apartmentNumber')} : ''"
+                      th:style="${#fields.hasErrors('apartmentNumber')} ? 'display: block;' : 'display: none;'"></span>
+
+                <label>Floor</label>
+                <input type="number" th:field="*{floor}" required min="1" max="100" placeholder="e.g. 1"
+                       th:classappend="${#fields.hasErrors('floor')} ? 'is-invalid'">
+                <span id="floor-error" class="error-text"
+                      th:text="${#fields.hasErrors('floor')} ? ${#fields.firstError('floor')} : ''"
+                      th:style="${#fields.hasErrors('floor')} ? 'display: block;' : 'display: none;'"></span>
+
+                <label>Area (m²)</label>
+                <input type="number" step="0.01" th:field="*{area}" required min="10" max="1000" placeholder="e.g. 75.5"
+                       th:classappend="${#fields.hasErrors('area')} ? 'is-invalid'">
+                <span id="area-error" class="error-text"
+                      th:text="${#fields.hasErrors('area')} ? ${#fields.firstError('area')} : ''"
+                      th:style="${#fields.hasErrors('area')} ? 'display: block;' : 'display: none;'"></span>
+
+                <label>Room Type</label>
+                <select th:field="*{roomType}" required
+                        th:classappend="${#fields.hasErrors('roomType')} ? 'is-invalid'">
+                    <option value="">Select room type</option>
+                    <option value="Studio">Studio</option>
+                    <option value="1 Bedroom">1 Bedroom</option>
+                    <option value="2 Bedrooms">2 Bedrooms</option>
+                    <option value="3 Bedrooms">3 Bedrooms</option>
+                    <option value="Penthouse">Penthouse</option>
+                </select>
+                <span id="roomType-error" class="error-text"
+                      th:text="${#fields.hasErrors('roomType')} ? ${#fields.firstError('roomType')} : ''"
+                      th:style="${#fields.hasErrors('roomType')} ? 'display: block;' : 'display: none;'"></span>
+
+                <label>Status</label>
+                <select th:field="*{status}" required
+                        th:classappend="${#fields.hasErrors('status')} ? 'is-invalid'">
+                    <option value="0">Vacant</option>
+                    <option value="1">Occupied</option>
+                    <option value="2">Maintenance</option>
+                </select>
+                <span id="status-error" class="error-text"
+                      th:text="${#fields.hasErrors('status')} ? ${#fields.firstError('status')} : ''"
+                      th:style="${#fields.hasErrors('status')} ? 'display: block;' : 'display: none;'"></span>
+
+                <label>Max Occupancy</label>
+                <input type="number" th:field="*{maxOccupancy}" required min="1" max="20" placeholder="e.g. 4"
+                       th:classappend="${#fields.hasErrors('maxOccupancy')} ? 'is-invalid'">
+                <span id="maxOccupancy-error" class="error-text"
+                      th:text="${#fields.hasErrors('maxOccupancy')} ? ${#fields.firstError('maxOccupancy')} : ''"
+                      th:style="${#fields.hasErrors('maxOccupancy')} ? 'display: block;' : 'display: none;'"></span>
+
+                <div class="form-actions" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                    <a th:href="@{/admin/apartments}" class="cancel-btn" style="border: 1px solid var(--border-color); text-align: center;">Cancel</a>
+                    <button type="submit" class="save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Client-side Validation Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector("form");
+            const apartmentNumber = document.getElementById("apartmentNumber");
+            const floor = document.getElementById("floor");
+            const area = document.getElementById("area");
+            const roomType = document.getElementById("roomType");
+            const status = document.getElementById("status");
+            const maxOccupancy = document.getElementById("maxOccupancy");
+
+            const errors = {
+                apartmentNumber: document.getElementById("apartmentNumber-error"),
+                floor: document.getElementById("floor-error"),
+                area: document.getElementById("area-error"),
+                roomType: document.getElementById("roomType-error"),
+                status: document.getElementById("status-error"),
+                maxOccupancy: document.getElementById("maxOccupancy-error")
+            };
+
+            function showError(input, errorEl, message) {
+                input.classList.add("is-invalid");
+                errorEl.textContent = message;
+                errorEl.style.display = "block";
+            }
+
+            function clearError(input, errorEl) {
+                input.classList.remove("is-invalid");
+                errorEl.textContent = "";
+                errorEl.style.display = "none";
+            }
+
+            function validateApartmentNumber() {
+                const val = apartmentNumber.value.trim();
+                if (!val) {
+                    showError(apartmentNumber, errors.apartmentNumber, "Apartment number is required");
+                    return false;
+                }
+                if (val.length < 2 || val.length > 20) {
+                    showError(apartmentNumber, errors.apartmentNumber, "Apartment number must be between 2 and 20 characters");
+                    return false;
+                }
+                if (!/^[a-zA-Z0-9\-]+$/.test(val)) {
+                    showError(apartmentNumber, errors.apartmentNumber, "Apartment number can only contain letters, numbers, and dashes (e.g. A-101, 109)");
+                    return false;
+                }
+                clearError(apartmentNumber, errors.apartmentNumber);
+                return true;
+            }
+
+            function validateFloor() {
+                const val = floor.value.trim();
+                if (!val) {
+                    showError(floor, errors.floor, "Floor is required");
+                    return false;
+                }
+                const num = parseInt(val);
+                if (isNaN(num) || num < 1 || num > 100) {
+                    showError(floor, errors.floor, "Floor must be a whole number between 1 and 100");
+                    return false;
+                }
+                clearError(floor, errors.floor);
+                return true;
+            }
+
+            function validateArea() {
+                const val = area.value.trim();
+                if (!val) {
+                    showError(area, errors.area, "Area is required");
+                    return false;
+                }
+                const num = parseFloat(val);
+                if (isNaN(num) || num < 10.0 || num > 1000.0) {
+                    showError(area, errors.area, "Area must be a number between 10.00 and 1000.00 m²");
+                    return false;
+                }
+                clearError(area, errors.area);
+                return true;
+            }
+
+            function validateRoomType() {
+                const val = roomType.value;
+                if (!val) {
+                    showError(roomType, errors.roomType, "Please select a room type");
+                    return false;
+                }
+                clearError(roomType, errors.roomType);
+                return true;
+            }
+
+            function validateStatus() {
+                const val = status.value;
+                if (val === "") {
+                    showError(status, errors.status, "Please select a status");
+                    return false;
+                }
+                clearError(status, errors.status);
+                return true;
+            }
+
+            function validateMaxOccupancy() {
+                const val = maxOccupancy.value.trim();
+                if (!val) {
+                    showError(maxOccupancy, errors.maxOccupancy, "Max occupancy is required");
+                    return false;
+                }
+                const num = parseInt(val);
+                if (isNaN(num) || num < 1 || num > 20) {
+                    showError(maxOccupancy, errors.maxOccupancy, "Max occupancy must be a whole number between 1 and 20");
+                    return false;
+                }
+                clearError(maxOccupancy, errors.maxOccupancy);
+                return true;
+            }
+
+            // Dynamic validations on user interaction
+            apartmentNumber.addEventListener("input", validateApartmentNumber);
+            floor.addEventListener("input", validateFloor);
+            area.addEventListener("input", validateArea);
+            roomType.addEventListener("change", validateRoomType);
+            status.addEventListener("change", validateStatus);
+            maxOccupancy.addEventListener("input", validateMaxOccupancy);
+
+            form.addEventListener("submit", function(e) {
+                const aptValid = validateApartmentNumber();
+                const floorValid = validateFloor();
+                const areaValid = validateArea();
+                const roomTypeValid = validateRoomType();
+                const statusValid = validateStatus();
+                const maxOccValid = validateMaxOccupancy();
+
+                if (!aptValid || !floorValid || !areaValid || !roomTypeValid || !statusValid || !maxOccValid) {
+                    e.preventDefault();
+                    const firstErr = document.querySelector(".is-invalid");
+                    if (firstErr) {
+                        firstErr.scrollIntoView({ behavior: "smooth", block: "center" });
+                        firstErr.focus();
+                    }
+                }
+            });
+        });
+    </script>
+</main>
+
+</body>
+</html>

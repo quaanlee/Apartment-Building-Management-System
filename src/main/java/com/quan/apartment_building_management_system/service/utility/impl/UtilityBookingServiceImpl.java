@@ -112,9 +112,19 @@ public class UtilityBookingServiceImpl implements UtilityBookingService {
         booking.setStatus(newStatus);
         if (newStatus == 1) {               // Approved
             booking.setApprovedBy(actor);
+            booking.setCancelledAt(null);
+            booking.setCancelReason(null);
+        } else if (newStatus == 2) {        // Rejected
+            booking.setApprovedBy(null);
+            booking.setCancelledAt(null);
+            booking.setCancelReason(null);
         } else if (newStatus == 3) {        // Cancelled
             booking.setCancelledAt(LocalDateTime.now());
             booking.setApprovedBy(null);
+        } else if (newStatus == 0) {        // Cancel Approve/Reject -> revert to Pending
+            booking.setApprovedBy(null);
+            booking.setCancelledAt(null);
+            booking.setCancelReason(null);
         }
         utilityBookingRepository.save(booking);
     }
@@ -164,7 +174,7 @@ public class UtilityBookingServiceImpl implements UtilityBookingService {
                 format(booking.getStartTime()),
                 format(booking.getEndTime()),
                 durationHours,
-                booking.getStatus(),
+                booking.getStatus() != null ? booking.getStatus().intValue() : 0,
                 paymentStatus,
                 approvedByName
         );
@@ -174,7 +184,7 @@ public class UtilityBookingServiceImpl implements UtilityBookingService {
         UtilityBookingDetailDto dto = new UtilityBookingDetailDto();
 
         dto.setBookingId(booking.getBookingId());
-        dto.setBookingStatus(booking.getStatus());
+        dto.setBookingStatus(booking.getStatus() != null ? booking.getStatus().intValue() : 0);
 
         // Resident
         dto.setResidentFullName(booking.getProfile().getFullName());
@@ -201,13 +211,7 @@ public class UtilityBookingServiceImpl implements UtilityBookingService {
 
     /** Determines payment status by checking if any associated bill has been paid (Bill.status = 1). */
     private String resolvePaymentStatus(UtilityBooking booking) {
-        List<BillDetail> details = booking.getBillDetails();
-        if (details == null || details.isEmpty()) return "Unpaid";
-        boolean paid = details.stream()
-                .anyMatch(bd -> bd.getBill() != null
-                        && bd.getBill().getStatus() != null
-                        && bd.getBill().getStatus() == 1);
-        return paid ? "Paid" : "Unpaid";
+        return (booking.getPaymentStatus() != null && booking.getPaymentStatus()) ? "Paid" : "Unpaid";
     }
 
     /** Extracts payment amount and transaction code from associated bill payments. */

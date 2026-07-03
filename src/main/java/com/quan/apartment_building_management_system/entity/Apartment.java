@@ -7,6 +7,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,21 +29,35 @@ public class Apartment {
     @Column(name = "ApartmentID")
     private Integer apartmentId;
 
+    @NotBlank(message = "Apartment number is required")
+    @Size(max = 20, message = "Apartment number must be at most 20 characters")
     @Column(name = "ApartmentNumber", nullable = false, unique = true, length = 20)
     private String apartmentNumber;
 
+    @NotNull(message = "Floor is required")
+    @Min(value = 1, message = "Floor must be at least 1")
+    @Max(value = 100, message = "Floor must be at most 100")
     @Column(name = "Floor", nullable = false)
     private Byte floor;
 
+    @NotNull(message = "Area is required")
+    @DecimalMin(value = "10.0", message = "Area must be at least 10.0 m²")
+    @DecimalMax(value = "1000.0", message = "Area must be at most 1000.0 m²")
+    @Digits(integer = 6, fraction = 2, message = "Area must be a valid decimal number")
     @Column(name = "Area", nullable = false, precision = 8, scale = 2)
     private BigDecimal area;
 
+    @NotBlank(message = "Room type is required")
     @Column(name = "RoomType", nullable = false, length = 50)
     private String roomType;
 
+    @NotNull(message = "Status is required")
     @Column(name = "Status", nullable = false)
     private Byte status = 0;
 
+    @NotNull(message = "Max occupancy is required")
+    @Min(value = 1, message = "Max occupancy must be at least 1")
+    @Max(value = 20, message = "Max occupancy must be at most 20")
     @Column(name = "MaxOccupancy", nullable = false)
     private Byte maxOccupancy = 4;
 

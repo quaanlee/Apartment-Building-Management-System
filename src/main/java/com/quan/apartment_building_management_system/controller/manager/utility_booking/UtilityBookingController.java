@@ -26,7 +26,7 @@ import java.util.Map;
 @RequestMapping("/manager/utility-bookings")
 public class UtilityBookingController {
 
-    private static final int PAGE_SIZE = 5;
+    private static final int PAGE_SIZE = 7;
 
     private final UtilityBookingService utilityBookingService;
     private final UtilityService utilityService;
@@ -173,6 +173,7 @@ public class UtilityBookingController {
     private String resolveSuccessMessage(Byte status) {
         if (status == null) return "Booking updated.";
         return switch (status) {
+            case 0  -> "Booking approval/rejection cancelled successfully.";
             case 1  -> "Booking approved successfully.";
             case 2  -> "Booking rejected successfully.";
             case 3  -> "Booking cancelled successfully.";

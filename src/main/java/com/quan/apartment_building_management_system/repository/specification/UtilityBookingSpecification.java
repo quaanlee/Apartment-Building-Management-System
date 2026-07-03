@@ -1,9 +1,6 @@
 package com.quan.apartment_building_management_system.repository.specification;
 
-import com.quan.apartment_building_management_system.entity.BillDetail;
 import com.quan.apartment_building_management_system.entity.UtilityBooking;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
@@ -26,10 +23,10 @@ public class UtilityBookingSpecification {
     }
 
     /** Filter by booking status. */
-    public static Specification<UtilityBooking> hasBookingStatus(Byte status) {
+    public static Specification<UtilityBooking> hasBookingStatus(Integer status) {
         return (root, query, cb) -> {
             if (status == null) return cb.conjunction();
-            return cb.equal(root.get("status"), status);
+            return cb.equal(root.get("status"), status.byteValue());
         };
     }
 
@@ -74,25 +71,19 @@ public class UtilityBookingSpecification {
     }
 
     /**
-     * Filter by payment status using an EXISTS subquery on BillDetail.
-     * "Paid"   → booking has at least one BillDetail whose Bill.status = 1
-     * "Unpaid" → booking has no such BillDetail
+     * Filter by payment status.
+     * "Paid"   → booking.paymentStatus = true
+     * "Unpaid" → booking.paymentStatus = false
      */
     public static Specification<UtilityBooking> hasPaymentStatus(String paymentStatus) {
         return (root, query, cb) -> {
             if (paymentStatus == null || paymentStatus.isBlank()) return cb.conjunction();
-
-            Subquery<Integer> sub = query.subquery(Integer.class);
-            Root<BillDetail> bdRoot = sub.from(BillDetail.class);
-            sub.select(bdRoot.get("billDetailId"))
-               .where(
-                   cb.equal(bdRoot.get("booking"), root),
-                   cb.equal(bdRoot.get("bill").get("status"), (byte) 1)
-               );
-
-            return "paid".equalsIgnoreCase(paymentStatus)
-                    ? cb.exists(sub)
-                    : cb.not(cb.exists(sub));
+            if ("paid".equalsIgnoreCase(paymentStatus)) {
+                return cb.equal(root.get("paymentStatus"), true);
+            } else if ("unpaid".equalsIgnoreCase(paymentStatus)) {
+                return cb.equal(root.get("paymentStatus"), false);
+            }
+            return cb.conjunction();
         };
     }
 }

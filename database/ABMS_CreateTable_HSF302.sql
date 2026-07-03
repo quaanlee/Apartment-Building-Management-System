@@ -153,6 +153,23 @@ CREATE TABLE Utility (
     Status      BIT             NOT NULL         DEFAULT 1   -- 1: Hoạt động | 0: Dừng
 );
 GO
+-- ============================================================
+-- 9.1 UtilityImage (Ảnh Tiện ích)
+-- ============================================================
+CREATE TABLE UtilityImage (
+    ImageID     INT           IDENTITY(1,1)   PRIMARY KEY,
+    UtilityID   INT           NOT NULL,                      -- Khóa ngoại liên kết với bảng Utility
+    ImageURL    NVARCHAR(500) NOT NULL,                      -- Đường dẫn lưu file ảnh (hoặc link CDN)
+    Caption     NVARCHAR(255) NULL,                          -- Mô tả ngắn cho bức ảnh (ví dụ: "Góc chính diện", "View ban đêm")
+    IsPrimary   BIT           NOT NULL         DEFAULT 0,    -- 1: Ảnh đại diện/Ảnh chính | 0: Ảnh phụ
+    CreatedDate DATETIME      NOT NULL         DEFAULT GETDATE(), -- Ngày đăng ảnh
+    
+    -- Tạo ràng buộc khóa ngoại để đảm bảo toàn vẹn dữ liệu
+    CONSTRAINT FK_UtilityImage_Utility FOREIGN KEY (UtilityID) 
+        REFERENCES Utility(UtilityID) 
+        ON DELETE CASCADE -- Nếu xóa tiện ích, tự động xóa hết ảnh liên quan
+);
+GO
 
 -- ============================================================
 -- 10. UtilityPrice (Cấu hình bảng giá tiện ích)
@@ -198,6 +215,7 @@ CREATE TABLE UtilityBooking (
     CreatedAt       DATETIME        NOT NULL         DEFAULT GETDATE(),
     CanceledAt      DATETIME        NULL,
     CancelReason    NVARCHAR(255)   NULL,
+    PaymentStatus   BIT             NOT NULL         DEFAULT 0,
 
     CONSTRAINT FK_Booking_Profile       FOREIGN KEY (ProfileID)      REFERENCES Profile(ProfileID),
     CONSTRAINT FK_Booking_Resource      FOREIGN KEY (ResourceID)     REFERENCES UtilityResource(ResourceID),

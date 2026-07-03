@@ -10,7 +10,7 @@ public class UtilityBookingDetailDto {
 
     // Booking meta
     private Integer bookingId;
-    private Byte bookingStatus;       // 0=Pending | 1=Approved | 2=Rejected | 3=Cancelled
+    private Integer bookingStatus;       // 0=Pending | 1=Approved | 2=Rejected | 3=Cancelled
 
     // Resident information
     private String residentFullName;
@@ -37,8 +37,8 @@ public class UtilityBookingDetailDto {
     public Integer getBookingId() { return bookingId; }
     public void setBookingId(Integer bookingId) { this.bookingId = bookingId; }
 
-    public Byte getBookingStatus() { return bookingStatus; }
-    public void setBookingStatus(Byte bookingStatus) { this.bookingStatus = bookingStatus; }
+    public Integer getBookingStatus() { return bookingStatus; }
+    public void setBookingStatus(Integer bookingStatus) { this.bookingStatus = bookingStatus; }
 
     public String getResidentFullName() { return residentFullName; }
     public void setResidentFullName(String residentFullName) { this.residentFullName = residentFullName; }

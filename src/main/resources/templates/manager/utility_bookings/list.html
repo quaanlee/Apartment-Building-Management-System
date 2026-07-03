@@ -46,13 +46,17 @@
         </div>
 
         <!-- ── Filter Bar ────────────────────────────────────────── -->
-        <div class="ub-filter-bar">
+        <form id="ubFilterForm" method="GET" th:action="@{/manager/utility-bookings}" class="ub-filter-bar">
+            <!-- Hidden input for pagination -->
+            <input type="hidden" id="ubFormPage" name="page" th:value="${currentPage}">
 
-            <!-- Search by resident name -->
+            <div class="ub-filter-grid">
+                <!-- Search by resident name -->
             <div class="ub-search-wrap">
                 <i class="fas fa-search"></i>
                 <input type="text"
                        id="ubSearch"
+                       name="residentName"
                        class="ub-search-input"
                        placeholder="Search residents..."
                        th:value="${filter.residentName}">
@@ -60,7 +64,7 @@
 
             <!-- Start Time date picker -->
             <div class="ub-date-wrap">
-                <button class="ub-date-btn" id="ubStartTimeBtn" data-for="ubStartTimePicker">
+                <button type="button" class="ub-date-btn" id="ubStartTimeBtn" data-for="ubStartTimePicker">
                     <i class="fas fa-calendar"></i>
                     <span id="ubStartTimeLabel" data-default="Start Time">Start Time</span>
                     <i class="fas fa-chevron-down" style="font-size:10px"></i>
@@ -69,23 +73,23 @@
                     <div class="ub-date-picker-row">
                         <div>
                             <label>From</label>
-                            <input type="date" id="ubStartTimeFrom" th:value="${filter.startTimeFrom}">
+                            <input type="date" id="ubStartTimeFrom" name="startTimeFrom" th:value="${filter.startTimeFrom}">
                         </div>
                         <div>
                             <label>To</label>
-                            <input type="date" id="ubStartTimeTo" th:value="${filter.startTimeTo}">
+                            <input type="date" id="ubStartTimeTo" name="startTimeTo" th:value="${filter.startTimeTo}">
                         </div>
                     </div>
                     <div class="ub-date-actions">
-                        <button class="ub-date-cancel">Clear</button>
-                        <button class="ub-date-apply">Apply</button>
+                        <button type="button" class="ub-date-cancel">Clear</button>
+                        <button type="button" class="ub-date-apply">Apply</button>
                     </div>
                 </div>
             </div>
 
             <!-- Created At date picker -->
             <div class="ub-date-wrap">
-                <button class="ub-date-btn" id="ubCreatedAtBtn" data-for="ubCreatedAtPicker">
+                <button type="button" class="ub-date-btn" id="ubCreatedAtBtn" data-for="ubCreatedAtPicker">
                     <i class="fas fa-clock"></i>
                     <span id="ubCreatedAtLabel" data-default="Created At">Created At</span>
                     <i class="fas fa-chevron-down" style="font-size:10px"></i>
@@ -94,22 +98,22 @@
                     <div class="ub-date-picker-row">
                         <div>
                             <label>From</label>
-                            <input type="date" id="ubCreatedAtFrom" th:value="${filter.createdAtFrom}">
+                            <input type="date" id="ubCreatedAtFrom" name="createdAtFrom" th:value="${filter.createdAtFrom}">
                         </div>
                         <div>
                             <label>To</label>
-                            <input type="date" id="ubCreatedAtTo" th:value="${filter.createdAtTo}">
+                            <input type="date" id="ubCreatedAtTo" name="createdAtTo" th:value="${filter.createdAtTo}">
                         </div>
                     </div>
                     <div class="ub-date-actions">
-                        <button class="ub-date-cancel">Clear</button>
-                        <button class="ub-date-apply">Apply</button>
+                        <button type="button" class="ub-date-cancel">Clear</button>
+                        <button type="button" class="ub-date-apply">Apply</button>
                     </div>
                 </div>
             </div>
 
             <!-- Booking Status filter -->
-            <select id="ubBookingStatus" class="ub-filter-select">
+            <select id="ubBookingStatus" name="bookingStatus" class="ub-filter-select">
                 <option value="">Booking Status: All</option>
                 <option value="0" th:selected="${filter.bookingStatus != null && filter.bookingStatus == 0}">Pending</option>
                 <option value="1" th:selected="${filter.bookingStatus != null && filter.bookingStatus == 1}">Approved</option>
@@ -118,14 +122,14 @@
             </select>
 
             <!-- Payment Status filter -->
-            <select id="ubPaymentStatus" class="ub-filter-select">
+            <select id="ubPaymentStatus" name="paymentStatus" class="ub-filter-select">
                 <option value="">Payment Status: All</option>
                 <option value="paid"   th:selected="${'paid'.equals(filter.paymentStatus)}">Paid</option>
                 <option value="unpaid" th:selected="${'unpaid'.equals(filter.paymentStatus)}">Unpaid</option>
             </select>
 
             <!-- Utility filter -->
-            <select id="ubUtility" class="ub-filter-select">
+            <select id="ubUtility" name="utilityId" class="ub-filter-select">
                 <option value="">Utility: All</option>
                 <option th:each="u : ${utilities}"
                         th:value="${u.utilityId}"
@@ -133,8 +137,14 @@
                         th:selected="${filter.utilityId != null && filter.utilityId == u.utilityId}">
                 </option>
             </select>
-
-        </div><!-- end filter bar -->
+                <!-- Clear Filter Button -->
+                <div style="grid-column: 4;">
+                    <button type="button" id="ubBtnClearFilters" class="ub-btn-clear-filters">
+                        <i class="fas fa-filter-circle-xmark"></i> Clear Filters
+                    </button>
+                </div>
+            </div><!-- end filter grid -->
+        </form><!-- end filter bar -->
 
         <!-- ── Table ─────────────────────────────────────────────── -->
         <div class="ub-table-card">
@@ -236,8 +246,19 @@
                     Showing <span th:text="${bookings.size()}">0</span> of
                     <span th:text="${totalElements}">0</span> bookings
                 </span>
-                <div class="ub-pagination" id="ubPagination">
-                    <!-- Rendered by JS -->
+                <div class="ub-pagination" id="ubPagination" th:if="${totalPages > 1}">
+                    <button type="button" class="ub-page-btn" th:disabled="${currentPage == 0}" th:data-page="${currentPage - 1}">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    
+                    <button type="button" class="ub-page-btn" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:classappend="${currentPage == i ? 'active' : ''}"
+                            th:data-page="${i}"
+                            th:text="${i + 1}"></button>
+
+                    <button type="button" class="ub-page-btn" th:disabled="${currentPage == totalPages - 1}" th:data-page="${currentPage + 1}">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
             </div>
         </div><!-- end table card -->

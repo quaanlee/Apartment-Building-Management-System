@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/admin/layout :: admin-layout(~{::main}, 'building')}">
+<head>
+    <title>Unit Details</title>
+</head>
+<body>
+
+<main>
+    <!-- Link custom stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/manager/apartment/building-management.css}">
+
+    <div class="detail-header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div class="detail-title" style="font-size: 24px; font-weight: 700; color: var(--text-primary);">
+            Unit Details: <span th:text="${apartment.apartmentNumber}">A-405</span>
+        </div>
+        <a th:href="@{/admin/apartments}" class="cancel-btn" style="display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="detail-wrapper" style="padding: 0; min-height: auto; background: none; display: block;">
+        <div class="detail-card" style="width: 100%; box-sizing: border-box;">
+
+            <!-- Main Detail Layout with Flex/Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                <!-- Images Panel -->
+                <div>
+                    <div class="apartment-image-box">
+                        <img src="https://file4.batdongsan.com.vn/2026/06/15/20260615174054-60b1_wm.jpg" alt="Unit image 1">
+                    </div>
+                    <div class="apartment-image-box" style="margin-bottom: 0;">
+                        <img src="https://file4.batdongsan.com.vn/2026/06/15/20260615174054-e86b_wm.jpg" alt="Unit image 2">
+                    </div>
+                </div>
+
+                <!-- Info Panel -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="info-grid" style="grid-template-columns: 1fr; gap: 12px; margin-top: 0;">
+                        <div class="info-box">
+                            <span class="label">ROOM TYPE</span>
+                            <span class="value" th:text="${apartment.roomType}">3 Bedrooms</span>
+                        </div>
+
+                        <div class="info-box">
+                            <span class="label">AREA</span>
+                            <span class="value" th:text="${apartment.area + ' m²'}">78.00 m²</span>
+                        </div>
+
+                        <div class="info-box">
+                            <span class="label">MAX OCCUPANCY</span>
+                            <span class="value" th:text="${apartment.maxOccupancy + ' Persons'}">6 Persons</span>
+                        </div>
+                    </div>
+
+                    <div style="background: #F4F5F7; border-radius: var(--radius-md); padding: 16px; display: flex; align-items: center; gap: 12px;">
+                        <strong style="color: var(--text-primary); font-size: 14px;">STATUS:</strong>
+                        <span th:if="${apartment.status == 0}" class="badge vacant">Vacant</span>
+                        <span th:if="${apartment.status == 1}" class="badge occupied">Occupied</span>
+                        <span th:if="${apartment.status == 2}" class="badge maintenance">Maintenance</span>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; gap: 12px; justify-content: flex-start;">
+                        <a th:href="@{/admin/apartments/assign/{id}(id=${apartment.apartmentId})}" class="save-btn" style="text-align: center;">
+                            <i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i> Assign Resident
+                        </a>
+                        <a th:href="@{/admin/apartments/edit/{id}(id=${apartment.apartmentId})}" class="cancel-btn" style="text-align: center; border: 1px solid var(--border-color);">
+                            <i class="fa-solid fa-pen" style="margin-right: 8px;"></i> Edit Unit
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Residents Section -->
+            <div style="margin-top: 32px;">
+                <h2 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-users" style="color: var(--primary-color);"></i> Current Residents
+                </h2>
+
+                <table class="detail-table">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="ra : ${residentApartments}">
+                        <td th:text="${ra.profile.fullName}">John Doe</td>
+                        <td th:text="${ra.profile.phoneNumber}">0123456789</td>
+                        <td th:text="${ra.profile.email}">john@example.com</td>
+                        <td class="actions">
+                            <a th:href="@{/admin/users/detail/{id}(id=${ra.profile.profileId})}" title="View Resident Detail">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(residentApartments)}">
+                        <td colspan="4" style="text-align: center; padding: 24px; color: var(--text-secondary);">
+                            No residents assigned to this apartment yet.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

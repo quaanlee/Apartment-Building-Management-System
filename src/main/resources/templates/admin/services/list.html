@@ -56,7 +56,7 @@
 
                 <!-- Card header: icon + status/type -->
                 <div class="service-card-header">
-                    <div th:class="'service-icon-box type-' + ${#strings.toLowerCase(service.serviceType)}">
+                    <div th:class="|service-icon-box type-${#strings.toLowerCase(service.serviceType)}|">
                         <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'electricity')}" class="fa-solid fa-bolt"></i>
                         <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'water')}" class="fa-solid fa-droplet"></i>
                         <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'cleaning')}" class="fa-solid fa-broom"></i>

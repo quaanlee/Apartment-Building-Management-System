@@ -11,7 +11,7 @@ public class UtilityBookingFilterRequest {
     private String startTimeTo;     // format: yyyy-MM-dd
     private String createdAtFrom;   // format: yyyy-MM-dd
     private String createdAtTo;     // format: yyyy-MM-dd
-    private Byte bookingStatus;     // null=All | 0=Pending | 1=Approved | 2=Rejected | 3=Cancelled
+    private Integer bookingStatus;     // null=All | 0=Pending | 1=Approved | 2=Rejected | 3=Cancelled
     private String paymentStatus;   // null=All | "paid" | "unpaid"
     private Integer utilityId;
     private int page = 0;
@@ -34,8 +34,8 @@ public class UtilityBookingFilterRequest {
     public String getCreatedAtTo() { return createdAtTo; }
     public void setCreatedAtTo(String createdAtTo) { this.createdAtTo = createdAtTo; }
 
-    public Byte getBookingStatus() { return bookingStatus; }
-    public void setBookingStatus(Byte bookingStatus) { this.bookingStatus = bookingStatus; }
+    public Integer getBookingStatus() { return bookingStatus; }
+    public void setBookingStatus(Integer bookingStatus) { this.bookingStatus = bookingStatus; }
 
     public String getPaymentStatus() { return paymentStatus; }
     public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
