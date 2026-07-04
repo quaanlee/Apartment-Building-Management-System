@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="resident-layout(content, activeTab)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABMS Resident Portal</title>
+    <!-- CSS File (Thymeleaf dùng khi chạy Spring Boot) -->
+    <link rel="stylesheet" th:href="@{/css/layout/layout_resident.css}">
+    <!-- CSS File (Đường dẫn tương đối dùng để xem trực tiếp file HTML không cần server) -->
+    <link rel="stylesheet" href="../../../static/css/layout/layout_resident.css">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h1>ABMS Resident</h1>
+            <p>Resident Portal</p>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="sidebar-item" th:classappend="${activeTab == 'apartments' ? 'active' : ''}">
+                <a th:href="@{/resident/apartments}">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Apartments</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'services & utility' ? 'active' : ''}">
+                <a th:href="@{/resident/services}">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Services & Utility</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'maintenance' ? 'active' : ''}">
+                <a th:href="@{/resident/maintenance}">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    <span>Maintainance</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'billing' ? 'active' : ''}">
+                <a th:href="@{/resident/billing}">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Billing</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'payment' ? 'active' : ''}">
+                <a th:href="@{/resident/payment}">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Payment</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'booking' ? 'active' : ''}">
+                <a th:href="@{/resident/booking}">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Booking</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'vehicles' ? 'active' : ''}">
+                <a th:href="@{/resident/vehicles}">
+                    <i class="fa-solid fa-car"></i>
+                    <span>Vehical</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'notification' ? 'active' : ''}">
+                <a th:href="@{/resident/notifications}">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>Notification</span>
+                </a>
+            </li>
+
+        </ul>
+
+        <div class="sidebar-footer">
+            <a th:href="@{/logout}" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- Main Panel (Header + Main Content) -->
+    <div class="main-panel">
+
+        <!-- Header Section -->
+        <header class="header">
+            <!-- Page Title Area -->
+            <div class="header-title-area">
+                <button class="sidebar-toggle-btn" id="sidebarToggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <span class="header-page-title" th:text="${pageTitle != null ? pageTitle : 'Resident Dashboard'}">Resident Dashboard</span>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="header-actions">
+                <button class="icon-btn" title="Notifications">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="badge"></span>
+                </button>
+
+                <a th:href="@{/resident/profile}" class="user-profile-trigger" id="userProfileTrigger" style="text-decoration: none;">
+                    <div class="user-avatar-placeholder">R</div>
+                    <span class="user-role">Resident</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Page Content Insertion -->
+        <main class="content-container">
+            <div th:replace="${content}">
+                <!-- Page content will be injected here -->
+            </div>
+        </main>
+
+    </div>
+
+</div>
+
+<!-- Toast Notification Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Toast message data bridge for external layout_resident.js script -->
+<div id="toastMessageData"
+     th:if="${message != null}"
+     th:data-message="${message}"
+     th:data-type="${messageType != null ? messageType : 'success'}"
+     style="display: none;"></div>
+
+<!-- JS File (Thymeleaf dùng khi chạy Spring Boot) -->
+<script th:src="@{/js/layout/layout_resident.js}"></script>
+<!-- JS File (Đường dẫn tương đối dùng để xem trực tiếp file HTML không cần server) -->
+<script src="../../../static/js/layout/layout_resident.js"></script>
+</body>
+</html>
