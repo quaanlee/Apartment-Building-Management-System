@@ -43,15 +43,13 @@
 
                 <form th:action="@{/login}" method="POST">
 
-                    <!-- Email Address Field -->
+                    <!-- Username Field -->
                     <div class="form-group">
-                        <label for="email" class="form-label">Email Address</label>
+                        <label for="username" class="form-label">Username</label>
                         <div class="input-container">
                             <i data-lucide="mail" class="input-icon"></i>
-                            <input type="email" id="email" name="username" class="form-input"
-                                placeholder="name@example.com" required autocomplete="email"
-                                pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}"
-                                title="Please enter a valid email address (e.g. name@example.com)">
+                            <input type="text" id="username" name="username" class="form-input"
+                                placeholder="Enter your username" required autocomplete="username">
                         </div>
                     </div>
 

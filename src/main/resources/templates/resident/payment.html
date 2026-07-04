@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/resident/layout_resident :: resident-layout(~{::main}, 'payment')}">
+<head>
+    <title>Payment History</title>
+</head>
+<body>
+<main th:fragment="content">
+    <link rel="stylesheet" th:href="@{/css/resident/payment.css}">
+
+    <div class="page-header">
+        <h2 class="page-title">Payment History</h2>
+        <p class="page-subtitle">All your past transactions and payment records</p>
+    </div>
+
+    <!-- Error Alert -->
+    <div th:if="${error}" class="alert alert-danger" style="background-color: #FDE8E8; color: #9B1C1C; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span th:text="${error}">An error occurred</span>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+        <div class="summary-card green">
+            <div class="summary-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="summary-body">
+                <span class="summary-label">Total Paid</span>
+                <span class="summary-value" th:text="${#numbers.formatDecimal(totalPaid, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</span>
+            </div>
+        </div>
+        <div class="summary-card blue">
+            <div class="summary-icon"><i class="fa-solid fa-calendar-day"></i></div>
+            <div class="summary-body">
+                <span class="summary-label">Paid This Month</span>
+                <span class="summary-value" th:text="${#numbers.formatDecimal(paidThisMonth, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</span>
+            </div>
+        </div>
+        <div class="summary-card orange">
+            <div class="summary-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="summary-body">
+                <span class="summary-label">Pending / Failed</span>
+                <span class="summary-value" th:text="${pendingOrFailed + ' txn'}">0 txn</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <a th:href="@{/resident/payment}" th:classappend="${activeStatus == null ? 'active' : ''}">All</a>
+        <a th:href="@{/resident/payment(status='success')}" th:classappend="${activeStatus == 'success' ? 'active' : ''}">Success</a>
+        <a th:href="@{/resident/payment(status='pending')}" th:classappend="${activeStatus == 'pending' ? 'active' : ''}">Pending</a>
+        <a th:href="@{/resident/payment(status='failed')}" th:classappend="${activeStatus == 'failed' ? 'active' : ''}">Failed</a>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="table-card">
+        <table class="payment-table">
+            <thead>
+                <tr>
+                    <th>Transaction Code</th>
+                    <th>Bill Period</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Payment Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${#lists.isEmpty(payments)}">
+                    <td colspan="6" class="no-data">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>No payment records found.</span>
+                    </td>
+                </tr>
+                <tr th:each="p : ${payments}">
+                    <td class="txn-code" th:text="${p.transactionCode != null ? p.transactionCode : 'N/A'}">N/A</td>
+                    <td th:text="${p.bill != null ? 'T' + p.bill.billMonth + '/' + p.bill.billYear : 'N/A'}">N/A</td>
+                    <td class="amount" th:text="${p.amount != null ? #numbers.formatDecimal(p.amount, 1, 'POINT', 0, 'COMMA') + ' VNĐ' : 'N/A'}">N/A</td>
+                    <td th:text="${p.paymentMethod != null ? p.paymentMethod.methodName : 'N/A'}">N/A</td>
+                    <td th:text="${p.paymentDate != null ? #temporals.format(p.paymentDate, 'dd/MM/yyyy HH:mm') : 'N/A'}">N/A</td>
+                    <td>
+                        <span class="status-badge"
+                              th:classappend="${p.status == 1 ? 'success' : (p.status == 2 ? 'failed' : 'pending')}"
+                              th:text="${p.status == 1 ? 'Success' : (p.status == 2 ? 'Failed' : 'Pending')}">Pending</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</main>
+</body>
+</html>
