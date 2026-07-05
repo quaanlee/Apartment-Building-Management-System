@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/resident/layout_resident :: resident-layout(~{::main}, 'billing')}">
+<head>
+    <title>Bill Details</title>
+</head>
+<body>
+<main th:fragment="content">
+    <link rel="stylesheet" th:href="@{/css/resident/billing.css}">
+
+    <div class="page-header">
+        <h2 class="page-title">Service Bill Details</h2>
+        <p class="page-subtitle">Review individual service item charges and transaction history</p>
+    </div>
+
+    <!-- Back and Pay Buttons -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <a th:href="@{/resident/billing}" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> Back to List
+        </a>
+        <div th:if="${bill.status == 0 || bill.status == 2}">
+            <a th:href="@{/payment/bill/{id}(id=${bill.billId})}" class="btn btn-success">
+                <i class="fa-solid fa-credit-card"></i> Pay This Bill
+            </a>
+        </div>
+    </div>
+
+    <!-- Detailed Invoice Sheet -->
+    <section class="invoice-sheet">
+        <div class="invoice-top">
+            <div class="invoice-brand">
+                <h1>ABMS APARTMENT</h1>
+                <p>Building Management Board Invoice Center</p>
+            </div>
+            <div class="text-right">
+                <div>
+                    <span class="status-badge"
+                          th:classappend="${bill.status == 1 ? 'paid' : (bill.status == 2 ? 'overdue' : 'unpaid')}"
+                          th:text="${bill.status == 1 ? 'Paid' : (bill.status == 2 ? 'Overdue' : 'Unpaid')}">Unpaid</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="invoice-meta">
+            <div>
+                <h4>Billed To</h4>
+                <p>
+                    <strong th:text="${ownerName}">Resident Name</strong><br>
+                    Apartment: <strong th:text="${apartment.apartmentNumber}">A-101</strong><br>
+                    Floor: <span th:text="${apartment.floor}">1</span>,
+                    Area: <span th:text="${apartment.area} + ' m²'">75.5 m²</span>
+                </p>
+            </div>
+            <div class="text-right">
+                <h4>Billing Details</h4>
+                <p>
+                    Billing Month: <strong th:text="${bill.billMonth} + '/' + ${bill.billYear}">06/2026</strong><br>
+                    Created Date: <span th:text="${bill.createdDate != null ? #temporals.format(bill.createdDate, 'dd/MM/yyyy') : 'N/A'}">01/06/2026</span><br>
+                    Due Date: <strong style="color: #EF4444;" th:text="${bill.dueDate != null ? #temporals.format(bill.dueDate, 'dd/MM/yyyy') : 'N/A'}">15/06/2026</strong><br>
+                    <span th:if="${bill.paidDate != null}">
+                        Paid Date: <strong style="color: #10B981;" th:text="${#temporals.format(bill.paidDate, 'dd/MM/yyyy HH:mm')}">12/06/2026 14:00</strong>
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Billing Items Table -->
+        <div class="table-card">
+            <table class="billing-table">
+                <thead>
+                    <tr>
+                        <th>Billing Item &amp; Description</th>
+                        <th class="right">Unit Price</th>
+                        <th class="right">Qty</th>
+                        <th class="right">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Exclude utility booking details by filtering th:if="${detail.booking == null}" -->
+                    <tr th:each="detail : ${bill.billDetails}" th:if="${detail.booking == null}">
+                        <td>
+                            <div class="detail-stack">
+                                <strong th:text="${detail.serviceItem.serviceName}">Management Fee</strong>
+                                <span th:text="${detail.description}">Monthly maintenance fee</span>
+                            </div>
+                        </td>
+                        <td class="right" th:text="${#numbers.formatDecimal(detail.serviceItem.unitPrice, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">$50.00</td>
+                        <td class="right" th:text="${#numbers.formatDecimal(detail.quantity, 1, 'POINT', 0, 'COMMA') + ' ' + (detail.serviceItem.unit != null ? detail.serviceItem.unit.unitName : '')}">1.00</td>
+                        <td class="right amount" th:text="${#numbers.formatDecimal(detail.amount, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">$50.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="invoice-total">
+            <div class="invoice-total-box">
+                <span class="invoice-total-label">Grand Total</span>
+                <span class="invoice-total-value" th:text="${#numbers.formatDecimal(bill.totalAmount, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</span>
+            </div>
+        </div>
+
+        <footer class="invoice-footer">
+            <p>Please contact the Building Management Board if you have questions about this invoice.</p>
+        </footer>
+    </section>
+
+</main>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package com.quan.apartment_building_management_system.controller;
+package com.quan.apartment_building_management_system.controller.resident.payment;
 
 import com.quan.apartment_building_management_system.entity.Account;
 import com.quan.apartment_building_management_system.service.PayOSService;
@@ -63,18 +63,29 @@ public class PaymentWebhookController {
     }
 
     /**
-     * Return page after successful payment — redirected here by PayOS.
+     * Return page after successful payment — redirected here by PayOS with ?orderCode=...&code=00
      */
     @GetMapping("/success")
-    public String paymentSuccess() {
-        return "resident/payment_success";
+    public String paymentSuccess(@RequestParam(required = false) Long orderCode,
+                                 @RequestParam(required = false) String code) {
+        if (orderCode != null) {
+            try {
+                payOSService.confirmPaymentFromReturn(orderCode, code);
+            } catch (Exception e) {
+                System.err.println("[PayOS Success Return Error] " + e.getMessage());
+            }
+        }
+        return "resident/payment/payment_success";
     }
 
     /**
-     * Return page when user cancels on PayOS checkout — redirected here by PayOS.
+     * Return page when user cancels on PayOS checkout — redirected here by PayOS with ?orderCode=...
      */
     @GetMapping("/cancel")
-    public String paymentCancel() {
-        return "resident/payment_cancel";
+    public String paymentCancel(@RequestParam(required = false) Long orderCode) {
+        if (orderCode != null) {
+            payOSService.confirmPaymentCancelled(orderCode);
+        }
+        return "resident/payment/payment_cancel";
     }
 }

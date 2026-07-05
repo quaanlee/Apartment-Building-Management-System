@@ -1,4 +1,4 @@
-package com.quan.apartment_building_management_system.controller;
+package com.quan.apartment_building_management_system.controller.resident.payment;
 
 import com.quan.apartment_building_management_system.entity.Account;
 import com.quan.apartment_building_management_system.entity.Payment;
@@ -72,6 +72,6 @@ public class ResidentPaymentController {
         model.addAttribute("pendingOrFailed", pendingOrFailed);
         model.addAttribute("activeStatus", status);
 
-        return "resident/payment";
+        return "resident/payment/payment";
     }
 }

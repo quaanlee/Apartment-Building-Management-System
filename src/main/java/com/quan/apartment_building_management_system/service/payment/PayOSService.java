@@ -3,18 +3,19 @@ package com.quan.apartment_building_management_system.service;
 import com.quan.apartment_building_management_system.entity.*;
 import com.quan.apartment_building_management_system.repository.*;
 
-import lombok.NonNull;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.payos.PayOS;
-import vn.payos.type.*;
+import vn.payos.model.v2.paymentRequests.CreatePaymentLinkRequest;
+import vn.payos.model.v2.paymentRequests.CreatePaymentLinkResponse;
+import vn.payos.model.v2.paymentRequests.PaymentLink;
+import vn.payos.model.v2.paymentRequests.PaymentLinkItem;
+import vn.payos.model.v2.paymentRequests.PaymentLinkStatus;
+import vn.payos.model.webhooks.WebhookData;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,10 +52,6 @@ public class PayOSService {
     /**
      * Creates a PayOS payment link for the given bill.
      * Returns the checkout URL to redirect the resident to.
-     *
-     * @param billId    ID of the bill to pay
-     * @param accountId ID of the resident's account
-     * @return PayOS checkout URL string
      */
     public String createPaymentLink(Integer billId, Integer accountId) throws Exception {
         Bill bill = billRepository.findById(billId)
@@ -64,51 +61,46 @@ public class PayOSService {
             throw new IllegalStateException("Bill is already paid or overdue-locked.");
         }
 
-        // Generate a completely unique order code using timestamp to prevent PayOS duplicate orderCode errors
-        long orderCode = System.currentTimeMillis();
+        long orderCode = System.currentTimeMillis() / 1000L;
+        long amount = bill.getTotalAmount().longValue();
 
-        // Amount must be in VND (integer, no decimal)
-        int amount = bill.getTotalAmount().intValue();
+        if (amount < 2000) {
+            throw new IllegalStateException("PayOS requires a minimum payment amount of 2000 VND.");
+        }
 
-        String description = "Bill T" + bill.getBillMonth() + "/" + bill.getBillYear()
-                + " - " + bill.getApartment().getApartmentNumber();
+        // PayOS description: alphanumeric only, max 25 characters
+        String description = ("Bill" + bill.getBillId()).replaceAll("[^a-zA-Z0-9]", "");
+        if (description.length() > 25) {
+            description = description.substring(0, 25);
+        }
 
-        // Build item list for PayOS checkout page display
-        List<ItemData> items = new ArrayList<>();
-        items.add(ItemData.builder()
+        PaymentLinkItem item = PaymentLinkItem.builder()
                 .name(description)
                 .quantity(1)
                 .price(amount)
-                .build());
+                .build();
 
-        // Create PayOS payment data
-        PaymentData paymentData = PaymentData.builder()
+        CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
                 .orderCode(orderCode)
                 .amount(amount)
                 .description(description)
-                .items(items)
+                .item(item)
                 .returnUrl(returnUrl)
                 .cancelUrl(cancelUrl)
                 .build();
 
-        // Call PayOS API
-        CheckoutResponseData response = payOS.createPaymentLink(paymentData);
+        CreatePaymentLinkResponse response = payOS.paymentRequests().create(paymentData);
 
-        // Save a PENDING Payment record immediately so we can track it
         saveInitialPaymentRecord(bill, accountId, String.valueOf(orderCode), new BigDecimal(amount));
 
         return response.getCheckoutUrl();
     }
 
-    /**
-     * Saves an initial PENDING payment record to the DB when a payment link is
-     * created.
-     */
     private void saveInitialPaymentRecord(Bill bill, Integer accountId, String orderCode, BigDecimal amount) {
-        // Avoid duplicate pending records for the same bill
         boolean exists = paymentRepository.findByTransactionCode(orderCode).isPresent();
-        if (exists)
+        if (exists) {
             return;
+        }
 
         PaymentMethod payOSMethod = paymentMethodRepository.findByMethodName("PayOS")
                 .orElseGet(() -> {
@@ -128,7 +120,7 @@ public class PayOSService {
         payment.setPaymentMethod(payOSMethod);
         payment.setTransactionCode(orderCode);
         payment.setAmount(amount);
-        payment.setStatus((byte) 0); // PENDING
+        payment.setStatus((byte) 0);
         payment.setPaymentDate(LocalDateTime.now());
         paymentRepository.save(payment);
     }
@@ -136,45 +128,76 @@ public class PayOSService {
     /**
      * Processes the PayOS webhook callback.
      * Verifies the signature via PayOS SDK, then updates Bill and Payment status.
-     *
-     * @param webhookBody Raw webhook payload from PayOS as Map
      */
     @Transactional
     public void processWebhook(Map<String, Object> webhookBody) throws Exception {
-        // Build Webhook object from raw map fields for SDK 1.0.3
-        String code = String.valueOf(webhookBody.getOrDefault("code", ""));
-        String desc = String.valueOf(webhookBody.getOrDefault("desc", ""));
-        String signature = String.valueOf(webhookBody.getOrDefault("signature", ""));
-        @SuppressWarnings("unchecked")
-        Map<String, Object> data = (Map<String, Object>) webhookBody.get("data");
-
-        Webhook webhook = Webhook.builder()
-                .code(code)
-                .desc(desc)
-                .data((@NonNull WebhookData) data)
-                .signature(signature)
-                .build();
-
-        WebhookData webhookData = payOS.verifyPaymentWebhookData(webhook);
+        WebhookData webhookData = payOS.webhooks().verify(webhookBody);
 
         long orderCode = webhookData.getOrderCode();
-        // PayOS sends code "00" for success
-        boolean isSuccess = "00".equals(String.valueOf(webhookBody.get("code")));
+        if ("00".equals(webhookData.getCode())) {
+            markPaymentSuccess(String.valueOf(orderCode));
+        } else {
+            markPaymentFailed(String.valueOf(orderCode));
+        }
+    }
 
-        // Update Payment record to SUCCESS or FAILED and update associated Bill status
-        paymentRepository.findByTransactionCode(String.valueOf(orderCode)).ifPresent(payment -> {
-            payment.setStatus(isSuccess ? (byte) 1 : (byte) 2);
-            if (isSuccess) {
-                payment.setPaymentDate(LocalDateTime.now());
-                
-                // Update associated Bill to PAID (1)
-                Bill bill = payment.getBill();
-                if (bill != null) {
-                    bill.setStatus((byte) 1);
-                    bill.setPaidDate(LocalDateTime.now());
-                    billRepository.save(bill);
-                }
+    /**
+     * Confirms payment when PayOS redirects the user back to returnUrl (no webhook/ngrok needed).
+     * PayOS appends orderCode and code=00 to the success URL.
+     */
+    @Transactional
+    public void confirmPaymentFromReturn(long orderCode, String code) throws Exception {
+        if (!"00".equals(code)) {
+            return;
+        }
+
+        try {
+            PaymentLink paymentLink = payOS.paymentRequests().get(orderCode);
+            PaymentLinkStatus status = paymentLink.getStatus();
+            if (status == PaymentLinkStatus.CANCELLED || status == PaymentLinkStatus.FAILED) {
+                return;
             }
+        } catch (Exception e) {
+            System.err.println("[PayOS Return Verify Warning] " + e.getMessage());
+        }
+
+        markPaymentSuccess(String.valueOf(orderCode));
+    }
+
+    /**
+     * Marks payment as cancelled when user is redirected to cancelUrl.
+     */
+    @Transactional
+    public void confirmPaymentCancelled(long orderCode) {
+        markPaymentFailed(String.valueOf(orderCode));
+    }
+
+    private void markPaymentSuccess(String orderCode) {
+        paymentRepository.findByTransactionCode(orderCode).ifPresent(payment -> {
+            if (payment.getStatus() != null && payment.getStatus() == 1) {
+                return;
+            }
+
+            payment.setStatus((byte) 1);
+            payment.setPaymentDate(LocalDateTime.now());
+
+            Bill bill = payment.getBill();
+            if (bill != null && bill.getStatus() != null && bill.getStatus() == 0) {
+                bill.setStatus((byte) 1);
+                bill.setPaidDate(LocalDateTime.now());
+                billRepository.save(bill);
+            }
+
+            paymentRepository.save(payment);
+        });
+    }
+
+    private void markPaymentFailed(String orderCode) {
+        paymentRepository.findByTransactionCode(orderCode).ifPresent(payment -> {
+            if (payment.getStatus() != null && payment.getStatus() == 1) {
+                return;
+            }
+            payment.setStatus((byte) 2);
             paymentRepository.save(payment);
         });
     }
