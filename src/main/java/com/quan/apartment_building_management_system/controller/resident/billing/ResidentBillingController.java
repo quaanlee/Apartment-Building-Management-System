@@ -7,6 +7,9 @@ import com.quan.apartment_building_management_system.entity.Profile;
 import com.quan.apartment_building_management_system.repository.BillRepository;
 import com.quan.apartment_building_management_system.repository.ProfileRepository;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,9 +36,12 @@ public class ResidentBillingController {
     }
 
     @GetMapping
-    public String viewBills(@RequestParam(required = false) Byte status,
-                            HttpSession session,
-                            Model model) {
+    public String viewBills(@RequestParam(required = false) String period,
+            @RequestParam(required = false) Byte status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            HttpSession session,
+            Model model) {
         Account currentUser = (Account) session.getAttribute("currentUser");
         if (currentUser == null) {
             return "redirect:/login";
@@ -43,11 +49,14 @@ public class ResidentBillingController {
 
         Optional<Profile> profileOpt = profileRepository.findByAccountAccountId(currentUser.getAccountId());
         if (profileOpt.isEmpty() || profileOpt.get().getApartment() == null) {
-            model.addAttribute("error", "Tài khoản của bạn chưa được liên kết với căn hộ nào. Vui lòng liên hệ Ban quản lý.");
+            model.addAttribute("error",
+                    "Tài khoản của bạn chưa được liên kết với căn hộ nào. Vui lòng liên hệ Ban quản lý.");
             model.addAttribute("bills", List.of());
             model.addAttribute("totalUnpaid", BigDecimal.ZERO);
             model.addAttribute("totalPaid", BigDecimal.ZERO);
             model.addAttribute("totalOverdue", BigDecimal.ZERO);
+            model.addAttribute("currentPage", 0);
+            model.addAttribute("totalPages", 0);
             return "resident/billing/list";
         }
 
@@ -56,52 +65,56 @@ public class ResidentBillingController {
         model.addAttribute("apartment", apartment);
         model.addAttribute("residentName", profile.getFullName());
 
-        List<Bill> rawBills = billRepository.findByApartmentApartmentId(apartment.getApartmentId());
-        List<Bill> bills = new ArrayList<>(rawBills);
+        // Parse YYYY-MM
+        Short year = null;
+        Byte month = null;
+        if (period != null && period.matches("\\d{4}-\\d{2}")) {
+            String[] parts = period.split("-");
+            year = Short.parseShort(parts[0]);
+            month = Byte.parseByte(parts[1]);
+        }
 
-        // Calculate summary metrics
-        BigDecimal totalUnpaid = bills.stream()
+        // Calculate summary metrics on all bills
+        List<Bill> allBills = billRepository.findByApartmentApartmentId(apartment.getApartmentId());
+        BigDecimal totalUnpaid = allBills.stream()
                 .filter(b -> b.getStatus() != null && b.getStatus() == 0)
                 .map(Bill::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalPaid = bills.stream()
+        BigDecimal totalPaid = allBills.stream()
                 .filter(b -> b.getStatus() != null && b.getStatus() == 1)
                 .map(Bill::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalOverdue = bills.stream()
+        BigDecimal totalOverdue = allBills.stream()
                 .filter(b -> b.getStatus() != null && b.getStatus() == 2)
                 .map(Bill::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Apply status filter if present
-        if (status != null) {
-            bills = bills.stream()
-                    .filter(b -> b.getStatus() != null && b.getStatus().equals(status))
-                    .collect(Collectors.toList());
-        }
+        // Retrieve paginated & filtered bills
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Bill> billPage = billRepository.findByApartmentAndFilter(
+                apartment.getApartmentId(), status, month, year, pageable);
 
-        // Sort bills so that the newest billing month/year is first
-        bills.sort((b1, b2) -> {
-            int yearCompare = Short.compare(b2.getBillYear(), b1.getBillYear());
-            if (yearCompare != 0) return yearCompare;
-            return Byte.compare(b2.getBillMonth(), b1.getBillMonth());
-        });
+        model.addAttribute("bills", billPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", billPage.getTotalPages());
+        model.addAttribute("totalItems", billPage.getTotalElements());
+        model.addAttribute("size", size);
+        model.addAttribute("period", period);
+        model.addAttribute("activeStatus", status);
 
-        model.addAttribute("bills", bills);
         model.addAttribute("totalUnpaid", totalUnpaid);
         model.addAttribute("totalPaid", totalPaid);
         model.addAttribute("totalOverdue", totalOverdue);
-        model.addAttribute("activeStatus", status);
 
         return "resident/billing/list";
     }
 
     @GetMapping("/detail/{billId}")
     public String viewBillDetail(@PathVariable Integer billId,
-                                 HttpSession session,
-                                 Model model) {
+            HttpSession session,
+            Model model) {
         Account currentUser = (Account) session.getAttribute("currentUser");
         if (currentUser == null) {
             return "redirect:/login";
@@ -127,7 +140,6 @@ public class ResidentBillingController {
         }
 
         model.addAttribute("bill", bill);
-        model.addAttribute("ownerName", profile.getFullName());
         model.addAttribute("apartment", apartment);
 
         return "resident/billing/detail";

@@ -186,3 +186,54 @@
     background: #FEE2E2;
     color: #9B1C1C;
 }
+
+/* Button Classes */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.btn-secondary {
+    background: #fff;
+    color: #374151;
+    border-color: #D1D5DB;
+}
+
+.btn-secondary:hover {
+    background: #F9FAFB;
+    border-color: #9CA3AF;
+}
+
+.btn-primary {
+    background: #582BE8;
+    color: #fff;
+    border-color: #582BE8;
+}
+
+.btn-primary:hover {
+    background: #4622C4;
+}
+
+.btn-success {
+    background: #10B981;
+    color: #fff;
+    border-color: #10B981;
+}
+
+.btn-success:hover {
+    background: #059669;
+}

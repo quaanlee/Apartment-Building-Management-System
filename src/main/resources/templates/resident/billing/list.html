@@ -45,11 +45,22 @@
     </div>
 
     <!-- Filter Bar -->
-    <div class="filter-bar" th:if="${apartment != null}">
-        <a th:href="@{/resident/billing}" th:classappend="${activeStatus == null ? 'active' : ''}">All</a>
-        <a th:href="@{/resident/billing(status=0)}" th:classappend="${activeStatus == 0 ? 'active' : ''}">Unpaid</a>
-        <a th:href="@{/resident/billing(status=1)}" th:classappend="${activeStatus == 1 ? 'active' : ''}">Paid</a>
-        <a th:href="@{/resident/billing(status=2)}" th:classappend="${activeStatus == 2 ? 'active' : ''}">Overdue</a>
+    <div class="filter-bar" th:if="${apartment != null}" style="display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
+        <div class="status-filters" style="display: flex; gap: 8px;">
+            <a th:href="@{/resident/billing(status='', period=${period})}" th:classappend="${activeStatus == null ? 'active' : ''}">All</a>
+            <a th:href="@{/resident/billing(status=0, period=${period})}" th:classappend="${activeStatus == 0 ? 'active' : ''}">Unpaid</a>
+            <a th:href="@{/resident/billing(status=1, period=${period})}" th:classappend="${activeStatus == 1 ? 'active' : ''}">Paid</a>
+            <a th:href="@{/resident/billing(status=2, period=${period})}" th:classappend="${activeStatus == 2 ? 'active' : ''}">Overdue</a>
+        </div>
+        
+        <form th:action="@{/resident/billing}" method="get" class="search-form" style="display: flex; gap: 8px; align-items: center;">
+            <input type="hidden" name="status" th:value="${activeStatus}">
+            <label for="period" style="font-size: 14px; font-weight: 500; color: #4B5563;">Period:</label>
+            <input type="month" id="period" name="period" th:value="${period}" style="padding: 6px 12px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 14px; color: #374151; outline: none; transition: border-color 0.2s;" onchange="this.form.submit()">
+            <a th:if="${period != null && !period.isEmpty()}" th:href="@{/resident/billing(status=${activeStatus})}" class="btn btn-secondary btn-sm" style="padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; height: 34px; line-height: 1;">
+                <i class="fa-solid fa-xmark"></i> Clear
+            </a>
+        </form>
     </div>
 
     <!-- Bills Table -->
@@ -93,6 +104,39 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-bar" th:if="${apartment != null && totalPages > 1}" style="display: flex; justify-content: center; align-items: center; margin-top: 20px; padding: 10px 0;">
+        <div class="pagination-buttons" style="display: flex; gap: 6px;">
+            <!-- Previous Button -->
+            <a th:href="@{/resident/billing(page=${currentPage - 1}, status=${activeStatus}, period=${period})}"
+               th:if="${currentPage > 0}"
+               class="btn btn-secondary btn-sm" style="padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-chevron-left"></i> Prev
+            </a>
+            <span th:if="${currentPage == 0}" class="btn btn-secondary btn-sm disabled" style="padding: 6px 12px; border-radius: 6px; opacity: 0.5; cursor: not-allowed; pointer-events: none; display: inline-flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-chevron-left"></i> Prev
+            </span>
+
+            <!-- Page Numbers -->
+            <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:href="@{/resident/billing(page=${i}, status=${activeStatus}, period=${period})}"
+                   th:text="${i + 1}"
+                   th:classappend="${currentPage == i ? 'btn-primary' : 'btn-secondary'}"
+                   class="btn btn-sm" style="padding: 6px 12px; border-radius: 6px; min-width: 32px; text-align: center; font-weight: 500; display: inline-flex; align-items: center; justify-content: center;">1</a>
+            </th:block>
+
+            <!-- Next Button -->
+            <a th:href="@{/resident/billing(page=${currentPage + 1}, status=${activeStatus}, period=${period})}"
+               th:if="${currentPage < totalPages - 1}"
+               class="btn btn-secondary btn-sm" style="padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
+                Next <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <span th:if="${currentPage == totalPages - 1}" class="btn btn-secondary btn-sm disabled" style="padding: 6px 12px; border-radius: 6px; opacity: 0.5; cursor: not-allowed; pointer-events: none; display: inline-flex; align-items: center; justify-content: center;">
+                Next <i class="fa-solid fa-chevron-right"></i>
+            </span>
+        </div>
     </div>
 
 </main>

@@ -45,11 +45,26 @@
     </div>
 
     <!-- Filter Bar -->
-    <div class="filter-bar">
-        <a th:href="@{/resident/payment}" th:classappend="${activeStatus == null ? 'active' : ''}">All</a>
-        <a th:href="@{/resident/payment(status='success')}" th:classappend="${activeStatus == 'success' ? 'active' : ''}">Success</a>
-        <a th:href="@{/resident/payment(status='pending')}" th:classappend="${activeStatus == 'pending' ? 'active' : ''}">Pending</a>
-        <a th:href="@{/resident/payment(status='failed')}" th:classappend="${activeStatus == 'failed' ? 'active' : ''}">Failed</a>
+    <div class="filter-bar" style="display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
+        <div class="status-filters" style="display: flex; gap: 8px;">
+            <a th:href="@{/resident/payment(status='', startDate=${startDate}, endDate=${endDate})}" th:classappend="${activeStatus == null ? 'active' : ''}">All</a>
+            <a th:href="@{/resident/payment(status='success', startDate=${startDate}, endDate=${endDate})}" th:classappend="${activeStatus == 'success' ? 'active' : ''}">Success</a>
+            <a th:href="@{/resident/payment(status='pending', startDate=${startDate}, endDate=${endDate})}" th:classappend="${activeStatus == 'pending' ? 'active' : ''}">Pending</a>
+            <a th:href="@{/resident/payment(status='failed', startDate=${startDate}, endDate=${endDate})}" th:classappend="${activeStatus == 'failed' ? 'active' : ''}">Failed</a>
+        </div>
+        
+        <form th:action="@{/resident/payment}" method="get" class="search-form" style="display: flex; gap: 8px; align-items: center;">
+            <input type="hidden" name="status" th:value="${activeStatus}">
+            <label for="startDate" style="font-size: 14px; font-weight: 500; color: #4B5563;">From:</label>
+            <input type="date" id="startDate" name="startDate" th:value="${startDate}" style="padding: 6px 12px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 14px; color: #374151; outline: none; transition: border-color 0.2s;" onchange="this.form.submit()">
+            
+            <label for="endDate" style="font-size: 14px; font-weight: 500; color: #4B5563;">To:</label>
+            <input type="date" id="endDate" name="endDate" th:value="${endDate}" style="padding: 6px 12px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 14px; color: #374151; outline: none; transition: border-color 0.2s;" onchange="this.form.submit()">
+            
+            <a th:if="${(startDate != null && !startDate.isEmpty()) || (endDate != null && !endDate.isEmpty())}" th:href="@{/resident/payment(status=${activeStatus})}" class="btn btn-secondary btn-sm" style="padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; height: 34px; line-height: 1;">
+                <i class="fa-solid fa-xmark"></i> Clear
+            </a>
+        </form>
     </div>
 
     <!-- Transactions Table -->
@@ -61,13 +76,14 @@
                     <th>Bill Period</th>
                     <th>Amount</th>
                     <th>Method</th>
+                    <th>Paid By</th>
                     <th>Payment Date</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:if="${#lists.isEmpty(payments)}">
-                    <td colspan="6" class="no-data">
+                    <td colspan="7" class="no-data">
                         <i class="fa-solid fa-receipt"></i>
                         <span>No payment records found.</span>
                     </td>
@@ -77,6 +93,7 @@
                     <td th:text="${p.bill != null ? 'T' + p.bill.billMonth + '/' + p.bill.billYear : 'N/A'}">N/A</td>
                     <td class="amount" th:text="${p.amount != null ? #numbers.formatDecimal(p.amount, 1, 'POINT', 0, 'COMMA') + ' VNĐ' : 'N/A'}">N/A</td>
                     <td th:text="${p.paymentMethod != null ? p.paymentMethod.methodName : 'N/A'}">N/A</td>
+                    <td th:text="${p.paidBy != null ? (p.paidBy.profile != null ? p.paidBy.profile.fullName : p.paidBy.username) : 'N/A'}">N/A</td>
                     <td th:text="${p.paymentDate != null ? #temporals.format(p.paymentDate, 'dd/MM/yyyy HH:mm') : 'N/A'}">N/A</td>
                     <td>
                         <span class="status-badge"
@@ -86,6 +103,39 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-bar" th:if="${totalPages > 1}" style="display: flex; justify-content: center; align-items: center; margin-top: 20px; padding: 10px 0;">
+        <div class="pagination-buttons" style="display: flex; gap: 6px;">
+            <!-- Previous Button -->
+            <a th:href="@{/resident/payment(page=${currentPage - 1}, status=${activeStatus}, startDate=${startDate}, endDate=${endDate})}"
+               th:if="${currentPage > 0}"
+               class="btn btn-secondary btn-sm" style="padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-chevron-left"></i> Prev
+            </a>
+            <span th:if="${currentPage == 0}" class="btn btn-secondary btn-sm disabled" style="padding: 6px 12px; border-radius: 6px; opacity: 0.5; cursor: not-allowed; pointer-events: none; display: inline-flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-chevron-left"></i> Prev
+            </span>
+
+            <!-- Page Numbers -->
+            <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:href="@{/resident/payment(page=${i}, status=${activeStatus}, startDate=${startDate}, endDate=${endDate})}"
+                   th:text="${i + 1}"
+                   th:classappend="${currentPage == i ? 'btn-primary' : 'btn-secondary'}"
+                   class="btn btn-sm" style="padding: 6px 12px; border-radius: 6px; min-width: 32px; text-align: center; font-weight: 500; display: inline-flex; align-items: center; justify-content: center;">1</a>
+            </th:block>
+
+            <!-- Next Button -->
+            <a th:href="@{/resident/payment(page=${currentPage + 1}, status=${activeStatus}, startDate=${startDate}, endDate=${endDate})}"
+               th:if="${currentPage < totalPages - 1}"
+               class="btn btn-secondary btn-sm" style="padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
+                Next <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <span th:if="${currentPage == totalPages - 1}" class="btn btn-secondary btn-sm disabled" style="padding: 6px 12px; border-radius: 6px; opacity: 0.5; cursor: not-allowed; pointer-events: none; display: inline-flex; align-items: center; justify-content: center;">
+                Next <i class="fa-solid fa-chevron-right"></i>
+            </span>
+        </div>
     </div>
 
 </main>

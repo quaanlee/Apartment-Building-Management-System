@@ -1,4 +1,4 @@
-package com.quan.apartment_building_management_system.service;
+package com.quan.apartment_building_management_system.service.payment;
 
 import com.quan.apartment_building_management_system.entity.*;
 import com.quan.apartment_building_management_system.repository.*;
@@ -200,5 +200,11 @@ public class PayOSService {
             payment.setStatus((byte) 2);
             paymentRepository.save(payment);
         });
+    }
+
+    public Integer getBillIdByOrderCode(String orderCode) {
+        return paymentRepository.findByTransactionCode(orderCode)
+                .map(payment -> payment.getBill() != null ? payment.getBill().getBillId() : null)
+                .orElse(null);
     }
 }

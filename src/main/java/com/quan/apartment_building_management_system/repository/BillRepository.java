@@ -83,6 +83,17 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
     @Query("SELECT s.serviceType as type, SUM(bd.amount) as total FROM BillDetail bd JOIN bd.serviceItem s JOIN bd.bill b WHERE (:fromYear IS NULL OR b.billYear > :fromYear OR (b.billYear = :fromYear AND b.billMonth >= :fromMonth)) AND (:toYear IS NULL OR b.billYear < :toYear OR (b.billYear = :toYear AND b.billMonth <= :toMonth)) AND (:status IS NULL OR b.status = :status) AND (:revenueType IS NULL OR s.serviceType = :revenueType) AND (:month IS NULL OR b.billMonth = :month) GROUP BY s.serviceType ORDER BY SUM(bd.amount) DESC")
     List<Object[]> sumByServiceType(@Param("fromYear") Integer fromYear, @Param("fromMonth") Integer fromMonth, @Param("toYear") Integer toYear, @Param("toMonth") Integer toMonth, @Param("status") Byte status, @Param("revenueType") String revenueType, @Param("month") Byte month);
+
+    @Query("SELECT b FROM Bill b WHERE b.apartment.apartmentId = :apartmentId " +
+           "AND (:status IS NULL OR b.status = :status) " +
+           "AND (:month IS NULL OR b.billMonth = :month) " +
+           "AND (:year IS NULL OR b.billYear = :year) " +
+           "ORDER BY b.billYear DESC, b.billMonth DESC")
+    Page<Bill> findByApartmentAndFilter(@Param("apartmentId") Integer apartmentId,
+                                       @Param("status") Byte status,
+                                       @Param("month") Byte month,
+                                       @Param("year") Short year,
+                                       Pageable pageable);
 }
 
 

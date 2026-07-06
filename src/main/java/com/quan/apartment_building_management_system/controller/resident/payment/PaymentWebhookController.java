@@ -1,7 +1,7 @@
 package com.quan.apartment_building_management_system.controller.resident.payment;
 
 import com.quan.apartment_building_management_system.entity.Account;
-import com.quan.apartment_building_management_system.service.PayOSService;
+import com.quan.apartment_building_management_system.service.payment.PayOSService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -67,25 +67,45 @@ public class PaymentWebhookController {
      */
     @GetMapping("/success")
     public String paymentSuccess(@RequestParam(required = false) Long orderCode,
-                                 @RequestParam(required = false) String code) {
+                                 @RequestParam(required = false) String code,
+                                 RedirectAttributes redirectAttributes) {
+        Integer billId = null;
         if (orderCode != null) {
             try {
                 payOSService.confirmPaymentFromReturn(orderCode, code);
+                billId = payOSService.getBillIdByOrderCode(String.valueOf(orderCode));
             } catch (Exception e) {
                 System.err.println("[PayOS Success Return Error] " + e.getMessage());
             }
         }
-        return "resident/payment/payment_success";
+        redirectAttributes.addFlashAttribute("message", "Thanh toán hóa đơn thành công!");
+        redirectAttributes.addFlashAttribute("messageType", "success");
+        if (billId != null) {
+            return "redirect:/resident/billing/detail/" + billId;
+        }
+        return "redirect:/resident/billing";
     }
 
     /**
      * Return page when user cancels on PayOS checkout — redirected here by PayOS with ?orderCode=...
      */
     @GetMapping("/cancel")
-    public String paymentCancel(@RequestParam(required = false) Long orderCode) {
+    public String paymentCancel(@RequestParam(required = false) Long orderCode,
+                                RedirectAttributes redirectAttributes) {
+        Integer billId = null;
         if (orderCode != null) {
-            payOSService.confirmPaymentCancelled(orderCode);
+            try {
+                payOSService.confirmPaymentCancelled(orderCode);
+                billId = payOSService.getBillIdByOrderCode(String.valueOf(orderCode));
+            } catch (Exception e) {
+                System.err.println("[PayOS Cancel Return Error] " + e.getMessage());
+            }
         }
-        return "resident/payment/payment_cancel";
+        redirectAttributes.addFlashAttribute("message", "Giao dịch thanh toán đã bị hủy.");
+        redirectAttributes.addFlashAttribute("messageType", "warning");
+        if (billId != null) {
+            return "redirect:/resident/billing/detail/" + billId;
+        }
+        return "redirect:/resident/billing";
     }
 }
