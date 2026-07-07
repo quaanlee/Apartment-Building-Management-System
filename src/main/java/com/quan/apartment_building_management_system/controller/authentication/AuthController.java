@@ -102,10 +102,10 @@ public class AuthController {
     @GetMapping("/maintainer/dashboard")
     public String maintainerDashboard(HttpSession session) {
         Account currentUser = (Account) session.getAttribute("currentUser");
-        if (currentUser == null || !"MAINTENANCE STAFF".equalsIgnoreCase(currentUser.getRole().getRoleName())) {
+        if (currentUser == null || !"MAINTENANCE_STAFF".equalsIgnoreCase(currentUser.getRole().getRoleName())) {
             return "redirect:/login";
         }
-        return "maintainer/dashboard";
+        return "redirect:/maintenance_staff/dashboard";
     }
 
     // ==========================================
@@ -309,7 +309,7 @@ public class AuthController {
             case "ADMIN"             -> "redirect:/admin/users";
             case "MANAGER"           -> "redirect:/manager/utility-bookings";
             case "RESIDENT"          -> "redirect:/resident/dashboard";
-            case "MAINTENANCE STAFF" -> "redirect:/maintainer/dashboard";
+            case "MAINTENANCE_STAFF" -> "redirect:/maintenance_staff/dashboard";
             default                  -> "redirect:/login";
         };
     }

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/maintenance/layout_maintenance :: maintenance-layout(~{::main}, 'history')}">
+<head>
+    <title>Task History - ABMS</title>
+</head>
+<body>
+
+<main class="tasks-page">
+    <div class="page-header">
+        <div>
+            <h2 th:text="${pageTitle}">Task History</h2>
+            <p>View a record of all the maintenance tasks you have completed.</p>
+        </div>
+    </div>
+
+    <div th:if="${tasks.empty}" class="empty-state" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+        <i class="fa-solid fa-clock-rotate-left" style="font-size: 48px; color: var(--border-color); margin-bottom: 16px;"></i>
+        <h3>No Completed Tasks</h3>
+        <p>You have not completed any tasks yet.</p>
+    </div>
+
+    <div class="task-grid" th:unless="${tasks.empty}">
+        <div th:each="task : ${tasks}" class="task-card" style="opacity: 0.85;">
+            <div class="task-header">
+                <span class="status-badge status-completed">Completed</span>
+            </div>
+            
+            <h3 class="task-title" th:text="${task.maintenanceRequest.title}">Fix Leaking Pipe</h3>
+            
+            <div class="task-meta">
+                <i class="fa-solid fa-location-dot"></i>
+                <span th:text="${task.maintenanceRequest.apartment.apartmentNumber} + ' (' + ${task.maintenanceRequest.profile.fullName} + ')'">Apt 101</span>
+            </div>
+            
+            <p class="task-desc" th:text="${task.maintenanceRequest.description}">Description of the problem</p>
+            
+            <div class="task-footer">
+                <a th:href="@{'/maintenance_staff/tasks/' + ${task.taskId}}" class="task-btn secondary">
+                    View History Report
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-block" th:if="${totalPages > 1}">
+        <div class="pagination-buttons">
+            <!-- Previous Button -->
+            <a th:href="@{/maintenance_staff/history(page=${currentPage - 1})}" 
+               class="pagination-btn" 
+               th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            
+            <!-- Page Numbers -->
+            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+               th:href="@{/maintenance_staff/history(page=${i})}" 
+               th:text="${i + 1}"
+               class="pagination-btn"
+               th:classappend="${i == currentPage} ? 'active' : ''">
+                1
+            </a>
+            
+            <!-- Next Button -->
+            <a th:href="@{/maintenance_staff/history(page=${currentPage + 1})}" 
+               class="pagination-btn" 
+               th:classappend="${currentPage + 1 == totalPages} ? 'disabled' : ''">
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

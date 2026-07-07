@@ -61,12 +61,32 @@ public class DatabaseInitializer implements CommandLineRunner {
         this.paymentRepository = paymentRepository;
     }
 
+    private void updateAccount(String oldUsername, String newUsername, String newPassword) {
+        accountRepository.findByUsername(oldUsername).ifPresent(account -> {
+            account.setUsername(newUsername);
+            account.setPassword(newPassword);
+            accountRepository.save(account);
+        });
+        // Also update password if they already use newUsername
+        accountRepository.findByUsername(newUsername).ifPresent(account -> {
+            account.setPassword(newPassword);
+            accountRepository.save(account);
+        });
+    }
+
     @Override
     @Transactional
     public void run(String... args) throws Exception {
         initializeOrUpdateUtilities();
 
         if (roleRepository.count() > 0) {
+            // Force update existing accounts to gmail format
+            updateAccount("admin", "admin@gmail.com", "admin123");
+            updateAccount("manager", "manager@gmail.com", "manager123");
+            updateAccount("staff", "staff@gmail.com", "staff123");
+            updateAccount("resident1", "resident1@gmail.com", "resident123");
+            updateAccount("resident2", "resident2@gmail.com", "resident123");
+            
             return; // Already initialized
         }
 
@@ -89,36 +109,36 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         // 2. Accounts
         Account adminAcc = new Account();
-        adminAcc.setUsername("admin");
-        adminAcc.setPassword("admin");
+        adminAcc.setUsername("admin@gmail.com");
+        adminAcc.setPassword("admin123");
         adminAcc.setRole(adminRole);
         adminAcc.setStatus(true);
         adminAcc = accountRepository.save(adminAcc);
 
         Account managerAcc = new Account();
-        managerAcc.setUsername("manager");
-        managerAcc.setPassword("manager");
+        managerAcc.setUsername("manager@gmail.com");
+        managerAcc.setPassword("manager123");
         managerAcc.setRole(managerRole);
         managerAcc.setStatus(true);
         managerAcc = accountRepository.save(managerAcc);
 
         Account residentAcc1 = new Account();
-        residentAcc1.setUsername("resident1");
-        residentAcc1.setPassword("resident1");
+        residentAcc1.setUsername("resident1@gmail.com");
+        residentAcc1.setPassword("resident123");
         residentAcc1.setRole(residentRole);
         residentAcc1.setStatus(true);
         residentAcc1 = accountRepository.save(residentAcc1);
 
         Account residentAcc2 = new Account();
-        residentAcc2.setUsername("resident2");
-        residentAcc2.setPassword("resident2");
+        residentAcc2.setUsername("resident2@gmail.com");
+        residentAcc2.setPassword("resident123");
         residentAcc2.setRole(residentRole);
         residentAcc2.setStatus(true);
         residentAcc2 = accountRepository.save(residentAcc2);
 
         Account staffAcc = new Account();
-        staffAcc.setUsername("staff");
-        staffAcc.setPassword("staff");
+        staffAcc.setUsername("staff@gmail.com");
+        staffAcc.setPassword("staff123");
         staffAcc.setRole(staffRole);
         staffAcc.setStatus(true);
         staffAcc = accountRepository.save(staffAcc);
