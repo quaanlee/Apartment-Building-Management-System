@@ -78,7 +78,7 @@ public class PaymentWebhookController {
                 System.err.println("[PayOS Success Return Error] " + e.getMessage());
             }
         }
-        redirectAttributes.addFlashAttribute("message", "Thanh toán hóa đơn thành công!");
+        redirectAttributes.addFlashAttribute("message", "Bill payment successfully!");
         redirectAttributes.addFlashAttribute("messageType", "success");
         if (billId != null) {
             return "redirect:/resident/billing/detail/" + billId;
@@ -101,7 +101,7 @@ public class PaymentWebhookController {
                 System.err.println("[PayOS Cancel Return Error] " + e.getMessage());
             }
         }
-        redirectAttributes.addFlashAttribute("message", "Giao dịch thanh toán đã bị hủy.");
+        redirectAttributes.addFlashAttribute("message", "Transaction has been canceled!");
         redirectAttributes.addFlashAttribute("messageType", "warning");
         if (billId != null) {
             return "redirect:/resident/billing/detail/" + billId;

@@ -7,6 +7,7 @@ import com.quan.apartment_building_management_system.entity.Profile;
 import com.quan.apartment_building_management_system.repository.BillRepository;
 import com.quan.apartment_building_management_system.repository.ProfileRepository;
 import jakarta.servlet.http.HttpSession;
+import com.quan.apartment_building_management_system.service.payment.PayOSService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,10 +30,12 @@ public class ResidentBillingController {
 
     private final BillRepository billRepository;
     private final ProfileRepository profileRepository;
+    private final PayOSService payOSService;
 
-    public ResidentBillingController(BillRepository billRepository, ProfileRepository profileRepository) {
+    public ResidentBillingController(BillRepository billRepository, ProfileRepository profileRepository, PayOSService payOSService) {
         this.billRepository = billRepository;
         this.profileRepository = profileRepository;
+        this.payOSService = payOSService;
     }
 
     @GetMapping
@@ -50,7 +53,7 @@ public class ResidentBillingController {
         Optional<Profile> profileOpt = profileRepository.findByAccountAccountId(currentUser.getAccountId());
         if (profileOpt.isEmpty() || profileOpt.get().getApartment() == null) {
             model.addAttribute("error",
-                    "Tài khoản của bạn chưa được liên kết với căn hộ nào. Vui lòng liên hệ Ban quản lý.");
+                    "Your account is not assigned any apartment!");
             model.addAttribute("bills", List.of());
             model.addAttribute("totalUnpaid", BigDecimal.ZERO);
             model.addAttribute("totalPaid", BigDecimal.ZERO);
@@ -64,6 +67,13 @@ public class ResidentBillingController {
         Apartment apartment = profile.getApartment();
         model.addAttribute("apartment", apartment);
         model.addAttribute("residentName", profile.getFullName());
+
+        // Sync pending payments with PayOS on page load
+        try {
+            payOSService.syncPendingPaymentsForApartment(apartment.getApartmentId());
+        } catch (Exception e) {
+            System.err.println("[ResidentBillingController Sync Warning] " + e.getMessage());
+        }
 
         // Parse YYYY-MM
         Short year = null;
@@ -127,6 +137,13 @@ public class ResidentBillingController {
 
         Profile profile = profileOpt.get();
         Apartment apartment = profile.getApartment();
+
+        // Sync pending payments with PayOS on page load
+        try {
+            payOSService.syncPendingPaymentsForApartment(apartment.getApartmentId());
+        } catch (Exception e) {
+            System.err.println("[ResidentBillingController Detail Sync Warning] " + e.getMessage());
+        }
 
         Optional<Bill> billOpt = billRepository.findById(billId);
         if (billOpt.isEmpty()) {

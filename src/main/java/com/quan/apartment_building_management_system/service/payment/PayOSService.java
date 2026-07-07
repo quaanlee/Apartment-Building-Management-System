@@ -1,7 +1,14 @@
 package com.quan.apartment_building_management_system.service.payment;
 
-import com.quan.apartment_building_management_system.entity.*;
-import com.quan.apartment_building_management_system.repository.*;
+import com.quan.apartment_building_management_system.entity.Account;
+import com.quan.apartment_building_management_system.entity.Apartment;
+import com.quan.apartment_building_management_system.entity.Bill;
+import com.quan.apartment_building_management_system.entity.Payment;
+import com.quan.apartment_building_management_system.entity.PaymentMethod;
+import com.quan.apartment_building_management_system.repository.AccountRepository;
+import com.quan.apartment_building_management_system.repository.BillRepository;
+import com.quan.apartment_building_management_system.repository.PaymentMethodRepository;
+import com.quan.apartment_building_management_system.repository.PaymentRepository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,6 +23,7 @@ import vn.payos.model.webhooks.WebhookData;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -80,6 +88,8 @@ public class PayOSService {
                 .price(amount)
                 .build();
 
+        long expiredAt = (System.currentTimeMillis() / 1000L) + (2 * 60); // Link expires in 10 minutes
+
         CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
                 .orderCode(orderCode)
                 .amount(amount)
@@ -87,6 +97,7 @@ public class PayOSService {
                 .item(item)
                 .returnUrl(returnUrl)
                 .cancelUrl(cancelUrl)
+                .expiredAt(expiredAt)
                 .build();
 
         CreatePaymentLinkResponse response = payOS.paymentRequests().create(paymentData);
@@ -142,7 +153,8 @@ public class PayOSService {
     }
 
     /**
-     * Confirms payment when PayOS redirects the user back to returnUrl (no webhook/ngrok needed).
+     * Confirms payment when PayOS redirects the user back to returnUrl (no
+     * webhook/ngrok needed).
      * PayOS appends orderCode and code=00 to the success URL.
      */
     @Transactional
@@ -206,5 +218,48 @@ public class PayOSService {
         return paymentRepository.findByTransactionCode(orderCode)
                 .map(payment -> payment.getBill() != null ? payment.getBill().getBillId() : null)
                 .orElse(null);
+    }
+
+    /**
+     * Synchronizes pending payments of an apartment with PayOS.
+     * Marks expired or cancelled links as FAILED (status 2).
+     */
+    @Transactional
+    public void syncPendingPaymentsForApartment(Integer apartmentId) {
+        List<Payment> pendingPayments = paymentRepository
+                .findByBillApartmentApartmentIdOrderByPaymentDateDesc(apartmentId);
+        if (pendingPayments == null || pendingPayments.isEmpty()) {
+            return;
+        }
+
+        LocalDateTime tenMinutesAgo = LocalDateTime.now().minusMinutes(10);
+
+        for (Payment p : pendingPayments) {
+            if (p.getStatus() == null || p.getStatus() != 0) {
+                continue;
+            }
+
+            // If it is older than 10 minutes, mark as failed directly to avoid unnecessary
+            // API calls
+            if (p.getPaymentDate() != null && p.getPaymentDate().isBefore(tenMinutesAgo)) {
+                markPaymentFailed(p.getTransactionCode());
+                continue;
+            }
+
+            try {
+                long orderCode = Long.parseLong(p.getTransactionCode());
+                PaymentLink paymentLink = payOS.paymentRequests().get(orderCode);
+                String statusStr = paymentLink.getStatus().toString();
+
+                if ("PAID".equals(statusStr)) {
+                    markPaymentSuccess(p.getTransactionCode());
+                } else if ("CANCELLED".equals(statusStr) || "EXPIRED".equals(statusStr) || "FAILED".equals(statusStr)) {
+                    markPaymentFailed(p.getTransactionCode());
+                }
+            } catch (Exception e) {
+                System.err.println(
+                        "[PayOS Sync Warning] For orderCode " + p.getTransactionCode() + ": " + e.getMessage());
+            }
+        }
     }
 }

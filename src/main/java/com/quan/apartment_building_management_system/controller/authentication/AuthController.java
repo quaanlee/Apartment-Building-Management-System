@@ -40,17 +40,17 @@ public class AuthController {
 
     @PostMapping("/login")
     public String handleLogin(
-            @RequestParam("username") String username,
+            @RequestParam("email") String email,
             @RequestParam("password") String password,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        if (username == null || username.trim().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Username or email cannot be empty.");
+        if (email == null || email.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Email cannot be empty.");
             return "redirect:/login";
         }
 
-        Optional<Account> accountOpt = accountService.findByUsername(username);
+        Optional<Account> accountOpt = accountService.findByEmail(email);
 
         if (accountOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Invalid email or password. Please try again.");

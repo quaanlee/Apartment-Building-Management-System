@@ -7,6 +7,7 @@ import com.quan.apartment_building_management_system.entity.Apartment;
 import com.quan.apartment_building_management_system.repository.PaymentRepository;
 import com.quan.apartment_building_management_system.repository.ProfileRepository;
 import jakarta.servlet.http.HttpSession;
+import com.quan.apartment_building_management_system.service.payment.PayOSService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,10 +31,12 @@ public class ResidentPaymentController {
 
     private final PaymentRepository paymentRepository;
     private final ProfileRepository profileRepository;
+    private final PayOSService payOSService;
 
-    public ResidentPaymentController(PaymentRepository paymentRepository, ProfileRepository profileRepository) {
+    public ResidentPaymentController(PaymentRepository paymentRepository, ProfileRepository profileRepository, PayOSService payOSService) {
         this.paymentRepository = paymentRepository;
         this.profileRepository = profileRepository;
+        this.payOSService = payOSService;
     }
 
     @GetMapping
@@ -49,7 +52,7 @@ public class ResidentPaymentController {
 
         Optional<Profile> profileOpt = profileRepository.findByAccountAccountId(currentUser.getAccountId());
         if (profileOpt.isEmpty() || profileOpt.get().getApartment() == null) {
-            model.addAttribute("error", "Tài khoản của bạn chưa được liên kết với căn hộ nào. Vui lòng liên hệ Ban quản lý.");
+            model.addAttribute("error", "Your account is not assigned any apartment!");
             model.addAttribute("payments", List.of());
             model.addAttribute("totalPaid", BigDecimal.ZERO);
             model.addAttribute("paidThisMonth", BigDecimal.ZERO);
@@ -60,6 +63,13 @@ public class ResidentPaymentController {
         }
 
         Apartment apartment = profileOpt.get().getApartment();
+
+        // Sync pending payments with PayOS on page load
+        try {
+            payOSService.syncPendingPaymentsForApartment(apartment.getApartmentId());
+        } catch (Exception e) {
+            System.err.println("[ResidentPaymentController Sync Warning] " + e.getMessage());
+        }
 
         // 1. Calculate overall summary statistics based on ALL payments
         List<Payment> allPayments = paymentRepository.findByBillApartmentApartmentIdOrderByPaymentDateDesc(apartment.getApartmentId());
@@ -90,6 +100,12 @@ public class ResidentPaymentController {
         LocalDateTime endDateTime = null;
         if (endDate != null && !endDate.isEmpty()) {
             endDateTime = LocalDate.parse(endDate).atTime(23, 59, 59);
+        }
+
+        if (startDateTime != null && endDateTime != null && startDateTime.isAfter(endDateTime)) {
+            model.addAttribute("error", "To Date must after From Date");
+            startDateTime = null;
+            endDateTime = null;
         }
 
         // 3. Status filter code
