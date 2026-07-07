@@ -7,41 +7,204 @@
 </head>
 <body>
 <div id="main-content">
-    <!-- Load Bootstrap 5 since this page relies on Bootstrap classes -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         #main-content { font-family: 'Inter', sans-serif; }
-        .stats-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); transition: transform 0.2s; }
-        .stats-card:hover { transform: translateY(-2px); }
-        .stats-card .number { font-size: 2rem; font-weight: 700; }
-        .stats-card .label { color: #6c757d; font-size: 0.9rem; }
-        .stats-card .icon { font-size: 2rem; opacity: 0.6; }
-        .search-box { border-radius: 8px; transition: all 0.3s; }
-        .search-box:focus { border-color: #582BE8; box-shadow: 0 0 0 3px rgba(88, 43, 232, 0.15); outline: none; }
-
-        /* Unified purple focus for all form elements in the filter row */
-        .form-control:focus, .form-select:focus {
-            border-color: #582BE8 !important;
-            box-shadow: 0 0 0 3px rgba(88, 43, 232, 0.15) !important;
+        
+        /* Stats Grid Layout */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
         }
-        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+        @media (max-width: 1024px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 576px) {
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Stats Card Component */
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            border: 1px solid #E5E7EB;
+            transition: transform 0.2s;
+        }
+        .stats-card:hover {
+            transform: translateY(-2px);
+        }
+        .stats-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1E1B4B;
+        }
+        .stats-card .label {
+            color: #6B7280;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stats-card .icon {
+            font-size: 2rem;
+            opacity: 0.8;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .progress-container {
+            background-color: #E5E7EB;
+            border-radius: 9999px;
+            overflow: hidden;
+            height: 6px;
+            width: 100%;
+            margin-top: 12px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #582BE8;
+            border-radius: 9999px;
+        }
+        
+        /* Card Component */
+        .card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            margin-bottom: 24px;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Filter Form Component */
+        .filter-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            align-items: flex-end;
+        }
+        @media (max-width: 768px) {
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input, .form-group select {
+            height: 38px;
+            padding: 0 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #582BE8;
+            box-shadow: 0 0 0 3px rgba(88, 43, 232, 0.15);
+            outline: none;
+        }
+        .input-group {
+            display: flex;
+            width: 100%;
+        }
+        .input-group input {
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+        .input-group button {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+            border: 1px solid #582BE8;
+            background: #582BE8;
+            color: white;
+            cursor: pointer;
+            padding: 0 16px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .input-group button:hover {
+            background: #4a22c9;
+        }
+        
+        /* Table Component */
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        .table th {
+            padding: 14px 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #F9FAFB;
+            border-bottom: 2px solid #E5E7EB;
+        }
+        .table td {
+            padding: 16px 20px;
+            border-top: 1px solid #E5E7EB;
+            font-size: 14px;
+            color: #1E1B4B;
+        }
+        .table tbody tr:hover td {
+            background-color: #FAFAFE;
+        }
+        
+        /* Badge Component */
+        .badge-block {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            background: #F3F4F6;
+            color: #374151;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
         .status-occupied { background: #F0EDFE; color: #582BE8; }
         .status-vacant { background: #e8f5e9; color: #2e7d32; }
         .status-maintenance { background: #fff3e0; color: #e65100; }
-        .pagination-custom .page-item.active .page-link { background-color: #582BE8; border-color: #582BE8; color: white; }
-        .pagination-custom .page-link { color: #582BE8; border-radius: 8px; margin: 0 3px; }
-        .table-hover tbody tr:hover { background-color: #f8f9fc; cursor: pointer; }
-        .table thead th { border-bottom: 2px solid #e3e6f0; color: #582BE8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* Override Bootstrap blue with Manager brand purple (#582BE8) */
-        .text-primary { color: #582BE8 !important; }
-        .bg-primary { background-color: #582BE8 !important; }
-        .btn-primary { background-color: #582BE8 !important; border-color: #582BE8 !important; }
-        .btn-primary:hover, .btn-primary:focus, .btn-primary:active { background-color: #4a22c9 !important; border-color: #4a22c9 !important; }
-        .progress-bar.bg-primary { background-color: #582BE8 !important; }
-
+        
         /* Actions buttons styled as circular outline icons */
         .actions {
             display: flex;
@@ -66,104 +229,152 @@
             color: #582BE8;
             border-color: #582BE8;
         }
+        
+        /* Pagination Component */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-top: 1px solid #E5E7EB;
+        }
+        .pagination {
+            display: flex;
+            list-style: none;
+            gap: 6px;
+            margin: 0;
+            padding: 0;
+        }
+        .pagination .page-item .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 36px;
+            min-width: 36px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            color: #582BE8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 0 8px;
+            transition: all 0.2s ease;
+        }
+        .pagination .page-item.active .page-link {
+            background: #582BE8;
+            color: white;
+            border-color: #582BE8;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #9CA3AF;
+            pointer-events: none;
+            background: #F3F4F6;
+            border-color: #E5E7EB;
+        }
+        .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+            background: #F0EDFE;
+            border-color: #582BE8;
+        }
+        
+        /* Utility Styles */
+        .text-primary { color: #582BE8 !important; }
+        .text-success { color: #2e7d32 !important; }
+        .text-warning { color: #e65100 !important; }
+        .text-center { text-align: center; }
+        .text-muted { color: #6B7280; }
+        .small { font-size: 12px; }
+        .mt-3 { margin-top: 12px; }
+        .mb-2 { margin-bottom: 8px; }
+        .d-block { display: block; }
+        .py-4 { padding-top: 24px; padding-bottom: 24px; }
     </style>
 
     <p class="text-muted small">Monitor and manage the status of all building units.</p>
 
     <!-- Statistics Cards -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-3 col-sm-6">
-            <div class="stats-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="number" th:text="${totalUnits != null ? totalUnits : 0}">0</div>
-                        <div class="label">TOTAL UNITS</div>
-                    </div>
-                    <div class="icon text-primary"><i class="fas fa-building"></i></div>
+    <div class="stats-row">
+        <div class="stats-card">
+            <div class="flex-between">
+                <div>
+                    <div class="number" th:text="${totalUnits != null ? totalUnits : 0}">0</div>
+                    <div class="label">TOTAL UNITS</div>
+                </div>
+                <div class="icon text-primary"><i class="fas fa-building"></i></div>
+            </div>
+        </div>
+        <div class="stats-card">
+            <div class="flex-between">
+                <div>
+                    <div class="number" th:text="${occupiedUnits != null ? occupiedUnits : 0}">0</div>
+                    <div class="label">OCCUPIED</div>
+                </div>
+                <div class="icon text-primary"><i class="fas fa-users"></i></div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar-fill"
+                     th:style="'width: ' + (${totalUnits != null && totalUnits > 0 ? (occupiedUnits * 100 / totalUnits) : 0}) + '%'">
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="stats-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="number" th:text="${occupiedUnits != null ? occupiedUnits : 0}">0</div>
-                        <div class="label">OCCUPIED</div>
-                    </div>
-                    <div class="icon text-primary"><i class="fas fa-users"></i></div>
+        <div class="stats-card">
+            <div class="flex-between">
+                <div>
+                    <div class="number text-success" th:text="${vacantUnits != null ? vacantUnits : 0}">0</div>
+                    <div class="label">VACANT</div>
                 </div>
-                <div class="mt-2">
-                    <div class="progress" style="height: 6px;">
-                        <div class="progress-bar bg-primary"
-                             th:style="'width: ' + (${totalUnits != null && totalUnits > 0 ? (occupiedUnits * 100 / totalUnits) : 0}) + '%'">
-                        </div>
-                    </div>
-                </div>
+                <div class="icon text-success"><i class="fas fa-door-open"></i></div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="stats-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="number text-success" th:text="${vacantUnits != null ? vacantUnits : 0}">0</div>
-                        <div class="label">VACANT</div>
-                    </div>
-                    <div class="icon text-success"><i class="fas fa-door-open"></i></div>
+        <div class="stats-card">
+            <div class="flex-between">
+                <div>
+                    <div class="number text-warning" th:text="${maintenanceUnits != null ? maintenanceUnits : 0}">0</div>
+                    <div class="label">MAINTENANCE</div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="stats-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="number text-warning" th:text="${maintenanceUnits != null ? maintenanceUnits : 0}">0</div>
-                        <div class="label">MAINTENANCE</div>
-                    </div>
-                    <div class="icon text-warning"><i class="fas fa-tools"></i></div>
-                </div>
+                <div class="icon text-warning"><i class="fas fa-tools"></i></div>
             </div>
         </div>
     </div>
 
     <!-- Search & Filter -->
-    <div class="card shadow-sm mb-4">
+    <div class="card">
         <div class="card-body">
-            <form th:action="@{/manager/apartments}" method="get" class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label small fw-bold text-muted">SEARCH</label>
-                    <input type="text" name="search" class="form-control form-control-sm search-box"
+            <form th:action="@{/manager/apartments}" method="get" class="filter-form">
+                <div class="form-group">
+                    <label>SEARCH</label>
+                    <input type="text" name="search" class="search-box"
                            placeholder="Search by Unit, Block, or Floor..."
                            th:value="${search}">
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold text-muted">FLOOR</label>
-                    <select name="floor" class="form-select form-select-sm">
+                <div class="form-group">
+                    <label>FLOOR</label>
+                    <select name="floor">
                         <option value="">All Floors</option>
                         <option th:each="i : ${#numbers.sequence(1, 30)}"
                                 th:value="${i}" th:text="${i}"
                                 th:selected="${floor == i}"></option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold text-muted">STATUS</label>
-                    <select name="status" class="form-select form-select-sm">
+                <div class="form-group">
+                    <label>STATUS</label>
+                    <select name="status">
                         <option value="">All Status</option>
                         <option value="0" th:selected="${status == 0}">Vacant</option>
                         <option value="1" th:selected="${status == 1}">Occupied</option>
                         <option value="2" th:selected="${status == 2}">Maintenance</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold text-muted">MIN AREA</label>
-                    <input type="number" name="minArea" class="form-control form-control-sm"
+                <div class="form-group">
+                    <label>MIN AREA</label>
+                    <input type="number" name="minArea"
                            placeholder="m²" th:value="${minArea}" step="0.01">
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold text-muted">MAX AREA</label>
+                <div class="form-group">
+                    <label>MAX AREA</label>
                     <div class="input-group">
-                        <input type="number" name="maxArea" class="form-control form-control-sm"
+                        <input type="number" name="maxArea"
                                placeholder="m²" th:value="${maxArea}" step="0.01">
-                        <button type="submit" class="btn btn-primary btn-sm">
+                        <button type="submit">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
@@ -173,10 +384,10 @@
     </div>
 
     <!-- Apartment Table -->
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
+    <div class="card">
+        <div class="card-body" style="padding: 0;">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table">
                     <thead>
                     <tr>
                         <th style="width: 50px;">#</th>
@@ -194,9 +405,9 @@
                     <tr th:each="apartment, stat : ${apartments}">
                         <td class="text-muted" th:text="${stat.index + 1 + currentPage * size}"></td>
                         <td><strong th:text="${apartment.apartmentNumber}"></strong></td>
-                        <td><span class="badge bg-light text-dark" th:text="${#strings.substring(apartment.apartmentNumber, 0, 1)}"></span></td>
+                        <td><span class="badge-block" th:text="${#strings.substring(apartment.apartmentNumber, 0, 1)}"></span></td>
                         <td th:text="${apartment.floor}"></td>
-                        <td><span class="badge bg-light text-dark" th:text="${apartment.roomType}"></span></td>
+                        <td><span class="badge-block" th:text="${apartment.roomType}"></span></td>
                         <td th:text="${apartment.area} + ' m²'"></td>
                         <td th:text="${apartment.occupancyDisplay}"></td>
                         <td>
@@ -216,7 +427,7 @@
                         <td colspan="9" class="text-center py-4">
                             <div class="text-muted">
                                 <i class="fas fa-building fa-2x mb-2 d-block"></i>
-                                <p class="mb-0">No apartments found</p>
+                                <p class="mb-2">No apartments found</p>
                                 <small>Try adjusting your search criteria</small>
                             </div>
                         </td>
@@ -226,16 +437,16 @@
             </div>
 
             <!-- Pagination -->
-            <div th:if="${totalPages > 0}" class="d-flex justify-content-between align-items-center p-3 border-top">
+            <div th:if="${totalPages > 0}" class="pagination-container">
                 <div>
-                        <span class="text-muted small">
-                            Showing <span th:text="${currentPage * size + 1}"></span>
-                            to <span th:text="${(currentPage + 1) * size > totalItems ? totalItems : (currentPage + 1) * size}"></span>
-                            of <span th:text="${totalItems}"></span> entries
-                        </span>
+                    <span class="text-muted small">
+                        Showing <span th:text="${currentPage * size + 1}"></span>
+                        to <span th:text="${(currentPage + 1) * size > totalItems ? totalItems : (currentPage + 1) * size}"></span>
+                        of <span th:text="${totalItems}"></span> entries
+                    </span>
                 </div>
                 <nav>
-                    <ul class="pagination pagination-custom mb-0">
+                    <ul class="pagination">
                         <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
                             <a class="page-link" th:href="@{/manager/apartments(search=${search}, floor=${floor}, status=${status}, minArea=${minArea}, maxArea=${maxArea}, page=${currentPage - 1}, size=${size}, sortBy=${sortBy}, direction=${direction})}">
                                 <i class="fas fa-chevron-left"></i>
@@ -248,7 +459,7 @@
                                th:text="${i + 1}"></a>
                         </li>
                         <li class="page-item" th:if="${currentPage + 1 < totalPages - 1 and currentPage + 2 < totalPages - 1}">
-                            <span class="page-link">...</span>
+                            <span class="page-link" style="border: none; background: none; color: #6B7280; pointer-events: none;">...</span>
                         </li>
                         <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
                             <a class="page-link" th:href="@{/manager/apartments(search=${search}, floor=${floor}, status=${status}, minArea=${minArea}, maxArea=${maxArea}, page=${currentPage + 1}, size=${size}, sortBy=${sortBy}, direction=${direction})}">

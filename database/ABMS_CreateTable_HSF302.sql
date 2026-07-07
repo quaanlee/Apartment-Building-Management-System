@@ -357,9 +357,10 @@ CREATE TABLE Notification (
     CreatedBy           INT             NOT NULL,
     CreatedAt           DATETIME        NOT NULL         DEFAULT GETDATE(),
     RelatedEntityType   NVARCHAR(50)    NULL,            -- Bill, Booking, Request, Vehicle,...
-    RelatedEntityID     INT             NULL,            -- ID bản ghi liên quan
-
-    CONSTRAINT FK_Notification_CreatedBy FOREIGN KEY (CreatedBy) REFERENCES Account(AccountID)
+    ReceiverID     INT             NULL,            -- ID bản ghi liên quan
+	Recipient           NVARCHAR(50)    NULL          -- ĐỐI ĐƯỢNG NHẬN: TOÀN BỘ, CHỦ HỘ, NHÂN VIÊN BẢO TRÌ,TÙY CHỌN CƯ DÂN RIÊNG,....
+    CONSTRAINT FK_Notification_CreatedBy FOREIGN KEY (CreatedBy) REFERENCES Account(AccountID),
+	CONSTRAINT FK_Notification_ReceiverID FOREIGN KEY (ReceiverID) REFERENCES Account(AccountID)
 );
 GO
 

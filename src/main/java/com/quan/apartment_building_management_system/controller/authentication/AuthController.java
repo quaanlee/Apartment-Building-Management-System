@@ -40,19 +40,24 @@ public class AuthController {
 
     @PostMapping("/login")
     public String handleLogin(
-            @RequestParam("username") String username,
+            @RequestParam("email") String email,
             @RequestParam("password") String password,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
+        System.out.println("================ login =================");
+        System.out.println("email: " + email);
+        System.out.println("password: " + password);
+        System.out.println("================ login =================");
 
-        if (username == null || !username.matches(EMAIL_REGEX)) {
-            redirectAttributes.addFlashAttribute("error", "Invalid email format. Please enter a valid email address.");
+        if (email == null || email.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Email cannot be empty.");
             return "redirect:/login";
         }
 
-        Optional<Account> accountOpt = accountService.findByUsername(username);
+        Optional<Account> accountOpt = accountService.findByUsername(email);
 
         if (accountOpt.isEmpty()) {
+            System.out.println("Account not found for email: " + email);
             redirectAttributes.addFlashAttribute("error", "Invalid email or password. Please try again.");
             return "redirect:/login";
         }
@@ -83,10 +88,13 @@ public class AuthController {
     @GetMapping("/admin/dashboard")
     public String adminDashboard(HttpSession session) {
         Account currentUser = (Account) session.getAttribute("currentUser");
-        if (currentUser == null) return "redirect:/login";
+        if (currentUser == null)
+            return "redirect:/login";
         String role = currentUser.getRole().getRoleName().toUpperCase();
-        if ("MANAGER".equals(role)) return "redirect:/manager/utility-bookings";
-        if (!"ADMIN".equals(role)) return "redirect:/login";
+        if ("MANAGER".equals(role))
+            return "redirect:/manager/utility-bookings";
+        if (!"ADMIN".equals(role))
+            return "redirect:/login";
         return "admin/dashboard";
     }
 
@@ -306,11 +314,11 @@ public class AuthController {
     private String getRedirectUrlForRole(Account account) {
         String roleName = account.getRole().getRoleName().toUpperCase();
         return switch (roleName) {
-            case "ADMIN"             -> "redirect:/admin/users";
-            case "MANAGER"           -> "redirect:/manager/utility-bookings";
-            case "RESIDENT"          -> "redirect:/resident/dashboard";
+            case "ADMIN" -> "redirect:/admin/users";
+            case "MANAGER" -> "redirect:/manager/utility-bookings";
+            case "RESIDENT" -> "redirect:/resident/dashboard";
             case "MAINTENANCE STAFF" -> "redirect:/maintainer/dashboard";
-            default                  -> "redirect:/login";
+            default -> "redirect:/login";
         };
     }
 }

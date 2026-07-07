@@ -3,6 +3,8 @@ package com.quan.apartment_building_management_system.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "MaintenanceRequest")

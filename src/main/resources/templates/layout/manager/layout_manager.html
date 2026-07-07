@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="manager-layout(content, activeTab)">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,125 +10,132 @@
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
 
-<div class="app-container">
+    <div class="app-container">
 
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            <h1>ABMS Manager</h1>
-            <p>Operations Portal</p>
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h1>ABMS Manager</h1>
+                <p>Operations Portal</p>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
+                    <a th:href="@{#}">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'profiles' ? 'active' : ''}">
+                    <a th:href="@{/manager/profiles}">
+                        <i class="fa-solid fa-address-book"></i>
+                        <span>Profiles Directory</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'apartments' ? 'active' : ''}">
+                    <a th:href="@{/manager/apartments}">
+                        <i class="fa-solid fa-building"></i>
+                        <span>Apartments</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'billing' ? 'active' : ''}">
+                    <a th:href="@{/manager/bills}">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <span>Billing & Payments</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'maintenance' ? 'active' : ''}">
+                    <a th:href="@{/manager/maintenance}">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                        <span>Maintenance</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'bookings' ? 'active' : ''}">
+                    <a th:href="@{/manager/utility-bookings}">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>Amenity Bookings</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'service_utility' ? 'active' : ''}">
+                    <a th:href="@{/manager/services}">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Service & Utility</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'revenue' ? 'active' : ''}">
+                    <a th:href="@{/manager/revenue}">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Revenue Report</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" th:classappend="${activeTab == 'vehicles' ? 'active' : ''}">
+                    <a th:href="@{#}">
+                        <i class="fa-solid fa-car"></i>
+                        <span>Vehicles</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a th:href="@{/logout}" class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+
+        </aside>
+
+        <!-- Main Panel (Header + Main Content) -->
+        <div class="main-panel">
+
+            <!-- Header Section -->
+            <header class="header">
+                <!-- Page Title Area -->
+                <div class="header-title-area">
+                    <button class="sidebar-toggle-btn" id="sidebarToggle">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <span class="header-page-title"
+                        th:text="${pageTitle != null ? pageTitle : 'Manager Dashboard'}">Manager Dashboard</span>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="header-actions">
+                    <button class="icon-btn" title="Notifications">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="badge"></span>
+                    </button>
+
+                    <a th:href="@{/manager/profiles}" class="user-profile-trigger" id="userProfileTrigger"
+                        style="text-decoration: none;">
+                        <div class="user-avatar-placeholder">M</div>
+                        <span class="user-role">Manager Staff</span>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Main Page Content Insertion -->
+            <main class="content-container">
+                <div th:replace="${content}">
+                    <!-- Page content will be injected here -->
+                </div>
+            </main>
+
         </div>
-
-        <ul class="sidebar-menu">
-            <li class="sidebar-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
-                <a th:href="@{#}">
-                    <i class="fas fa-th-large"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="sidebar-item" th:classappend="${activeTab == 'profiles' ? 'active' : ''}">
-                <a th:href="@{/manager/profiles}">
-                    <i class="fa-solid fa-address-book"></i>
-                    <span>Profiles Directory</span>
-                </a>
-            </li>
-            <li class="sidebar-item" th:classappend="${activeTab == 'apartments' ? 'active' : ''}">
-                <a th:href="@{/manager/apartments}">
-                    <i class="fa-solid fa-building"></i>
-                    <span>Apartments</span>
-                </a>
-            </li>
-            <li class="sidebar-item" th:classappend="${activeTab == 'billing' ? 'active' : ''}">
-                <a th:href="@{/manager/bills}">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                    <span>Billing & Payments</span>
-                </a>
-            </li>
-            <li class="sidebar-item" th:classappend="${activeTab == 'maintenance' ? 'active' : ''}">
-                <a th:href="@{/manager/maintenance}">
-                    <i class="fa-solid fa-screwdriver-wrench"></i>
-                    <span>Maintenance</span>
-                </a>
-            </li>
-            <li class="sidebar-item" th:classappend="${activeTab == 'bookings' ? 'active' : ''}">
-                <a th:href="@{/manager/utility-bookings}">
-                    <i class="fa-solid fa-calendar-check"></i>
-                    <span>Amenity Bookings</span>
-                </a>
-            </li>
-            <li class="sidebar-item" th:classappend="${activeTab == 'service & utility' ? 'active' : ''}">
-                <a th:href="@{/manager/services}">
-                    <i class="fas fa-briefcase"></i>
-                    <span>Service & Utility</span>
-                </a>
-            </li>
-            <li class="sidebar-item" th:classappend="${activeTab == 'vehicles' ? 'active' : ''}">
-                <a th:href="@{#}">
-                    <i class="fa-solid fa-car"></i>
-                    <span>Vehicles</span>
-                </a>
-            </li>
-        </ul>
-
-        <div class="sidebar-footer">
-            <a th:href="@{/logout}" class="logout-btn">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Logout</span>
-            </a>
-        </div>
-
-    </aside>
-
-    <!-- Main Panel (Header + Main Content) -->
-    <div class="main-panel">
-
-        <!-- Header Section -->
-        <header class="header">
-            <!-- Page Title Area -->
-            <div class="header-title-area">
-                <button class="sidebar-toggle-btn" id="sidebarToggle">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-                <span class="header-page-title" th:text="${pageTitle != null ? pageTitle : 'Manager Dashboard'}">Manager Dashboard</span>
-            </div>
-
-            <!-- Action Controls -->
-            <div class="header-actions">
-                <button class="icon-btn" title="Notifications">
-                    <i class="fa-solid fa-bell"></i>
-                    <span class="badge"></span>
-                </button>
-
-                <a th:href="@{/manager/profiles}" class="user-profile-trigger" id="userProfileTrigger" style="text-decoration: none;">
-                    <div class="user-avatar-placeholder">M</div>
-                    <span class="user-role">Manager Staff</span>
-                </a>
-            </div>
-        </header>
-
-        <!-- Main Page Content Insertion -->
-        <main class="content-container">
-            <div th:replace="${content}">
-                <!-- Page content will be injected here -->
-            </div>
-        </main>
 
     </div>
 
-</div>
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
-<!-- Toast Notification Container -->
-<div class="toast-container" id="toastContainer"></div>
+    <!-- Toast message data bridge for external layout_admin.js script -->
+    <div id="toastMessageData" th:if="${message != null}" th:data-message="${message}"
+        th:data-type="${messageType != null ? messageType : 'success'}" style="display: none;"></div>
 
-<!-- Toast message data bridge for external layout_admin.js script -->
-<div id="toastMessageData"
-     th:if="${message != null}"
-     th:data-message="${message}"
-     th:data-type="${messageType != null ? messageType : 'success'}"
-     style="display: none;"></div>
-
-<script th:src="@{/js/layout/layout_manager.js}"></script>
+    <script th:src="@{/js/layout/layout_manager.js}"></script>
 </body>
+
 </html>
