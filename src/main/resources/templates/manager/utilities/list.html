@@ -106,6 +106,10 @@
                     <i class="fa-solid fa-location-dot"></i>
                     <span th:text="${util.location}">Floor 25, North Wing</span>
                 </div>
+                <div class="location-row" style="margin-top: 4px;">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span th:text="${util.typeLabel}">RESERVABLE</span>
+                </div>
                 <div class="card-actions-row">
                     <a th:href="@{/manager/utilities/{id}(id=${util.utilityId}, query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" class="btn-detail-link">Details</a>
                 </div>
@@ -176,7 +180,7 @@
 
         <div class="pricing-table-row" th:each="price : ${utilityPrices}">
             <div class="pricing-meta">
-                <h3 th:text="${price.utility.utilityName}">Gym</h3>
+                <h3 th:text="${price.resource.utilityName + ' - ' + price.resource.resourceName}">Gym</h3>
             </div>
             <div th:text="${price.unit.unitName}">hour</div>
             <div class="price-amount" th:text="'$' + ${#numbers.formatDecimal(price.price, 1, 2)}">$0.00</div>

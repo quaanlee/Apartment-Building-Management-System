@@ -13,8 +13,8 @@ public class UtilityImage {
     private Integer imageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UtilityID", nullable = false)
-    private Utility utility;
+    @JoinColumn(name = "ResourceID", nullable = false)
+    private UtilityResource resource;
 
     @Column(name = "ImageURL", nullable = false, length = 500)
     private String imageUrl;
@@ -38,12 +38,12 @@ public class UtilityImage {
         this.imageId = imageId;
     }
 
-    public Utility getUtility() {
-        return utility;
+    public UtilityResource getResource() {
+        return resource;
     }
 
-    public void setUtility(Utility utility) {
-        this.utility = utility;
+    public void setResource(UtilityResource resource) {
+        this.resource = resource;
     }
 
     public String getImageUrl() {

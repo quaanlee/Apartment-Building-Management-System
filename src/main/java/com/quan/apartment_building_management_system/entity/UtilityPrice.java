@@ -25,8 +25,8 @@ public class UtilityPrice {
     private Integer utilityPriceId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UtilityID", nullable = false)
-    private Utility utility;
+    @JoinColumn(name = "ResourceID", nullable = false)
+    private UtilityResource resource;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UnitID", nullable = false)
@@ -49,12 +49,12 @@ public class UtilityPrice {
         this.utilityPriceId = utilityPriceId;
     }
 
-    public Utility getUtility() {
-        return utility;
+    public UtilityResource getResource() {
+        return resource;
     }
 
-    public void setUtility(Utility utility) {
-        this.utility = utility;
+    public void setResource(UtilityResource resource) {
+        this.resource = resource;
     }
 
     public Unit getUnit() {

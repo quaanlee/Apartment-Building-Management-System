@@ -7,6 +7,7 @@ import com.quan.apartment_building_management_system.entity.ServiceItem;
 import com.quan.apartment_building_management_system.entity.Unit;
 import com.quan.apartment_building_management_system.entity.Utility;
 import com.quan.apartment_building_management_system.entity.UtilityPrice;
+import com.quan.apartment_building_management_system.entity.UtilityResource;
 import com.quan.apartment_building_management_system.service.utility.ServiceItemService;
 import com.quan.apartment_building_management_system.service.utility.UnitService;
 import com.quan.apartment_building_management_system.service.utility.UtilityPriceService;
@@ -111,9 +112,10 @@ public class ManagerServiceController {
         if (priceQuery != null && !priceQuery.trim().isEmpty()) {
             String pq = priceQuery.trim().toLowerCase();
             allPrices = utilityPriceService.findAll().stream()
-                    .filter(price -> (price.getUtility() != null
-                            && price.getUtility().getUtilityName() != null
-                            && price.getUtility().getUtilityName().toLowerCase().contains(pq))
+                    .filter(price -> (price.getResource() != null
+                            && price.getResource().getUtility() != null
+                            && price.getResource().getUtility().getUtilityName() != null
+                            && price.getResource().getUtility().getUtilityName().toLowerCase().contains(pq))
                             || (price.getUnit() != null
                             && price.getUnit().getUnitName() != null
                             && price.getUnit().getUnitName().toLowerCase().contains(pq)))
@@ -172,6 +174,32 @@ public class ManagerServiceController {
         model.addAttribute("priceQuery", priceQuery);
         model.addAttribute("activeTab", "service_utility");
         return "manager/utilities/detail";
+    }
+
+    @GetMapping("/manager/utilities/resources/{id}")
+    public String viewResourceDetails(@PathVariable("id") Integer id,
+                                      @RequestParam(value = "query", required = false) String query,
+                                      @RequestParam(value = "statusFilter", required = false) String statusFilter,
+                                      @RequestParam(value = "page", defaultValue = "1") int page,
+                                      @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+                                      @RequestParam(value = "priceQuery", required = false) String priceQuery,
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
+        UtilityResource resource = utilityResourceService.findById(id).orElse(null);
+        if (resource == null) {
+            redirectAttributes.addFlashAttribute("message", "Resource not found.");
+            return "redirect:/manager/utilities";
+        }
+        UtilityDTO.Resource resourceDTO = dtoHandler.toUtilityResourceDTO(resource);
+        model.addAttribute("resource", resourceDTO);
+        model.addAttribute("utility", dtoHandler.toUtilityDTO(resource.getUtility(), false));
+        model.addAttribute("query", query);
+        model.addAttribute("statusFilter", statusFilter);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("currentPricePage", pricePage);
+        model.addAttribute("priceQuery", priceQuery);
+        model.addAttribute("activeTab", "service_utility");
+        return "manager/resource_detail";
     }
 
     @PostMapping("/manager/utilities/resources/toggle-status/{id}")

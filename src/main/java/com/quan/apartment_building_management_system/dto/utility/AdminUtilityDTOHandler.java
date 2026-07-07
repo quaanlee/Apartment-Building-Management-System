@@ -2,10 +2,12 @@ package com.quan.apartment_building_management_system.dto.utility;
 
 import com.quan.apartment_building_management_system.entity.Unit;
 import com.quan.apartment_building_management_system.entity.Utility;
+import com.quan.apartment_building_management_system.entity.UtilityImage;
 import com.quan.apartment_building_management_system.entity.UtilityPrice;
 import com.quan.apartment_building_management_system.entity.UtilityResource;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -24,13 +26,31 @@ public class AdminUtilityDTOHandler {
         if (entity == null) {
             return null;
         }
+        String primaryImage = null;
+        List<String> secondaryImages = new ArrayList<>();
+        if (entity.getUtilityImages() != null) {
+            for (UtilityImage image : entity.getUtilityImages()) {
+                if (Boolean.TRUE.equals(image.getPrimary()) && primaryImage == null) {
+                    primaryImage = image.getImageUrl();
+                } else {
+                    secondaryImages.add(image.getImageUrl());
+                }
+            }
+        }
+        List<UtilityDTO.Price> prices = entity.getUtilityPrices() != null
+                ? entity.getUtilityPrices().stream().map(this::toUtilityPriceDTO).toList()
+                : List.of();
         return new UtilityDTO.Resource(
                 entity.getResourceId(),
                 entity.getUtility() != null ? entity.getUtility().getUtilityId() : null,
                 entity.getUtility() != null ? entity.getUtility().getUtilityName() : null,
                 entity.getResourceName(),
                 entity.getLocation(),
-                entity.getStatus()
+                entity.getDescription(),
+                entity.getStatus(),
+                primaryImage,
+                secondaryImages,
+                prices
         );
     }
 
@@ -42,21 +62,20 @@ public class AdminUtilityDTOHandler {
                 entity.getUtilityId(),
                 entity.getUtilityName(),
                 entity.getDescription(),
-                entity.getStatus()
+                entity.getStatus(),
+                entity.getType()
         );
+        dto.setImageUrl(entity.getImageUrl());
         if (includeResources && entity.getUtilityResources() != null) {
             dto.setUtilityResources(entity.getUtilityResources().stream()
                     .map(this::toUtilityResourceDTO)
                     .toList());
         }
-        if (entity.getUtilityPrices() != null) {
-            dto.setUtilityPrices(entity.getUtilityPrices().stream()
-                    .map(p -> new UtilityDTO.Price(
-                            p.getUtilityPriceId(),
-                            null,
-                            toUnitDTO(p.getUnit()),
-                            p.getPrice()
-                    ))
+        if (entity.getUtilityResources() != null) {
+            dto.setUtilityPrices(entity.getUtilityResources().stream()
+                    .filter(res -> res.getUtilityPrices() != null)
+                    .flatMap(res -> res.getUtilityPrices().stream())
+                    .map(this::toUtilityPriceDTO)
                     .toList());
         }
         return dto;
@@ -66,9 +85,27 @@ public class AdminUtilityDTOHandler {
         if (entity == null) {
             return null;
         }
+        UtilityDTO simpleUtility = null;
+        UtilityDTO.Resource simpleResource = null;
+        if (entity.getResource() != null) {
+            UtilityResource r = entity.getResource();
+            simpleResource = new UtilityDTO.Resource();
+            simpleResource.setResourceId(r.getResourceId());
+            simpleResource.setResourceName(r.getResourceName());
+            simpleResource.setLocation(r.getLocation());
+            simpleResource.setStatus(r.getStatus());
+            if (r.getUtility() != null) {
+                Utility u = r.getUtility();
+                simpleResource.setUtilityId(u.getUtilityId());
+                simpleResource.setUtilityName(u.getUtilityName());
+                simpleUtility = new UtilityDTO(u.getUtilityId(), u.getUtilityName(), u.getDescription(), u.getStatus(), u.getType());
+                simpleUtility.setImageUrl(u.getImageUrl());
+            }
+        }
         return new UtilityDTO.Price(
                 entity.getUtilityPriceId(),
-                toUtilityDTO(entity.getUtility(), false),
+                simpleUtility,
+                simpleResource,
                 toUnitDTO(entity.getUnit()),
                 entity.getPrice()
         );
@@ -94,9 +131,13 @@ public class AdminUtilityDTOHandler {
         }
         entity.setUtilityName(dto.getUtilityName());
         entity.setDescription(dto.getDescription());
+        if (dto.getType() != null) {
+            entity.setType(dto.getType());
+        }
         if (dto.getStatus() != null) {
             entity.setStatus(dto.getStatus());
         }
+        entity.setImageUrl(dto.getRawImageUrl());
     }
 
     public Utility toEntity(UtilityDTO dto) {
@@ -107,6 +148,8 @@ public class AdminUtilityDTOHandler {
         entity.setUtilityId(dto.getUtilityId());
         entity.setUtilityName(dto.getUtilityName());
         entity.setDescription(dto.getDescription());
+        entity.setImageUrl(dto.getRawImageUrl());
+        entity.setType(dto.getType() != null ? dto.getType() : true);
         if (dto.getStatus() != null) {
             entity.setStatus(dto.getStatus());
         } else {

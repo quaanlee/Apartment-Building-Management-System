@@ -30,13 +30,18 @@ public class UtilityPriceServiceImpl implements UtilityPriceService {
     }
 
     @Override
-    public List<UtilityPrice> findByUtilityId(Integer utilityId) {
-        return utilityPriceRepository.findByUtilityUtilityId(utilityId);
+    public List<UtilityPrice> findByResourceId(Integer resourceId) {
+        return utilityPriceRepository.findByResourceResourceId(resourceId);
     }
 
     @Override
-    public Optional<UtilityPrice> findByUtilityIdAndUnitId(Integer utilityId, Integer unitId) {
-        return utilityPriceRepository.findByUtilityUtilityIdAndUnitUnitId(utilityId, unitId);
+    public List<UtilityPrice> findByUtilityId(Integer utilityId) {
+        return utilityPriceRepository.findByResourceUtilityUtilityId(utilityId);
+    }
+
+    @Override
+    public Optional<UtilityPrice> findByResourceIdAndUnitId(Integer resourceId, Integer unitId) {
+        return utilityPriceRepository.findByResourceResourceIdAndUnitUnitId(resourceId, unitId);
     }
 
     @Override

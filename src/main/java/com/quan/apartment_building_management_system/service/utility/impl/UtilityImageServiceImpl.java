@@ -30,6 +30,11 @@ public class UtilityImageServiceImpl implements UtilityImageService {
     }
 
     @Override
+    public List<UtilityImage> findByResourceId(Integer resourceId) {
+        return repository.findByResourceId(resourceId);
+    }
+
+    @Override
     public UtilityImage save(UtilityImage utilityImage) {
         return repository.save(utilityImage);
     }

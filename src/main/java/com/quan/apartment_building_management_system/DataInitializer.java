@@ -77,17 +77,17 @@ public class DataInitializer implements CommandLineRunner {
 
             Account accAdmin = new Account(); accAdmin.setUsername("alex.mercer"); accAdmin.setPassword("password123"); accAdmin.setRole(admin);
             accAdmin = accountRepository.save(accAdmin);
-            Profile profAdmin = new Profile(); profAdmin.setAccount(accAdmin); profAdmin.setFullName("Alex Mercer");
+            Profile profAdmin = new Profile(); profAdmin.setAccount(accAdmin); profAdmin.setFullName("Alex Mercer"); profAdmin.setCitizenId("100000000001");
             profileRepository.save(profAdmin);
 
             Account accManager = new Account(); accManager.setUsername("jane.doe"); accManager.setPassword("password123"); accManager.setRole(manager);
             accManager = accountRepository.save(accManager);
-            Profile profManager = new Profile(); profManager.setAccount(accManager); profManager.setFullName("Jane Doe");
+            Profile profManager = new Profile(); profManager.setAccount(accManager); profManager.setFullName("Jane Doe"); profManager.setCitizenId("100000000002");
             profileRepository.save(profManager);
 
             Account accSecurity = new Account(); accSecurity.setUsername("ryan.smith"); accSecurity.setPassword("password123"); accSecurity.setRole(security);
             accSecurity = accountRepository.save(accSecurity);
-            Profile profSecurity = new Profile(); profSecurity.setAccount(accSecurity); profSecurity.setFullName("Ryan Smith");
+            Profile profSecurity = new Profile(); profSecurity.setAccount(accSecurity); profSecurity.setFullName("Ryan Smith"); profSecurity.setCitizenId("100000000003");
             profileRepository.save(profSecurity);
         }
 
@@ -152,6 +152,7 @@ public class DataInitializer implements CommandLineRunner {
                 Profile dummyProf = new Profile();
                 dummyProf.setAccount(dummyAcc);
                 dummyProf.setFullName(res[1]);
+                dummyProf.setCitizenId("200000000" + apt.getApartmentId());
                 profileRepository.save(dummyProf);
 
                 ResidentApartment ra = new ResidentApartment();

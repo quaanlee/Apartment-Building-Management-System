@@ -150,48 +150,21 @@ CREATE TABLE Utility (
     UtilityID   INT             IDENTITY(1,1)   PRIMARY KEY,
     UtilityName NVARCHAR(100)   NOT NULL         UNIQUE,
     Description NVARCHAR(255)   NULL,
-    Status      BIT             NOT NULL         DEFAULT 1   -- 1: Hoạt động | 0: Dừng
-);
-GO
--- ============================================================
--- 9.1 UtilityImage (Ảnh Tiện ích)
--- ============================================================
-CREATE TABLE UtilityImage (
-    ImageID     INT           IDENTITY(1,1)   PRIMARY KEY,
-    UtilityID   INT           NOT NULL,                      -- Khóa ngoại liên kết với bảng Utility
-    ImageURL    NVARCHAR(500) NOT NULL,                      -- Đường dẫn lưu file ảnh (hoặc link CDN)
-    Caption     NVARCHAR(255) NULL,                          -- Mô tả ngắn cho bức ảnh (ví dụ: "Góc chính diện", "View ban đêm")
-    IsPrimary   BIT           NOT NULL         DEFAULT 0,    -- 1: Ảnh đại diện/Ảnh chính | 0: Ảnh phụ
-    CreatedDate DATETIME      NOT NULL         DEFAULT GETDATE(), -- Ngày đăng ảnh
-    
-    -- Tạo ràng buộc khóa ngoại để đảm bảo toàn vẹn dữ liệu
-    CONSTRAINT FK_UtilityImage_Utility FOREIGN KEY (UtilityID) 
-        REFERENCES Utility(UtilityID) 
-        ON DELETE CASCADE -- Nếu xóa tiện ích, tự động xóa hết ảnh liên quan
-);
-GO
--- ============================================================
--- 10. UtilityPrice (Cấu hình bảng giá tiện ích)
--- ============================================================
-CREATE TABLE UtilityPrice (
-    UtilityPriceID  INT             IDENTITY(1,1)   PRIMARY KEY,
-    UtilityID       INT             NOT NULL,
-    UnitID          INT             NOT NULL,
-    Price           DECIMAL(18,2)   NOT NULL         DEFAULT 0,
-
-    CONSTRAINT FK_UtilityPrice_Utility FOREIGN KEY (UtilityID) REFERENCES Utility(UtilityID),
-    CONSTRAINT FK_UtilityPrice_Unit    FOREIGN KEY (UnitID)    REFERENCES Unit(UnitID)
+    ImageURL    NVARCHAR(500)   NULL,
+    Status      BIT             NOT NULL         DEFAULT 1,  -- 1: Hoạt động | 0: Dừng
+    Type        BIT             NOT NULL         DEFAULT 1   -- 1: RESERVABLE | 0: FREE_USE
 );
 GO
 
 -- ============================================================
--- 11. UtilityResource (Tài nguyên cụ thể của tiện ích)
+-- 9.1 UtilityResource (Tài nguyên cụ thể của tiện ích)
 -- ============================================================
 CREATE TABLE UtilityResource (
     ResourceID      INT             IDENTITY(1,1)   PRIMARY KEY,
     UtilityID       INT             NOT NULL,
     ResourceName    NVARCHAR(100)   NOT NULL,
     Location        NVARCHAR(150)   NULL,
+    Description     NVARCHAR(255)   NULL,
     Status          BIT             NOT NULL         DEFAULT 1,  -- 1: Sẵn sàng | 0: Bảo trì
 
     CONSTRAINT FK_UtilityResource_Utility FOREIGN KEY (UtilityID) REFERENCES Utility(UtilityID)
@@ -199,7 +172,39 @@ CREATE TABLE UtilityResource (
 GO
 
 -- ============================================================
--- 12. UtilityBooking (Đặt tiện ích)
+-- 9.2 UtilityPrice (Cấu hình bảng giá tiện ích)
+-- ============================================================
+CREATE TABLE UtilityPrice (
+    UtilityPriceID  INT             IDENTITY(1,1)   PRIMARY KEY,
+    ResourceID      INT             NOT NULL,
+    UnitID          INT             NOT NULL,
+    Price           DECIMAL(18,2)   NOT NULL         DEFAULT 0,
+
+    CONSTRAINT FK_UtilityPrice_UtilityResource FOREIGN KEY (ResourceID) REFERENCES UtilityResource(ResourceID),
+    CONSTRAINT FK_UtilityPrice_Unit            FOREIGN KEY (UnitID)     REFERENCES Unit(UnitID)
+);
+GO
+
+-- ============================================================
+-- 9.3 UtilityImage (Ảnh Tiện ích)
+-- ============================================================
+CREATE TABLE UtilityImage (
+    ImageID     INT           IDENTITY(1,1)   PRIMARY KEY,
+    ResourceID  INT           NOT NULL,                      -- Khóa ngoại liên kết với bảng UtilityResource
+    ImageURL    NVARCHAR(500) NOT NULL,                      -- Đường dẫn lưu file ảnh (hoặc link CDN)
+    Caption     NVARCHAR(255) NULL,                          -- Mô tả ngắn cho bức ảnh (ví dụ: "Góc chính diện", "View ban đêm")
+    IsPrimary   BIT           NOT NULL         DEFAULT 0,    -- 1: Ảnh đại diện/Ảnh chính | 0: Ảnh phụ
+    CreatedDate DATETIME      NOT NULL         DEFAULT GETDATE(), -- Ngày đăng ảnh
+    
+    -- Tạo ràng buộc khóa ngoại để đảm bảo toàn vẹn dữ liệu
+    CONSTRAINT FK_UtilityImage_UtilityResource FOREIGN KEY (ResourceID) 
+        REFERENCES UtilityResource(ResourceID) 
+        ON DELETE CASCADE -- Nếu xóa tài nguyên tiện ích, tự động xóa hết ảnh liên quan
+);
+GO
+
+-- ============================================================
+-- 10. UtilityBooking (Đặt tiện ích)
 -- ============================================================
 CREATE TABLE UtilityBooking (
     BookingID       INT             IDENTITY(1,1)   PRIMARY KEY,

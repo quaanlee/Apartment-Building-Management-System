@@ -313,23 +313,6 @@ public class DatabaseInitializer implements CommandLineRunner {
         Utility swimming = utilityRepository.findById(2).orElse(null);
 
         UtilityPrice gymPrice = null;
-        UtilityPrice swimPrice = null;
-
-        if (gym != null) {
-            gymPrice = new UtilityPrice();
-            gymPrice.setUtility(gym);
-            gymPrice.setUnit(hourUnit);
-            gymPrice.setPrice(new BigDecimal("5.00"));
-            gymPrice = utilityPriceRepository.save(gymPrice);
-        }
-
-        if (swimming != null) {
-            swimPrice = new UtilityPrice();
-            swimPrice.setUtility(swimming);
-            swimPrice.setUnit(turnUnit);
-            swimPrice.setPrice(new BigDecimal("10.00"));
-            swimPrice = utilityPriceRepository.save(swimPrice);
-        }
 
         // 9. Utility Resources
         UtilityResource gymResource = null;
@@ -340,6 +323,27 @@ public class DatabaseInitializer implements CommandLineRunner {
             gymResource.setLocation("Floor 2 - Block A");
             gymResource.setStatus(true);
             gymResource = utilityResourceRepository.save(gymResource);
+
+            gymPrice = new UtilityPrice();
+            gymPrice.setResource(gymResource);
+            gymPrice.setUnit(hourUnit);
+            gymPrice.setPrice(new BigDecimal("5.00"));
+            gymPrice = utilityPriceRepository.save(gymPrice);
+        }
+
+        if (swimming != null) {
+            UtilityResource swimmingResource = new UtilityResource();
+            swimmingResource.setUtility(swimming);
+            swimmingResource.setResourceName("Main Pool");
+            swimmingResource.setLocation("Rooftop");
+            swimmingResource.setStatus(true);
+            swimmingResource = utilityResourceRepository.save(swimmingResource);
+
+            UtilityPrice swimPrice = new UtilityPrice();
+            swimPrice.setResource(swimmingResource);
+            swimPrice.setUnit(turnUnit);
+            swimPrice.setPrice(new BigDecimal("10.00"));
+            utilityPriceRepository.save(swimPrice);
         }
 
         // 10. Sample Utility Booking (Approved booking for current month)
@@ -534,9 +538,10 @@ public class DatabaseInitializer implements CommandLineRunner {
             cinema = utilityRepository.save(cinema);
         }
         // Seed Price for Cinema
-        if (cinema != null && hourUnit != null && utilityPriceRepository.findByUtilityUtilityIdAndUnitUnitId(cinema.getUtilityId(), hourUnit.getUnitId()).isEmpty()) {
+        UtilityResource cinemaResourceForPrice = cinema != null ? utilityResourceRepository.findByUtilityUtilityId(cinema.getUtilityId()).stream().findFirst().orElse(null) : null;
+        if (cinemaResourceForPrice != null && hourUnit != null && utilityPriceRepository.findByResourceResourceIdAndUnitUnitId(cinemaResourceForPrice.getResourceId(), hourUnit.getUnitId()).isEmpty()) {
             UtilityPrice price = new UtilityPrice();
-            price.setUtility(cinema);
+            price.setResource(cinemaResourceForPrice);
             price.setUnit(hourUnit);
             price.setPrice(new BigDecimal("12.00"));
             utilityPriceRepository.save(price);
@@ -561,9 +566,10 @@ public class DatabaseInitializer implements CommandLineRunner {
             garden = utilityRepository.save(garden);
         }
         // Seed Price for Garden
-        if (garden != null && turnUnit != null && utilityPriceRepository.findByUtilityUtilityIdAndUnitUnitId(garden.getUtilityId(), turnUnit.getUnitId()).isEmpty()) {
+        UtilityResource gardenResourceForPrice = garden != null ? utilityResourceRepository.findByUtilityUtilityId(garden.getUtilityId()).stream().findFirst().orElse(null) : null;
+        if (gardenResourceForPrice != null && turnUnit != null && utilityPriceRepository.findByResourceResourceIdAndUnitUnitId(gardenResourceForPrice.getResourceId(), turnUnit.getUnitId()).isEmpty()) {
             UtilityPrice price = new UtilityPrice();
-            price.setUtility(garden);
+            price.setResource(gardenResourceForPrice);
             price.setUnit(turnUnit);
             price.setPrice(new BigDecimal("20.00"));
             utilityPriceRepository.save(price);

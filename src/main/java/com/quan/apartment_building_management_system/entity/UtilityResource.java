@@ -33,11 +33,20 @@ public class UtilityResource {
     @Column(name = "Location", length = 150)
     private String location;
 
+    @Column(name = "Description", length = 255)
+    private String description;
+
     @Column(name = "Status", nullable = false)
     private Boolean status = true;
 
     @OneToMany(mappedBy = "resource")
     private List<UtilityBooking> utilityBookings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "resource")
+    private List<UtilityPrice> utilityPrices = new ArrayList<>();
+
+    @OneToMany(mappedBy = "resource")
+    private List<UtilityImage> utilityImages = new ArrayList<>();
 
     public UtilityResource() {
     }
@@ -74,6 +83,14 @@ public class UtilityResource {
         this.location = location;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public Boolean getStatus() {
         return status;
     }
@@ -88,5 +105,21 @@ public class UtilityResource {
 
     public void setUtilityBookings(List<UtilityBooking> utilityBookings) {
         this.utilityBookings = utilityBookings;
+    }
+
+    public List<UtilityPrice> getUtilityPrices() {
+        return utilityPrices;
+    }
+
+    public void setUtilityPrices(List<UtilityPrice> utilityPrices) {
+        this.utilityPrices = utilityPrices;
+    }
+
+    public List<UtilityImage> getUtilityImages() {
+        return utilityImages;
+    }
+
+    public void setUtilityImages(List<UtilityImage> utilityImages) {
+        this.utilityImages = utilityImages;
     }
 }

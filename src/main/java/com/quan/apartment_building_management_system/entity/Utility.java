@@ -26,17 +26,17 @@ public class Utility {
     @Column(name = "Description", length = 255)
     private String description;
 
+    @Column(name = "ImageURL", length = 500)
+    private String imageUrl;
+
     @Column(name = "Status", nullable = false)
     private Boolean status = true;
 
-    @OneToMany(mappedBy = "utility")
-    private List<UtilityPrice> utilityPrices = new ArrayList<>();
+    @Column(name = "Type", nullable = false)
+    private Boolean type = true;
 
     @OneToMany(mappedBy = "utility")
     private List<UtilityResource> utilityResources = new ArrayList<>();
-
-    @OneToMany(mappedBy = "utility")
-    private List<UtilityImage> utilityImages = new ArrayList<>();
 
     public Utility() {
     }
@@ -65,6 +65,14 @@ public class Utility {
         this.description = description;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public Boolean getStatus() {
         return status;
     }
@@ -73,12 +81,12 @@ public class Utility {
         this.status = status;
     }
 
-    public List<UtilityPrice> getUtilityPrices() {
-        return utilityPrices;
+    public Boolean getType() {
+        return type;
     }
 
-    public void setUtilityPrices(List<UtilityPrice> utilityPrices) {
-        this.utilityPrices = utilityPrices;
+    public void setType(Boolean type) {
+        this.type = type;
     }
 
     public List<UtilityResource> getUtilityResources() {
@@ -87,13 +95,5 @@ public class Utility {
 
     public void setUtilityResources(List<UtilityResource> utilityResources) {
         this.utilityResources = utilityResources;
-    }
-
-    public List<UtilityImage> getUtilityImages() {
-        return utilityImages;
-    }
-
-    public void setUtilityImages(List<UtilityImage> utilityImages) {
-        this.utilityImages = utilityImages;
     }
 }

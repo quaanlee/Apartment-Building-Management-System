@@ -9,6 +9,8 @@ public class UtilityDTO {
     private String utilityName;
     private String description;
     private Boolean status;
+    private Boolean type;
+    private String imageUrl;
     private List<Resource> utilityResources = new ArrayList<>();
     private List<Price> utilityPrices = new ArrayList<>();
 
@@ -20,6 +22,11 @@ public class UtilityDTO {
         this.utilityName = utilityName;
         this.description = description;
         this.status = status;
+    }
+
+    public UtilityDTO(Integer utilityId, String utilityName, String description, Boolean status, Boolean type) {
+        this(utilityId, utilityName, description, status);
+        this.type = type;
     }
 
     public Integer getUtilityId() {
@@ -54,6 +61,26 @@ public class UtilityDTO {
         this.status = status;
     }
 
+    public Boolean getType() {
+        return type;
+    }
+
+    public void setType(Boolean type) {
+        this.type = type;
+    }
+
+    public String getTypeLabel() {
+        return Boolean.TRUE.equals(type) ? "RESERVABLE" : "FREE_USE";
+    }
+
+    public String getRawImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public List<Resource> getUtilityResources() {
         return utilityResources;
     }
@@ -78,7 +105,11 @@ public class UtilityDTO {
         private String utilityName;
         private String resourceName;
         private String location;
+        private String description;
         private Boolean status;
+        private String primaryImageUrl;
+        private List<String> secondaryImageUrls = new ArrayList<>();
+        private List<Price> prices = new ArrayList<>();
 
         public Resource() {
         }
@@ -90,6 +121,19 @@ public class UtilityDTO {
             this.resourceName = resourceName;
             this.location = location;
             this.status = status;
+        }
+
+        public Resource(Integer resourceId, Integer utilityId, String utilityName, String resourceName, String location, String description, Boolean status, String primaryImageUrl, List<String> secondaryImageUrls, List<Price> prices) {
+            this.resourceId = resourceId;
+            this.utilityId = utilityId;
+            this.utilityName = utilityName;
+            this.resourceName = resourceName;
+            this.location = location;
+            this.description = description;
+            this.status = status;
+            this.primaryImageUrl = primaryImageUrl;
+            this.secondaryImageUrls = secondaryImageUrls;
+            this.prices = prices;
         }
 
         public Integer getResourceId() {
@@ -139,11 +183,44 @@ public class UtilityDTO {
         public void setStatus(Boolean status) {
             this.status = status;
         }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getPrimaryImageUrl() {
+            return primaryImageUrl;
+        }
+
+        public void setPrimaryImageUrl(String primaryImageUrl) {
+            this.primaryImageUrl = primaryImageUrl;
+        }
+
+        public List<String> getSecondaryImageUrls() {
+            return secondaryImageUrls;
+        }
+
+        public void setSecondaryImageUrls(List<String> secondaryImageUrls) {
+            this.secondaryImageUrls = secondaryImageUrls;
+        }
+
+        public List<Price> getPrices() {
+            return prices;
+        }
+
+        public void setPrices(List<Price> prices) {
+            this.prices = prices;
+        }
     }
 
     public static class Price {
         private Integer utilityPriceId;
         private UtilityDTO utility;
+        private Resource resource;
         private Unit unit;
         private BigDecimal price;
 
@@ -153,6 +230,14 @@ public class UtilityDTO {
         public Price(Integer utilityPriceId, UtilityDTO utility, Unit unit, BigDecimal price) {
             this.utilityPriceId = utilityPriceId;
             this.utility = utility;
+            this.unit = unit;
+            this.price = price;
+        }
+
+        public Price(Integer utilityPriceId, UtilityDTO utility, Resource resource, Unit unit, BigDecimal price) {
+            this.utilityPriceId = utilityPriceId;
+            this.utility = utility;
+            this.resource = resource;
             this.unit = unit;
             this.price = price;
         }
@@ -171,6 +256,14 @@ public class UtilityDTO {
 
         public void setUtility(UtilityDTO utility) {
             this.utility = utility;
+        }
+
+        public Resource getResource() {
+            return resource;
+        }
+
+        public void setResource(Resource resource) {
+            this.resource = resource;
         }
 
         public Unit getUnit() {

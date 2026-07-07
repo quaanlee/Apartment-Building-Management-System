@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'utilities')}" lang="en">
+<head>
+</head>
+<body>
+
+<main class="utility-container">
+    <link rel="stylesheet" th:href="@{/css/admin/utilities.css}">
+
+    <!-- Breadcrumb & Back -->
+    <div class="detail-header-nav" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div class="breadcrumb-container" style="font-size: 14px; color: var(--text-secondary);">
+            <a th:href="@{/admin/utilities}" style="color: var(--primary-color); text-decoration: none;">Utility Management</a>
+            <span style="margin: 0 8px;">/</span>
+            <a th:href="@{/admin/utilities/{id}(id=${utility.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" 
+               th:text="${utility.utilityName}" style="color: var(--primary-color); text-decoration: none;">Gym</a>
+            <span style="margin: 0 8px;">/</span>
+            <span th:text="${resource.resourceName}" style="font-weight: 600; color: var(--text-primary);">Gym 1</span>
+        </div>
+        <a th:href="@{/admin/utilities/{id}(id=${utility.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" 
+           class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 16px; border-radius: var(--radius-md); font-weight: 500; font-size: 14px;">
+            <i class="fa-solid fa-arrow-left"></i> Back to Utility
+        </a>
+    </div>
+
+    <!-- Header Details Title Area -->
+    <div class="main-header" style="margin-bottom: 24px;">
+        <div class="title-section">
+            <h2 th:text="${resource.resourceName}">Gym 1</h2>
+            <p th:text="'Resource of utility: ' + ${utility.utilityName}">Resource of Gym</p>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <span th:class="${resource.status} ? 'badge-status active' : 'badge-status maintenance'"
+                  th:text="${resource.status} ? 'Ready' : 'Maintenance'"
+                  style="font-size: 13px; padding: 6px 12px; font-weight: 600;">Ready</span>
+            <button class="btn-primary" style="padding: 8px 16px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-md); border: none; cursor: pointer;" 
+                    onclick="openEditResourceModal()">
+                <i class="fa-solid fa-pencil"></i> Edit Resource
+            </button>
+        </div>
+    </div>
+
+    <!-- Image Gallery -->
+    <div class="gallery-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; height: 380px; margin-bottom: 32px; border-radius: var(--radius-lg, 16px); overflow: hidden;">
+        <div class="gallery-main" style="height: 100%;">
+            <img th:src="${resource.primaryImageUrl != null ? resource.primaryImageUrl : utility.imageUrl}" alt="Primary Image" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="gallery-side" style="display: flex; flex-direction: column; gap: 16px; height: 100%;">
+            <!-- Secondaries loop -->
+            <div class="side-img-box" style="flex: 1; height: calc(50% - 8px); overflow: hidden; border-radius: var(--radius-md, 8px);">
+                <img th:src="${!#lists.isEmpty(resource.secondaryImageUrls) ? resource.secondaryImageUrls[0] : utility.imageUrl}" alt="Secondary Image 1" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.95) contrast(1.05);">
+            </div>
+            <div class="side-img-box" style="flex: 1; height: calc(50% - 8px); overflow: hidden; border-radius: var(--radius-md, 8px);">
+                <img th:src="${#lists.size(resource.secondaryImageUrls) > 1 ? resource.secondaryImageUrls[1] : utility.imageUrl}" alt="Secondary Image 2" style="width: 100%; height: 100%; object-fit: cover; filter: hue-rotate(10deg) brightness(0.9);">
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Section -->
+    <div class="overview-section" style="margin-bottom: 32px; background: white; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+        <h3 style="margin-top: 0; margin-bottom: 12px; color: var(--text-primary); font-size: 18px;">Resource Overview</h3>
+        <p th:text="${resource.description != null && !resource.description.isEmpty() ? resource.description : 'No description provided for this resource.'}"
+           style="color: var(--text-secondary); line-height: 1.6; margin: 0;">
+            Description details...
+        </p>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="operations-grid" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; margin-bottom: 48px;">
+        <!-- Location Card -->
+        <div class="info-card" style="background: white; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-primary); font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">LOCATION &amp; STATUS INFO</h4>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <i class="fa-solid fa-location-dot" style="font-size: 20px; color: var(--primary-color);"></i>
+                    <div>
+                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">LOCATION</div>
+                        <div style="font-weight: 700; color: var(--text-primary);" th:text="${resource.location}">Floor 2, Block A</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <i class="fa-solid fa-signal" style="font-size: 20px; color: var(--primary-color);"></i>
+                    <div>
+                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">OPERATIONAL STATUS</div>
+                        <div style="font-weight: 700; color: var(--text-primary);" th:text="${resource.status ? 'Available for booking' : 'Under Maintenance'}">Available for booking</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Billing Rates Card -->
+        <div class="info-card" style="background: white; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px;">
+                <h4 style="margin: 0; color: var(--text-primary); font-size: 16px; font-weight: 700;">BILLING RATES</h4>
+                <button class="btn-primary" style="padding: 6px 12px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-md); border: none; cursor: pointer;" 
+                        onclick="openPricingModal()">
+                    <i class="fa-solid fa-plus"></i> Configure Price
+                </button>
+            </div>
+            <div class="rates-list" style="display: flex; flex-direction: column; gap: 12px;">
+                <div th:each="price : ${resource.prices}" class="rate-row" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <span style="font-weight: 600; color: var(--text-primary);" th:text="'Rate (' + ${price.unit.unitName} + ')'">Rate (Hour)</span>
+                    <span style="font-weight: 700; color: var(--primary-color); font-size: 16px;" th:text="'$' + ${#numbers.formatDecimal(price.price, 1, 2)}">$5.00</span>
+                </div>
+                <div th:if="${#lists.isEmpty(resource.prices)}" style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                    No pricing configurations defined for this resource.
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Manage Pricing Modal -->
+    <div class="modal-overlay" id="pricingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="pricingTitle" th:text="'Configure Pricing for ' + ${resource.resourceName}">Configure Pricing</h3>
+                <button class="modal-close" onclick="closeModal('pricingModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <form th:action="@{/admin/utilities/manage-pricing(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST">
+                <input type="hidden" name="resourceId" th:value="${resource.resourceId}">
+                <input type="hidden" name="fromResourceDetail" value="true">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Resource Name</label>
+                        <input type="text" th:value="${resource.resourceName}" class="form-control" disabled style="background: #f1f5f9; color: #475569; font-weight: 600;">
+                    </div>
+                    <div class="form-group">
+                        <label for="pricingUnitId">Pricing Unit</label>
+                        <select name="unitId" id="pricingUnitId" class="form-control" required>
+                            <option th:each="unit : ${allUnits}" th:value="${unit.unitId}" th:text="${unit.unitName}">hour</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pricingPrice">Price ($)</label>
+                        <input type="number" name="price" id="pricingPrice" step="0.01" min="0" class="form-control" placeholder="0.00" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('pricingModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Pricing</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Resource Modal -->
+    <div class="modal-overlay" id="editResourceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Resource</h3>
+                <button class="modal-close" onclick="closeModal('editResourceModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <form th:action="@{/admin/utilities/resources/edit(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="resourceId" th:value="${resource.resourceId}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="resourceNameField">Resource Name</label>
+                        <input type="text" name="resourceName" id="resourceNameField" class="form-control" th:value="${resource.resourceName}" placeholder="e.g. Main Training Hall" maxlength="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceDescriptionField">Description</label>
+                        <textarea name="resourceDescription" id="resourceDescriptionField" class="form-control" th:text="${resource.description}" placeholder="e.g. Equipped with standard treadmills..." maxlength="255"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceLocationField">Location</label>
+                        <input type="text" name="resourceLocation" id="resourceLocationField" class="form-control" th:value="${resource.location}" placeholder="e.g. Floor 2, Block A" maxlength="150" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourcePrimaryImageField">Primary Image (Leave empty to keep current)</label>
+                        <input type="file" name="primaryImage" id="resourcePrimaryImageField" class="form-control" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceSecondaryImagesField">Secondary Images (Leave empty to keep current, minimum 2 if uploading)</label>
+                        <input type="file" name="secondaryImages" id="resourceSecondaryImagesField" class="form-control" accept="image/*" multiple>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceStatusField">Status</label>
+                        <select name="status" id="resourceStatusField" class="form-control">
+                             <option value="true" th:selected="${resource.status}">Ready</option>
+                             <option value="false" th:selected="${!resource.status}">Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('editResourceModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function showModal(id) {
+            document.getElementById(id).classList.add("active");
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove("active");
+        }
+
+        function openPricingModal() {
+            document.getElementById("pricingPrice").value = "";
+            showModal("pricingModal");
+        }
+
+        function openEditResourceModal() {
+            showModal("editResourceModal");
+        }
+        /*]]>*/
+    </script>
+</main>
+
+</body>
+</html>

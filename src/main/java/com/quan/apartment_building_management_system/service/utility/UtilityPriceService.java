@@ -11,9 +11,11 @@ public interface UtilityPriceService {
 
     Optional<UtilityPrice> findById(Integer id);
 
+    List<UtilityPrice> findByResourceId(Integer resourceId);
+
     List<UtilityPrice> findByUtilityId(Integer utilityId);
 
-    Optional<UtilityPrice> findByUtilityIdAndUnitId(Integer utilityId, Integer unitId);
+    Optional<UtilityPrice> findByResourceIdAndUnitId(Integer resourceId, Integer unitId);
 
     UtilityPrice save(UtilityPrice utilityPrice);
 

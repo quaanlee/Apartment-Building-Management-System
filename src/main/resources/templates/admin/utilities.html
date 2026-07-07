@@ -101,10 +101,21 @@
                     <i class="fa-solid fa-location-dot"></i>
                     <span th:text="${util.location}">Floor 25, North Wing</span>
                 </div>
+                <div class="location-row" style="margin-top: 4px;">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span th:text="${util.typeLabel}">RESERVABLE</span>
+                </div>
                 <div class="card-actions-row">
                     <a th:href="@{/admin/utilities/{id}(id=${util.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" class="btn-detail-link">Details</a>
 
-                    <button class="icon-action-btn" th:onclick="openEditUtilityModal([[${util.utilityId}]], [[${util.utilityName}]], [[${util.description}]], [[${util.status}]])" title="Edit Utility">
+                    <button class="icon-action-btn" 
+                            th:data-id="${util.utilityId}"
+                            th:data-name="${util.utilityName}"
+                            th:data-desc="${util.description}"
+                            th:data-status="${util.status}"
+                            th:data-type="${util.type}"
+                            onclick="openEditUtilityModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-desc'), this.getAttribute('data-status') === 'true', this.getAttribute('data-type') === 'true')"
+                            title="Edit Utility">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
                     <form th:action="@{/admin/utilities/toggle-status/{id}(id=${util.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" style="display:inline;">
@@ -114,7 +125,11 @@
                     </form>
 
                     <!-- Add Resource context trigger -->
-                    <button class="icon-action-btn add-resource" th:onclick="openAddResourceModal([[${util.utilityId}]], [[${util.utilityName}]])" title="Add Resource">
+                    <button class="icon-action-btn add-resource"
+                            th:data-id="${util.utilityId}"
+                            th:data-name="${util.utilityName}"
+                            onclick="openAddResourceModal(this.getAttribute('data-id'), this.getAttribute('data-name'))"
+                            title="Add Resource">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
@@ -150,85 +165,7 @@
         </div>
     </div>
 
-    <!-- Pricing Configurations Header -->
-    <div class="main-header" style="margin-top: 56px;">
-        <div class="title-section">
-            <h2>Pricing Configurations</h2>
-            <p>Define billing price structures and units for each utility.</p>
-        </div>
 
-        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-            <form th:action="@{/admin/utilities}" method="GET" style="display: flex; gap: 8px; margin: 0; align-items: center;">
-                <input type="hidden" name="query" th:value="${query}">
-                <input type="hidden" name="status" th:value="${statusFilter}">
-                <input type="hidden" name="page" th:value="${currentPage}">
-                <input type="text" name="priceQuery" th:value="${priceQuery}" placeholder="Search pricing..."
-                       style="padding: 10px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: var(--font-main); font-size: 14px; outline: none; min-width: 200px; color: var(--text-primary); background-color: var(--white);"
-                       onfocus="this.style.borderColor='var(--primary-color)'" onblur="this.style.borderColor='var(--border-color)'">
-                <button type="submit" class="btn-primary" style="padding: 10px 14px; background-color: var(--primary-color); border: none; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); cursor: pointer; color: var(--white);">
-                    <i class="fas fa-search"></i>
-                </button>
-                <a th:if="${priceQuery != null && !priceQuery.isEmpty()}" th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage})}"
-                   class="btn-secondary" style="padding: 10px 12px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: var(--white); color: var(--text-secondary); height: 38px; box-sizing: border-box;">
-                    <i class="fas fa-times"></i>
-                </a>
-            </form>
-            <button class="btn-primary" onclick="openConfigurePricingModal()">
-                <i class="fas fa-plus"></i> Configure Price
-            </button>
-        </div>
-    </div>
-
-    <!-- Pricing Configurations Table -->
-    <div class="pricing-table-card" style="margin-top: 16px;">
-        <div class="pricing-table-header">
-            <div>Utility</div>
-            <div>Unit</div>
-            <div>Price</div>
-            <div style="text-align: right;">Actions</div>
-        </div>
-
-        <div class="pricing-table-row" th:each="price : ${utilityPrices}">
-            <div class="pricing-meta">
-                <h3 th:text="${price.utility.utilityName}">Gym</h3>
-            </div>
-            <div th:text="${price.unit.unitName}">hour</div>
-            <div class="price-amount" th:text="'$' + ${#numbers.formatDecimal(price.price, 1, 2)}">$0.00</div>
-
-            <div class="pricing-actions">
-                <button class="icon-action-btn" th:onclick="openEditPricingModal([[${price.utility.utilityId}]], [[${price.unit.unitId}]], [[${price.price}]])" title="Edit Price">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-                <form th:action="@{/admin/utilities/delete-pricing/{id}(id=${price.utilityPriceId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" style="display:inline;">
-                    <button type="submit" class="icon-action-btn" style="color: #ef4444;" title="Delete Price" onclick="return confirm('Are you sure you want to delete this pricing configuration?')">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <div th:if="${#lists.isEmpty(utilityPrices)}" style="padding: 40px; text-align: center; color: var(--text-secondary);">
-            No pricing configurations defined. Click "Configure Price" to add one.
-        </div>
-    </div>
-
-    <!-- Pricing Pagination Row -->
-    <div class="pagination-container-row" th:if="${totalPricePages > 1}" style="margin-top: 16px;">
-        <span class="pagination-info" th:text="'Showing page ' + ${currentPricePage} + ' of ' + ${totalPricePages}">Showing page 1 of 3</span>
-        <div class="pagination-pages-box">
-            <a th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage - 1}, priceQuery=${priceQuery})}"
-               class="page-nav-btn" th:classappend="${currentPricePage == 1} ? 'disabled'"><i class="fa-solid fa-chevron-left"></i></a>
-
-            <a th:each="pageNum : ${#numbers.sequence(1, totalPricePages)}"
-               th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${pageNum}, priceQuery=${priceQuery})}"
-               class="page-num-btn"
-               th:classappend="${currentPricePage == pageNum} ? 'active'"
-               th:text="${pageNum}">1</a>
-
-            <a th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage + 1}, priceQuery=${priceQuery})}"
-               class="page-nav-btn" th:classappend="${currentPricePage == totalPricePages} ? 'disabled'"><i class="fa-solid fa-chevron-right"></i></a>
-        </div>
-    </div>
 
     <!-- Modals -->
 
@@ -239,7 +176,7 @@
                 <h3 id="utilityModalTitle">Add New Utility</h3>
                 <button class="modal-close" onclick="closeModal('utilityModal')"><i class="fas fa-times"></i></button>
             </div>
-            <form th:action="@{/admin/utilities/save(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST">
+            <form th:action="@{/admin/utilities/save(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="utilityId" id="utilityIdField">
                 <div class="modal-body">
                     <div class="form-group">
@@ -249,6 +186,10 @@
                     <div class="form-group">
                         <label for="utilityDescField">Description</label>
                         <textarea name="description" id="utilityDescField" class="form-control" placeholder="e.g. Fitness and wellness facility..." maxlength="100" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="utilityImageField">Utility Main Image</label>
+                        <input type="file" name="utilityImage" id="utilityImageField" class="form-control" accept="image/*">
                     </div>
                     <div class="form-group" style="display: none;">
                         <label for="utilityStatusField">Status</label>
@@ -392,6 +333,8 @@
             document.getElementById("utilityNameField").value = "";
             document.getElementById("utilityDescField").value = "";
             document.getElementById("utilityStatusField").value = "true";
+            document.getElementById("utilityImageField").value = "";
+            document.getElementById("utilityImageField").required = true;
             showModal("utilityModal");
         }
 
@@ -401,6 +344,8 @@
             document.getElementById("utilityNameField").value = name;
             document.getElementById("utilityDescField").value = desc;
             document.getElementById("utilityStatusField").value = status ? "true" : "false";
+            document.getElementById("utilityImageField").value = "";
+            document.getElementById("utilityImageField").required = false;
             showModal("utilityModal");
         }
 

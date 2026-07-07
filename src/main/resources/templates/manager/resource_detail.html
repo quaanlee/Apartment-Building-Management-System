@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'service_utility')}" lang="en">
+<head>
+</head>
+<body>
+
+<main class="utility-container">
+    <link rel="stylesheet" th:href="@{/css/admin/utilities.css}">
+
+    <!-- Breadcrumb & Back -->
+    <div class="detail-header-nav" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div class="breadcrumb-container" style="font-size: 14px; color: var(--text-secondary);">
+            <a th:href="@{/manager/utilities}" style="color: var(--primary-color); text-decoration: none;">Service &amp; Utility</a>
+            <span style="margin: 0 8px;">/</span>
+            <a th:href="@{/manager/utilities/{id}(id=${utility.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" 
+               th:text="${utility.utilityName}" style="color: var(--primary-color); text-decoration: none;">Gym</a>
+            <span style="margin: 0 8px;">/</span>
+            <span th:text="${resource.resourceName}" style="font-weight: 600; color: var(--text-primary);">Gym 1</span>
+        </div>
+        <a th:href="@{/manager/utilities/{id}(id=${utility.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" 
+           class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 16px; border-radius: var(--radius-md); font-weight: 500; font-size: 14px;">
+            <i class="fa-solid fa-arrow-left"></i> Back to Utility
+        </a>
+    </div>
+
+    <!-- Header Details Title Area -->
+    <div class="main-header" style="margin-bottom: 24px;">
+        <div class="title-section">
+            <h2 th:text="${resource.resourceName}">Gym 1</h2>
+            <p th:text="'Resource of utility: ' + ${utility.utilityName}">Resource of Gym</p>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <span th:class="${resource.status} ? 'badge-status active' : 'badge-status maintenance'"
+                  th:text="${resource.status} ? 'Ready' : 'Maintenance'"
+                  style="font-size: 13px; padding: 6px 12px; font-weight: 600;">Ready</span>
+        </div>
+    </div>
+
+    <!-- Image Gallery -->
+    <div class="gallery-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; height: 380px; margin-bottom: 32px; border-radius: var(--radius-lg, 16px); overflow: hidden;">
+        <div class="gallery-main" style="height: 100%;">
+            <img th:src="${resource.primaryImageUrl != null ? resource.primaryImageUrl : utility.imageUrl}" alt="Primary Image" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div class="gallery-side" style="display: flex; flex-direction: column; gap: 16px; height: 100%;">
+            <!-- Secondaries loop -->
+            <div class="side-img-box" style="flex: 1; height: calc(50% - 8px); overflow: hidden; border-radius: var(--radius-md, 8px);">
+                <img th:src="${!#lists.isEmpty(resource.secondaryImageUrls) ? resource.secondaryImageUrls[0] : utility.imageUrl}" alt="Secondary Image 1" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.95) contrast(1.05);">
+            </div>
+            <div class="side-img-box" style="flex: 1; height: calc(50% - 8px); overflow: hidden; border-radius: var(--radius-md, 8px);">
+                <img th:src="${#lists.size(resource.secondaryImageUrls) > 1 ? resource.secondaryImageUrls[1] : utility.imageUrl}" alt="Secondary Image 2" style="width: 100%; height: 100%; object-fit: cover; filter: hue-rotate(10deg) brightness(0.9);">
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Section -->
+    <div class="overview-section" style="margin-bottom: 32px; background: white; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+        <h3 style="margin-top: 0; margin-bottom: 12px; color: var(--text-primary); font-size: 18px;">Resource Overview</h3>
+        <p th:text="${resource.description != null && !resource.description.isEmpty() ? resource.description : 'No description provided for this resource.'}"
+           style="color: var(--text-secondary); line-height: 1.6; margin: 0;">
+            Description details...
+        </p>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="operations-grid" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; margin-bottom: 48px;">
+        <!-- Location Card -->
+        <div class="info-card" style="background: white; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-primary); font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">LOCATION &amp; STATUS INFO</h4>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <i class="fa-solid fa-location-dot" style="font-size: 20px; color: var(--primary-color);"></i>
+                    <div>
+                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">LOCATION</div>
+                        <div style="font-weight: 700; color: var(--text-primary);" th:text="${resource.location}">Floor 2, Block A</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <i class="fa-solid fa-signal" style="font-size: 20px; color: var(--primary-color);"></i>
+                    <div>
+                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">OPERATIONAL STATUS</div>
+                        <div style="font-weight: 700; color: var(--text-primary);" th:text="${resource.status ? 'Available for booking' : 'Under Maintenance'}">Available for booking</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Billing Rates Card -->
+        <div class="info-card" style="background: white; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-primary); font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">BILLING RATES</h4>
+            <div class="rates-list" style="display: flex; flex-direction: column; gap: 12px;">
+                <div th:each="price : ${resource.prices}" class="rate-row" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <span style="font-weight: 600; color: var(--text-primary);" th:text="'Rate (' + ${price.unit.unitName} + ')'">Rate (Hour)</span>
+                    <span style="font-weight: 700; color: var(--primary-color); font-size: 16px;" th:text="'$' + ${#numbers.formatDecimal(price.price, 1, 2)}">$5.00</span>
+                </div>
+                <div th:if="${#lists.isEmpty(resource.prices)}" style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                    No pricing configurations defined for this resource.
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>
