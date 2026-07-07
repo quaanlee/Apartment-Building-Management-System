@@ -80,7 +80,7 @@ public class ManagerMaintenanceController {
         int pageSize = 7;
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by("requestDate").descending());
         Page<MaintenanceRequest> requestPage = maintenanceRequestService.searchRequests(searchKeyword, status, fromDate, toDate, pageable);
-        List<Profile> activeStaff = profileService.findActiveMaintenanceStaffs();
+        List<com.quan.apartment_building_management_system.dto.maintenance.StaffWorkStatusDTO> activeStaff = maintenanceTaskService.getActiveMaintenanceStaffWithWorkStatus();
 
         // Calculate counts based on all requests
         List<MaintenanceRequest> allRequests = maintenanceRequestService.findAll();

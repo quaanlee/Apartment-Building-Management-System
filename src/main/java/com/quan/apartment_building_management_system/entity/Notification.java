@@ -43,8 +43,12 @@ public class Notification {
     @Column(name = "RelatedEntityType", length = 50)
     private String relatedEntityType;
 
-    @Column(name = "RelatedEntityID")
-    private Integer relatedEntityId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ReceiverID")
+    private Account receiver;
+
+    @Column(name = "Recipient", length = 50)
+    private String recipient;
 
     @OneToMany(mappedBy = "notification")
     private List<AccountNotification> accountNotifications = new ArrayList<>();
@@ -108,12 +112,20 @@ public class Notification {
         this.relatedEntityType = relatedEntityType;
     }
 
-    public Integer getRelatedEntityId() {
-        return relatedEntityId;
+    public Account getReceiver() {
+        return receiver;
     }
 
-    public void setRelatedEntityId(Integer relatedEntityId) {
-        this.relatedEntityId = relatedEntityId;
+    public void setReceiver(Account receiver) {
+        this.receiver = receiver;
+    }
+
+    public String getRecipient() {
+        return recipient;
+    }
+
+    public void setRecipient(String recipient) {
+        this.recipient = recipient;
     }
 
     public List<AccountNotification> getAccountNotifications() {

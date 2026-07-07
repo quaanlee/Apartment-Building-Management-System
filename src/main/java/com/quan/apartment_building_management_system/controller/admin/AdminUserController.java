@@ -59,7 +59,7 @@ public class AdminUserController {
                 .filter(p -> p.getAccount() != null && "MANAGER".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
                 .count();
         long totalMaintenance = allProfiles.stream()
-                .filter(p -> p.getAccount() != null && "MAINTENANCE_STAFF".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
+                .filter(p -> p.getAccount() != null && "MAINTENANCE_STAFF".equalsIgnoreCase(p.getAccount().getRole().getRoleName().replace(" ", "_")))
                 .count();
 
         // Get list of all roles for filter dropdown

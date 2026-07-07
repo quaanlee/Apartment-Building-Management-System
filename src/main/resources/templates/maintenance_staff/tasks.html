@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/maintenance/layout_maintenance :: maintenance-layout(~{::main}, 'tasks')}">
+<head>
+    <title>Assigned Tasks - ABMS</title>
+</head>
+<body>
+
+<main class="tasks-page">
+    <div class="page-header">
+        <div>
+            <h2 th:text="${pageTitle}">Assigned Task</h2>
+            <p>Manage and report on your ongoing maintenance assignments.</p>
+        </div>
+    </div>
+
+    <div th:if="${message}" class="alert" th:classappend="${messageType == 'error'} ? ' alert-danger' : ' alert-success'" th:text="${message}">
+        Alert message
+    </div>
+
+    <div th:if="${tasks.empty}" class="empty-state" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+        <i class="fa-solid fa-clipboard-check" style="font-size: 48px; color: var(--border-color); margin-bottom: 16px;"></i>
+        <h3>Không có task nào được giao</h3>
+    </div>
+
+    <div class="task-grid" th:unless="${tasks.empty}">
+        <div th:each="task : ${tasks}" class="task-card">
+            <div class="task-header">
+                <span th:if="${task.status == 1}" class="status-badge status-assigned">Assigned</span>
+                <span th:if="${task.status == 2}" class="status-badge status-progress">In Progress</span>
+            </div>
+            
+            <h3 class="task-title" th:text="${task.maintenanceRequest.title}">Fix Leaking Pipe</h3>
+            
+            <div class="task-meta">
+                <i class="fa-solid fa-location-dot"></i>
+                <span th:text="${task.maintenanceRequest.apartment.apartmentNumber} + ' (' + ${task.maintenanceRequest.profile.fullName} + ')'">Apt 101</span>
+            </div>
+            
+            <div class="task-meta">
+                <i class="fa-solid fa-calendar"></i>
+                <span th:text="${#temporals.format(task.assignedDate, 'dd MMM yyyy, HH:mm')}">12 Oct 2026</span>
+            </div>
+            
+            <p class="task-desc" th:text="${task.maintenanceRequest.description}">Description of the problem</p>
+            
+            <div class="task-footer">
+                <a th:href="@{'/maintenance_staff/tasks/' + ${task.taskId}}" class="task-btn primary">
+                    View Details &amp; Report
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-block" th:if="${totalPages > 1}">
+        <div class="pagination-buttons">
+            <!-- Previous Button -->
+            <a th:href="@{/maintenance_staff/tasks(page=${currentPage - 1})}" 
+               class="pagination-btn" 
+               th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            
+            <!-- Page Numbers -->
+            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+               th:href="@{/maintenance_staff/tasks(page=${i})}" 
+               th:text="${i + 1}"
+               class="pagination-btn"
+               th:classappend="${i == currentPage} ? 'active' : ''">
+                1
+            </a>
+            
+            <!-- Next Button -->
+            <a th:href="@{/maintenance_staff/tasks(page=${currentPage + 1})}" 
+               class="pagination-btn" 
+               th:classappend="${currentPage + 1 == totalPages} ? 'disabled' : ''">
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

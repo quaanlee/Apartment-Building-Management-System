@@ -145,69 +145,6 @@
         </div>
     </div>
 
-    <!-- Pricing Configurations Header -->
-    <div class="main-header pricing-section-header">
-        <div class="title-section">
-            <h2>Pricing Configurations</h2>
-            <p>View billing price structures and units for each utility.</p>
-        </div>
-
-        <div class="price-search-row">
-            <form th:action="@{/manager/utilities}" method="GET" class="price-search-form">
-                <input type="hidden" name="query" th:value="${query}">
-                <input type="hidden" name="status" th:value="${statusFilter}">
-                <input type="hidden" name="page" th:value="${currentPage}">
-                <input type="text" name="priceQuery" th:value="${priceQuery}" placeholder="Search pricing..."
-                       class="price-search-input">
-                <button type="submit" class="price-search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-                <a th:if="${priceQuery != null && !priceQuery.isEmpty()}" th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage})}"
-                   class="price-clear-btn">
-                    <i class="fas fa-times"></i>
-                </a>
-            </form>
-        </div>
-    </div>
-
-    <!-- Pricing Configurations Table -->
-    <div class="pricing-table-card pricing-table-spaced">
-        <div class="pricing-table-header">
-            <div>Utility</div>
-            <div>Unit</div>
-            <div>Price</div>
-        </div>
-
-        <div class="pricing-table-row" th:each="price : ${utilityPrices}">
-            <div class="pricing-meta">
-                <h3 th:text="${price.resource.utilityName + ' - ' + price.resource.resourceName}">Gym</h3>
-            </div>
-            <div th:text="${price.unit.unitName}">hour</div>
-            <div class="price-amount" th:text="'$' + ${#numbers.formatDecimal(price.price, 1, 2)}">$0.00</div>
-        </div>
-
-        <div th:if="${#lists.isEmpty(utilityPrices)}" class="utility-empty-state">
-            No pricing configurations defined.
-        </div>
-    </div>
-
-    <!-- Pricing Pagination Row -->
-    <div class="pagination-container-row pagination-spaced" th:if="${totalPricePages > 1}">
-        <span class="pagination-info" th:text="'Showing page ' + ${currentPricePage} + ' of ' + ${totalPricePages}">Showing page 1 of 3</span>
-        <div class="pagination-pages-box">
-            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage - 1}, priceQuery=${priceQuery})}"
-               class="page-nav-btn" th:classappend="${currentPricePage == 1} ? 'disabled'"><i class="fa-solid fa-chevron-left"></i></a>
-
-            <a th:each="pageNum : ${#numbers.sequence(1, totalPricePages)}"
-               th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${pageNum}, priceQuery=${priceQuery})}"
-               class="page-num-btn"
-               th:classappend="${currentPricePage == pageNum} ? 'active'"
-               th:text="${pageNum}">1</a>
-
-            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage + 1}, priceQuery=${priceQuery})}"
-               class="page-nav-btn" th:classappend="${currentPricePage == totalPricePages} ? 'disabled'"><i class="fa-solid fa-chevron-right"></i></a>
-        </div>
-    </div>
 </main>
 
 <script th:inline="javascript">

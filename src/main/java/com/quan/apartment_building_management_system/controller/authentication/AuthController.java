@@ -40,17 +40,17 @@ public class AuthController {
 
     @PostMapping("/login")
     public String handleLogin(
-            @RequestParam("username") String username,
+            @RequestParam("email") String email,
             @RequestParam("password") String password,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        if (username == null || !username.matches(EMAIL_REGEX)) {
-            redirectAttributes.addFlashAttribute("error", "Invalid email format. Please enter a valid email address.");
+        if (email == null || email.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Email cannot be empty.");
             return "redirect:/login";
         }
 
-        Optional<Account> accountOpt = accountService.findByUsername(username);
+        Optional<Account> accountOpt = accountService.findByUsername(email);
 
         if (accountOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Invalid email or password. Please try again.");
@@ -83,10 +83,13 @@ public class AuthController {
     @GetMapping("/admin/dashboard")
     public String adminDashboard(HttpSession session) {
         Account currentUser = (Account) session.getAttribute("currentUser");
-        if (currentUser == null) return "redirect:/login";
+        if (currentUser == null)
+            return "redirect:/login";
         String role = currentUser.getRole().getRoleName().toUpperCase();
-        if ("MANAGER".equals(role)) return "redirect:/manager/utility-bookings";
-        if (!"ADMIN".equals(role)) return "redirect:/login";
+        if ("MANAGER".equals(role))
+            return "redirect:/manager/utility-bookings";
+        if (!"ADMIN".equals(role))
+            return "redirect:/login";
         return "admin/dashboard";
     }
 
@@ -102,10 +105,11 @@ public class AuthController {
     @GetMapping("/maintainer/dashboard")
     public String maintainerDashboard(HttpSession session) {
         Account currentUser = (Account) session.getAttribute("currentUser");
-        if (currentUser == null || !"MAINTENANCE STAFF".equalsIgnoreCase(currentUser.getRole().getRoleName())) {
+        if (currentUser == null
+                || !"MAINTENANCE_STAFF".equalsIgnoreCase(currentUser.getRole().getRoleName().replace(" ", "_"))) {
             return "redirect:/login";
         }
-        return "maintainer/dashboard";
+        return "redirect:/maintenance_staff/dashboard";
     }
 
     // ==========================================
@@ -304,13 +308,13 @@ public class AuthController {
     }
 
     private String getRedirectUrlForRole(Account account) {
-        String roleName = account.getRole().getRoleName().toUpperCase();
+        String roleName = account.getRole().getRoleName().toUpperCase().replace(" ", "_");
         return switch (roleName) {
-            case "ADMIN"             -> "redirect:/admin/users";
-            case "MANAGER"           -> "redirect:/manager/utility-bookings";
-            case "RESIDENT"          -> "redirect:/resident/dashboard";
-            case "MAINTENANCE STAFF" -> "redirect:/maintainer/dashboard";
-            default                  -> "redirect:/login";
+            case "ADMIN" -> "redirect:/admin/users";
+            case "MANAGER" -> "redirect:/manager/utility-bookings";
+            case "RESIDENT" -> "redirect:/resident/dashboard";
+            case "MAINTENANCE_STAFF" -> "redirect:/maintenance_staff/dashboard";
+            default -> "redirect:/login";
         };
     }
 }

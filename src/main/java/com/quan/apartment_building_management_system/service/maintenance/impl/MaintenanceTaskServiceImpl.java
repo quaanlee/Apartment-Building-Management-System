@@ -1,17 +1,13 @@
 package com.quan.apartment_building_management_system.service.maintenance.impl;
 
-import com.quan.apartment_building_management_system.dto.maintenance.StaffWorkStatusDTO;
-import com.quan.apartment_building_management_system.entity.MaintenanceRequest;
 import com.quan.apartment_building_management_system.entity.MaintenanceTask;
-import com.quan.apartment_building_management_system.entity.Profile;
-import com.quan.apartment_building_management_system.repository.MaintenanceRequestRepository;
 import com.quan.apartment_building_management_system.repository.MaintenanceTaskRepository;
-import com.quan.apartment_building_management_system.repository.ProfileRepository;
 import com.quan.apartment_building_management_system.service.maintenance.MaintenanceTaskService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,15 +16,9 @@ import java.util.Optional;
 public class MaintenanceTaskServiceImpl implements MaintenanceTaskService {
 
     private final MaintenanceTaskRepository maintenanceTaskRepository;
-    private final MaintenanceRequestRepository maintenanceRequestRepository;
-    private final ProfileRepository profileRepository;
 
-    public MaintenanceTaskServiceImpl(MaintenanceTaskRepository maintenanceTaskRepository,
-                                      MaintenanceRequestRepository maintenanceRequestRepository,
-                                      ProfileRepository profileRepository) {
+    public MaintenanceTaskServiceImpl(MaintenanceTaskRepository maintenanceTaskRepository) {
         this.maintenanceTaskRepository = maintenanceTaskRepository;
-        this.maintenanceRequestRepository = maintenanceRequestRepository;
-        this.profileRepository = profileRepository;
     }
 
     @Override
@@ -52,65 +42,118 @@ public class MaintenanceTaskServiceImpl implements MaintenanceTaskService {
     }
 
     @Override
+    public List<MaintenanceTask> findByStaffIdAndStatusIn(Integer staffId, List<Byte> statuses) {
+        return maintenanceTaskRepository.findByStaffAccountIdAndStatusIn(staffId, statuses);
+    }
+
+    @Override
+    public List<MaintenanceTask> findByStaffIdAndStatus(Integer staffId, Byte status) {
+        return maintenanceTaskRepository.findByStaffAccountIdAndStatus(staffId, status);
+    }
+
+    @Override
+    public Page<MaintenanceTask> findByStaffIdAndStatusIn(Integer staffId, List<Byte> statuses, Pageable pageable) {
+        return maintenanceTaskRepository.findByStaffAccountIdAndStatusIn(staffId, statuses, pageable);
+    }
+
+    @Override
+    public Page<MaintenanceTask> findByStaffIdAndStatus(Integer staffId, Byte status, Pageable pageable) {
+        return maintenanceTaskRepository.findByStaffAccountIdAndStatus(staffId, status, pageable);
+    }
+
+    @Override
     @Transactional
     public MaintenanceTask save(MaintenanceTask maintenanceTask) {
         return maintenanceTaskRepository.save(maintenanceTask);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.quan.apartment_building_management_system.repository.MaintenanceRequestRepository maintenanceRequestRepository;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.quan.apartment_building_management_system.repository.AccountRepository accountRepository;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.quan.apartment_building_management_system.repository.ProfileRepository profileRepository;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.quan.apartment_building_management_system.repository.NotificationRepository notificationRepository;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.quan.apartment_building_management_system.repository.AccountNotificationRepository accountNotificationRepository;
+
+    @Override
+    @Transactional
+    public void assignTask(Integer requestId, Integer staffId, java.time.LocalDateTime deadline, Integer managerId) {
+        com.quan.apartment_building_management_system.entity.MaintenanceRequest req = maintenanceRequestRepository.findById(requestId).orElseThrow();
+        
+        // Resolve Profile to Account to fix matching bug and support busy check
+        com.quan.apartment_building_management_system.entity.Profile staffProfile = profileRepository.findById(staffId).orElseThrow();
+        com.quan.apartment_building_management_system.entity.Account staff = staffProfile.getAccount();
+        if (staff == null) {
+            throw new IllegalArgumentException("Selected staff profile does not have an active account.");
+        }
+
+        // Validate that the staff member is not busy with another task
+        String workStatus = getStaffWorkStatus(staff.getAccountId());
+        if ("busy".equals(workStatus)) {
+            throw new IllegalStateException("Nhân viên " + staffProfile.getFullName() + " đang có công việc chưa hoàn thành, không thể giao thêm việc!");
+        }
+
+        com.quan.apartment_building_management_system.entity.Account manager = accountRepository.findById(managerId).orElseThrow();
+
+        MaintenanceTask task = new MaintenanceTask();
+        task.setMaintenanceRequest(req);
+        task.setStaff(staff);
+        task.setAssignedBy(manager);
+        task.setAssignedDate(java.time.LocalDateTime.now());
+        task.setDeadline(deadline);
+        task.setStatus((byte) 1); // Assigned
+        maintenanceTaskRepository.save(task);
+
+        req.setStatus((byte) 2); // Assigned
+        maintenanceRequestRepository.save(req);
+
+        // Create notification for staff
+        com.quan.apartment_building_management_system.entity.Notification notification = new com.quan.apartment_building_management_system.entity.Notification();
+        notification.setTitle("New Task Assigned");
+        notification.setContent("You have been assigned a new task: " + req.getTitle());
+        notification.setNotificationType((byte) 3); // 3: General/Task Info
+        notification.setCreatedBy(manager);
+        notification.setCreatedAt(java.time.LocalDateTime.now());
+        notification.setRelatedEntityType("MaintenanceTask");
+        notification.setReceiver(staff);
+        notificationRepository.save(notification);
+
+        com.quan.apartment_building_management_system.entity.AccountNotification accNotif = new com.quan.apartment_building_management_system.entity.AccountNotification();
+        accNotif.setNotification(notification);
+        accNotif.setAccount(staff);
+        accNotif.setIsRead(false);
+        accountNotificationRepository.save(accNotif);
+    }
+
+    @Override
+    public String getStaffWorkStatus(Integer staffId) {
+        List<MaintenanceTask> tasks = maintenanceTaskRepository.findByStaffAccountIdAndStatusIn(staffId, List.of((byte)1, (byte)2));
+        return tasks.isEmpty() ? "available" : "busy";
+    }
+
+    @Override
+    public List<com.quan.apartment_building_management_system.dto.maintenance.StaffWorkStatusDTO> getActiveMaintenanceStaffWithWorkStatus() {
+        List<com.quan.apartment_building_management_system.dto.maintenance.StaffWorkStatusDTO> result = new java.util.ArrayList<>();
+        List<com.quan.apartment_building_management_system.entity.Profile> profiles = profileRepository.findAll();
+        for (com.quan.apartment_building_management_system.entity.Profile p : profiles) {
+            if (p.getAccount() != null && "MAINTENANCE_STAFF".equalsIgnoreCase(p.getAccount().getRole().getRoleName())) {
+                String status = getStaffWorkStatus(p.getAccount().getAccountId());
+                result.add(new com.quan.apartment_building_management_system.dto.maintenance.StaffWorkStatusDTO(p, status));
+            }
+        }
+        return result;
     }
 
     @Override
     @Transactional
     public void deleteById(Integer id) {
         maintenanceTaskRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional
-    public MaintenanceTask assignTask(Integer requestId, Integer staffProfileId, LocalDateTime deadline, Integer managerAccountId) {
-        MaintenanceRequest request = maintenanceRequestRepository.findById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException("MaintenanceRequest not found with ID: " + requestId));
-
-        Profile staff = profileRepository.findById(staffProfileId)
-                .orElseThrow(() -> new IllegalArgumentException("Staff Profile not found with ID: " + staffProfileId));
-
-        Profile manager = profileRepository.findByAccountAccountId(managerAccountId)
-                .orElseThrow(() -> new IllegalArgumentException("Manager Profile not found for Account ID: " + managerAccountId));
-
-        MaintenanceTask task = new MaintenanceTask();
-        task.setMaintenanceRequest(request);
-        task.setStaff(staff.getAccount());
-        task.setAssignedBy(manager.getAccount());
-        task.setAssignedDate(LocalDateTime.now());
-        task.setDeadline(deadline);
-        task.setStatus((byte) 1); // 1 = ASSIGNED
-        task = maintenanceTaskRepository.save(task);
-
-        request.setStatus((byte) 1); // 1 = ASSIGNED
-        maintenanceRequestRepository.save(request);
-
-        return task;
-    }
-
-    @Override
-    public List<StaffWorkStatusDTO> getActiveMaintenanceStaffWithWorkStatus() {
-        List<Profile> staffs = profileRepository.findActiveMaintenanceStaffs();
-        return staffs.stream().map(profile -> {
-            String workStatus = "available";
-            if (profile.getAccount() != null) {
-                List<MaintenanceTask> tasks = maintenanceTaskRepository.findByStaffAccountId(profile.getAccount().getAccountId());
-                boolean hasIncompleteTask = tasks.stream().anyMatch(task -> task.getStatus() == 1);
-                if (hasIncompleteTask) {
-                    workStatus = "busy";
-                }
-            }
-            return new StaffWorkStatusDTO(profile, workStatus);
-        }).toList();
-    }
-
-    @Override
-    public String getStaffWorkStatus(Integer accountId) {
-        if (accountId == null) return "available";
-        List<MaintenanceTask> tasks = maintenanceTaskRepository.findByStaffAccountId(accountId);
-        boolean hasIncompleteTask = tasks.stream().anyMatch(task -> task.getStatus() == 1);
-        return hasIncompleteTask ? "busy" : "available";
     }
 }

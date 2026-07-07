@@ -1,7 +1,7 @@
 package com.quan.apartment_building_management_system.entity;
 
-import jakarta.persistence.*;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 

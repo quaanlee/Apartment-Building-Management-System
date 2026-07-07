@@ -81,20 +81,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Pricing Card (from Database) -->
-        <div class="info-card">
-            <h4>BILLING RATES</h4>
-            <div class="rates-list">
-                <div class="rate-row" th:each="price : ${utility.utilityPrices}">
-                    <span class="rate-name" th:text="'Rate (' + ${price.unit.unitName} + ')'">Rate (Hour)</span>
-                    <span class="price-value" th:text="'$' + ${#numbers.formatDecimal(price.price, 1, 2)}">$5.00</span>
-                </div>
-                <div th:if="${#lists.isEmpty(utility.utilityPrices)}" class="utility-empty-state">
-                    No pricing configurations defined.
-                </div>
-            </div>
-        </div>
     </div>
 </main>
 

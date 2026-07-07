@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'billing')}">
+<head>
+    <title>Bill Details - ABMS</title>
+</head>
+<body>
+
+<main class="billing-page">
+    <div class="page-header">
+        <div class="invoice-action-group">
+            <h2>Service Bill Details</h2>
+            <p>Review invoice items, resident information, due dates, and payment history.</p>
+        </div>
+    </div>
+
+    <div class="invoice-actions">
+        <a th:href="@{/manager/bills}" class="billing-btn secondary">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to List
+        </a>
+
+        <div>
+            <button onclick="window.print()" class="billing-btn secondary">
+                <i class="fa-solid fa-print"></i>
+                Print Invoice
+            </button>
+            <form th:action="@{/manager/bills/{id}/toggle-payment(id=${bill.billId})}" method="post">
+                <button type="submit"
+                        th:class="${bill.status == 1} ? 'billing-btn danger' : 'billing-btn success'">
+                    <i th:class="${bill.status == 1} ? 'fa-solid fa-rotate-left' : 'fa-solid fa-check'"></i>
+                    <span th:text="${bill.status == 1} ? 'Revert to Unpaid' : 'Mark as Paid'">Mark as Paid</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <section id="invoiceSheet" class="invoice-sheet">
+        <div class="invoice-top">
+            <div class="invoice-brand">
+                <h1>ABMS APARTMENT</h1>
+                <p>Building Management Board Invoice Center</p>
+            </div>
+
+            <div class="text-right">
+                <div>
+                    <span th:if="${bill.status == 0}" class="status-badge status-unpaid">Unpaid</span>
+                    <span th:if="${bill.status == 1}" class="status-badge status-paid">Paid</span>
+                    <span th:if="${bill.status == 2}" class="status-badge status-overdue">Overdue</span>
+                </div>
+                <span class="invoice-id" th:text="'Invoice #' + ${bill.billId}">Invoice #1001</span>
+            </div>
+        </div>
+
+        <div class="invoice-meta">
+            <div>
+                <h4>Billed To</h4>
+                <p>
+                    <strong th:text="${ownerName}">Resident name</strong><br>
+                    Apartment: <strong th:text="${bill.apartment.apartmentNumber}">A-101</strong><br>
+                    Floor: <span th:text="${bill.apartment.floor}">1</span>,
+                    Area: <span th:text="${bill.apartment.area} + ' m2'">75.5 m2</span>
+                </p>
+            </div>
+
+            <div class="text-right">
+                <h4>Billing Details</h4>
+                <p>
+                    Billing Month: <strong th:text="${bill.billMonth} + '/' + ${bill.billYear}">06/2026</strong><br>
+                    Created Date: <span th:text="${#temporals.format(bill.createdDate, 'yyyy-MM-dd')}">2026-06-01</span><br>
+                    Due Date: <strong class="status-due" th:text="${#temporals.format(bill.dueDate, 'yyyy-MM-dd')}">2026-06-15</strong><br>
+                    <span th:if="${bill.paidDate != null}">
+                        Paid Date: <strong class="status-settled" th:text="${#temporals.format(bill.paidDate, 'yyyy-MM-dd HH:mm')}">2026-06-12 14:00</strong>
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <div class="billing-table-wrap">
+            <table class="billing-table">
+                <thead>
+                <tr>
+                    <th>Billing Item &amp; Description</th>
+                    <th class="right">Unit Price</th>
+                    <th class="right">Qty</th>
+                    <th class="right">Subtotal</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="detail : ${bill.billDetails}">
+                    <td>
+                        <div class="resident-stack">
+                            <strong th:text="${detail.serviceItem.serviceName}">Management Fee</strong>
+                            <span th:text="${detail.description}">Monthly maintenance fee</span>
+                        </div>
+                    </td>
+                    <td class="right" th:text="'$' + ${#numbers.formatDecimal(detail.serviceItem.unitPrice, 1, 2)}">$50.00</td>
+                    <td class="right" th:text="${#numbers.formatDecimal(detail.quantity, 1, 2)}">1.00</td>
+                    <td class="right amount" th:text="'$' + ${#numbers.formatDecimal(detail.amount, 1, 2)}">$50.00</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="invoice-total">
+            <div>
+                <span>Grand Total</span>
+                <span th:text="'$' + ${#numbers.formatDecimal(bill.totalAmount, 1, 2)}">$50.00</span>
+            </div>
+        </div>
+
+        <footer class="invoice-footer">
+            <p>Please contact the Building Management Board if you have questions about this invoice.</p>
+            <p>Created by: <strong th:text="${bill.createdBy.username}">manager</strong></p>
+        </footer>
+    </section>
+</main>
+
+</body>
+</html>
