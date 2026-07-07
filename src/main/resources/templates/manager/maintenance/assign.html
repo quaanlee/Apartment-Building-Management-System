@@ -97,7 +97,7 @@
                                           th:data-staff-name="${staff.profile.fullName}"
                                           onsubmit="return confirm('Are you sure you want to assign ' + this.getAttribute('data-staff-name') + ' to this request?');" 
                                           style="margin: 0;">
-                                        <button type="submit" class="action-btn" style="background-color: #38a169; color: #ffffff; padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                        <button type="submit" class="action-btn" th:disabled="${staff.workStatus == 'busy'}" th:style="${staff.workStatus == 'busy'} ? 'background-color: #cbd5e0; color: #718096; padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: not-allowed; display: inline-flex; align-items: center; gap: 6px;' : 'background-color: #38a169; color: #ffffff; padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;'">
                                             <i class="fa-solid fa-check-double"></i>
                                             <span>Assign</span>
                                         </button>

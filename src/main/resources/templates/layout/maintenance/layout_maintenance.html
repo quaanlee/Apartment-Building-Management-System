@@ -32,7 +32,7 @@
                 <li class="sidebar-item" th:classappend="${activeTab == 'tasks' ? 'active' : ''}">
                     <a th:href="@{/maintenance_staff/tasks}">
                         <i class="fa-solid fa-screwdriver-wrench"></i>
-                        <span>Assigned Tasks</span>
+                        <span>Assigned Task</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'history' ? 'active' : ''}">
@@ -67,10 +67,10 @@
                 
                 <!-- Action Controls -->
                 <div class="header-actions">
-                    <button class="icon-btn" title="Notifications">
+                    <a th:href="@{/maintenance_staff/notifications}" class="icon-btn" id="notificationBellBtn" title="Notifications" style="position: relative; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; color: #475569; border: none; cursor: pointer; transition: all 0.2s;">
                         <i class="fa-solid fa-bell"></i>
-                        <span class="badge"></span>
-                    </button>
+                        <span class="badge" id="notificationBadge" style="display: none;">0</span>
+                    </a>
                     
                     <a href="#" class="user-profile-trigger" id="userProfileTrigger" style="text-decoration: none;">
                         <div class="user-avatar-placeholder">S</div>

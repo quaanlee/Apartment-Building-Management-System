@@ -11,10 +11,6 @@
             <h2>Perform and Report on Task</h2>
             <p>View request details, review history, and submit your repair report.</p>
         </div>
-        <a th:href="@{/maintenance_staff/tasks}" class="task-btn secondary">
-            <i class="fa-solid fa-arrow-left"></i>
-            Back to List
-        </a>
     </div>
 
     <div th:if="${message}" class="alert" th:classappend="${messageType == 'error'} ? ' alert-danger' : ' alert-success'" th:text="${message}">
@@ -60,7 +56,7 @@
 
                     <div class="form-group">
                         <label for="progressPercent">Task Progress (%) *</label>
-                        <input type="range" th:field="*{progressPercent}" id="progressPercent" min="0" max="100" oninput="document.getElementById('progVal').innerText = this.value + '%'">
+                        <input type="range" th:field="*{progressPercent}" id="progressPercent" min="0" max="100" th:data-min="${minProgress}" oninput="handleSliderInput(this)">
                         <div class="progress-display" id="progVal" th:text="*{progressPercent} + '%'">0%</div>
                         <span th:if="${#fields.hasErrors('progressPercent')}" th:errors="*{progressPercent}" class="form-error">Error</span>
                         <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Set to 100% to mark this task as completed.</p>
@@ -96,6 +92,17 @@
         </aside>
     </div>
 
+    <script>
+        function handleSliderInput(slider) {
+            const minVal = parseInt(slider.getAttribute('data-min') || '0');
+            let currentVal = parseInt(slider.value || '0');
+            if (currentVal < minVal) {
+                slider.value = minVal;
+                currentVal = minVal;
+            }
+            document.getElementById('progVal').innerText = currentVal + '%';
+        }
+    </script>
 </main>
 
 </body>

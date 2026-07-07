@@ -87,4 +87,39 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // 4. Maintenance Staff Notification Bell functionality
+    if (window.location.pathname.startsWith('/maintenance_staff')) {
+        const badge = document.getElementById('notificationBadge');
+
+        function loadNotifications() {
+            fetch('/maintenance_staff/api/notifications')
+                .then(res => res.json())
+                .then(data => {
+                    let unreadCount = 0;
+                    if (data && data.length > 0) {
+                        data.forEach(item => {
+                            if (!item.isRead) {
+                                unreadCount++;
+                            }
+                        });
+                    }
+                    if (badge) {
+                        if (unreadCount > 0) {
+                            badge.textContent = unreadCount;
+                            badge.style.display = 'flex';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(err => console.error('Error fetching notifications:', err));
+        }
+
+        // Initial load
+        loadNotifications();
+
+        // Check for new notifications every 30 seconds
+        setInterval(loadNotifications, 30000);
+    }
 });

@@ -190,8 +190,9 @@
                             <select id="staffId" name="staffId" class="form-select" required>
                                 <option value="" disabled selected>Select a technician...</option>
                                 <option th:each="staff : ${staffs}"
-                                        th:value="${staff.profileId}"
-                                        th:text="${staff.fullName}">Worker A (Plumber)</option>
+                                        th:value="${staff.profile.profileId}"
+                                        th:disabled="${staff.workStatus == 'busy'}"
+                                        th:text="${staff.profile.fullName} + (${staff.workStatus == 'busy'} ? ' (Busy)' : ' (Available)')">Worker A (Plumber)</option>
                             </select>
                         </div>
 

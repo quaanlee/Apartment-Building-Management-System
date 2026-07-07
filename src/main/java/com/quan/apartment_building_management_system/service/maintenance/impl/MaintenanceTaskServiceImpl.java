@@ -76,11 +76,30 @@ public class MaintenanceTaskServiceImpl implements MaintenanceTaskService {
     @org.springframework.beans.factory.annotation.Autowired
     private com.quan.apartment_building_management_system.repository.ProfileRepository profileRepository;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.quan.apartment_building_management_system.repository.NotificationRepository notificationRepository;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.quan.apartment_building_management_system.repository.AccountNotificationRepository accountNotificationRepository;
+
     @Override
     @Transactional
     public void assignTask(Integer requestId, Integer staffId, java.time.LocalDateTime deadline, Integer managerId) {
         com.quan.apartment_building_management_system.entity.MaintenanceRequest req = maintenanceRequestRepository.findById(requestId).orElseThrow();
-        com.quan.apartment_building_management_system.entity.Account staff = accountRepository.findById(staffId).orElseThrow();
+        
+        // Resolve Profile to Account to fix matching bug and support busy check
+        com.quan.apartment_building_management_system.entity.Profile staffProfile = profileRepository.findById(staffId).orElseThrow();
+        com.quan.apartment_building_management_system.entity.Account staff = staffProfile.getAccount();
+        if (staff == null) {
+            throw new IllegalArgumentException("Selected staff profile does not have an active account.");
+        }
+
+        // Validate that the staff member is not busy with another task
+        String workStatus = getStaffWorkStatus(staff.getAccountId());
+        if ("busy".equals(workStatus)) {
+            throw new IllegalStateException("Nhân viên " + staffProfile.getFullName() + " đang có công việc chưa hoàn thành, không thể giao thêm việc!");
+        }
+
         com.quan.apartment_building_management_system.entity.Account manager = accountRepository.findById(managerId).orElseThrow();
 
         MaintenanceTask task = new MaintenanceTask();
@@ -94,6 +113,23 @@ public class MaintenanceTaskServiceImpl implements MaintenanceTaskService {
 
         req.setStatus((byte) 2); // Assigned
         maintenanceRequestRepository.save(req);
+
+        // Create notification for staff
+        com.quan.apartment_building_management_system.entity.Notification notification = new com.quan.apartment_building_management_system.entity.Notification();
+        notification.setTitle("New Task Assigned");
+        notification.setContent("You have been assigned a new task: " + req.getTitle());
+        notification.setNotificationType((byte) 3); // 3: General/Task Info
+        notification.setCreatedBy(manager);
+        notification.setCreatedAt(java.time.LocalDateTime.now());
+        notification.setRelatedEntityType("MaintenanceTask");
+        notification.setRelatedEntityId(task.getTaskId());
+        notificationRepository.save(notification);
+
+        com.quan.apartment_building_management_system.entity.AccountNotification accNotif = new com.quan.apartment_building_management_system.entity.AccountNotification();
+        accNotif.setNotification(notification);
+        accNotif.setAccount(staff);
+        accNotif.setIsRead(false);
+        accountNotificationRepository.save(accNotif);
     }
 
     @Override

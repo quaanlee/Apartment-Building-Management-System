@@ -8,7 +8,7 @@
 <main class="tasks-page">
     <div class="page-header">
         <div>
-            <h2 th:text="${pageTitle}">Assigned Tasks</h2>
+            <h2 th:text="${pageTitle}">Assigned Task</h2>
             <p>Manage and report on your ongoing maintenance assignments.</p>
         </div>
     </div>
@@ -19,8 +19,7 @@
 
     <div th:if="${tasks.empty}" class="empty-state" style="text-align: center; padding: 40px; color: var(--text-secondary);">
         <i class="fa-solid fa-clipboard-check" style="font-size: 48px; color: var(--border-color); margin-bottom: 16px;"></i>
-        <h3>No Assigned Tasks</h3>
-        <p>You currently have no pending tasks. Great job!</p>
+        <h3>Không có task nào được giao</h3>
     </div>
 
     <div class="task-grid" th:unless="${tasks.empty}">

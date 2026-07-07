@@ -141,47 +141,47 @@ BEGIN
 END
 
 IF EXISTS (SELECT 1 FROM MaintenanceRequest WHERE RequestID = 3)
-    UPDATE MaintenanceRequest SET ProfileID = 2, ApartmentID = 1, Title = N'Tay nắm chốt cửa ban công bị kẹt', Description = N'Tay nắm cửa ban công hướng Đông bị kẹt cứng không thể gạt chốt khóa an toàn được, ban đêm gió lùa mạnh rất nguy hiểm.', Status = 2, RequestDate = DATEADD(day, -1, GETDATE()) WHERE RequestID = 3;
+    UPDATE MaintenanceRequest SET ProfileID = 2, ApartmentID = 1, Title = N'Tay nắm chốt cửa ban công bị kẹt', Description = N'Tay nắm cửa ban công hướng Đông bị kẹt cứng không thể gạt chốt khóa an toàn được, ban đêm gió lùa mạnh rất nguy hiểm.', Status = 0, RequestDate = DATEADD(day, -1, GETDATE()) WHERE RequestID = 3;
 ELSE
 BEGIN
     SET IDENTITY_INSERT MaintenanceRequest ON;
-    INSERT INTO MaintenanceRequest (RequestID, ProfileID, ApartmentID, Title, Description, Status, RequestDate) VALUES (3, 2, 1, N'Tay nắm chốt cửa ban công bị kẹt', N'Tay nắm cửa ban công hướng Đông bị kẹt cứng không thể gạt chốt khóa an toàn được, ban đêm gió lùa mạnh rất nguy hiểm.', 2, DATEADD(day, -1, GETDATE()));
+    INSERT INTO MaintenanceRequest (RequestID, ProfileID, ApartmentID, Title, Description, Status, RequestDate) VALUES (3, 2, 1, N'Tay nắm chốt cửa ban công bị kẹt', N'Tay nắm cửa ban công hướng Đông bị kẹt cứng không thể gạt chốt khóa an toàn được, ban đêm gió lùa mạnh rất nguy hiểm.', 0, DATEADD(day, -1, GETDATE()));
     SET IDENTITY_INSERT MaintenanceRequest OFF;
 END
 
 IF EXISTS (SELECT 1 FROM MaintenanceRequest WHERE RequestID = 4)
-    UPDATE MaintenanceRequest SET ProfileID = 2, ApartmentID = 1, Title = N'Điều hòa phòng ngủ chính không lạnh', Description = N'Điều hòa Daikin ở phòng ngủ master bật 16 độ nhưng chỉ có gió nhẹ không lạnh, có tiếng kêu rè rè khó chịu.', Status = 1, RequestDate = DATEADD(day, -2, GETDATE()) WHERE RequestID = 4;
+    UPDATE MaintenanceRequest SET ProfileID = 2, ApartmentID = 1, Title = N'Điều hòa phòng ngủ chính không lạnh', Description = N'Điều hòa Daikin ở phòng ngủ master bật 16 độ nhưng chỉ có gió nhẹ không lạnh, có tiếng kêu rè rè khó chịu.', Status = 0, RequestDate = DATEADD(day, -2, GETDATE()) WHERE RequestID = 4;
 ELSE
 BEGIN
     SET IDENTITY_INSERT MaintenanceRequest ON;
-    INSERT INTO MaintenanceRequest (RequestID, ProfileID, ApartmentID, Title, Description, Status, RequestDate) VALUES (4, 2, 1, N'Điều hòa phòng ngủ chính không lạnh', N'Điều hòa Daikin ở phòng ngủ master bật 16 độ nhưng chỉ có gió nhẹ không lạnh, có tiếng kêu rè rè khó chịu.', 1, DATEADD(day, -2, GETDATE()));
+    INSERT INTO MaintenanceRequest (RequestID, ProfileID, ApartmentID, Title, Description, Status, RequestDate) VALUES (4, 2, 1, N'Điều hòa phòng ngủ chính không lạnh', N'Điều hòa Daikin ở phòng ngủ master bật 16 độ nhưng chỉ có gió nhẹ không lạnh, có tiếng kêu rè rè khó chịu.', 0, DATEADD(day, -2, GETDATE()));
     SET IDENTITY_INSERT MaintenanceRequest OFF;
 END
 
 IF EXISTS (SELECT 1 FROM MaintenanceRequest WHERE RequestID = 5)
-    UPDATE MaintenanceRequest SET ProfileID = 2, ApartmentID = 1, Title = N'Bóng đèn hành lang bị cháy', Description = N'Bóng đèn downlight ở hành lang trước cửa căn hộ bị nhấp nháy liên tục rồi tắt hẳn, cần thay bóng mới.', Status = 2, RequestDate = DATEADD(day, -3, GETDATE()) WHERE RequestID = 5;
+    UPDATE MaintenanceRequest SET ProfileID = 2, ApartmentID = 1, Title = N'Bóng đèn hành lang bị cháy', Description = N'Bóng đèn downlight ở hành lang trước cửa căn hộ bị nhấp nháy liên tục rồi tắt hẳn, cần thay bóng mới.', Status = 0, RequestDate = DATEADD(day, -3, GETDATE()) WHERE RequestID = 5;
 ELSE
 BEGIN
     SET IDENTITY_INSERT MaintenanceRequest ON;
-    INSERT INTO MaintenanceRequest (RequestID, ProfileID, ApartmentID, Title, Description, Status, RequestDate) VALUES (5, 2, 1, N'Bóng đèn hành lang bị cháy', N'Bóng đèn downlight ở hành lang trước cửa căn hộ bị nhấp nháy liên tục rồi tắt hẳn, cần thay bóng mới.', 2, DATEADD(day, -3, GETDATE()));
+    INSERT INTO MaintenanceRequest (RequestID, ProfileID, ApartmentID, Title, Description, Status, RequestDate) VALUES (5, 2, 1, N'Bóng đèn hành lang bị cháy', N'Bóng đèn downlight ở hành lang trước cửa căn hộ bị nhấp nháy liên tục rồi tắt hẳn, cần thay bóng mới.', 0, DATEADD(day, -3, GETDATE()));
     SET IDENTITY_INSERT MaintenanceRequest OFF;
 END
 
 IF EXISTS (SELECT 1 FROM MaintenanceRequest WHERE RequestID = 6)
-    UPDATE MaintenanceRequest SET ProfileID = 2, ApartmentID = 2, Title = N'Kẹt vòi xịt vệ sinh toilet phụ', Description = N'Vòi xịt vệ sinh phòng tắm phụ bị kẹt nút nhấn, nước chảy liên tục không ngắt được phải khóa van góc.', Status = 1, RequestDate = DATEADD(day, -1, GETDATE()) WHERE RequestID = 6;
+    UPDATE MaintenanceRequest SET ProfileID = 2, ApartmentID = 2, Title = N'Kẹt vòi xịt vệ sinh toilet phụ', Description = N'Vòi xịt vệ sinh phòng tắm phụ bị kẹt nút nhấn, nước chảy liên tục không ngắt được phải khóa van góc.', Status = 0, RequestDate = DATEADD(day, -1, GETDATE()) WHERE RequestID = 6;
 ELSE
 BEGIN
     SET IDENTITY_INSERT MaintenanceRequest ON;
-    INSERT INTO MaintenanceRequest (RequestID, ProfileID, ApartmentID, Title, Description, Status, RequestDate) VALUES (6, 2, 2, N'Kẹt vòi xịt vệ sinh toilet phụ', N'Vòi xịt vệ sinh phòng tắm phụ bị kẹt nút nhấn, nước chảy liên tục không ngắt được phải khóa van góc.', 1, DATEADD(day, -1, GETDATE()));
+    INSERT INTO MaintenanceRequest (RequestID, ProfileID, ApartmentID, Title, Description, Status, RequestDate) VALUES (6, 2, 2, N'Kẹt vòi xịt vệ sinh toilet phụ', N'Vòi xịt vệ sinh phòng tắm phụ bị kẹt nút nhấn, nước chảy liên tục không ngắt được phải khóa van góc.', 0, DATEADD(day, -1, GETDATE()));
     SET IDENTITY_INSERT MaintenanceRequest OFF;
 END
 
 IF EXISTS (SELECT 1 FROM MaintenanceRequest WHERE RequestID = 7)
-    UPDATE MaintenanceRequest SET ProfileID = 2, ApartmentID = 2, Title = N'Hỏng công tắc bình nóng lạnh', Description = N'Công tắc bật bình nóng lạnh phòng tắm chính bị lỏng lẻo gạt lên không sáng đèn và không nóng.', Status = 2, RequestDate = DATEADD(day, -4, GETDATE()) WHERE RequestID = 7;
+    UPDATE MaintenanceRequest SET ProfileID = 2, ApartmentID = 2, Title = N'Hỏng công tắc bình nóng lạnh', Description = N'Công tắc bật bình nóng lạnh phòng tắm chính bị lỏng lẻo gạt lên không sáng đèn và không nóng.', Status = 0, RequestDate = DATEADD(day, -4, GETDATE()) WHERE RequestID = 7;
 ELSE
 BEGIN
     SET IDENTITY_INSERT MaintenanceRequest ON;
-    INSERT INTO MaintenanceRequest (RequestID, ProfileID, ApartmentID, Title, Description, Status, RequestDate) VALUES (7, 2, 2, N'Hỏng công tắc bình nóng lạnh', N'Công tắc bật bình nóng lạnh phòng tắm chính bị lỏng lẻo gạt lên không sáng đèn và không nóng.', 2, DATEADD(day, -4, GETDATE()));
+    INSERT INTO MaintenanceRequest (RequestID, ProfileID, ApartmentID, Title, Description, Status, RequestDate) VALUES (7, 2, 2, N'Hỏng công tắc bình nóng lạnh', N'Công tắc bật bình nóng lạnh phòng tắm chính bị lỏng lẻo gạt lên không sáng đèn và không nóng.', 0, DATEADD(day, -4, GETDATE()));
     SET IDENTITY_INSERT MaintenanceRequest OFF;
 END
 GO
@@ -196,85 +196,31 @@ BEGIN
     INSERT INTO MaintenanceTask (TaskID, RequestID, StaffID, AssignedBy, AssignedDate, Deadline, Status) VALUES (1, 2, 4, 2, DATEADD(hour, -2, GETDATE()), DATEADD(day, 2, GETDATE()), 1);
     SET IDENTITY_INSERT MaintenanceTask OFF;
 END
-
--- Task 2: assigned to Staff 5, Status 3 (Completed)
-IF EXISTS (SELECT 1 FROM MaintenanceTask WHERE TaskID = 2)
-    UPDATE MaintenanceTask SET RequestID = 3, StaffID = 5, AssignedBy = 2, AssignedDate = DATEADD(hour, -23, GETDATE()), Deadline = DATEADD(day, 2, GETDATE()), Status = 3 WHERE TaskID = 2;
-ELSE
-BEGIN
-    SET IDENTITY_INSERT MaintenanceTask ON;
-    INSERT INTO MaintenanceTask (TaskID, RequestID, StaffID, AssignedBy, AssignedDate, Deadline, Status) VALUES (2, 3, 5, 2, DATEADD(hour, -23, GETDATE()), DATEADD(day, 2, GETDATE()), 3);
-    SET IDENTITY_INSERT MaintenanceTask OFF;
-END
-
--- Task 3: assigned to Staff 4, Status 2 (In Progress)
-IF EXISTS (SELECT 1 FROM MaintenanceTask WHERE TaskID = 3)
-    UPDATE MaintenanceTask SET RequestID = 4, StaffID = 4, AssignedBy = 2, AssignedDate = DATEADD(day, -1, GETDATE()), Deadline = DATEADD(day, 1, GETDATE()), Status = 2 WHERE TaskID = 3;
-ELSE
-BEGIN
-    SET IDENTITY_INSERT MaintenanceTask ON;
-    INSERT INTO MaintenanceTask (TaskID, RequestID, StaffID, AssignedBy, AssignedDate, Deadline, Status) VALUES (3, 4, 4, 2, DATEADD(day, -1, GETDATE()), DATEADD(day, 1, GETDATE()), 2);
-    SET IDENTITY_INSERT MaintenanceTask OFF;
-END
-
--- Task 4: assigned to Staff 4, Status 3 (Completed)
-IF EXISTS (SELECT 1 FROM MaintenanceTask WHERE TaskID = 4)
-    UPDATE MaintenanceTask SET RequestID = 5, StaffID = 4, AssignedBy = 2, AssignedDate = DATEADD(day, -2, GETDATE()), Deadline = DATEADD(day, -1, GETDATE()), Status = 3 WHERE TaskID = 4;
-ELSE
-BEGIN
-    SET IDENTITY_INSERT MaintenanceTask ON;
-    INSERT INTO MaintenanceTask (TaskID, RequestID, StaffID, AssignedBy, AssignedDate, Deadline, Status) VALUES (4, 5, 4, 2, DATEADD(day, -2, GETDATE()), DATEADD(day, -1, GETDATE()), 3);
-    SET IDENTITY_INSERT MaintenanceTask OFF;
-END
-
--- Task 5: assigned to Staff 4, Status 1 (Assigned - Overdue!)
-IF EXISTS (SELECT 1 FROM MaintenanceTask WHERE TaskID = 5)
-    UPDATE MaintenanceTask SET RequestID = 6, StaffID = 4, AssignedBy = 2, AssignedDate = DATEADD(day, -3, GETDATE()), Deadline = DATEADD(day, -1, GETDATE()), Status = 1 WHERE TaskID = 5;
-ELSE
-BEGIN
-    SET IDENTITY_INSERT MaintenanceTask ON;
-    INSERT INTO MaintenanceTask (TaskID, RequestID, StaffID, AssignedBy, AssignedDate, Deadline, Status) VALUES (5, 6, 4, 2, DATEADD(day, -3, GETDATE()), DATEADD(day, -1, GETDATE()), 1);
-    SET IDENTITY_INSERT MaintenanceTask OFF;
-END
-
--- Task 6: assigned to Staff 4, Status 3 (Completed)
-IF EXISTS (SELECT 1 FROM MaintenanceTask WHERE TaskID = 6)
-    UPDATE MaintenanceTask SET RequestID = 7, StaffID = 4, AssignedBy = 2, AssignedDate = DATEADD(day, -4, GETDATE()), Deadline = DATEADD(day, -2, GETDATE()), Status = 3 WHERE TaskID = 6;
-ELSE
-BEGIN
-    SET IDENTITY_INSERT MaintenanceTask ON;
-    INSERT INTO MaintenanceTask (TaskID, RequestID, StaffID, AssignedBy, AssignedDate, Deadline, Status) VALUES (6, 7, 4, 2, DATEADD(day, -4, GETDATE()), DATEADD(day, -2, GETDATE()), 3);
-    SET IDENTITY_INSERT MaintenanceTask OFF;
-END
 GO
 
 -- 7. Maintenance Reports
-SET IDENTITY_INSERT MaintenanceReport ON;
+-- (No mock reports since Task 1 is in Assigned status with 0% progress)
 
-IF EXISTS (SELECT 1 FROM MaintenanceReport WHERE ReportID = 1)
-    UPDATE MaintenanceReport SET TaskID = 3, ReportContent = N'Đã kiểm tra dàn nóng và lạnh. Block điều hòa không chạy do tụ đề bị hỏng. Đã liên hệ bên đại lý cung cấp linh kiện để thay tụ đề Panasonic mới.', ProgressPercent = 50, CreatedAt = DATEADD(hour, -12, GETDATE()) WHERE ReportID = 1;
+-- 8. Notifications Mock Data
+SET IDENTITY_INSERT Notification ON;
+
+IF EXISTS (SELECT 1 FROM Notification WHERE NotificationID = 1)
+    UPDATE Notification SET Title = N'Công việc mới được phân công', Content = N'Bạn được phân công xử lý sự cố: Ổ cắm điện phòng khách bị cháy chập.', CreatedBy = 2, CreatedAt = DATEADD(hour, -1, GETDATE()), RelatedEntityType = 'MaintenanceTask', RelatedEntityId = 1 WHERE NotificationID = 1;
 ELSE
-    INSERT INTO MaintenanceReport (ReportID, TaskID, ReportContent, ProgressPercent, CreatedAt) VALUES (1, 3, N'Đã kiểm tra dàn nóng và lạnh. Block điều hòa không chạy do tụ đề bị hỏng. Đã liên hệ bên đại lý cung cấp linh kiện để thay tụ đề Panasonic mới.', 50, DATEADD(hour, -12, GETDATE()));
+    INSERT INTO Notification (NotificationID, Title, Content, NotificationType, CreatedBy, CreatedAt, RelatedEntityType, RelatedEntityId)
+    VALUES (1, N'Công việc mới được phân công', N'Bạn được phân công xử lý sự cố: Ổ cắm điện phòng khách bị cháy chập.', 3, 2, DATEADD(hour, -1, GETDATE()), 'MaintenanceTask', 1);
 
-IF EXISTS (SELECT 1 FROM MaintenanceReport WHERE ReportID = 2)
-    UPDATE MaintenanceReport SET TaskID = 4, ReportContent = N'Tháo bỏ chấn lưu bóng đèn cũ bị hỏng và vệ sinh máng đèn LED trước khi lắp bóng mới.', ProgressPercent = 50, CreatedAt = DATEADD(day, -1, GETDATE()) WHERE ReportID = 2;
+SET IDENTITY_INSERT Notification OFF;
+GO
+
+-- 9. Account Notifications Mock Data
+SET IDENTITY_INSERT AccountNotification ON;
+
+IF EXISTS (SELECT 1 FROM AccountNotification WHERE ID = 1)
+    UPDATE AccountNotification SET NotificationID = 1, AccountID = 4, IsRead = 0, ReadAt = NULL WHERE ID = 1;
 ELSE
-    INSERT INTO MaintenanceReport (ReportID, TaskID, ReportContent, ProgressPercent, CreatedAt) VALUES (2, 4, N'Tháo bỏ chấn lưu bóng đèn cũ bị hỏng và vệ sinh máng đèn LED trước khi lắp bóng mới.', 50, DATEADD(day, -1, GETDATE()));
+    INSERT INTO AccountNotification (ID, NotificationID, AccountID, IsRead, ReadAt)
+    VALUES (1, 1, 4, 0, NULL);
 
-IF EXISTS (SELECT 1 FROM MaintenanceReport WHERE ReportID = 3)
-    UPDATE MaintenanceReport SET TaskID = 4, ReportContent = N'Đã thay bóng LED Philips 9W mới. Ánh sáng đều tốt, công suất ổn định.', ProgressPercent = 100, CreatedAt = DATEADD(hour, -18, GETDATE()) WHERE ReportID = 3;
-ELSE
-    INSERT INTO MaintenanceReport (ReportID, TaskID, ReportContent, ProgressPercent, CreatedAt) VALUES (3, 4, N'Đã thay bóng LED Philips 9W mới. Ánh sáng đều tốt, công suất ổn định.', 100, DATEADD(hour, -18, GETDATE()));
-
-IF EXISTS (SELECT 1 FROM MaintenanceReport WHERE ReportID = 4)
-    UPDATE MaintenanceReport SET TaskID = 6, ReportContent = N'Đo kiểm tra thấy tiếp điểm công tắc bị chập cháy sun nhựa bên trong hạt nút ấn.', ProgressPercent = 30, CreatedAt = DATEADD(day, -3, GETDATE()) WHERE ReportID = 4;
-ELSE
-    INSERT INTO MaintenanceReport (ReportID, TaskID, ReportContent, ProgressPercent, CreatedAt) VALUES (4, 6, N'Đo kiểm tra thấy tiếp điểm công tắc bị chập cháy sun nhựa bên trong hạt nút ấn.', 30, DATEADD(day, -3, GETDATE()));
-
-IF EXISTS (SELECT 1 FROM MaintenanceReport WHERE ReportID = 5)
-    UPDATE MaintenanceReport SET TaskID = 6, ReportContent = N'Đã thay thế hạt công tắc Panasonic chính hãng mới. Bình nóng lạnh bật tắt hoạt động bình thường, an toàn.', ProgressPercent = 100, CreatedAt = DATEADD(day, -2, GETDATE()) WHERE ReportID = 5;
-ELSE
-    INSERT INTO MaintenanceReport (ReportID, TaskID, ReportContent, ProgressPercent, CreatedAt) VALUES (5, 6, N'Đã thay thế hạt công tắc Panasonic chính hãng mới. Bình nóng lạnh bật tắt hoạt động bình thường, an toàn.', 100, DATEADD(day, -2, GETDATE()));
-
-SET IDENTITY_INSERT MaintenanceReport OFF;
+SET IDENTITY_INSERT AccountNotification OFF;
 GO
