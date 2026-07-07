@@ -62,7 +62,7 @@ public class ManagerProfileController {
             @RequestParam(value = "size", defaultValue = "5") int size,
             Model model) {
 
-        String roleName = "resident".equalsIgnoreCase(type) ? "RESIDENT" : "MAINTENANCE_STAFF";
+        String roleName = "resident".equalsIgnoreCase(type) ? "Resident" : "Maintenance Staff";
         Optional<Role> roleOpt = roleService.findByRoleName(roleName);
         
         Integer roleId = null;
@@ -75,10 +75,10 @@ public class ManagerProfileController {
 
         List<Profile> allProfiles = profileService.findAll();
         long totalResidents = allProfiles.stream()
-                .filter(p -> p.getAccount() != null && "RESIDENT".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
+                .filter(p -> p.getAccount() != null && "RESIDENT".equalsIgnoreCase(p.getAccount().getRole().getRoleName().replace(" ", "_")))
                 .count();
         long totalMaintenance = allProfiles.stream()
-                .filter(p -> p.getAccount() != null && "MAINTENANCE_STAFF".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
+                .filter(p -> p.getAccount() != null && "MAINTENANCE_STAFF".equalsIgnoreCase(p.getAccount().getRole().getRoleName().replace(" ", "_")))
                 .count();
 
         model.addAttribute("profiles", userPage.getContent());

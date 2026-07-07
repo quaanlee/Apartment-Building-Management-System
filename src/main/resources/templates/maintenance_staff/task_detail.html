@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/maintenance/layout_maintenance :: maintenance-layout(~{::main}, 'tasks')}">
+<head>
+    <title>Task Detail - ABMS</title>
+</head>
+<body>
+
+<main class="tasks-page">
+    <div class="page-header">
+        <div>
+            <h2>Perform and Report on Task</h2>
+            <p>View request details, review history, and submit your repair report.</p>
+        </div>
+    </div>
+
+    <div th:if="${message}" class="alert" th:classappend="${messageType == 'error'} ? ' alert-danger' : ' alert-success'" th:text="${message}">
+        Alert message
+    </div>
+
+    <div class="detail-layout">
+        <section class="detail-card">
+            <h3>Task Information</h3>
+            <div class="info-group">
+                <div class="info-label">Title</div>
+                <div class="info-value" th:text="${task.maintenanceRequest.title}">Fix pipe</div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Description</div>
+                <div class="info-value" th:text="${task.maintenanceRequest.description}">Water is leaking from the sink pipe...</div>
+            </div>
+            <div style="display: flex; gap: 40px; margin-top: 24px;">
+                <div class="info-group">
+                    <div class="info-label">Location</div>
+                    <div class="info-value" th:text="${task.maintenanceRequest.apartment.apartmentNumber}">Apt 101</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Resident Name</div>
+                    <div class="info-value" th:text="${task.maintenanceRequest.profile.fullName}">John Doe</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Assigned On</div>
+                    <div class="info-value" th:text="${#temporals.format(task.assignedDate, 'dd MMM yyyy, HH:mm')}">12 Oct 2026</div>
+                </div>
+            </div>
+
+            <div th:if="${task.status != 3}">
+                <h3 style="margin-top: 40px;">Submit Detailed Repair Report</h3>
+                <form class="report-form" th:action="@{'/maintenance_staff/tasks/' + ${task.taskId} + '/report'}" th:object="${reportDto}" method="post">
+                    <input type="hidden" th:field="*{taskId}"/>
+                    
+                    <div class="form-group">
+                        <label for="reportContent">Report Content *</label>
+                        <textarea th:field="*{reportContent}" id="reportContent" class="form-control" rows="4" placeholder="Describe the actions taken, materials used, etc." required></textarea>
+                        <span th:if="${#fields.hasErrors('reportContent')}" th:errors="*{reportContent}" class="form-error">Error</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="progressPercent">Task Progress (%) *</label>
+                        <input type="range" th:field="*{progressPercent}" id="progressPercent" min="0" max="100" th:data-min="${minProgress}" oninput="handleSliderInput(this)">
+                        <div class="progress-display" id="progVal" th:text="*{progressPercent} + '%'">0%</div>
+                        <span th:if="${#fields.hasErrors('progressPercent')}" th:errors="*{progressPercent}" class="form-error">Error</span>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Set to 100% to mark this task as completed.</p>
+                    </div>
+
+                    <button type="submit" class="task-btn primary" style="align-self: flex-start; margin-top: 8px;">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Submit Report &amp; Update Progress
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <aside class="detail-card">
+            <h3>Report History</h3>
+            <div th:if="${reports.empty}" style="color: var(--text-secondary); font-size: 14px; font-style: italic;">
+                No reports submitted yet.
+            </div>
+            <div class="timeline" th:unless="${reports.empty}">
+                <div class="timeline-item" th:each="report : ${reports}">
+                    <div class="timeline-date" th:text="${#temporals.format(report.createdAt, 'dd MMM yyyy, HH:mm')}">12 Oct 2026 15:00</div>
+                    <div class="timeline-content">
+                        <div th:text="${report.reportContent}">Fixed the valve.</div>
+                        <span class="timeline-progress" th:text="'Progress: ' + ${report.progressPercent} + '%'">Progress: 50%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${task.status == 3}" style="margin-top: 32px; padding: 16px; background: #D1FAE5; border-radius: var(--radius-md); text-align: center; color: #059669; font-weight: 600;">
+                <i class="fa-solid fa-check-circle" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>
+                Task Completed
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        function handleSliderInput(slider) {
+            const minVal = parseInt(slider.getAttribute('data-min') || '0');
+            let currentVal = parseInt(slider.value || '0');
+            if (currentVal < minVal) {
+                slider.value = minVal;
+                currentVal = minVal;
+            }
+            document.getElementById('progVal').innerText = currentVal + '%';
+        }
+    </script>
+</main>
+
+</body>
+</html>

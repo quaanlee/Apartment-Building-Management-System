@@ -44,10 +44,6 @@ public class AuthController {
             @RequestParam("password") String password,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
-        System.out.println("================ login =================");
-        System.out.println("email: " + email);
-        System.out.println("password: " + password);
-        System.out.println("================ login =================");
 
         if (email == null || email.trim().isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Email cannot be empty.");
@@ -57,7 +53,6 @@ public class AuthController {
         Optional<Account> accountOpt = accountService.findByUsername(email);
 
         if (accountOpt.isEmpty()) {
-            System.out.println("Account not found for email: " + email);
             redirectAttributes.addFlashAttribute("error", "Invalid email or password. Please try again.");
             return "redirect:/login";
         }
@@ -110,10 +105,11 @@ public class AuthController {
     @GetMapping("/maintainer/dashboard")
     public String maintainerDashboard(HttpSession session) {
         Account currentUser = (Account) session.getAttribute("currentUser");
-        if (currentUser == null || !"MAINTENANCE STAFF".equalsIgnoreCase(currentUser.getRole().getRoleName())) {
+        if (currentUser == null
+                || !"MAINTENANCE_STAFF".equalsIgnoreCase(currentUser.getRole().getRoleName().replace(" ", "_"))) {
             return "redirect:/login";
         }
-        return "maintainer/dashboard";
+        return "redirect:/maintenance_staff/dashboard";
     }
 
     // ==========================================
@@ -312,12 +308,12 @@ public class AuthController {
     }
 
     private String getRedirectUrlForRole(Account account) {
-        String roleName = account.getRole().getRoleName().toUpperCase();
+        String roleName = account.getRole().getRoleName().toUpperCase().replace(" ", "_");
         return switch (roleName) {
             case "ADMIN" -> "redirect:/admin/users";
             case "MANAGER" -> "redirect:/manager/utility-bookings";
             case "RESIDENT" -> "redirect:/resident/dashboard";
-            case "MAINTENANCE STAFF" -> "redirect:/maintainer/dashboard";
+            case "MAINTENANCE_STAFF" -> "redirect:/maintenance_staff/dashboard";
             default -> "redirect:/login";
         };
     }

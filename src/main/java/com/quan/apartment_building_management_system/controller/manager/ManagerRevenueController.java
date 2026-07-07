@@ -32,7 +32,7 @@ public class ManagerRevenueController {
     private static final int PAGE_SIZE = 15;
     private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DecimalFormat VND_FMT = new DecimalFormat("#,###,###,###",
-            DecimalFormatSymbols.getInstance(Locale.of("vi", "VN")));
+            DecimalFormatSymbols.getInstance(new Locale("vi", "VN")));
 
     private final BillRepository billRepository;
 

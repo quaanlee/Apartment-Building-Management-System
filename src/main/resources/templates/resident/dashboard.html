@@ -1,48 +1,56 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/resident/layout_resident :: resident-layout(~{::#main-content}, 'dashboard')}"
+      th:with="pageTitle='Resident Dashboard'">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resident Dashboard | ABM System</title>
+    <title>Resident Dashboard</title>
+</head>
+<body>
+<div id="main-content">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            margin: 0;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
+        .dashboard-welcome-card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E5E7EB;
+            text-align: center;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+        .dashboard-welcome-card h1 {
+            color: #1E1B4B;
+            font-size: 24px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        .dashboard-welcome-card p {
+            color: #6B7280;
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+        .btn-action-dash {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-        }
-        .card {
-            background: white;
-            padding: 3rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        h1 { color: #1e293b; margin-bottom: 1rem; }
-        p { color: #64748b; margin-bottom: 2rem; }
-        .btn-logout {
-            padding: 0.75rem 1.5rem;
-            background-color: #ef4444;
+            padding: 10px 20px;
+            background-color: #582BE8;
             color: white;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
+            transition: background-color 0.2s;
         }
-        .btn-logout:hover {
-            background-color: #dc2626;
+        .btn-action-dash:hover {
+            background-color: #4a22c9;
         }
     </style>
-</head>
-<body>
-    <div class="card">
-        <h1>Resident Dashboard</h1>
-        <p>Welcome back, <span th:text="${session.currentUser != null ? session.currentUser.username : 'Resident'}">Resident</span>!</p>
-        <a th:href="@{/logout}" class="btn-logout">Logout</a>
+    
+    <div class="dashboard-welcome-card">
+        <h1>Welcome Back!</h1>
+        <p>Hello, <strong th:text="${session.currentUser != null ? session.currentUser.username : 'Resident'}">Resident</strong>. Welcome to your ABMS Resident Portal.</p>
+        <a th:href="@{/resident/billing}" class="btn-action-dash">View My Bills</a>
     </div>
+</div>
 </body>
 </html>
