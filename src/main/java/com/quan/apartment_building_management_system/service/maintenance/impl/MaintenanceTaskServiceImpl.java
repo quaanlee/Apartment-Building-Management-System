@@ -111,7 +111,7 @@ public class MaintenanceTaskServiceImpl implements MaintenanceTaskService {
         task.setStatus((byte) 1); // Assigned
         maintenanceTaskRepository.save(task);
 
-        req.setStatus((byte) 2); // Assigned
+        req.setStatus((byte) 1); // In Progress
         maintenanceRequestRepository.save(req);
 
         // Create notification for staff
