@@ -87,19 +87,10 @@ public class AuthController {
             return "redirect:/login";
         String role = currentUser.getRole().getRoleName().toUpperCase();
         if ("MANAGER".equals(role))
-            return "redirect:/manager/utility-bookings";
+            return "redirect:/manager/dashboard";
         if (!"ADMIN".equals(role))
             return "redirect:/login";
         return "admin/dashboard";
-    }
-
-    @GetMapping("/resident/dashboard")
-    public String residentDashboard(HttpSession session) {
-        Account currentUser = (Account) session.getAttribute("currentUser");
-        if (currentUser == null || !"RESIDENT".equalsIgnoreCase(currentUser.getRole().getRoleName())) {
-            return "redirect:/login";
-        }
-        return "resident/dashboard";
     }
 
     @GetMapping("/maintainer/dashboard")
