@@ -121,13 +121,13 @@ public class DataInitializer implements CommandLineRunner {
             managerRole.setRoleName("Manager");
             managerRole = roleRepository.save(managerRole);
 
-            staffRole = new Role();
-            staffRole.setRoleName("Maintenance Staff");
-            staffRole = roleRepository.save(staffRole);
-
             residentRole = new Role();
             residentRole.setRoleName("Resident");
             residentRole = roleRepository.save(residentRole);
+
+            staffRole = new Role();
+            staffRole.setRoleName("Maintenance Staff");
+            staffRole = roleRepository.save(staffRole);
         } else {
             adminRole = roleRepository.findAll().stream().filter(r -> "Admin".equalsIgnoreCase(r.getRoleName())).findFirst().orElse(null);
             managerRole = roleRepository.findAll().stream().filter(r -> "Manager".equalsIgnoreCase(r.getRoleName())).findFirst().orElse(null);
@@ -185,19 +185,19 @@ public class DataInitializer implements CommandLineRunner {
             managerAcc.setStatus(true);
             managerAcc = accountRepository.save(managerAcc);
 
-            staffAcc = new Account();
-            staffAcc.setUsername("staff@gmail.com");
-            staffAcc.setPassword("123456");
-            staffAcc.setRole(staffRole);
-            staffAcc.setStatus(true);
-            staffAcc = accountRepository.save(staffAcc);
-
             residentAcc = new Account();
             residentAcc.setUsername("resident@gmail.com");
             residentAcc.setPassword("123456");
             residentAcc.setRole(residentRole);
             residentAcc.setStatus(true);
             residentAcc = accountRepository.save(residentAcc);
+
+            staffAcc = new Account();
+            staffAcc.setUsername("staff@gmail.com");
+            staffAcc.setPassword("123456");
+            staffAcc.setRole(staffRole);
+            staffAcc.setStatus(true);
+            staffAcc = accountRepository.save(staffAcc);
         } else {
             adminAcc = accountRepository.findByUsername("admin@gmail.com").orElse(null);
             managerAcc = accountRepository.findByUsername("manager@gmail.com").orElse(null);
@@ -281,20 +281,6 @@ public class DataInitializer implements CommandLineRunner {
                 managerProfile = profileRepository.save(managerProfile);
             }
 
-            if (staffAcc != null) {
-                staffProfile = new Profile();
-                staffProfile.setAccount(staffAcc);
-                staffProfile.setFullName("Nguyễn Văn Bảo Trì");
-                staffProfile.setGender("Nam");
-                staffProfile.setDateOfBirth(LocalDate.of(1993, 2, 28));
-                staffProfile.setCitizenId("012345678903");
-                staffProfile.setNationality("Vietnam");
-                staffProfile.setEthnicity("Kinh");
-                staffProfile.setPhoneNumber("0923456789");
-                staffProfile.setEmail("staff@gmail.com");
-                staffProfile = profileRepository.save(staffProfile);
-            }
-
             if (residentAcc != null) {
                 residentProfile = new Profile();
                 residentProfile.setAccount(residentAcc);
@@ -311,6 +297,20 @@ public class DataInitializer implements CommandLineRunner {
                 residentProfile.setIsHouseholdOwner(true);
                 residentProfile.setMoveInDate(LocalDate.now().minusMonths(6));
                 residentProfile = profileRepository.save(residentProfile);
+            }
+
+            if (staffAcc != null) {
+                staffProfile = new Profile();
+                staffProfile.setAccount(staffAcc);
+                staffProfile.setFullName("Nguyễn Văn Bảo Trì");
+                staffProfile.setGender("Nam");
+                staffProfile.setDateOfBirth(LocalDate.of(1993, 2, 28));
+                staffProfile.setCitizenId("012345678903");
+                staffProfile.setNationality("Vietnam");
+                staffProfile.setEthnicity("Kinh");
+                staffProfile.setPhoneNumber("0923456789");
+                staffProfile.setEmail("staff@gmail.com");
+                staffProfile = profileRepository.save(staffProfile);
             }
         } else {
             List<Profile> profs = profileRepository.findAll();

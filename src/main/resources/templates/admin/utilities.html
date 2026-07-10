@@ -97,10 +97,7 @@
             <!-- Middle: Details & Admin Actions -->
             <div class="card-details-box">
                 <h3 th:text="${util.utilityName}">Rooftop Infinity Pool</h3>
-                <div class="location-row">
-                    <i class="fa-solid fa-location-dot"></i>
-                    <span th:text="${util.location}">Floor 25, North Wing</span>
-                </div>
+
                 <div class="location-row" style="margin-top: 4px;">
                     <i class="fa-solid fa-circle-info"></i>
                     <span th:text="${util.typeLabel}">RESERVABLE</span>
@@ -124,22 +121,11 @@
                         </button>
                     </form>
 
-                    <!-- Add Resource context trigger -->
-                    <button class="icon-action-btn add-resource"
-                            th:data-id="${util.utilityId}"
-                            th:data-name="${util.utilityName}"
-                            onclick="openAddResourceModal(this.getAttribute('data-id'), this.getAttribute('data-name'))"
-                            title="Add Resource">
-                        <i class="fas fa-plus"></i>
-                    </button>
+
                 </div>
             </div>
 
-            <!-- Right: Bookings stats -->
-            <div class="card-stats-box">
-                <span class="stats-number" th:text="${util.bookingsPerMonth}">142</span>
-                <span class="stats-label">Bookings/month</span>
-            </div>
+
         </div>
 
         <div th:if="${#lists.isEmpty(utilities)}" style="padding: 40px; text-align: center; color: var(--text-secondary); background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-top: 16px;">
@@ -190,6 +176,13 @@
                     <div class="form-group">
                         <label for="utilityImageField">Utility Main Image</label>
                         <input type="file" name="utilityImage" id="utilityImageField" class="form-control" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="utilityTypeField">Type</label>
+                        <select name="type" id="utilityTypeField" class="form-control">
+                            <option value="true">Need to book (Reservable)</option>
+                            <option value="false">No need to book (Free Use)</option>
+                        </select>
                     </div>
                     <div class="form-group" style="display: none;">
                         <label for="utilityStatusField">Status</label>
@@ -333,17 +326,19 @@
             document.getElementById("utilityNameField").value = "";
             document.getElementById("utilityDescField").value = "";
             document.getElementById("utilityStatusField").value = "true";
+            document.getElementById("utilityTypeField").value = "true";
             document.getElementById("utilityImageField").value = "";
             document.getElementById("utilityImageField").required = true;
             showModal("utilityModal");
         }
 
-        function openEditUtilityModal(id, name, desc, status) {
+        function openEditUtilityModal(id, name, desc, status, type) {
             document.getElementById("utilityModalTitle").innerText = "Edit Utility";
             document.getElementById("utilityIdField").value = id;
             document.getElementById("utilityNameField").value = name;
             document.getElementById("utilityDescField").value = desc;
             document.getElementById("utilityStatusField").value = status ? "true" : "false";
+            document.getElementById("utilityTypeField").value = type ? "true" : "false";
             document.getElementById("utilityImageField").value = "";
             document.getElementById("utilityImageField").required = false;
             showModal("utilityModal");

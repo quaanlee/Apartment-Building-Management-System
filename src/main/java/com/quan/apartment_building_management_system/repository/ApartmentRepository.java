@@ -21,12 +21,14 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Integer> {
             "(:search IS NULL OR :search = '' OR " +
             "LOWER(a.apartmentNumber) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(a.roomType) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+            "(:roomType IS NULL OR :roomType = '' OR a.roomType = :roomType) AND " +
             "(:floor IS NULL OR a.floor = :floor) AND " +
             "(:status IS NULL OR a.status = :status) AND " +
             "(:minArea IS NULL OR a.area >= :minArea) AND " +
             "(:maxArea IS NULL OR a.area <= :maxArea)")
     Page<Apartment> findFiltered(
             @Param("search") String search,
+            @Param("roomType") String roomType,
             @Param("floor") Byte floor,
             @Param("status") Byte status,
             @Param("minArea") BigDecimal minArea,

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/resident/layout_resident :: resident-layout(~{::content}, 'apartments')}">
+<body>
+
+<div th:fragment="content">
+    <!-- Page Specific Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/resident/detail.css}">
+
+    <!-- Top Action Row -->
+    <div class="detail-header-action">
+        <a th:href="@{/resident/apartments}" class="btn-back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Apartments Directory
+        </a>
+    </div>
+
+    <!-- Image Gallery Section -->
+    <div class="gallery-container">
+        <!-- Main Large Image -->
+        <div class="gallery-main">
+            <img th:src="${apartment.imageUrls != null && !apartment.imageUrls.isEmpty()} 
+                          ? ${apartment.imageUrls.get(0)} 
+                          : 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80'" 
+                 alt="Apartment Main View">
+        </div>
+        
+        <!-- Stacked Side Thumbnails -->
+        <div class="gallery-side">
+            <!-- Sub Image 1 -->
+            <div class="gallery-thumb">
+                <img th:src="${apartment.imageUrls != null && apartment.imageUrls.size() > 1} 
+                              ? ${apartment.imageUrls.get(1)} 
+                              : 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'" 
+                     alt="Living Area View">
+            </div>
+            <!-- Sub Image 2 -->
+            <div class="gallery-thumb">
+                <img th:src="${apartment.imageUrls != null && apartment.imageUrls.size() > 2} 
+                              ? ${apartment.imageUrls.get(2)} 
+                              : 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80'" 
+                     alt="Bedroom View">
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Sections Grid -->
+    <div class="detail-sections-grid">
+        <!-- Left Main Specs Content -->
+        <div class="specs-detail-card">
+            <div class="specs-title-row">
+                <h1 th:text="'Unit ' + ${apartment.apartmentNumber}">Unit A-101</h1>
+                
+                <!-- Status badge matching style -->
+                <span th:if="${apartment.status == 0}" class="badge badge-available">Available</span>
+                <span th:if="${apartment.status == 1}" class="badge badge-occupied">Occupied</span>
+                <span th:if="${apartment.status == 2}" class="badge badge-maintenance">Maintenance</span>
+            </div>
+
+            <!-- Specs Mini Grid -->
+            <div class="specs-overview-cards">
+                <div class="spec-mini-card">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span class="spec-val" th:text="${apartment.floor} + 'F'">1F</span>
+                    <span class="spec-lbl">Floor Level</span>
+                </div>
+                <div class="spec-mini-card">
+                    <i class="fa-solid fa-ruler-combined"></i>
+                    <span class="spec-val" th:text="${apartment.area} + ' m²'">75.00 m²</span>
+                    <span class="spec-lbl">Area Size</span>
+                </div>
+                <div class="spec-mini-card">
+                    <i class="fa-solid fa-bed"></i>
+                    <span class="spec-val" th:text="${apartment.roomType}">2BR</span>
+                    <span class="spec-lbl">Configuration</span>
+                </div>
+                <div class="spec-mini-card">
+                    <i class="fa-solid fa-users"></i>
+                    <span class="spec-val" th:text="${apartment.maxOccupancy} + ' Pax'">4 Pax</span>
+                    <span class="spec-lbl">Max Capacity</span>
+                </div>
+            </div>
+
+            <!-- Dynamic Room Description -->
+            <div class="specs-description">
+                <h3>
+                    <i class="fa-solid fa-circle-info"></i>
+                    Property Description
+                </h3>
+                
+                <p th:if="${apartment.roomType == '1BR' || apartment.roomType == 'Studio' || apartment.roomType == '1 Bedroom'}">
+                    This premium 1 Bedroom / Studio apartment features a compact and open layout, offering maximum space utilization and cozy modern design. Perfect for singles or couples, it boasts high-quality wooden flooring, smart energy-saving fixtures, and large double-glazed windows that fill the living spaces with bright natural daylight. The kitchen is fully integrated with elegant marble countertops and built-in cabinet storage.
+                </p>
+                <p th:if="${apartment.roomType == '2BR' || apartment.roomType == '2 Bedrooms'}">
+                    Designed with modern families in mind, this elegant 2 Bedroom residence offers a perfect balance of privacy and shared living. It features a spacious open-concept living area connected to a private balcony overlooking beautiful urban scenery. The master bedroom includes an en-suite bathroom with luxury sanitary ware, while the secondary bedroom is highly versatile for children or as a dedicated workspace/home office.
+                </p>
+                <p th:if="${apartment.roomType == '3BR' || apartment.roomType == '3 Bedrooms'}">
+                    Our signature 3 Bedroom luxury apartment is the epitome of comfort and premium living. It features a grand living room, a separate formal dining area, and a fully equipped chef's kitchen. With three expansive bedrooms and two bathroom suites, it offers ample room for larger families. Large wrap-around windows offer panoramic city views, creating a dramatic sense of space and premium luxury.
+                </p>
+                <!-- Fallback description -->
+                <p th:if="${apartment.roomType != '1BR' && apartment.roomType != 'Studio' && apartment.roomType != '1 Bedroom' && apartment.roomType != '2BR' && apartment.roomType != '2 Bedrooms' && apartment.roomType != '3BR' && apartment.roomType != '3 Bedrooms'}">
+                    This high-end apartment unit represents the premium living standards of the ABMS residence. Offering exceptional layout efficiency, modern thermal insulation, and top-tier security access (via smart lock and RFID tags), the residence provides a peaceful and modern lifestyle environment.
+                </p>
+            </div>
+
+            <!-- Additional specs table info -->
+            <div class="specs-description">
+                <h3>
+                    <i class="fa-solid fa-list-ul"></i>
+                    General Specifications
+                </h3>
+                <p>
+                    All units in the complex feature premium acoustic insulation between floors, centralized VRV air conditioning hookups, fiber-optic internet connectivity sockets, and modern fire safety sprinkler systems connected directly to the central control station.
+                </p>
+            </div>
+        </div>
+
+        <!-- Right Sidebar Cards Column -->
+        <div class="specs-side-column">
+            <!-- Registered Occupants (Only for Occupied apartments) -->
+            <div class="side-card">
+                <h3 class="side-card-title">
+                    <i class="fa-solid fa-people-roof"></i>
+                    Active Occupants
+                </h3>
+                
+                <div class="occupants-list" th:if="${apartment.status == 1 && !#lists.isEmpty(apartment.currentResidents)}">
+                    <div class="occupant-item" th:each="res : ${apartment.currentResidents}">
+                        <div class="occupant-name">
+                            <i class="fa-solid fa-circle-user" style="color: var(--primary-color);"></i>
+                            <span th:text="${res.fullName}">Nguyen Van A</span>
+                            <span th:class="${res.isHouseholdOwner ? 'badge-owner' : 'badge-member'}" 
+                                  th:text="${res.isHouseholdOwner ? 'Owner' : (res.relationshipToOwner != null && res.relationshipToOwner != '' ? res.relationshipToOwner : 'Member')}">Owner</span>
+                        </div>
+                        <div class="occupant-meta" th:if="${res.phoneNumber != null}">
+                            <i class="fa-solid fa-phone"></i>
+                            <span th:text="${res.phoneNumber}">0912345678</span>
+                        </div>
+                        <div class="occupant-meta" th:if="${res.email != null}">
+                            <i class="fa-solid fa-envelope"></i>
+                            <span th:text="${res.email}">a.nguyen@email.com</span>
+                        </div>
+                        <div class="occupant-meta" th:if="${res.moveInDate != null}">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <span>Moved in: <span th:text="${#temporals.format(res.moveInDate, 'MMM dd, yyyy')}">Jan 01, 2023</span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty state for occupants list -->
+                <div class="occupant-empty" th:if="${apartment.status != 1 || #lists.isEmpty(apartment.currentResidents)}">
+                    <i class="fa-solid fa-door-closed"></i>
+                    <p>No active residents are registered in this apartment unit.</p>
+                </div>
+            </div>
+
+            <!-- Premium Amenities & Features -->
+            <div class="side-card">
+                <h3 class="side-card-title">
+                    <i class="fa-solid fa-star"></i>
+                    Premium Features
+                </h3>
+                <ul class="features-list">
+                    <li><i class="fa-solid fa-circle-check"></i> Smart Keyless Lock (PIN/RFID)</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Double-glazed soundproof glass</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Fiber-optic FTTH broadband socket</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Video intercom entry phone</li>
+                    <li><i class="fa-solid fa-circle-check"></i> 100% backup emergency power</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Central smoke & heat detector</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

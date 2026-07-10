@@ -62,6 +62,38 @@
     bindConfirmModal();
     bindTableActions();
     bindPaginationEvents();
+    bindAutoApproveToggle();
+  }
+
+  function bindAutoApproveToggle() {
+    const toggle = document.getElementById('autoApproveToggle');
+    if (!toggle) return;
+    toggle.addEventListener('change', (e) => {
+      const enabled = e.target.checked;
+      const formData = new FormData();
+      formData.append('enabled', enabled);
+      fetch(BASE_URL + '/auto-approve/toggle', {
+        method: 'POST',
+        body: formData
+      })
+      .then(r => r.json())
+      .then(resp => {
+        if (resp.success) {
+          showToast(`Auto Approve has been turned ${enabled ? 'ON' : 'OFF'}`, 'success');
+          if (enabled) {
+              // Reload page to reflect newly approved bookings
+              setTimeout(() => location.reload(), 1500);
+          }
+        } else {
+          toggle.checked = !enabled; // revert
+          showToast(resp.message || 'Operation failed.', 'error');
+        }
+      })
+      .catch(() => {
+        toggle.checked = !enabled; // revert
+        showToast('Network error. Please try again.', 'error');
+      });
+    });
   }
 
   // ── Submit Helper ───────────────────────────────────────────────────────────

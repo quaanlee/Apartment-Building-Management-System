@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout/resident/layout_resident :: resident-layout(~{::#main-content}, 'booking')}"
+      th:with="pageTitle='Gói Dịch Vụ Của Tôi'">
+<head>
+    <title>Gói Dịch Vụ Của Tôi</title>
+</head>
+<body>
+<div id="main-content" class="container py-4">
+    <link rel="stylesheet" th:href="@{/css/resident/utility-resident.css}">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/resident/utilities}" style="color: var(--primary-color); text-decoration: none;">Tiện Ích</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Gói Dịch Vụ Của Tôi</li>
+        </ol>
+    </nav>
+    <style>
+        .text-primary { color: var(--primary-color) !important; }
+        .bg-primary { background-color: var(--primary-color) !important; }
+        .border-primary { border-color: var(--primary-color) !important; border-width: 2px !important; }
+        .bg-success { background-color: #10b981 !important; } /* Standard green for active */
+    </style>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">Gói Dịch Vụ Của Tôi</h2>
+    </div>
+    
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        <div class="col" th:each="mem : ${memberships}">
+            <div class="card h-100 shadow-sm border-0 rounded-4" th:classappend="${mem.statusLabel == 'Active'} ? 'border-primary' : 'bg-light opacity-75'">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-title fw-bold text-primary mb-1" th:text="${mem.utilityName}"></h5>
+                            <span class="text-muted" th:text="${mem.packageName}"></span>
+                        </div>
+                        <span class="badge rounded-pill px-3 py-2" th:classappend="${mem.statusLabel == 'Active'} ? 'bg-success' : 'bg-secondary'" th:text="${mem.statusLabel}"></span>
+                    </div>
+                    <hr>
+                    <div class="row mb-3 text-muted">
+                        <div class="col-6">
+                            <small class="d-block">Ngày bắt đầu</small>
+                            <strong class="text-dark" th:text="${#temporals.format(mem.startDate, 'dd/MM/yyyy')}"></strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="d-block">Ngày kết thúc</small>
+                            <strong class="text-dark" th:text="${#temporals.format(mem.endDate, 'dd/MM/yyyy')}"></strong>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <span th:if="${mem.paymentStatus}" class="text-success fw-bold"><i class="fas fa-check-circle"></i> Đã Thanh Toán</span>
+                        <span th:unless="${mem.paymentStatus}" class="text-warning fw-bold"><i class="fas fa-clock"></i> Chưa Thanh Toán</span>
+                        <strong class="fs-5 text-dark" th:text="${#numbers.formatDecimal(mem.price, 0, 'COMMA', 0, 'POINT') + ' VND'}"></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(memberships)}" class="col-12 text-center py-5">
+            <h5 class="text-muted">Bạn chưa đăng ký gói tiện ích nào.</h5>
+        </div>
+    </div>
+</div>
+</body>
+</html>

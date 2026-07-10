@@ -62,10 +62,31 @@ public class UtilityBookingController {
         model.addAttribute("stats",         stats);
         model.addAttribute("utilities",     utilities);
         model.addAttribute("filter",        filter);
+        model.addAttribute("autoApproveEnabled", utilityBookingService.isAutoApproveEnabled());
         model.addAttribute("pageTitle",     "Utility Booking Management");
         model.addAttribute("activeTab",     "bookings");
 
         return "manager/utility_bookings/list";
+    }
+
+    /**
+     * AJAX – Toggles the auto approve feature.
+     */
+    @PostMapping("/auto-approve/toggle")
+    @ResponseBody
+    public Map<String, Object> toggleAutoApprove(@RequestParam boolean enabled, HttpSession session) {
+        if (isUnauthorized(session)) return unauthorizedResponse();
+
+        try {
+            Account user = (Account) session.getAttribute("user");
+            utilityBookingService.setAutoApproveEnabled(enabled, user);
+            Map<String, Object> result = new HashMap<>();
+            result.put("success", true);
+            result.put("enabled", enabled);
+            return result;
+        } catch (Exception e) {
+            return errorResponse(e.getMessage());
+        }
     }
 
     // ── AJAX endpoints ────────────────────────────────────────────────────────────

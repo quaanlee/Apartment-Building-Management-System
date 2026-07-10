@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    REVENUE REPORT PAGE - ABMS Admin Design System
    ============================================================ */
 
@@ -179,6 +179,7 @@
 .rev-date-icon { font-size: 18px; color: var(--color-secondary); flex-shrink: 0; }
 
 .rev-date-display {
+    pointer-events: none;
     background: transparent;
     border: none;
     outline: none;

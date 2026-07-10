@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="manager-layout(content, activeTab)">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +10,6 @@
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
 
     <div class="app-container">
@@ -23,62 +21,62 @@
                 <p>Operations Portal</p>
             </div>
 
-            <ul class="sidebar-menu">
-                <li class="sidebar-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
-                    <a th:href="@{#}">
-                        <i class="fas fa-th-large"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'profiles' ? 'active' : ''}">
-                    <a th:href="@{/manager/profiles}">
-                        <i class="fa-solid fa-address-book"></i>
-                        <span>Profiles Directory</span>
-                    </a>
-                </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'apartments' ? 'active' : ''}">
-                    <a th:href="@{/manager/apartments}">
-                        <i class="fa-solid fa-building"></i>
-                        <span>Apartments</span>
-                    </a>
-                </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'billing' ? 'active' : ''}">
-                    <a th:href="@{/manager/bills}">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                        <span>Billing & Payments</span>
-                    </a>
-                </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'maintenance' ? 'active' : ''}">
-                    <a th:href="@{/manager/maintenance}">
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                        <span>Maintenance</span>
-                    </a>
-                </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'bookings' ? 'active' : ''}">
-                    <a th:href="@{/manager/utility-bookings}">
-                        <i class="fa-solid fa-calendar-check"></i>
-                        <span>Amenity Bookings</span>
-                    </a>
-                </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'service_utility' ? 'active' : ''}">
-                    <a th:href="@{/manager/services}">
-                        <i class="fas fa-briefcase"></i>
-                        <span>Service & Utility</span>
-                    </a>
-                </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'revenue' ? 'active' : ''}">
-                    <a th:href="@{/manager/revenue}">
-                        <i class="fa-solid fa-chart-line"></i>
-                        <span>Revenue Report</span>
-                    </a>
-                </li>
-                <li class="sidebar-item" th:classappend="${activeTab == 'vehicles' ? 'active' : ''}">
-                    <a th:href="@{#}">
-                        <i class="fa-solid fa-car"></i>
-                        <span>Vehicles</span>
-                    </a>
-                </li>
-            </ul>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
+                <a th:href="@{#}">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'profiles' ? 'active' : ''}">
+                <a th:href="@{/manager/profiles}">
+                    <i class="fa-solid fa-address-book"></i>
+                    <span>Profiles Directory</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'apartments' ? 'active' : ''}">
+                <a th:href="@{/manager/apartments}">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Apartments</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'billing' ? 'active' : ''}">
+                <a th:href="@{/manager/bills}">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Billing & Payments</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'maintenance' ? 'active' : ''}">
+                <a th:href="@{/manager/maintenance}">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    <span>Maintenance</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'bookings' ? 'active' : ''}">
+                <a th:href="@{/manager/utility-bookings}">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Amenity Bookings</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'service & utility' ? 'active' : ''}">
+                <a th:href="@{/manager/services}">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Service & Utility</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'vehicles' ? 'active' : ''}">
+                <a th:href="@{/manager/vehicles}">
+                    <i class="fa-solid fa-car"></i>
+                    <span>Vehicles</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'notifications' ? 'active' : ''}">
+                <a th:href="@{/manager/notifications}">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </li>
+        </ul>
 
             <div class="sidebar-footer">
                 <a th:href="@{/logout}" class="logout-btn">
@@ -138,5 +136,4 @@
 
     <script th:src="@{/js/layout/layout_manager.js}"></script>
 </body>
-
 </html>

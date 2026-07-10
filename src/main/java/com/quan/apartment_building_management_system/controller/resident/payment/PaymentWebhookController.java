@@ -63,6 +63,29 @@ public class PaymentWebhookController {
     }
 
     /**
+     * Resident initiates payment for a utility membership package.
+     */
+    @PostMapping("/membership/initiate")
+    public String initiateMembershipPayment(@RequestParam Integer utilityId,
+                                            @RequestParam Integer resourceId,
+                                            @RequestParam Integer utilityPriceId,
+                                            HttpSession session,
+                                            RedirectAttributes redirectAttributes) {
+        Account currentUser = (Account) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+        try {
+            String checkoutUrl = payOSService.createMembershipPaymentLink(utilityId, utilityPriceId, currentUser.getAccountId());
+            return "redirect:" + checkoutUrl;
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Payment initiation failed: " + e.getMessage());
+            return "redirect:/resident/utilities/resources/" + resourceId;
+        }
+    }
+
+    /**
      * Return page after successful payment — redirected here by PayOS with ?orderCode=...&code=00
      */
     @GetMapping("/success")
@@ -70,14 +93,39 @@ public class PaymentWebhookController {
                                  @RequestParam(required = false) String code,
                                  RedirectAttributes redirectAttributes) {
         Integer billId = null;
+        boolean isMembership = false;
+        boolean isBooking = false;
         if (orderCode != null) {
             try {
+                if (orderCode >= 900000000000L) {
+                    isMembership = true;
+                } else if (orderCode >= 800000000000L) {
+                    isBooking = true;
+                }
                 payOSService.confirmPaymentFromReturn(orderCode, code);
                 billId = payOSService.getBillIdByOrderCode(String.valueOf(orderCode));
             } catch (Exception e) {
                 System.err.println("[PayOS Success Return Error] " + e.getMessage());
             }
         }
+        
+        if (isBooking) {
+            redirectAttributes.addFlashAttribute("successMessage", "Booking payment successful!");
+            return "redirect:/resident/utilities/history";
+        }
+        
+        if (isMembership) {
+            Integer resourceId = null;
+            if (orderCode != null) {
+                resourceId = payOSService.getResourceIdByMembershipOrderCode(String.valueOf(orderCode));
+            }
+            redirectAttributes.addFlashAttribute("errorMessage", "Membership purchased successfully!");
+            if (resourceId != null) {
+                return "redirect:/resident/utilities/resources/" + resourceId;
+            }
+            return "redirect:/resident/utilities";
+        }
+
         redirectAttributes.addFlashAttribute("message", "Bill payment successfully!");
         redirectAttributes.addFlashAttribute("messageType", "success");
         if (billId != null) {
@@ -93,14 +141,48 @@ public class PaymentWebhookController {
     public String paymentCancel(@RequestParam(required = false) Long orderCode,
                                 RedirectAttributes redirectAttributes) {
         Integer billId = null;
+        boolean isMembership = false;
+        boolean isBooking = false;
         if (orderCode != null) {
             try {
+                if (orderCode >= 900000000000L) {
+                    isMembership = true;
+                } else if (orderCode >= 800000000000L) {
+                    isBooking = true;
+                }
                 payOSService.confirmPaymentCancelled(orderCode);
                 billId = payOSService.getBillIdByOrderCode(String.valueOf(orderCode));
             } catch (Exception e) {
                 System.err.println("[PayOS Cancel Return Error] " + e.getMessage());
             }
         }
+        if (isBooking) {
+            com.quan.apartment_building_management_system.dto.utility.BookingRequestDTO req = null;
+            if (orderCode != null) {
+                req = payOSService.getBookingRequestByOrderCode(String.valueOf(orderCode));
+            }
+            payOSService.confirmPaymentCancelled(orderCode);
+            
+            redirectAttributes.addFlashAttribute("errorMessage", "Thanh toán bị hủy. Vui lòng thử lại!");
+            if (req != null) {
+                redirectAttributes.addFlashAttribute("bookingRequest", req);
+                return "redirect:/resident/utilities/rebook";
+            }
+            return "redirect:/resident/utilities/history";
+        }
+        
+        if (isMembership) {
+            Integer resourceId = null;
+            if (orderCode != null) {
+                resourceId = payOSService.getResourceIdByMembershipOrderCode(String.valueOf(orderCode));
+            }
+            redirectAttributes.addFlashAttribute("errorMessage", "Membership payment has been canceled!");
+            if (resourceId != null) {
+                return "redirect:/resident/utilities/resources/" + resourceId;
+            }
+            return "redirect:/resident/utilities";
+        }
+
         redirectAttributes.addFlashAttribute("message", "Transaction has been canceled!");
         redirectAttributes.addFlashAttribute("messageType", "warning");
         if (billId != null) {

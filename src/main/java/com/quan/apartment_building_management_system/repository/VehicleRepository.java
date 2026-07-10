@@ -11,4 +11,8 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Integer> {
     List<Vehicle> findByProfileProfileId(Integer profileId);
 
     Optional<Vehicle> findByLicensePlate(String licensePlate);
+
+    long countByStatus(Byte status);
+
+    List<Vehicle> findByStatusOrderByRegisteredDateDesc(Byte status);
 }
