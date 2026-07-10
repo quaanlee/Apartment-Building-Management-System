@@ -9,6 +9,16 @@ import com.quan.apartment_building_management_system.repository.AccountRepositor
 import com.quan.apartment_building_management_system.repository.BillRepository;
 import com.quan.apartment_building_management_system.repository.PaymentMethodRepository;
 import com.quan.apartment_building_management_system.repository.PaymentRepository;
+import com.quan.apartment_building_management_system.repository.UtilityMembershipRepository;
+import com.quan.apartment_building_management_system.repository.UtilityPriceRepository;
+import com.quan.apartment_building_management_system.repository.UtilityRepository;
+import com.quan.apartment_building_management_system.repository.ProfileRepository;
+import com.quan.apartment_building_management_system.repository.UtilityBookingRepository;
+import com.quan.apartment_building_management_system.entity.UtilityMembership;
+import com.quan.apartment_building_management_system.entity.UtilityPrice;
+import com.quan.apartment_building_management_system.entity.Utility;
+import com.quan.apartment_building_management_system.entity.Profile;
+import com.quan.apartment_building_management_system.entity.UtilityBooking;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +32,7 @@ import vn.payos.model.v2.paymentRequests.PaymentLinkStatus;
 import vn.payos.model.webhooks.WebhookData;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +49,11 @@ public class PayOSService {
     private final PaymentRepository paymentRepository;
     private final PaymentMethodRepository paymentMethodRepository;
     private final AccountRepository accountRepository;
+    private final UtilityMembershipRepository utilityMembershipRepository;
+    private final UtilityPriceRepository utilityPriceRepository;
+    private final UtilityRepository utilityRepository;
+    private final ProfileRepository profileRepository;
+    private final UtilityBookingRepository utilityBookingRepository;
 
     @Value("${payos.return-url}")
     private String returnUrl;
@@ -49,12 +65,22 @@ public class PayOSService {
             BillRepository billRepository,
             PaymentRepository paymentRepository,
             PaymentMethodRepository paymentMethodRepository,
-            AccountRepository accountRepository) {
+            AccountRepository accountRepository,
+            UtilityMembershipRepository utilityMembershipRepository,
+            UtilityPriceRepository utilityPriceRepository,
+            UtilityRepository utilityRepository,
+            ProfileRepository profileRepository,
+            UtilityBookingRepository utilityBookingRepository) {
         this.payOS = payOS;
         this.billRepository = billRepository;
         this.paymentRepository = paymentRepository;
         this.paymentMethodRepository = paymentMethodRepository;
         this.accountRepository = accountRepository;
+        this.utilityMembershipRepository = utilityMembershipRepository;
+        this.utilityPriceRepository = utilityPriceRepository;
+        this.utilityRepository = utilityRepository;
+        this.profileRepository = profileRepository;
+        this.utilityBookingRepository = utilityBookingRepository;
     }
 
     /**
@@ -104,6 +130,115 @@ public class PayOSService {
 
         saveInitialPaymentRecord(bill, accountId, String.valueOf(orderCode), new BigDecimal(amount));
 
+        return response.getCheckoutUrl();
+    }
+
+    /**
+     * Creates a PayOS payment link for a Utility Membership.
+     * Generates a temporary UtilityMembership with PaymentStatus = false.
+     * Uses orderCode >= 900000000000L to differentiate from bill payments.
+     */
+    public String createMembershipPaymentLink(Integer utilityId, Integer utilityPriceId, Integer accountId) throws Exception {
+        Profile profile = profileRepository.findByAccountAccountId(accountId)
+                .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
+
+        Utility utility = utilityRepository.findById(utilityId)
+                .orElseThrow(() -> new IllegalArgumentException("Utility not found"));
+
+        UtilityPrice price = utilityPriceRepository.findById(utilityPriceId)
+                .orElseThrow(() -> new IllegalArgumentException("Price not found"));
+
+        // Create pending membership
+        UtilityMembership membership = new UtilityMembership();
+        membership.setProfile(profile);
+        membership.setUtility(utility);
+        membership.setUtilityPrice(price);
+        membership.setStartDate(LocalDate.now());
+        
+        String unitName = price.getUnit().getUnitName().toLowerCase();
+        if (unitName.contains("hour") || unitName.contains("day")) {
+            membership.setEndDate(LocalDate.now());
+        } else if (unitName.contains("month")) {
+            membership.setEndDate(LocalDate.now().plusMonths(1));
+        } else {
+            membership.setEndDate(LocalDate.now().plusYears(1));
+        }
+        
+        membership.setStatus(false);
+        membership.setPaymentStatus(false);
+        membership.setCreatedAt(LocalDateTime.now());
+        membership = utilityMembershipRepository.save(membership);
+
+        long orderCode = 900000000000L + membership.getMembershipId();
+        long amount = price.getPrice().longValue();
+
+        if (amount < 2000) {
+            throw new IllegalStateException("PayOS requires a minimum payment amount of 2000 VND.");
+        }
+
+        String description = ("Pkg " + utility.getUtilityName()).replaceAll("[^a-zA-Z0-9 ]", "");
+        if (description.length() > 25) {
+            description = description.substring(0, 25);
+        }
+
+        PaymentLinkItem item = PaymentLinkItem.builder()
+                .name(description)
+                .quantity(1)
+                .price(amount)
+                .build();
+
+        long expiredAt = (System.currentTimeMillis() / 1000L) + (2 * 60);
+
+        CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
+                .orderCode(orderCode)
+                .amount(amount)
+                .description(description)
+                .item(item)
+                .returnUrl(returnUrl)
+                .cancelUrl(cancelUrl)
+                .expiredAt(expiredAt)
+                .build();
+
+        CreatePaymentLinkResponse response = payOS.paymentRequests().create(paymentData);
+
+        return response.getCheckoutUrl();
+    }
+    
+    public String createBookingPaymentLink(Integer bookingId) throws Exception {
+        UtilityBooking booking = utilityBookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+                
+        long orderCode = 800000000000L + booking.getBookingId();
+        long amount = booking.getTotalPrice().longValue();
+        
+        if (amount < 2000) {
+            throw new IllegalStateException("PayOS requires a minimum payment amount of 2000 VND.");
+        }
+        
+        String description = ("Book " + booking.getResource().getResourceName()).replaceAll("[^a-zA-Z0-9 ]", "");
+        if (description.length() > 25) {
+            description = description.substring(0, 25);
+        }
+        
+        PaymentLinkItem item = PaymentLinkItem.builder()
+                .name(description)
+                .quantity(1)
+                .price(amount)
+                .build();
+                
+        long expiredAt = (System.currentTimeMillis() / 1000L) + (5 * 60); // 5 minutes expiration
+        
+        CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
+                .orderCode(orderCode)
+                .amount(amount)
+                .description(description)
+                .item(item)
+                .returnUrl(returnUrl)
+                .cancelUrl(cancelUrl)
+                .expiredAt(expiredAt)
+                .build();
+                
+        CreatePaymentLinkResponse response = payOS.paymentRequests().create(paymentData);
         return response.getCheckoutUrl();
     }
 
@@ -185,6 +320,31 @@ public class PayOSService {
     }
 
     private void markPaymentSuccess(String orderCode) {
+        long code = Long.parseLong(orderCode);
+        if (code >= 900000000000L) {
+            Integer membershipId = (int) (code - 900000000000L);
+            utilityMembershipRepository.findById(membershipId).ifPresent(membership -> {
+                if (membership.getPaymentStatus() != null && membership.getPaymentStatus()) {
+                    return;
+                }
+                membership.setPaymentStatus(true);
+                membership.setStatus(true);
+                utilityMembershipRepository.save(membership);
+            });
+            return;
+        } else if (code >= 800000000000L) {
+            Integer bookingId = (int) (code - 800000000000L);
+            utilityBookingRepository.findById(bookingId).ifPresent(booking -> {
+                if (booking.getPaymentStatus() != null && booking.getPaymentStatus()) {
+                    return;
+                }
+                booking.setPaymentStatus(true);
+                booking.setStatus((byte) 1); // Approved
+                utilityBookingRepository.save(booking);
+            });
+            return;
+        }
+
         paymentRepository.findByTransactionCode(orderCode).ifPresent(payment -> {
             if (payment.getStatus() != null && payment.getStatus() == 1) {
                 return;
@@ -204,7 +364,44 @@ public class PayOSService {
         });
     }
 
+    public Integer getResourceIdByMembershipOrderCode(String orderCode) {
+        try {
+            long code = Long.parseLong(orderCode);
+            if (code >= 900000000000L) {
+                Integer membershipId = (int) (code - 900000000000L);
+                return utilityMembershipRepository.findById(membershipId)
+                        .map(m -> m.getUtilityPrice())
+                        .map(p -> p.getResource())
+                        .map(r -> r.getResourceId())
+                        .orElse(null);
+            }
+        } catch (Exception e) {
+            // Ignore format exception or null
+        }
+        return null;
+    }
+
     private void markPaymentFailed(String orderCode) {
+        long code = Long.parseLong(orderCode);
+        if (code >= 900000000000L) {
+            Integer membershipId = (int) (code - 900000000000L);
+            // User cancelled the payment -> delete the pending membership
+            utilityMembershipRepository.findById(membershipId).ifPresent(membership -> {
+                utilityMembershipRepository.delete(membership);
+            });
+            return;
+        } else if (code >= 800000000000L) {
+            Integer bookingId = (int) (code - 800000000000L);
+            utilityBookingRepository.findById(bookingId).ifPresent(booking -> {
+                booking.setPaymentStatus(false);
+                booking.setStatus((byte) 2); // Cancelled/Rejected
+                booking.setCancelReason("Payment cancelled");
+                booking.setCancelledAt(LocalDateTime.now());
+                utilityBookingRepository.save(booking);
+            });
+            return;
+        }
+
         paymentRepository.findByTransactionCode(orderCode).ifPresent(payment -> {
             if (payment.getStatus() != null && payment.getStatus() == 1) {
                 return;

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ABMS Resident Portal</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS File (Thymeleaf dùng khi chạy Spring Boot) -->
     <link rel="stylesheet" th:href="@{/css/layout/layout_resident.css}">
     <!-- CSS File (Đường dẫn tương đối dùng để xem trực tiếp file HTML không cần server) -->
@@ -61,7 +63,7 @@
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'booking' ? 'active' : ''}">
-                <a th:href="@{/resident/booking}">
+                <a th:href="@{/resident/utilities}">
                     <i class="fa-solid fa-calendar-check"></i>
                     <span>Booking</span>
                 </a>
@@ -142,5 +144,7 @@
 <script th:src="@{/js/layout/layout_resident.js}"></script>
 <!-- JS File (Đường dẫn tương đối dùng để xem trực tiếp file HTML không cần server) -->
 <script src="../../../static/js/layout/layout_resident.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

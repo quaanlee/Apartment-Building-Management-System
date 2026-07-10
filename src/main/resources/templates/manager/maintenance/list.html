@@ -165,55 +165,6 @@
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════ -->
-        <!-- ASSIGN STAFF MODAL                                          -->
-        <!-- ═══════════════════════════════════════════════════════════ -->
-        <div class="modal-overlay" id="assignStaffModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-            <div class="modal-box">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="modalTitle">Assign Maintenance Staff</h3>
-                    <button class="modal-close-btn" id="closeAssignModalBtn" aria-label="Close">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-                <form id="assignStaffForm" th:action="@{/manager/maintenance/assign}" method="post">
-                    <div class="modal-body">
-                        <!-- Request Details Info (Non-editable) -->
-                        <div class="form-group">
-                            <label class="form-label">Incident Request</label>
-                            <input type="text" id="assignRequestTitleDisplay" class="form-input" readonly style="background-color: #f7fafc; font-weight: 600;">
-                            <input type="hidden" id="assignRequestId" name="requestId">
-                        </div>
-
-                        <!-- Staff Dropdown Selection -->
-                        <div class="form-group">
-                            <label class="form-label" for="staffId">Select Maintenance Staff</label>
-                            <select id="staffId" name="staffId" class="form-select" required>
-                                <option value="" disabled selected>Select a technician...</option>
-                                <option th:each="staff : ${staffs}"
-                                        th:value="${staff.profile.profileId}"
-                                        th:disabled="${staff.workStatus == 'busy'}"
-                                        th:text="${staff.profile.fullName} + (${staff.workStatus == 'busy'} ? ' (Busy)' : ' (Available)')">Worker A (Plumber)</option>
-                            </select>
-                        </div>
-
-                        <!-- Deadline Datepicker -->
-                        <div class="form-group">
-                            <label class="form-label" for="deadline">Completion Deadline</label>
-                            <input type="datetime-local" id="deadline" name="deadline" class="form-input" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="modal-cancel-btn" id="cancelAssignModalBtn">Cancel</button>
-                        <button type="submit" class="modal-submit-btn">
-                            <i class="fa-solid fa-circle-check"></i>
-                            Confirm Assignment
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- ═══════════════════════════════════════════════════════════ -->
         <!-- VIEW PROGRESS MODAL                                         -->
         <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="modal-overlay" id="viewProgressModal" role="dialog" aria-modal="true" aria-labelledby="progressModalTitle">
@@ -377,44 +328,6 @@
                     window.location.href = url;
                 };
 
-                /* ── Assign Staff Modal Logic ── */
-                const assignModal = document.getElementById("assignStaffModal");
-                const closeAssignBtn = document.getElementById("closeAssignModalBtn");
-                const cancelAssignBtn = document.getElementById("cancelAssignModalBtn");
-                const assignForm = document.getElementById("assignStaffForm");
-
-                document.querySelectorAll(".assign-btn").forEach(btn => {
-                    btn.addEventListener("click", function () {
-                        const requestId = this.getAttribute("data-request-id");
-                        const requestTitle = this.getAttribute("data-request-title");
-
-                        document.getElementById("assignRequestId").value = requestId;
-                        document.getElementById("assignRequestTitleDisplay").value = requestTitle;
-
-                        // Set a default deadline (e.g. 24 hours from now)
-                        const now = new Date();
-                        now.setDate(now.getDate() + 1); // add 24 hours
-                        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                        document.getElementById("deadline").value = now.toISOString().slice(0, 16);
-
-                        openAssignModal();
-                    });
-                });
-
-                function openAssignModal() {
-                    assignModal.classList.add("is-open");
-                    document.body.classList.add("modal-open");
-                }
-
-                function closeAssignModal() {
-                    assignModal.classList.remove("is-open");
-                    document.body.classList.remove("modal-open");
-                    assignForm.reset();
-                }
-
-                if (closeAssignBtn) closeAssignBtn.addEventListener("click", closeAssignModal);
-                if (cancelAssignBtn) cancelAssignBtn.addEventListener("click", closeAssignModal);
-
                 /* ── View Progress Modal Logic (AJAX calls) ── */
                 const progressModal = document.getElementById("viewProgressModal");
                 const closeProgressBtn = document.getElementById("closeProgressModalBtn");
@@ -539,13 +452,11 @@
 
                 /* Overlay and Escape close controls */
                 window.addEventListener("click", function (e) {
-                    if (e.target === assignModal) closeAssignModal();
                     if (e.target === progressModal) closeProgressModal();
                 });
 
                 document.addEventListener("keydown", function (e) {
                     if (e.key === "Escape") {
-                        closeAssignModal();
                         closeProgressModal();
                     }
                 });

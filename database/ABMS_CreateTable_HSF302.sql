@@ -484,3 +484,23 @@ CREATE TABLE SalesContract (
     CONSTRAINT CHK_SalesContract_Price CHECK (SellingPrice >= 0)
 );
 GO
+
+-- ============================================================
+-- 26. UtilityMembership (Gói thành viên sử dụng tiện ích)
+-- ============================================================
+CREATE TABLE UtilityMembership (
+    MembershipID    INT             IDENTITY(1,1)   PRIMARY KEY,
+    ProfileID       INT             NOT NULL,
+    UtilityID       INT             NOT NULL,
+    UtilityPriceID  INT             NOT NULL,
+    StartDate       DATE            NOT NULL,
+    EndDate         DATE            NOT NULL,
+    PaymentStatus   BIT             NOT NULL        DEFAULT 0,
+    Status          BIT             NOT NULL        DEFAULT 1,
+    CreatedAt       DATETIME        NOT NULL        DEFAULT GETDATE(),
+
+    CONSTRAINT FK_UtilityMembership_Profile      FOREIGN KEY (ProfileID)      REFERENCES Profile(ProfileID),
+    CONSTRAINT FK_UtilityMembership_Utility      FOREIGN KEY (UtilityID)      REFERENCES Utility(UtilityID),
+    CONSTRAINT FK_UtilityMembership_UtilityPrice FOREIGN KEY (UtilityPriceID) REFERENCES UtilityPrice(UtilityPriceID)
+);
+GO

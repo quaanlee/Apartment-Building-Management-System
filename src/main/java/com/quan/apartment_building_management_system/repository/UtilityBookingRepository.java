@@ -27,4 +27,10 @@ public interface UtilityBookingRepository
     @Query("SELECT COUNT(ub) FROM UtilityBooking ub WHERE ub.startTime >= :startOfDay AND ub.startTime < :endOfDay")
     long countTodaySchedule(@Param("startOfDay") LocalDateTime startOfDay,
                             @Param("endOfDay") LocalDateTime endOfDay);
+                            
+    boolean existsByResourceResourceIdAndStatusInAndStartTimeLessThanAndEndTimeGreaterThan(
+            Integer resourceId, List<Byte> statuses, LocalDateTime endTime, LocalDateTime startTime);
+            
+    List<UtilityBooking> findByResourceResourceIdAndStatusInAndStartTimeBetween(
+            Integer resourceId, List<Byte> statuses, LocalDateTime start, LocalDateTime end);
 }
