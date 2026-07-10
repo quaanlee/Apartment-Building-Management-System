@@ -43,7 +43,7 @@
 
         <form th:action="@{/resident/utilities/book}" method="post" th:object="${bookingRequest}" id="bookingForm">
             <input type="hidden" name="utilityId" th:value="${resource.utilityId}">
-            <input type="hidden" name="resourceId" th:value="${resource.resourceId}">
+            <input type="hidden" id="resourceIdInput" name="resourceId" th:value="${resource.resourceId}">
 
             <div class="booking-layout">
                 <!-- LEFT COLUMN: Form -->
@@ -77,8 +77,8 @@
 
                     <div class="package-cards" style="display: flex; gap: 16px; align-items: stretch;">
                         <div th:each="price, iterStat : ${resource.prices}" style="flex: 1;">
-                            <input type="radio" name="priceId" th:value="${price.utilityPriceId}"
-                                class="package-input" style="display: none;" th:id="${'price_' + price.utilityPriceId}"
+                            <input type="radio" name="priceId" th:value="${price.utilityPriceId}" class="package-input"
+                                style="display: none;" th:id="${'price_' + price.utilityPriceId}"
                                 th:checked="${iterStat.index == 0}">
                             <label class="package-card" th:for="${'price_' + price.utilityPriceId}"
                                 style="display: block; height: 100%; pointer-events: none; cursor: default; margin: 0; box-sizing: border-box; border: 1px solid var(--border-color) !important; box-shadow: none !important;">
@@ -120,16 +120,18 @@
                             style="position: relative; height: 24px; background: #e2e8f0; border-radius: 4px; overflow: hidden; display: flex;">
                             <!-- Assuming opening hours 06:00 to 22:00 (16 hours total) -->
                             <th:block th:each="b : ${bookings}">
-                            <!-- calculate left % and width % based on start and end time -->
-                            <div th:if="${b.startTime.toLocalDate().isEqual(selectedDate)}"
-                                style="position: absolute; height: 100%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-size: 9px; font-weight: bold; overflow: hidden; white-space: nowrap;" th:with="
+                                <!-- calculate left % and width % based on start and end time -->
+                                <div th:if="${b.startTime.toLocalDate().isEqual(selectedDate)}"
+                                    style="position: absolute; height: 100%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-size: 9px; font-weight: bold; overflow: hidden; white-space: nowrap;"
+                                    th:with="
                                      startHour=${b.startTime.hour + b.startTime.minute / 60.0},
                                      endHour=${b.endTime.hour + b.endTime.minute / 60.0},
                                      leftPercent=${(startHour - 6) / 16.0 * 100},
                                      widthPercent=${(endHour - startHour) / 16.0 * 100}"
-                                th:styleappend="|left: ${leftPercent < 0 ? 0 : leftPercent}%; width: ${widthPercent > 100 ? 100 : widthPercent}%;|">
-                                <span th:text="${#temporals.format(b.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(b.endTime, 'HH:mm')}"></span>
-                            </div>
+                                    th:styleappend="|left: ${leftPercent < 0 ? 0 : leftPercent}%; width: ${widthPercent > 100 ? 100 : widthPercent}%;|">
+                                    <span
+                                        th:text="${#temporals.format(b.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(b.endTime, 'HH:mm')}"></span>
+                                </div>
                             </th:block>
                         </div>
                         <div
@@ -152,27 +154,30 @@
                         <div class="form-field">
                             <label>Select Date</label>
                             <div style="display: flex; gap: 8px; align-items: stretch;">
-                                <input type="date" class="custom-input" name="bookingDate" required
-                                    id="bookingDate" th:value="${#temporals.format(bookingRequest.bookingDate, 'yyyy-MM-dd')}"
+                                <input type="date" class="custom-input" name="bookingDate" required id="bookingDate"
+                                    th:value="${#temporals.format(bookingRequest.bookingDate, 'yyyy-MM-dd')}"
                                     th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
                                     style="flex-grow: 1;">
-                                <button type="button" class="btn-primary" onclick="window.location.href = window.location.pathname + '?date=' + document.getElementById('bookingDate').value;"
-                                    style="padding: 10px 16px; border-radius: 8px; border: none; background: var(--primary-color); color: white; cursor: pointer; white-space: nowrap; font-weight: 500;">Save
-                                    Date</button>
+                                <button type="button" class="btn-primary" 
+                                    onclick="var d = document.getElementById('bookingDate').value; var r = document.getElementById('resourceIdInput').value; if(d && r) { window.location.href = '/resident/utilities/book/' + r + '?date=' + d; } else { alert('Vui lòng chọn ngày!'); }"
+                                    style="padding: 10px 16px; border-radius: 8px; border: none; background: var(--primary-color); color: white; cursor: pointer; white-space: nowrap; font-weight: 500;">Change Date</button>
                             </div>
                         </div>
                         <div class="datetime-grid">
                             <div class="form-field">
                                 <label>Start Time</label>
-                                <input type="time" class="custom-input" name="startTime" required id="startTime" th:value="${bookingRequest.startTime != null ? #temporals.format(bookingRequest.startTime, 'HH:mm') : ''}">
+                                <input type="time" class="custom-input" name="startTime" required id="startTime"
+                                    th:value="${bookingRequest.startTime != null ? #temporals.format(bookingRequest.startTime, 'HH:mm') : ''}">
                             </div>
                             <div class="form-field">
                                 <label>End Time</label>
-                                <input type="time" class="custom-input" name="endTime" required id="endTime" th:value="${bookingRequest.endTime != null ? #temporals.format(bookingRequest.endTime, 'HH:mm') : ''}">
+                                <input type="time" class="custom-input" name="endTime" required id="endTime"
+                                    th:value="${bookingRequest.endTime != null ? #temporals.format(bookingRequest.endTime, 'HH:mm') : ''}">
                             </div>
                         </div>
                         <div style="margin-top: 16px; text-align: right;">
-                            <button type="submit" th:formaction="@{/resident/utilities/calculate}" formmethod="post" class="btn-primary"
+                            <button type="submit" th:formaction="@{/resident/utilities/calculate}" formmethod="post"
+                                class="btn-primary"
                                 style="padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; background-color: var(--primary-color); color: white; font-weight: 600;">Save
                                 All</button>
                         </div>
@@ -191,19 +196,26 @@
                             </div>
                             <div class="summary-col" style="text-align: right;">
                                 <span>Package</span>
-                                <strong id="summaryPackageName" th:text="${calculatedPackageName != null ? calculatedPackageName : (!resource.prices.isEmpty() ? resource.prices[0].unit.unitName : 'Giờ')}">Giờ</strong>
+                                <strong id="summaryPackageName"
+                                    th:text="${calculatedPackageName != null ? calculatedPackageName : (!resource.prices.isEmpty() ? resource.prices[0].unit.unitName : 'Giờ')}">Giờ</strong>
                             </div>
                         </div>
 
                         <div class="summary-datetime">
-                            <div><i class="fa-regular fa-calendar-days"></i> <span id="summaryDate" th:text="${bookingRequest.bookingDate != null ? #temporals.format(bookingRequest.bookingDate, 'dd/MM/yyyy') : 'Select date'}">Select date</span>
+                            <div><i class="fa-regular fa-calendar-days"></i> <span id="summaryDate"
+                                    th:text="${bookingRequest.bookingDate != null ? #temporals.format(bookingRequest.bookingDate, 'dd/MM/yyyy') : 'Select date'}">Select
+                                    date</span>
                             </div>
-                            <div><i class="fa-regular fa-clock"></i> <span id="summaryTime" th:text="${bookingRequest.startTime != null && bookingRequest.endTime != null ? #temporals.format(bookingRequest.startTime, 'HH:mm') + ' - ' + #temporals.format(bookingRequest.endTime, 'HH:mm') : '--:-- - --:--'}">--:-- - --:--</span></div>
+                            <div><i class="fa-regular fa-clock"></i> <span id="summaryTime"
+                                    th:text="${bookingRequest.startTime != null && bookingRequest.endTime != null ? #temporals.format(bookingRequest.startTime, 'HH:mm') + ' - ' + #temporals.format(bookingRequest.endTime, 'HH:mm') : '--:-- - --:--'}">--:--
+                                    - --:--</span></div>
                         </div>
 
                         <div class="summary-item">
                             <span class="label">Subtotal:</span>
-                            <span class="value" id="summarySubtotal" th:text="${calculatedTotal != null ? #numbers.formatDecimal(calculatedTotal, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0 VND</span>
+                            <span class="value" id="summarySubtotal"
+                                th:text="${calculatedTotal != null ? #numbers.formatDecimal(calculatedTotal, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                                VND</span>
                         </div>
                         <div class="summary-item">
                             <span class="label">Service Fee:</span>
@@ -214,7 +226,10 @@
 
                         <div class="summary-total">
                             <span class="label">Total:</span>
-                            <span class="value" id="summaryTotal" style="color: var(--primary-color); font-size: 18px; font-weight: bold;" th:text="${calculatedTotal != null ? #numbers.formatDecimal(calculatedTotal, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0 VND</span>
+                            <span class="value" id="summaryTotal"
+                                style="color: var(--primary-color); font-size: 18px; font-weight: bold;"
+                                th:text="${calculatedTotal != null ? #numbers.formatDecimal(calculatedTotal, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                                VND</span>
                         </div>
 
                         <!-- Add JS Debug Output here -->
@@ -225,11 +240,14 @@
                             <div style="display: flex; gap: 16px;">
                                 <label
                                     style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
-                                    <input type="radio" name="paymentMethod" value="CASH" th:checked="${bookingRequest.paymentMethod == null || bookingRequest.paymentMethod == 'CASH'}"> Cash
+                                    <input type="radio" name="paymentMethod" value="CASH"
+                                        th:checked="${bookingRequest.paymentMethod == null || bookingRequest.paymentMethod == 'CASH'}">
+                                    Cash
                                 </label>
                                 <label
                                     style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
-                                    <input type="radio" name="paymentMethod" value="ONLINE" th:checked="${bookingRequest.paymentMethod == 'ONLINE'}"> Online (PayOS)
+                                    <input type="radio" name="paymentMethod" value="ONLINE"
+                                        th:checked="${bookingRequest.paymentMethod == 'ONLINE'}"> Online (PayOS)
                                 </label>
                             </div>
                         </div>
@@ -241,7 +259,8 @@
                         </div>
 
                         <button type="submit" class="btn-primary btn-confirm-booking" onclick="return confirmBooking()"
-                            style="width: 100%; border-radius: 8px; padding: 12px; border: none; cursor: pointer;">Confirm
+                            th:disabled="${errorMessage != null}"
+                            th:style="${errorMessage != null ? 'width: 100%; border-radius: 8px; padding: 12px; border: none; cursor: not-allowed; opacity: 0.6;' : 'width: 100%; border-radius: 8px; padding: 12px; border: none; cursor: pointer;'}">Confirm
                             Booking</button>
 
                         <div class="secure-payment-note">
@@ -275,11 +294,17 @@
         });
 
         function reloadWithDate() {
-            const dateInput = document.getElementById('bookingDate').value;
-            if (dateInput) {
-                window.location.href = window.location.pathname + '?date=' + dateInput;
-            } else {
-                alert('Vui lòng chọn ngày trước khi lưu.');
+            try {
+                const dateInput = document.getElementById('bookingDate').value;
+                const resourceId = document.getElementById('resourceIdInput').value;
+                if (dateInput) {
+                    window.location.href = '/resident/utilities/book/' + resourceId + '?date=' + dateInput;
+                } else {
+                    alert('Vui lòng chọn ngày trước khi lưu.');
+                }
+            } catch (e) {
+                console.error("Lỗi khi chuyển ngày:", e);
+                alert("Đã xảy ra lỗi hệ thống: " + e.message);
             }
         }
 

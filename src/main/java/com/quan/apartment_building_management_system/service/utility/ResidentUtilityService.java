@@ -27,6 +27,7 @@ public class ResidentUtilityService {
     private final UtilityMembershipRepository membershipRepository;
     private final ProfileRepository profileRepository;
     private final UtilityImageRepository imageRepository;
+    private final UtilityBookingService utilityBookingService;
 
     public ResidentUtilityService(UtilityRepository utilityRepository,
             UtilityResourceRepository resourceRepository,
@@ -34,7 +35,8 @@ public class ResidentUtilityService {
             UtilityBookingRepository bookingRepository,
             UtilityMembershipRepository membershipRepository,
             ProfileRepository profileRepository,
-            UtilityImageRepository imageRepository) {
+            UtilityImageRepository imageRepository,
+            UtilityBookingService utilityBookingService) {
         this.utilityRepository = utilityRepository;
         this.resourceRepository = resourceRepository;
         this.priceRepository = priceRepository;
@@ -42,6 +44,7 @@ public class ResidentUtilityService {
         this.membershipRepository = membershipRepository;
         this.profileRepository = profileRepository;
         this.imageRepository = imageRepository;
+        this.utilityBookingService = utilityBookingService;
     }
 
     public List<UtilityDTO> getActiveUtilities() {
@@ -128,19 +131,7 @@ public class ResidentUtilityService {
             LocalDateTime start = req.getBookingDate().atTime(req.getStartTime());
             LocalDateTime end = req.getBookingDate().atTime(req.getEndTime());
 
-            if (start.isBefore(LocalDateTime.now())) {
-                throw new IllegalArgumentException("Cannot book in the past");
-            }
-            if (!end.isAfter(start)) {
-                throw new IllegalArgumentException("End time must be after start time");
-            }
-
-            boolean hasOverlap = bookingRepository
-                    .existsByResourceResourceIdAndStatusInAndStartTimeLessThanAndEndTimeGreaterThan(
-                            resource.getResourceId(), List.of((byte) 0, (byte) 1), end, start);
-            if (hasOverlap) {
-                throw new IllegalArgumentException("Khung giờ này đã được đặt.");
-            }
+            validateBookingTime(resource.getResourceId(), start, end);
 
             // Calculate total price based on duration and unit price
             BigDecimal durationHours = BigDecimal.valueOf(Duration.between(start, end).toMinutes() / 60.0);
@@ -163,7 +154,11 @@ public class ResidentUtilityService {
                 booking.setPaymentStatus(false);
             }
 
-            booking.setStatus((byte) 0); // Pending
+            if (utilityBookingService.isAutoApproveEnabled()) {
+                booking.setStatus((byte) 1); // Approved
+            } else {
+                booking.setStatus((byte) 0); // Pending
+            }
             booking.setCreatedAt(LocalDateTime.now());
             return bookingRepository.save(booking);
 
@@ -211,6 +206,31 @@ public class ResidentUtilityService {
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
         return bookingRepository.findByResourceResourceIdAndStatusInAndStartTimeBetween(
                 resourceId, List.of((byte) 0, (byte) 1), startOfDay, endOfDay);
+    }
+
+    public void validateBookingTime(Integer resourceId, LocalDateTime start, LocalDateTime end) {
+        if (start.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Thời gian đặt bắt đầu không được ở trong quá khứ.");
+        }
+        if (!end.isAfter(start)) {
+            throw new IllegalArgumentException("Thời gian kết thúc phải sau thời gian bắt đầu.");
+        }
+        
+        // Add operating hours validation (06:00 to 22:00)
+        int startHour = start.getHour();
+        int endHour = end.getHour();
+        int endMinute = end.getMinute();
+        
+        if (startHour < 6 || startHour >= 22 || endHour < 6 || (endHour > 22 || (endHour == 22 && endMinute > 0))) {
+            throw new IllegalArgumentException("Giờ hoạt động của tiện ích là từ 06:00 đến 22:00.");
+        }
+
+        boolean hasOverlap = bookingRepository
+                .existsByResourceResourceIdAndStatusInAndStartTimeLessThanAndEndTimeGreaterThan(
+                        resourceId, List.of((byte) 0, (byte) 1), end, start);
+        if (hasOverlap) {
+            throw new IllegalArgumentException("Khung giờ này đã được đặt.");
+        }
     }
 
     public List<UtilityBookingHistoryDTO> getBookingHistory(Integer accountId) {

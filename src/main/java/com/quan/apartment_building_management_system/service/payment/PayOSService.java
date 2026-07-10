@@ -19,6 +19,7 @@ import com.quan.apartment_building_management_system.entity.UtilityPrice;
 import com.quan.apartment_building_management_system.entity.Utility;
 import com.quan.apartment_building_management_system.entity.Profile;
 import com.quan.apartment_building_management_system.entity.UtilityBooking;
+import com.quan.apartment_building_management_system.dto.utility.BookingRequestDTO;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -339,7 +340,7 @@ public class PayOSService {
                     return;
                 }
                 booking.setPaymentStatus(true);
-                booking.setStatus((byte) 1); // Approved
+                // Status remains unchanged (e.g. 0 - Pending) so manager can approve it later
                 utilityBookingRepository.save(booking);
             });
             return;
@@ -381,6 +382,29 @@ public class PayOSService {
         return null;
     }
 
+    public BookingRequestDTO getBookingRequestByOrderCode(String orderCode) {
+        try {
+            long code = Long.parseLong(orderCode);
+            if (code >= 800000000000L && code < 900000000000L) {
+                Integer bookingId = (int) (code - 800000000000L);
+                return utilityBookingRepository.findById(bookingId).map(b -> {
+                    BookingRequestDTO req = new BookingRequestDTO();
+                    req.setUtilityId(b.getResource().getUtility().getUtilityId());
+                    req.setResourceId(b.getResource().getResourceId());
+                    req.setPriceId(b.getUtilityPrice().getUtilityPriceId());
+                    req.setBookingDate(b.getStartTime().toLocalDate());
+                    req.setStartTime(b.getStartTime().toLocalTime());
+                    req.setEndTime(b.getEndTime().toLocalTime());
+                    req.setPaymentMethod("ONLINE");
+                    return req;
+                }).orElse(null);
+            }
+        } catch (Exception e) {
+            // Ignore format exception or null
+        }
+        return null;
+    }
+
     private void markPaymentFailed(String orderCode) {
         long code = Long.parseLong(orderCode);
         if (code >= 900000000000L) {
@@ -392,12 +416,9 @@ public class PayOSService {
             return;
         } else if (code >= 800000000000L) {
             Integer bookingId = (int) (code - 800000000000L);
+            // User cancelled the payment -> delete the pending booking
             utilityBookingRepository.findById(bookingId).ifPresent(booking -> {
-                booking.setPaymentStatus(false);
-                booking.setStatus((byte) 2); // Cancelled/Rejected
-                booking.setCancelReason("Payment cancelled");
-                booking.setCancelledAt(LocalDateTime.now());
-                utilityBookingRepository.save(booking);
+                utilityBookingRepository.delete(booking);
             });
             return;
         }

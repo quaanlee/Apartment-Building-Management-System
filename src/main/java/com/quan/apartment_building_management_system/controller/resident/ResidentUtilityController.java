@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -128,6 +129,11 @@ public class ResidentUtilityController {
         }
     }
 
+    @GetMapping("/calculate")
+    public String calculateRedirect() {
+        return "redirect:/resident/utilities";
+    }
+
     @PostMapping("/calculate")
     public String calculateSummary(@ModelAttribute BookingRequestDTO request, Model model, HttpSession session) {
         Account user = getCurrentUser(session);
@@ -154,14 +160,24 @@ public class ResidentUtilityController {
                 var price = priceOpt.get();
                 packageName = price.getUnit().getUnitName();
                 if (request.getStartTime() != null && request.getEndTime() != null) {
-                    if (packageName.toLowerCase().contains("giờ") || packageName.toLowerCase().contains("hour")) {
-                        long diffMinutes = java.time.Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
-                        if (diffMinutes > 0) {
-                            java.math.BigDecimal hours = java.math.BigDecimal.valueOf(diffMinutes).divide(java.math.BigDecimal.valueOf(60), 2, java.math.RoundingMode.HALF_UP);
-                            total = price.getPrice().multiply(hours);
+                    try {
+                        LocalDateTime start = bookingDate.atTime(request.getStartTime());
+                        LocalDateTime end = bookingDate.atTime(request.getEndTime());
+                        if (Boolean.TRUE.equals(utility.getType())) {
+                            utilityService.validateBookingTime(request.getResourceId(), start, end);
                         }
-                    } else {
-                        total = price.getPrice(); // Flat rate for non-hourly
+
+                        if (packageName.toLowerCase().contains("giờ") || packageName.toLowerCase().contains("hour")) {
+                            long diffMinutes = java.time.Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
+                            if (diffMinutes > 0) {
+                                java.math.BigDecimal hours = java.math.BigDecimal.valueOf(diffMinutes).divide(java.math.BigDecimal.valueOf(60), 2, java.math.RoundingMode.HALF_UP);
+                                total = price.getPrice().multiply(hours);
+                            }
+                        } else {
+                            total = price.getPrice(); // Flat rate for non-hourly
+                        }
+                    } catch (IllegalArgumentException e) {
+                        model.addAttribute("errorMessage", e.getMessage());
                     }
                 }
             }
@@ -171,6 +187,15 @@ public class ResidentUtilityController {
         model.addAttribute("calculatedTotal", total);
         
         return "resident/utility/booking";
+    }
+
+    @GetMapping("/rebook")
+    public String rebookSummary(Model model, HttpSession session) {
+        if (!model.containsAttribute("bookingRequest")) {
+            return "redirect:/resident/utilities";
+        }
+        BookingRequestDTO request = (BookingRequestDTO) model.getAttribute("bookingRequest");
+        return calculateSummary(request, model, session);
     }
 
     @GetMapping("/history")

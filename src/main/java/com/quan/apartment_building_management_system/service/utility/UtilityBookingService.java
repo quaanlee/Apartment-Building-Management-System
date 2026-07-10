@@ -15,6 +15,12 @@ import java.util.Optional;
 @Service
 public interface UtilityBookingService {
 
+    // ── Global settings ──────────────────────────────────────────────────────────
+
+    boolean isAutoApproveEnabled();
+
+    void setAutoApproveEnabled(boolean enabled, Account actor);
+
     // ── Existing methods ────────────────────────────────────────────────────────
 
     List<UtilityBooking> findAll();

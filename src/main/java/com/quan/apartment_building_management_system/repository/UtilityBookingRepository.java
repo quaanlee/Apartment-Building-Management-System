@@ -33,4 +33,6 @@ public interface UtilityBookingRepository
             
     List<UtilityBooking> findByResourceResourceIdAndStatusInAndStartTimeBetween(
             Integer resourceId, List<Byte> statuses, LocalDateTime start, LocalDateTime end);
+
+    List<UtilityBooking> findByStatusAndStartTimeGreaterThanEqual(Byte status, LocalDateTime startTime);
 }

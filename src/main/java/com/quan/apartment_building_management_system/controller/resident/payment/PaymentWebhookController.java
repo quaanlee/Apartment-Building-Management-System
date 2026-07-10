@@ -156,9 +156,18 @@ public class PaymentWebhookController {
                 System.err.println("[PayOS Cancel Return Error] " + e.getMessage());
             }
         }
-        
         if (isBooking) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Booking payment has been canceled!");
+            com.quan.apartment_building_management_system.dto.utility.BookingRequestDTO req = null;
+            if (orderCode != null) {
+                req = payOSService.getBookingRequestByOrderCode(String.valueOf(orderCode));
+            }
+            payOSService.confirmPaymentCancelled(orderCode);
+            
+            redirectAttributes.addFlashAttribute("errorMessage", "Thanh toán bị hủy. Vui lòng thử lại!");
+            if (req != null) {
+                redirectAttributes.addFlashAttribute("bookingRequest", req);
+                return "redirect:/resident/utilities/rebook";
+            }
             return "redirect:/resident/utilities/history";
         }
         
