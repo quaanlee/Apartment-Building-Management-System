@@ -29,6 +29,11 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
 
     @Override
     public String uploadUtilityImage(MultipartFile file) throws IOException {
+        return uploadImage(file, "abms/utilities");
+    }
+
+    @Override
+    public String uploadImage(MultipartFile file, String folder) throws IOException {
         if (file == null || file.isEmpty()) {
             return null;
         }
@@ -37,7 +42,7 @@ public class CloudinaryUploadServiceImpl implements CloudinaryUploadService {
         }
         Map<?, ?> result = cloudinary.uploader().upload(
                 file.getBytes(),
-                Map.of("folder", "abms/utilities", "resource_type", "image")
+                Map.of("folder", folder, "resource_type", "image")
         );
         Object secureUrl = result.get("secure_url");
         return secureUrl != null ? secureUrl.toString() : null;

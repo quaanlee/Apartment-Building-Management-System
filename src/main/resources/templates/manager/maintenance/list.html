@@ -416,10 +416,20 @@
                                             reportDateStr = new Date(report.createdAt).toLocaleString('vi-VN');
                                         }
 
+                                        let imagesHtml = '';
+                                        if (report.images && report.images.length > 0) {
+                                            imagesHtml = '<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">';
+                                            report.images.forEach(imgUrl => {
+                                                imagesHtml += `<a href="${imgUrl}" target="_blank"><img src="${imgUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"></a>`;
+                                            });
+                                            imagesHtml += '</div>';
+                                        }
+
                                         item.innerHTML = `
                                             <div class="timeline-content">
                                                 <strong>Progress: ${report.progressPercent}%</strong><br>
                                                 <span>${report.reportContent}</span>
+                                                ${imagesHtml}
                                             </div>
                                             <div class="timeline-meta">${reportDateStr}</div>
                                         `;

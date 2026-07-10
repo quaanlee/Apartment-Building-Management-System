@@ -2,6 +2,9 @@ package com.quan.apartment_building_management_system.controller.manager.bill;
 
 import com.quan.apartment_building_management_system.entity.*;
 import com.quan.apartment_building_management_system.repository.PaymentMethodRepository;
+import com.quan.apartment_building_management_system.repository.NotificationRepository;
+import com.quan.apartment_building_management_system.repository.AccountNotificationRepository;
+import com.quan.apartment_building_management_system.repository.ProfileRepository;
 import com.quan.apartment_building_management_system.service.apartment.ApartmentService;
 import com.quan.apartment_building_management_system.service.billing.BillDetailService;
 import com.quan.apartment_building_management_system.service.billing.BillService;
@@ -10,6 +13,7 @@ import com.quan.apartment_building_management_system.service.user.AccountService
 import com.quan.apartment_building_management_system.service.utility.ServiceItemService;
 import com.quan.apartment_building_management_system.service.utility.UtilityBookingService;
 import com.quan.apartment_building_management_system.dto.billing.BillDTO;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
 import org.springframework.stereotype.Controller;
@@ -36,6 +40,9 @@ public class ManagerBillController {
     private final PaymentService paymentService;
     private final AccountService accountService;
     private final PaymentMethodRepository paymentMethodRepository;
+    private final NotificationRepository notificationRepository;
+    private final AccountNotificationRepository accountNotificationRepository;
+    private final ProfileRepository profileRepository;
 
     public ManagerBillController(BillService billService,
                                  BillDetailService billDetailService,
@@ -44,7 +51,10 @@ public class ManagerBillController {
                                  UtilityBookingService utilityBookingService,
                                  PaymentService paymentService,
                                  AccountService accountService,
-                                 PaymentMethodRepository paymentMethodRepository) {
+                                 PaymentMethodRepository paymentMethodRepository,
+                                 NotificationRepository notificationRepository,
+                                 AccountNotificationRepository accountNotificationRepository,
+                                 ProfileRepository profileRepository) {
         this.billService = billService;
         this.billDetailService = billDetailService;
         this.apartmentService = apartmentService;
@@ -53,6 +63,9 @@ public class ManagerBillController {
         this.paymentService = paymentService;
         this.accountService = accountService;
         this.paymentMethodRepository = paymentMethodRepository;
+        this.notificationRepository = notificationRepository;
+        this.accountNotificationRepository = accountNotificationRepository;
+        this.profileRepository = profileRepository;
     }
 
     // 1. View & Search Bill List
@@ -200,11 +213,11 @@ public class ManagerBillController {
         return bookingDetails;
     }
 
-    // 5. Handle Bill Generation Post Action
     @PostMapping("/generate")
     public String generateBill(@Valid @ModelAttribute("billDto") BillDTO billDto,
                                BindingResult bindingResult,
                                Model model,
+                               HttpSession session,
                                RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
@@ -272,9 +285,36 @@ public class ManagerBillController {
         }
 
         // Fetch Manager/Admin account to set as creator
-        Account creator = accountService.findByUsername("manager").orElseGet(() ->
-                accountService.findByUsername("admin").orElse(null)
-        );
+        Account creator = null;
+        if (session != null) {
+            creator = (Account) session.getAttribute("currentUser");
+        }
+
+        // Fallback 1: Look up known email usernames in database
+        if (creator == null) {
+            creator = accountService.findByUsername("manager@gmail.com")
+                .orElseGet(() -> accountService.findByUsername("manager1@gmail.com")
+                .orElseGet(() -> accountService.findByUsername("admin@gmail.com")
+                .orElseGet(() -> accountService.findByUsername("admin1@gmail.com")
+                .orElseGet(() -> accountService.findByUsername("manager")
+                .orElseGet(() -> accountService.findByUsername("admin")
+                .orElse(null))))));
+        }
+
+        // Fallback 2: Look up any manager or admin role account in database
+        if (creator == null) {
+            creator = accountService.findAll().stream()
+                .filter(acc -> acc.getRole() != null && 
+                    ("MANAGER".equalsIgnoreCase(acc.getRole().getRoleName().toUpperCase().replace(" ", "_")) || 
+                     "ADMIN".equalsIgnoreCase(acc.getRole().getRoleName().toUpperCase().replace(" ", "_"))))
+                .findFirst()
+                .orElse(null);
+        }
+
+        // Fallback 3: Extreme fallback to first account in database
+        if (creator == null) {
+            creator = accountService.findAll().stream().findFirst().orElse(null);
+        }
 
         if (creator == null) {
             redirectAttributes.addFlashAttribute("message", "No manager or admin account found to sign the bill.");
@@ -386,7 +426,29 @@ public class ManagerBillController {
 
         // Update Total Amount on the Bill
         bill.setTotalAmount(totalAmount);
-        billService.save(bill);
+        bill = billService.save(bill);
+
+        // Create notifications for the residents in this apartment
+        List<Profile> profiles = profileRepository.findByApartmentApartmentId(apartment.getApartmentId());
+        for (Profile p : profiles) {
+            if (p.getAccount() != null) {
+                Notification notification = new Notification();
+                notification.setTitle("Hóa đơn mới tháng " + month + "/" + year);
+                notification.setContent("Căn hộ " + apartment.getApartmentNumber() + " có hóa đơn mới trị giá " + totalAmount + ". Hạn thanh toán đến ngày " + bill.getDueDate().toLocalDate().toString() + ".");
+                notification.setNotificationType((byte) 2); // 2: Hóa đơn
+                notification.setCreatedBy(creator);
+                notification.setCreatedAt(LocalDateTime.now());
+                notification.setRelatedEntityType("Bill");
+                notification.setReceiver(p.getAccount());
+                notificationRepository.save(notification);
+
+                AccountNotification accNotif = new AccountNotification();
+                accNotif.setNotification(notification);
+                accNotif.setAccount(p.getAccount());
+                accNotif.setIsRead(false);
+                accountNotificationRepository.save(accNotif);
+            }
+        }
 
         redirectAttributes.addFlashAttribute("message", "Bill generated successfully for Apartment " + apartment.getApartmentNumber() + " ($" + totalAmount + ")");
         redirectAttributes.addFlashAttribute("messageType", "success");

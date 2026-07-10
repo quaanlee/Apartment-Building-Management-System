@@ -190,6 +190,15 @@ public class ManagerMaintenanceController {
                     reportMap.put("reportContent", report.getReportContent());
                     reportMap.put("progressPercent", report.getProgressPercent());
                     reportMap.put("createdAt", report.getCreatedAt() != null ? report.getCreatedAt().toString() : "N/A");
+                    
+                    List<String> imageUrls = new ArrayList<>();
+                    if (report.getImages() != null) {
+                        for (com.quan.apartment_building_management_system.entity.MaintenanceReportImage img : report.getImages()) {
+                            imageUrls.add(img.getImageUrl());
+                        }
+                    }
+                    reportMap.put("images", imageUrls);
+                    
                     reportsList.add(reportMap);
                 }
             }
