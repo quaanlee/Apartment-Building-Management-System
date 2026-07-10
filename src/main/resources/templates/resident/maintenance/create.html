@@ -1,0 +1,59 @@
+﻿<div th:replace="~{layout/resident/layout_resident :: resident-layout(~{::content}, 'maintenance-requests')}">
+    <div th:fragment="content">
+        <link rel="stylesheet" th:href="@{/css/manager/maintenance/maintenance.css}">
+
+        <div class="back-link-row">
+            <a th:href="@{/resident/maintenance}" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Requests</span>
+            </a>
+        </div>
+
+        <div class="request-details-card">
+            <div class="card-header">
+                <h3>Create Maintenance Request</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" th:action="@{/resident/maintenance/create}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" class="form-input" required placeholder="e.g. Water leak in bathroom">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-input" rows="4" required placeholder="Describe the issue in detail..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Images (optional)</label>
+                        <input type="file" name="images" multiple accept="image/*" onchange="previewImages(event)">
+                        <div id="imagePreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+                    </div>
+                    <div class="form-group" style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                        <a th:href="@{/resident/maintenance}" class="back-btn" style="display:inline-flex;align-items:center;">Cancel</a>
+                        <button type="submit" class="btn-primary">Submit Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            function previewImages(event) {
+                var preview = document.getElementById('imagePreview');
+                preview.innerHTML = '';
+                var files = event.target.files;
+                for (var i = 0; i < files.length; i++) {
+                    (function(file) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            var img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.style.cssText = 'max-width:150px;max-height:150px;border-radius:6px;object-fit:cover;border:1px solid #e2e8f0;';
+                            preview.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                    })(files[i]);
+                }
+            }
+        </script>
+    </div>
+</div>

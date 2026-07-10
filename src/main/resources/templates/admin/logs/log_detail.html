@@ -59,13 +59,39 @@
                     </div>
                 </section>
                 
-                <section class="logs-detail-section">
+                <section class="logs-detail-section" th:if="${log.details != null and log.details != '{}' and log.details != ''}">
                     <h4 class="logs-detail-section-title">Log Content Details</h4>
                     <div class="logs-detail-json-box">
-                        <pre th:text="${log.details}" style="white-space: pre-wrap; word-wrap: break-word;">{}</pre>
+                        <pre id="logDetailsJson" style="white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; margin: 0; background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 8px; overflow-x: auto;">{}</pre>
                     </div>
                 </section>
+                <script>
+                    (function() {
+                        var pre = document.getElementById("logDetailsJson");
+                        if (!pre) return;
+                        try {
+                            var text = pre.textContent || pre.innerText;
+                            var raw = text.trim();
+                            if (!raw || raw === "{}" || raw === "") { var section = pre.closest("section"); if (section) section.style.display = "none"; return; }
+                            var obj = JSON.parse(raw);
+                            var formatted = JSON.stringify(obj, null, 2);
+                            pre.innerHTML = highlightJson(formatted);
+                        } catch(e) { pre.textContent = raw; }
+                    })();
+                    function highlightJson(json) {
+                        var e = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        e = e.replace(/"([^"]+)":/g, "<span style=""color:#89b4fa;"">$&</span>");
+                        e = e.replace(/: "([^"]*)"/g, ": <span style=""color:#a6e3a1;"">$&</span>");
+                        e = e.replace(/: (\d+\.?\d*)/g, ": <span style=""color:#fab387;"">$1</span>");
+                        e = e.replace(/: (true|false)/g, ": <span style=""color:#cba6f7;"">$1</span>");
+                        e = e.replace(/: (null)/g, ": <span style=""color:#f38ba8;"">$1</span>");
+                        return e;
+                    }
+                </script>
             </div>
         </div>
     </div>
 </div>
+
+
+

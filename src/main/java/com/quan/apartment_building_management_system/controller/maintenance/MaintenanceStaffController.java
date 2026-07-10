@@ -5,6 +5,8 @@ import com.quan.apartment_building_management_system.entity.MaintenanceReport;
 import com.quan.apartment_building_management_system.entity.MaintenanceTask;
 import com.quan.apartment_building_management_system.service.maintenance.MaintenanceReportService;
 import com.quan.apartment_building_management_system.service.maintenance.MaintenanceTaskService;
+import com.quan.apartment_building_management_system.repository.MaintenanceRequestRepository;
+import com.quan.apartment_building_management_system.entity.MaintenanceRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -28,15 +30,18 @@ import java.util.stream.Collectors;
 public class MaintenanceStaffController {
 
     private final MaintenanceTaskService maintenanceTaskService;
+    private final MaintenanceRequestRepository maintenanceRequestRepository;
     private final MaintenanceReportService maintenanceReportService;
     private final com.quan.apartment_building_management_system.service.user.AccountNotificationService accountNotificationService;
     private final com.quan.apartment_building_management_system.service.system.NotificationService notificationService;
 
     public MaintenanceStaffController(MaintenanceTaskService maintenanceTaskService,
+                                      MaintenanceRequestRepository maintenanceRequestRepository,
                                       MaintenanceReportService maintenanceReportService,
                                       com.quan.apartment_building_management_system.service.user.AccountNotificationService accountNotificationService,
                                       com.quan.apartment_building_management_system.service.system.NotificationService notificationService) {
         this.maintenanceTaskService = maintenanceTaskService;
+        this.maintenanceRequestRepository = maintenanceRequestRepository;
         this.maintenanceReportService = maintenanceReportService;
         this.accountNotificationService = accountNotificationService;
         this.notificationService = notificationService;
@@ -229,6 +234,17 @@ public class MaintenanceStaffController {
         }
         
         maintenanceTaskService.save(task);
+
+        // Update MaintenanceRequest status
+        MaintenanceRequest req = task.getMaintenanceRequest();
+        if (req != null) {
+            if (reportDto.getProgressPercent() == 100) {
+                req.setStatus((byte) 2); // Done
+            } else if (reportDto.getProgressPercent() > 0 && req.getStatus() == 0) {
+                req.setStatus((byte) 1); // In Progress
+            }
+            maintenanceRequestRepository.save(req);
+        }
 
         redirectAttributes.addFlashAttribute("message", "Report submitted successfully!");
         redirectAttributes.addFlashAttribute("messageType", "success");
