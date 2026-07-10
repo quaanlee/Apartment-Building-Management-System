@@ -2,9 +2,13 @@ package com.quan.apartment_building_management_system.controller.maintenance;
 
 import com.quan.apartment_building_management_system.dto.maintenance.MaintenanceReportDTO;
 import com.quan.apartment_building_management_system.entity.MaintenanceReport;
+import com.quan.apartment_building_management_system.entity.MaintenanceReportImage;
 import com.quan.apartment_building_management_system.entity.MaintenanceTask;
 import com.quan.apartment_building_management_system.service.maintenance.MaintenanceReportService;
 import com.quan.apartment_building_management_system.service.maintenance.MaintenanceTaskService;
+import com.quan.apartment_building_management_system.service.utility.CloudinaryUploadService;
+import com.quan.apartment_building_management_system.service.maintenance.MaintenanceReportImageService;
+import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -31,15 +35,21 @@ public class MaintenanceStaffController {
     private final MaintenanceReportService maintenanceReportService;
     private final com.quan.apartment_building_management_system.service.user.AccountNotificationService accountNotificationService;
     private final com.quan.apartment_building_management_system.service.system.NotificationService notificationService;
+    private final CloudinaryUploadService cloudinaryUploadService;
+    private final MaintenanceReportImageService maintenanceReportImageService;
 
     public MaintenanceStaffController(MaintenanceTaskService maintenanceTaskService,
                                       MaintenanceReportService maintenanceReportService,
                                       com.quan.apartment_building_management_system.service.user.AccountNotificationService accountNotificationService,
-                                      com.quan.apartment_building_management_system.service.system.NotificationService notificationService) {
+                                      com.quan.apartment_building_management_system.service.system.NotificationService notificationService,
+                                      CloudinaryUploadService cloudinaryUploadService,
+                                      MaintenanceReportImageService maintenanceReportImageService) {
         this.maintenanceTaskService = maintenanceTaskService;
         this.maintenanceReportService = maintenanceReportService;
         this.accountNotificationService = accountNotificationService;
         this.notificationService = notificationService;
+        this.cloudinaryUploadService = cloudinaryUploadService;
+        this.maintenanceReportImageService = maintenanceReportImageService;
     }
 
     // Utility to simulate logged-in maintenance staff. 
@@ -179,6 +189,7 @@ public class MaintenanceStaffController {
     public String submitReport(@PathVariable("id") Integer id,
                                @Valid @ModelAttribute("reportDto") MaintenanceReportDTO reportDto,
                                BindingResult bindingResult,
+                               @RequestParam(value = "reportImages", required = false) List<MultipartFile> reportImages,
                                HttpSession session,
                                RedirectAttributes redirectAttributes) {
         
@@ -219,7 +230,27 @@ public class MaintenanceStaffController {
         report.setReportContent(reportDto.getReportContent());
         report.setProgressPercent(reportDto.getProgressPercent());
         report.setCreatedAt(LocalDateTime.now());
-        maintenanceReportService.save(report);
+        MaintenanceReport savedReport = maintenanceReportService.save(report);
+
+        // Upload and save report images if present
+        if (reportImages != null && !reportImages.isEmpty()) {
+            for (MultipartFile file : reportImages) {
+                if (file != null && !file.isEmpty()) {
+                    try {
+                        String url = cloudinaryUploadService.uploadImage(file, "abms/maintenance");
+                        if (url != null) {
+                            MaintenanceReportImage reportImage = new MaintenanceReportImage();
+                            reportImage.setReport(savedReport);
+                            reportImage.setImageUrl(url);
+                            reportImage.setCaption(file.getOriginalFilename());
+                            maintenanceReportImageService.save(reportImage);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
 
         // Update task status based on progress
         if (reportDto.getProgressPercent() == 100) {
