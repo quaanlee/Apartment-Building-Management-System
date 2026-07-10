@@ -60,7 +60,7 @@ CREATE TABLE Profile (
     Gender                      NVARCHAR(10)    NULL,
     DateOfBirth                 DATE            NULL,
     PlaceOfBirth                NVARCHAR(100)   NULL,
-    CitizenID                   VARCHAR(20)     NULL            UNIQUE,
+    CitizenID                   VARCHAR(20)     NULL,
     CitizenIDIssueDate          DATE            NULL,
     CitizenIDIssuePlace         NVARCHAR(100)   NULL,
     Nationality                 NVARCHAR(50)    NULL,
@@ -81,6 +81,9 @@ CREATE TABLE Profile (
     CONSTRAINT FK_Profile_Account   FOREIGN KEY (AccountID)   REFERENCES Account(AccountID),
     CONSTRAINT FK_Profile_Apartment FOREIGN KEY (ApartmentID) REFERENCES Apartment(ApartmentID)
 );
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX UQ_Profile_CitizenID ON Profile(CitizenID) WHERE CitizenID IS NOT NULL;
 GO
 
 -- ============================================================
@@ -286,7 +289,7 @@ CREATE TABLE Payment (
     BillID          INT             NOT NULL,
     PaidBy          INT             NOT NULL,
     MethodID        INT             NOT NULL,
-    TransactionCode VARCHAR(100)    NULL             UNIQUE,
+    TransactionCode VARCHAR(100)    NULL,
     Amount          DECIMAL(18,2)   NOT NULL         CHECK (Amount > 0),
     PaymentDate     DATETIME        NOT NULL         DEFAULT GETDATE(),
     Status          TINYINT         NOT NULL         DEFAULT 0,  -- 0: PENDING | 1: SUCCESS | 2: FAILED
@@ -295,6 +298,9 @@ CREATE TABLE Payment (
     CONSTRAINT FK_Payment_PaidBy        FOREIGN KEY (PaidBy)    REFERENCES Account(AccountID),
     CONSTRAINT FK_Payment_Method        FOREIGN KEY (MethodID)  REFERENCES PaymentMethod(MethodID)
 );
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX UQ_Payment_TransactionCode ON Payment(TransactionCode) WHERE TransactionCode IS NOT NULL;
 GO
 
 -- ============================================================

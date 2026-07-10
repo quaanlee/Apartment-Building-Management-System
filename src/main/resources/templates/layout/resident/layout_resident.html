@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="resident-layout(content, activeTab)">
 <head>
     <meta charset="UTF-8">
@@ -47,7 +47,7 @@
             <li class="sidebar-item" th:classappend="${activeTab == 'maintenance-requests' ? 'active' : ''}">
                 <a th:href="@{/resident/maintenance}">
                     <i class="fa-solid fa-screwdriver-wrench"></i>
-                    <span>Maintenance Requests</span>
+                    <span>Maintenance</span>
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'billing' ? 'active' : ''}">
@@ -65,19 +65,19 @@
             <li class="sidebar-item" th:classappend="${activeTab == 'booking' ? 'active' : ''}">
                 <a th:href="@{/resident/utilities}">
                     <i class="fa-solid fa-calendar-check"></i>
-                    <span>Booking</span>
+                    <span>Amenity Bookings</span>
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'vehicles' ? 'active' : ''}">
                 <a th:href="@{/resident/vehicles}">
                     <i class="fa-solid fa-car"></i>
-                    <span>Vehical</span>
+                    <span>Vehicles</span>
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'notification' ? 'active' : ''}">
                 <a th:href="@{/resident/notifications}">
                     <i class="fa-solid fa-bell"></i>
-                    <span>Notification</span>
+                    <span>Notifications</span>
                 </a>
             </li>
 

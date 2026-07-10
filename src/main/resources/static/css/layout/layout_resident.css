@@ -436,3 +436,25 @@ body {
     display: block;
   }
 }
+
+/* ==========================================================================
+   Layout Resets (Prevents global Bootstrap styles from breaking layout)
+   ========================================================================== */
+.sidebar, .header {
+  font-family: var(--font-main) !important;
+  line-height: 1.5 !important;
+}
+
+.sidebar ul, .sidebar ol, .header ul, .header ol {
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+.sidebar h1, .sidebar h2, .sidebar p, .header h1, .header h2, .header p {
+  margin: 0 !important;
+}
+
+.sidebar a, .header a {
+  text-decoration: none !important;
+}

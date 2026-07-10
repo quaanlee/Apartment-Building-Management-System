@@ -1,0 +1,330 @@
+/* Resident Services & Facilities View Styles */
+
+/* Tab Navigation */
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.tabs-navigation {
+  background-color: #EEF2F6;
+  border-radius: 50px;
+  padding: 6px;
+  display: flex;
+  gap: 4px;
+}
+
+.tab-btn {
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 10px 24px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  background-color: var(--white);
+  color: var(--primary-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Tab Panels */
+.tab-panel {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* Services Grid & Cards */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.service-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.service-icon-box {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-md);
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* Assign different colors based on service type */
+.service-card.electricity .service-icon-box { background-color: #FFFBEB; color: #D97706; }
+.service-card.water .service-icon-box { background-color: #ECFDF5; color: #059669; }
+.service-card.parking .service-icon-box { background-color: #EFF6FF; color: #2563EB; }
+.service-card.rent .service-icon-box { background-color: #FDF2F8; color: #DB2777; }
+.service-card.service .service-icon-box { background-color: var(--primary-light); color: var(--primary-color); }
+
+.service-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.service-price {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.service-price span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.service-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+/* Facilities (Utilities) Grid & Cards */
+.utilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+.utility-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.utility-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.utility-image-container {
+  height: 180px;
+  background-color: #EEF2F6;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.utility-image-container i {
+  font-size: 48px;
+  color: var(--text-secondary);
+  opacity: 0.3;
+}
+
+.utility-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.utility-info {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-grow: 1;
+}
+
+.utility-title-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.utility-title-area h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.utility-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.utility-meta i {
+  color: var(--primary-color);
+}
+
+.utility-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.utility-prices-list {
+  border-top: 1px solid var(--border-color);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.utility-price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.price-unit {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.price-val {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.utility-actions {
+  margin-top: auto;
+  border-top: 1px solid var(--border-color);
+  padding: 20px 24px;
+  background-color: #F9FAFB;
+}
+
+.btn-book {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.btn-book:hover {
+  background-color: #431EC9;
+}
+
+.btn-book.disabled {
+  background-color: #E5E7EB;
+  color: #9CA3AF;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Search Bar styling */
+.filter-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  margin-bottom: 32px;
+}
+
+.filter-form {
+  display: grid;
+  gap: 16px;
+  align-items: center;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-control {
+  background-color: #F9FAFB;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text-primary);
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  height: 46px;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(88, 43, 232, 0.1);
+  background-color: var(--white);
+}
+
+.btn-search {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+  height: 46px;
+  box-sizing: border-box;
+}
+
+.btn-search:hover {
+  background-color: #431EC9;
+}

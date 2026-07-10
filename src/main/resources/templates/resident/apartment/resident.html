@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/resident/layout_resident :: resident-layout(~{::content}, 'apartments')}">
+<body>
+
+<div th:fragment="content">
+    <!-- Page Specific Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/resident/apartments.css}">
+
+    <!-- Upper Metrics Grid -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon total">
+                <i class="fa-solid fa-building"></i>
+            </div>
+            <div class="metric-info">
+                <h3 th:text="${totalUnits}">0</h3>
+                <p>Total Apartments</p>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon occupied">
+                <i class="fa-solid fa-house-user"></i>
+            </div>
+            <div class="metric-info">
+                <h3 th:text="${occupiedUnits}">0</h3>
+                <p>Occupied Units</p>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon available">
+                <i class="fa-solid fa-door-open"></i>
+            </div>
+            <div class="metric-info">
+                <h3 th:text="${vacantUnits}">0</h3>
+                <p>Available Units</p>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon maintenance">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+            <div class="metric-info">
+                <h3 th:text="${maintenanceUnits}">0</h3>
+                <p>In Maintenance</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Apartment Hero Section -->
+    <div class="my-apartment-section">
+        <h2 class="section-title">
+            <i class="fa-solid fa-circle-user"></i>
+            My Resident Accommodation
+        </h2>
+        
+        <!-- If assigned to an apartment -->
+        <div th:if="${myApartment != null}" class="my-apartment-card">
+            <div class="my-apt-main">
+                <p>Active Accommodation</p>
+                <h2 th:text="'Unit ' + ${myApartment.apartmentNumber}">A-101</h2>
+                <span class="badge badge-occupied">Occupied by You</span>
+            </div>
+            <div class="my-apt-details">
+                <div class="detail-item">
+                    <span class="detail-label">Floor</span>
+                    <span class="detail-value" th:text="${myApartment.floor} + 'F'">1F</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Apartment Size</span>
+                    <span class="detail-value" th:text="${myApartment.area} + ' m²'">75.00 m²</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Room Configuration</span>
+                    <span class="detail-value" th:text="${myApartment.roomType}">2BR</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Max Occupants</span>
+                    <span class="detail-value" th:text="${myApartment.maxOccupancy} + ' People'">4 People</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- If NOT assigned to any apartment -->
+        <div th:if="${myApartment == null}" class="my-apt-empty-card">
+            <i class="fa-solid fa-house-laptop"></i>
+            <h3>No Accommodation Details Found</h3>
+            <p>You are currently not registered as an active occupant of any apartment in the system. Please contact the building manager if this is an error.</p>
+        </div>
+    </div>
+
+    <!-- Filter & Search Panel -->
+    <div class="filter-card">
+        <form th:action="@{/resident/apartments}" method="get" class="filter-form">
+            <div class="form-group">
+                <label for="search">Apartment Code</label>
+                <input type="text" id="search" name="search" th:value="${search}" class="form-control" placeholder="e.g. A-101">
+            </div>
+            
+            <div class="form-group">
+                <label for="floor">Floor Level</label>
+                <select id="floor" name="floor" class="form-control">
+                    <option value="">All Floors</option>
+                    <option th:each="f : ${#numbers.sequence(1, 10)}" th:value="${f}" th:text="'Floor ' + ${f}" th:selected="${floor == f}"></option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="status">Availability</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="">All Status</option>
+                    <option value="0" th:selected="${status == 0}">Available</option>
+                    <option value="1" th:selected="${status == 1}">Occupied</option>
+                    <option value="2" th:selected="${status == 2}">Maintenance</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="roomType">Room Type</label>
+                <select id="roomType" name="roomType" class="form-control">
+                    <option value="">All Types</option>
+                    <option value="1BR" th:selected="${roomType == '1BR'}">1 Bedroom</option>
+                    <option value="2BR" th:selected="${roomType == '2BR'}">2 Bedrooms</option>
+                    <option value="3BR" th:selected="${roomType == '3BR'}">3 Bedrooms</option>
+                </select>
+            </div>
+            
+            <div class="form-group" style="flex-direction: row; gap: 8px; align-items: end;">
+                <button type="submit" class="btn-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Filter
+                </button>
+                <a th:href="@{/resident/apartments}" class="btn-reset">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Apartments Grid -->
+    <h2 class="section-title">
+        <i class="fa-solid fa-list-check"></i>
+        Building Directories
+    </h2>
+    
+    <div class="apartments-grid">
+        <div th:each="apt : ${apartments}" class="apt-card">
+            <div class="apt-card-header">
+                <span class="apt-card-title" th:text="${apt.apartmentNumber}">A-101</span>
+                
+                <!-- Status Badge -->
+                <span th:if="${apt.status == 0}" class="badge badge-available">Available</span>
+                <span th:if="${apt.status == 1}" class="badge badge-occupied">Occupied</span>
+                <span th:if="${apt.status == 2}" class="badge badge-maintenance">Maintenance</span>
+            </div>
+            
+            <div class="apt-card-body">
+                <div class="detail-item">
+                    <span class="detail-label">Floor</span>
+                    <span class="detail-value" th:text="${apt.floor} + 'F'">1F</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Room Type</span>
+                    <span class="detail-value" th:text="${apt.roomType}">2BR</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Area Size</span>
+                    <span class="detail-value" th:text="${apt.area} + ' m²'">75.00 m²</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Max Occupants</span>
+                    <span class="detail-value" th:text="${apt.maxOccupancy}">4</span>
+                </div>
+            </div>
+            
+            <div class="apt-card-footer">
+                <a th:href="@{/resident/apartments/{id}(id=${apt.apartmentId})}" class="btn-details" style="text-decoration: none;">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Specs
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${#lists.isEmpty(apartments)}" class="my-apt-empty-card" style="margin-bottom: 32px;">
+        <i class="fa-solid fa-folder-open"></i>
+        <h3>No Apartments Found</h3>
+        <p>No unit matching your search and filter parameters could be found in the system registry.</p>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div th:if="${totalPages > 1}" class="pagination-container">
+        <div class="pagination-info">
+            Showing Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span>
+            (<span th:text="${totalItems}">0</span> total units)
+        </div>
+        <div class="pagination-buttons">
+            <!-- Previous Button -->
+            <a th:href="@{/resident/apartments(page=${currentPage - 1}, search=${search}, floor=${floor}, status=${status}, roomType=${roomType})}" 
+               class="pagination-btn" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                <i class="fa-solid fa-angle-left"></i>
+            </a>
+            
+            <!-- Page Number Links -->
+            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+               th:href="@{/resident/apartments(page=${i}, search=${search}, floor=${floor}, status=${status}, roomType=${roomType})}" 
+               class="pagination-btn" th:text="${i + 1}" th:classappend="${currentPage == i ? 'active' : ''}">1</a>
+            
+            <!-- Next Button -->
+            <a th:href="@{/resident/apartments(page=${currentPage + 1}, search=${search}, floor=${floor}, status=${status}, roomType=${roomType})}" 
+               class="pagination-btn" th:classappend="${currentPage + 1 == totalPages ? 'disabled' : ''}">
+                <i class="fa-solid fa-angle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Detail Modal Dialog -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-wrapper">
+            <div class="modal-header">
+                <h2 id="modalAptNumber">Apartment Detail</h2>
+                <button class="modal-close-btn" onclick="closeModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Floor level</span>
+                        <span class="detail-value" id="modalFloor">1F</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Room configuration</span>
+                        <span class="detail-value" id="modalRoomType">2BR</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Area (Dimensions)</span>
+                        <span class="detail-value" id="modalArea">75 m²</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Max Occupancy Limit</span>
+                        <span class="detail-value" id="modalMaxOccupancy">4 People</span>
+                    </div>
+                    <div class="detail-item modal-row">
+                        <span class="detail-label">Current availability status</span>
+                        <span class="detail-value" id="modalStatus" style="font-weight: 700;">Available</span>
+                    </div>
+                    <div class="detail-item modal-row" style="border-top: none; padding-top: 0;">
+                        <span class="detail-label">Security Note</span>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
+                            This information is compiled directly from the building management database. To request leasing or report errors in this registry, please submit a service log or contact management directly.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal script -->
+    <script>
+        function openDetailModal(number, floor, type, area, occupants, status) {
+            document.getElementById('modalAptNumber').innerText = 'Apartment Unit ' + number;
+            document.getElementById('modalFloor').innerText = floor + 'F';
+            document.getElementById('modalRoomType').innerText = type;
+            document.getElementById('modalArea').innerText = area + ' m²';
+            document.getElementById('modalMaxOccupancy').innerText = occupants + ' People';
+            
+            var statusVal = document.getElementById('modalStatus');
+            if (status == '0') {
+                statusVal.innerText = 'Available';
+                statusVal.style.color = '#10B981';
+            } else if (status == '1') {
+                statusVal.innerText = 'Occupied';
+                statusVal.style.color = '#582BE8';
+            } else {
+                statusVal.innerText = 'Under Maintenance';
+                statusVal.style.color = '#EF4444';
+            }
+            
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        // Close on clicking overlay background
+        window.onclick = function(event) {
+            var modal = document.getElementById('detailModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</div>
+
+</body>
+</html>
