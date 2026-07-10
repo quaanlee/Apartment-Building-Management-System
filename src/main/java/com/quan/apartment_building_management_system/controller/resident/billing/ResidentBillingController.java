@@ -86,6 +86,21 @@ public class ResidentBillingController {
 
         // Calculate summary metrics on all bills
         List<Bill> allBills = billRepository.findByApartmentApartmentId(apartment.getApartmentId());
+        
+        // Check and update overdue status dynamically based on DueDate
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        boolean changed = false;
+        for (Bill b : allBills) {
+            if (b.getStatus() != null && b.getStatus() == 0 && b.getDueDate() != null && b.getDueDate().isBefore(now)) {
+                b.setStatus((byte) 2); // Mark as Overdue
+                billRepository.save(b);
+                changed = true;
+            }
+        }
+        if (changed) {
+            allBills = billRepository.findByApartmentApartmentId(apartment.getApartmentId());
+        }
+
         BigDecimal totalUnpaid = allBills.stream()
                 .filter(b -> b.getStatus() != null && b.getStatus() == 0)
                 .map(Bill::getTotalAmount)

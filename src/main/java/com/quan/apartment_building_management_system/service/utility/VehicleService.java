@@ -18,4 +18,16 @@ public interface VehicleService {
     Vehicle save(Vehicle vehicle);
 
     void deleteById(Integer id);
+
+    long countByStatus(Byte status);
+
+    List<Vehicle> getPendingRequests();
+
+    List<Vehicle> getApprovedVehicles();
+
+    void approveVehicle(Integer id, String approvedByUsername);
+
+    void rejectVehicle(Integer id);
+
+    void revokeVehicle(Integer id);
 }

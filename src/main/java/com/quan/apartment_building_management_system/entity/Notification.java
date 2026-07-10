@@ -50,7 +50,7 @@ public class Notification {
     @Column(name = "Recipient", length = 50)
     private String recipient;
 
-    @OneToMany(mappedBy = "notification")
+    @OneToMany(mappedBy = "notification", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     private List<AccountNotification> accountNotifications = new ArrayList<>();
 
     public Notification() {

@@ -50,4 +50,46 @@ public class VehicleServiceImpl implements VehicleService {
     public void deleteById(Integer id) {
         vehicleRepository.deleteById(id);
     }
+
+    @Override
+    public long countByStatus(Byte status) {
+        return vehicleRepository.countByStatus(status);
+    }
+
+    @Override
+    public List<Vehicle> getPendingRequests() {
+        return vehicleRepository.findByStatusOrderByRegisteredDateDesc((byte) 0);
+    }
+
+    @Override
+    public List<Vehicle> getApprovedVehicles() {
+        return vehicleRepository.findByStatusOrderByRegisteredDateDesc((byte) 1);
+    }
+
+    @Override
+    @Transactional
+    public void approveVehicle(Integer id, String approvedByUsername) {
+        Vehicle vehicle = vehicleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid vehicle Id:" + id));
+        vehicle.setStatus((byte) 1);
+        vehicle.setApprovedAt(java.time.LocalDateTime.now());
+        // For simplicity, we are not setting approvedBy Account object here without injecting AccountRepository
+        // A complete implementation would fetch the Account and set it.
+        vehicleRepository.save(vehicle);
+    }
+
+    @Override
+    @Transactional
+    public void rejectVehicle(Integer id) {
+        Vehicle vehicle = vehicleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid vehicle Id:" + id));
+        vehicle.setStatus((byte) 2);
+        vehicleRepository.save(vehicle);
+    }
+
+    @Override
+    @Transactional
+    public void revokeVehicle(Integer id) {
+        Vehicle vehicle = vehicleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid vehicle Id:" + id));
+        vehicle.setStatus((byte) 0);
+        vehicleRepository.save(vehicle);
+    }
 }

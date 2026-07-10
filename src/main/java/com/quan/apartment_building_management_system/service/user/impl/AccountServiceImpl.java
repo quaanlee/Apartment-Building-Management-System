@@ -21,17 +21,46 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> findAll() {
-        return accountRepository.findAll();
+        List<Account> accounts = accountRepository.findAll();
+        for (Account account : accounts) {
+            if (account.getRole() != null) {
+                account.getRole().getRoleName(); // Eagerly initialize proxy
+            }
+            if (account.getProfile() != null) {
+                account.getProfile().getFullName(); // Eagerly initialize proxy
+            }
+        }
+        return accounts;
     }
 
     @Override
     public Optional<Account> findById(Integer id) {
-        return accountRepository.findById(id);
+        Optional<Account> accountOpt = accountRepository.findById(id);
+        if (accountOpt.isPresent()) {
+            Account account = accountOpt.get();
+            if (account.getRole() != null) {
+                account.getRole().getRoleName(); // Eagerly initialize proxy
+            }
+            if (account.getProfile() != null) {
+                account.getProfile().getFullName(); // Eagerly initialize proxy
+            }
+        }
+        return accountOpt;
     }
 
     @Override
     public Optional<Account> findByUsername(String username) {
-        return accountRepository.findByUsername(username);
+        Optional<Account> accountOpt = accountRepository.findByUsername(username);
+        if (accountOpt.isPresent()) {
+            Account account = accountOpt.get();
+            if (account.getRole() != null) {
+                account.getRole().getRoleName(); // Eagerly initialize proxy
+            }
+            if (account.getProfile() != null) {
+                account.getProfile().getFullName(); // Eagerly initialize proxy
+            }
+        }
+        return accountOpt;
     }
 
     @Override

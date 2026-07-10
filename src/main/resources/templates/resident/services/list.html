@@ -1,0 +1,88 @@
+<div th:replace="~{layout/resident/layout_resident :: resident-layout(~{::content}, 'services')}">
+    <div th:fragment="content">
+        <!-- Load custom page styling -->
+        <link rel="stylesheet" th:href="@{/css/admin/services.css}">
+
+        <!-- PAGE HEADER -->
+        <div class="page-title-row">
+            <div class="page-title-left">
+                <h2 class="page-title">Service Catalog &amp; Pricing</h2>
+                <p class="page-subtitle">View utility types and service rates.</p>
+            </div>
+        </div>
+
+        <!-- STATISTICS CARDS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="stat-label">TOTAL SERVICES</span>
+                    <span class="stat-value" th:text="${totalServices}">0</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <span class="stat-label">ACTIVE SERVICES</span>
+                    <span class="stat-value" th:text="${activeServices}">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SERVICES GRID -->
+        <div class="services-grid">
+            <div class="service-card" th:each="service : ${services}">
+
+                <!-- Card header: icon + status/type -->
+                <div class="service-card-header">
+                    <div th:class="'service-icon-box type-' + ${#strings.toLowerCase(service.serviceType)}">
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'electricity')}" class="fa-solid fa-bolt"></i>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'water')}" class="fa-solid fa-droplet"></i>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'cleaning')}" class="fa-solid fa-broom"></i>
+                        <span th:if="${#strings.equalsIgnoreCase(service.serviceType, 'parking')}" class="parking-letter">P</span>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'management')}" class="fa-solid fa-building-circle-check"></i>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'internet')}" class="fa-solid fa-wifi"></i>
+                        <i th:if="${!#strings.equalsIgnoreCase(service.serviceType, 'electricity') and
+                                     !#strings.equalsIgnoreCase(service.serviceType, 'water') and
+                                     !#strings.equalsIgnoreCase(service.serviceType, 'cleaning') and
+                                     !#strings.equalsIgnoreCase(service.serviceType, 'parking') and
+                                     !#strings.equalsIgnoreCase(service.serviceType, 'management') and
+                                     !#strings.equalsIgnoreCase(service.serviceType, 'internet')}"
+                           class="fa-solid fa-cube"></i>
+                    </div>
+
+                    <div class="service-meta-right">
+                        <span th:class="${service.status ? 'status-badge active' : 'status-badge locked'}"
+                              th:text="${service.status ? 'ACTIVE' : 'LOCKED'}">ACTIVE</span>
+                        <span class="service-type-label"
+                              th:classappend="'label-' + ${#strings.toLowerCase(service.serviceType)}"
+                              th:text="${#strings.toUpperCase(service.serviceType)}">ELECTRICITY</span>
+                    </div>
+                </div>
+
+                <!-- Service name -->
+                <h3 class="service-name" th:text="${service.serviceName}">General Grid Supply</h3>
+
+                <!-- Pricing details -->
+                <div class="pricing-details">
+                    <div class="pricing-row">
+                        <span class="detail-label">Unit Price</span>
+                        <span class="detail-value" th:text="'$' + ${#numbers.formatDecimal(service.unitPrice, 1, 2)}">$0.18</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span class="detail-label">Unit Name</span>
+                        <span class="detail-value" th:text="${service.unitName}">kWh</span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <p class="service-desc" th:text="${service.description}" style="font-size: 13px; color: var(--text-secondary); margin-top: 12px; line-height: 1.5;"></p>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="no-results-card" th:if="${#lists.isEmpty(services)}" style="text-align: center; padding: 48px; background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-top: 24px;">
+            <i class="fa-solid fa-box-open" style="font-size: 48px; color: var(--text-secondary); margin-bottom: 16px;"></i>
+            <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary);">No services found</h3>
+        </div>
+
+    </div>
+</div>

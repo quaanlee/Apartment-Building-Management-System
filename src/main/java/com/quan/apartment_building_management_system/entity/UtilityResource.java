@@ -49,6 +49,7 @@ public class UtilityResource {
     private List<UtilityImage> utilityImages = new ArrayList<>();
 
     public UtilityResource() {
+        // Required by JPA
     }
 
     public Integer getResourceId() {
