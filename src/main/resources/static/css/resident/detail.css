@@ -1,0 +1,314 @@
+/* Apartment Detail Specification Page Styles */
+
+/* Header back button */
+.detail-header-action {
+  margin-bottom: 24px;
+}
+
+.btn-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.btn-back-link:hover {
+  color: var(--primary-color);
+}
+
+/* Image Gallery Layout */
+.gallery-container {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+  height: 420px;
+}
+
+.gallery-main {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  min-height: 0;
+}
+
+.gallery-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.gallery-main img:hover {
+  transform: scale(1.015);
+}
+
+.gallery-side {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 16px;
+  min-height: 0;
+}
+
+.gallery-thumb {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  min-height: 0;
+}
+
+.gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.gallery-thumb img:hover {
+  transform: scale(1.025);
+}
+
+/* Detail Sections Layout Grid */
+.detail-sections-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+/* Card layout adjustments for spec details */
+.specs-detail-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.specs-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.specs-title-row h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Specs Overview Badges/Metrics */
+.specs-overview-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.spec-mini-card {
+  background: #F8FAFC;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spec-mini-card i {
+  font-size: 20px;
+  color: var(--primary-color);
+}
+
+.spec-mini-card .spec-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.spec-mini-card .spec-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+/* Specs text info description */
+.specs-description {
+  margin-bottom: 32px;
+}
+
+.specs-description h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.specs-description p {
+  font-size: 14.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Side Column Cards */
+.side-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  margin-bottom: 24px;
+}
+
+.side-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Features List styling */
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.features-list li {
+  font-size: 14px;
+  color: var(--text-secondary);
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.features-list li i {
+  color: #10B981;
+  font-size: 14px;
+}
+
+/* Occupants items */
+.occupants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.occupant-item {
+  background: #F8FAFC;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  position: relative;
+}
+
+.occupant-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.occupant-meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.occupant-meta i {
+  width: 14px;
+}
+
+.badge-owner {
+  background-color: #FFF7ED;
+  color: #C2410C;
+  border: 1px solid #FED7AA;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  text-transform: uppercase;
+}
+
+.badge-member {
+  background-color: #F1F5F9;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  text-transform: uppercase;
+}
+
+.occupant-empty {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.occupant-empty i {
+  font-size: 32px;
+  color: #CBD5E1;
+  margin-bottom: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .gallery-container {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .gallery-main {
+    height: 280px;
+  }
+
+  .gallery-side {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 140px;
+    height: 140px;
+  }
+
+  .detail-sections-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .specs-detail-card {
+    padding: 20px;
+  }
+}

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/resident/layout_resident :: resident-layout(~{::content}, 'services & utility')}">
+<body>
+
+<div th:fragment="content">
+    <!-- Page Specific Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/resident/services.css}">
+
+    <!-- Search bar panel -->
+    <div class="filter-card" style="margin-bottom: 24px;">
+        <form th:action="@{/resident/services}" method="get" class="filter-form" style="grid-template-columns: 4fr 1fr;">
+            <div class="form-group">
+                <input type="text" id="keyword" name="keyword" th:value="${keyword}" class="form-control" placeholder="Search services or utility facilities (e.g. Water, Gym)...">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn-search" style="width: 100%;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tab Buttons -->
+    <div class="tabs-container">
+        <div class="tabs-navigation">
+            <button class="tab-btn active" onclick="switchTab(event, 'services-tab')">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                Standard Services
+            </button>
+            <button class="tab-btn" onclick="switchTab(event, 'utilities-tab')">
+                <i class="fa-solid fa-dumbbell"></i>
+                Building Utilities
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab 1: Standard Services -->
+    <div id="services-tab" class="tab-panel active">
+        <div class="services-grid">
+            <div th:each="srv : ${services}" class="service-card" 
+                 th:classappend="${#strings.toLowerCase(srv.serviceType)}">
+                
+                <div class="service-icon-box">
+                    <!-- Icon selection based on type -->
+                    <i th:if="${srv.serviceType == 'ELECTRICITY'}" class="fa-solid fa-bolt"></i>
+                    <i th:if="${srv.serviceType == 'WATER'}" class="fa-solid fa-droplet"></i>
+                    <i th:if="${srv.serviceType == 'PARKING'}" class="fa-solid fa-square-parking"></i>
+                    <i th:if="${srv.serviceType == 'RENT'}" class="fa-solid fa-key"></i>
+                    <i th:if="${srv.serviceType == 'SERVICE' || srv.serviceType == 'PENALTY'}" class="fa-solid fa-hand-holding-dollar"></i>
+                </div>
+                
+                <div>
+                    <span class="detail-label" th:text="${srv.serviceType}">SERVICE TYPE</span>
+                    <h3 class="service-title" th:text="${srv.serviceName}">Service Name</h3>
+                </div>
+                
+                <div class="service-price">
+                    <span th:text="${#numbers.formatDecimal(srv.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</span>
+                    <span th:text="'/ ' + ${srv.unitName}">/ Unit</span>
+                </div>
+                
+                <p class="service-description" th:text="${srv.description != null && srv.description != '' ? srv.description : 'Standard residential service tariff approved by the management board.'}">Description</p>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(services)}" class="my-apt-empty-card" style="margin-top: 24px;">
+            <i class="fa-solid fa-folder-open"></i>
+            <h3>No Services Found</h3>
+            <p>We could not find any active service items matching your search query.</p>
+        </div>
+    </div>
+
+    <!-- Tab 2: Utilities / Facilities -->
+    <div id="utilities-tab" class="tab-panel">
+        <div class="utilities-grid">
+            <div th:each="ut : ${utilities}" class="utility-card">
+                
+                <div class="utility-image-container">
+                    <!-- Display custom SVG icons as premium placeholders if no images exist -->
+                    <i th:if="${#strings.contains(#strings.toLowerCase(ut.utilityName), 'gym')}" class="fa-solid fa-dumbbell"></i>
+                    <i th:if="${#strings.contains(#strings.toLowerCase(ut.utilityName), 'pool') || #strings.contains(#strings.toLowerCase(ut.utilityName), 'swimming')}" class="fa-solid fa-person-swimming"></i>
+                    <i th:if="${#strings.contains(#strings.toLowerCase(ut.utilityName), 'bbq') || #strings.contains(#strings.toLowerCase(ut.utilityName), 'barbecue')}" class="fa-solid fa-fire-burner"></i>
+                    <i th:if="${#strings.contains(#strings.toLowerCase(ut.utilityName), 'tennis') || #strings.contains(#strings.toLowerCase(ut.utilityName), 'court')}" class="fa-solid fa-table-tennis-paddle-ball"></i>
+                    <i th:if="${!#strings.contains(#strings.toLowerCase(ut.utilityName), 'gym') && !#strings.contains(#strings.toLowerCase(ut.utilityName), 'pool') && !#strings.contains(#strings.toLowerCase(ut.utilityName), 'swimming') && !#strings.contains(#strings.toLowerCase(ut.utilityName), 'bbq') && !#strings.contains(#strings.toLowerCase(ut.utilityName), 'barbecue') && !#strings.contains(#strings.toLowerCase(ut.utilityName), 'tennis') && !#strings.contains(#strings.toLowerCase(ut.utilityName), 'court')}" class="fa-solid fa-cubes"></i>
+                    
+                    <!-- Status Badge -->
+                    <span th:if="${ut.status}" class="badge badge-available utility-badge">Active</span>
+                    <span th:if="${!ut.status}" class="badge badge-maintenance utility-badge">Maintenance</span>
+                </div>
+                
+                <div class="utility-info">
+                    <div class="utility-title-area">
+                        <h3 th:text="${ut.utilityName}">Utility Name</h3>
+                    </div>
+                    
+                    <div class="utility-meta">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>Ground Floor, Block B</span>
+                    </div>
+                    
+                    <p class="utility-description" th:text="${ut.description != null && ut.description != '' ? ut.description : 'Shared building utility facility available for reservation by residents.'}">Description</p>
+                    
+                    <!-- Utility pricing tiers -->
+                    <div class="utility-prices-list">
+                        <div class="detail-label" style="margin-bottom: 4px;">Pricing Tariffs</div>
+                        
+                        <div th:each="pr : ${prices}" th:if="${pr.utility.utilityId == ut.utilityId}" class="utility-price-item">
+                            <span class="price-unit" th:text="${pr.unit.unitName}">Hour</span>
+                            <span class="price-val" th:text="${#numbers.formatDecimal(pr.price, 0, 'COMMA', 0, 'POINT')} + ' VND'">50,000 VND</span>
+                        </div>
+                        
+                        <!-- Fallback if no prices mapped -->
+                        <div th:if="${#lists.isEmpty(prices)}" class="utility-price-item">
+                            <span class="price-unit">Access Fee</span>
+                            <span class="price-val">Free Access</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="utility-actions">
+                    <button class="btn-book" th:classappend="${!ut.status ? 'disabled' : ''}"
+                            th:attr="onclick=|handleBookingClick('${ut.utilityId}', '${ut.utilityName}', '${ut.status}')|">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        Reserve Facility
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(utilities)}" class="my-apt-empty-card" style="margin-top: 24px;">
+            <i class="fa-solid fa-folder-open"></i>
+            <h3>No Utilities Found</h3>
+            <p>We could not find any utility facilities matching your search query.</p>
+        </div>
+    </div>
+
+    <!-- Tab switching & Toast notifications script -->
+    <script>
+        function switchTab(evt, tabId) {
+            // Hide all tab panels
+            var tabPanels = document.getElementsByClassName("tab-panel");
+            for (var i = 0; i < tabPanels.length; i++) {
+                tabPanels[i].classList.remove("active");
+            }
+
+            // Remove active class from all buttons
+            var tabBtns = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+
+            // Show current tab panel and add active class to clicked button
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function handleBookingClick(utilityId, utilityName, status) {
+            if (status === 'false') {
+                showToast('This facility is currently under maintenance and cannot be reserved.', 'error');
+                return;
+            }
+            showToast('Redirecting to bookings for ' + utilityName + '...', 'success');
+            setTimeout(function() {
+                window.location.href = '/resident/booking?utilityId=' + utilityId;
+            }, 1000);
+        }
+    </script>
+</div>
+
+</body>
+</html>
