@@ -28,6 +28,7 @@ public class DatabaseInitializer implements CommandLineRunner {
     private final BillRepository billRepository;
     private final BillDetailRepository billDetailRepository;
     private final PaymentRepository paymentRepository;
+    private final DatabaseConstraintFixer databaseConstraintFixer;
 
     public DatabaseInitializer(RoleRepository roleRepository,
                                AccountRepository accountRepository,
@@ -43,7 +44,8 @@ public class DatabaseInitializer implements CommandLineRunner {
                                PaymentMethodRepository paymentMethodRepository,
                                BillRepository billRepository,
                                BillDetailRepository billDetailRepository,
-                               PaymentRepository paymentRepository) {
+                               PaymentRepository paymentRepository,
+                               DatabaseConstraintFixer databaseConstraintFixer) {
         this.roleRepository = roleRepository;
         this.accountRepository = accountRepository;
         this.profileRepository = profileRepository;
@@ -59,33 +61,55 @@ public class DatabaseInitializer implements CommandLineRunner {
         this.billRepository = billRepository;
         this.billDetailRepository = billDetailRepository;
         this.paymentRepository = paymentRepository;
+        this.databaseConstraintFixer = databaseConstraintFixer;
     }
 
     @Override
     @Transactional
     public void run(String... args) throws Exception {
+        databaseConstraintFixer.fixConstraints();
         initializeOrUpdateUtilities();
 
-        if (roleRepository.count() > 0) {
+        if (accountRepository.existsByUsername("resident1")) {
             return; // Already initialized
         }
 
-        // 1. Roles
-        Role adminRole = new Role();
-        adminRole.setRoleName("ADMIN");
-        adminRole = roleRepository.save(adminRole);
+        // 1. Roles (retrieve existing or create safely)
+        Role adminRole = roleRepository.findAll().stream()
+                .filter(r -> "ADMIN".equalsIgnoreCase(r.getRoleName()))
+                .findFirst().orElse(null);
+        if (adminRole == null) {
+            adminRole = new Role();
+            adminRole.setRoleName("ADMIN");
+            adminRole = roleRepository.save(adminRole);
+        }
 
-        Role managerRole = new Role();
-        managerRole.setRoleName("MANAGER");
-        managerRole = roleRepository.save(managerRole);
+        Role managerRole = roleRepository.findAll().stream()
+                .filter(r -> "MANAGER".equalsIgnoreCase(r.getRoleName()))
+                .findFirst().orElse(null);
+        if (managerRole == null) {
+            managerRole = new Role();
+            managerRole.setRoleName("MANAGER");
+            managerRole = roleRepository.save(managerRole);
+        }
 
-        Role residentRole = new Role();
-        residentRole.setRoleName("RESIDENT");
-        residentRole = roleRepository.save(residentRole);
+        Role residentRole = roleRepository.findAll().stream()
+                .filter(r -> "RESIDENT".equalsIgnoreCase(r.getRoleName()))
+                .findFirst().orElse(null);
+        if (residentRole == null) {
+            residentRole = new Role();
+            residentRole.setRoleName("RESIDENT");
+            residentRole = roleRepository.save(residentRole);
+        }
 
-        Role staffRole = new Role();
-        staffRole.setRoleName("MAINTENANCE_STAFF");
-        staffRole = roleRepository.save(staffRole);
+        Role staffRole = roleRepository.findAll().stream()
+                .filter(r -> "MAINTENANCE_STAFF".equalsIgnoreCase(r.getRoleName()) || "Maintenance Staff".equalsIgnoreCase(r.getRoleName()))
+                .findFirst().orElse(null);
+        if (staffRole == null) {
+            staffRole = new Role();
+            staffRole.setRoleName("MAINTENANCE_STAFF");
+            staffRole = roleRepository.save(staffRole);
+        }
 
         // 2. Accounts
         Account adminAcc = new Account();
@@ -124,55 +148,101 @@ public class DatabaseInitializer implements CommandLineRunner {
         staffAcc = accountRepository.save(staffAcc);
 
         // 3. Profiles
-        Profile adminProfile = new Profile();
-        adminProfile.setAccount(adminAcc);
-        adminProfile.setFullName("Lê Vũ Anh Quân");
-        adminProfile.setEmail("quanlva@abms.com");
-        adminProfile.setPhoneNumber("0987654321");
-        adminProfile.setCitizenId("000000000001");
-        adminProfile.setNationality("Vietnam");
-        adminProfile.setEthnicity("Kinh");
-        profileRepository.save(adminProfile);
+        // 3. Profiles
+        Profile adminProfile = profileRepository.findByCitizenId("000000000001").orElse(null);
+        if (adminProfile != null) {
+            adminProfile.setAccount(adminAcc);
+            adminProfile.setFullName("Lê Vũ Anh Quân");
+            adminProfile.setEmail("quanlva@abms.com");
+            adminProfile.setPhoneNumber("0987654321");
+            adminProfile = profileRepository.save(adminProfile);
+        } else {
+            adminProfile = new Profile();
+            adminProfile.setAccount(adminAcc);
+            adminProfile.setFullName("Lê Vũ Anh Quân");
+            adminProfile.setEmail("quanlva@abms.com");
+            adminProfile.setPhoneNumber("0987654321");
+            adminProfile.setCitizenId("000000000001");
+            adminProfile.setNationality("Vietnam");
+            adminProfile.setEthnicity("Kinh");
+            adminProfile = profileRepository.save(adminProfile);
+        }
 
-        Profile managerProfile = new Profile();
-        managerProfile.setAccount(managerAcc);
-        managerProfile.setFullName("Nguyễn Đức Nam");
-        managerProfile.setEmail("namnd@abms.com");
-        managerProfile.setPhoneNumber("0912345678");
-        managerProfile.setCitizenId("000000000002");
-        managerProfile.setNationality("Vietnam");
-        managerProfile.setEthnicity("Kinh");
-        profileRepository.save(managerProfile);
+        Profile managerProfile = profileRepository.findByCitizenId("000000000002").orElse(null);
+        if (managerProfile != null) {
+            managerProfile.setAccount(managerAcc);
+            managerProfile.setFullName("Nguyễn Đức Nam");
+            managerProfile.setEmail("namnd@abms.com");
+            managerProfile.setPhoneNumber("0912345678");
+            managerProfile = profileRepository.save(managerProfile);
+        } else {
+            managerProfile = new Profile();
+            managerProfile.setAccount(managerAcc);
+            managerProfile.setFullName("Nguyễn Đức Nam");
+            managerProfile.setEmail("namnd@abms.com");
+            managerProfile.setPhoneNumber("0912345678");
+            managerProfile.setCitizenId("000000000002");
+            managerProfile.setNationality("Vietnam");
+            managerProfile.setEthnicity("Kinh");
+            managerProfile = profileRepository.save(managerProfile);
+        }
 
-        Profile residentProfile1 = new Profile();
-        residentProfile1.setAccount(residentAcc1);
-        residentProfile1.setFullName("Phan Công Sơn");
-        residentProfile1.setEmail("sonpc@abms.com");
-        residentProfile1.setPhoneNumber("0909090909");
-        residentProfile1.setCitizenId("012345678901");
-        residentProfile1.setNationality("Vietnam");
-        residentProfile1.setEthnicity("Kinh");
-        residentProfile1 = profileRepository.save(residentProfile1);
+        Profile residentProfile1 = profileRepository.findByCitizenId("012345678901").orElse(null);
+        if (residentProfile1 != null) {
+            residentProfile1.setAccount(residentAcc1);
+            residentProfile1.setFullName("Phan Công Sơn");
+            residentProfile1.setEmail("sonpc@abms.com");
+            residentProfile1.setPhoneNumber("0909090909");
+            residentProfile1 = profileRepository.save(residentProfile1);
+        } else {
+            residentProfile1 = new Profile();
+            residentProfile1.setAccount(residentAcc1);
+            residentProfile1.setFullName("Phan Công Sơn");
+            residentProfile1.setEmail("sonpc@abms.com");
+            residentProfile1.setPhoneNumber("0909090909");
+            residentProfile1.setCitizenId("012345678901");
+            residentProfile1.setNationality("Vietnam");
+            residentProfile1.setEthnicity("Kinh");
+            residentProfile1 = profileRepository.save(residentProfile1);
+        }
 
-        Profile residentProfile2 = new Profile();
-        residentProfile2.setAccount(residentAcc2);
-        residentProfile2.setFullName("Trần Minh Thảo");
-        residentProfile2.setEmail("thaotm@abms.com");
-        residentProfile2.setPhoneNumber("0919191919");
-        residentProfile2.setCitizenId("012345678902");
-        residentProfile2.setNationality("Vietnam");
-        residentProfile2.setEthnicity("Kinh");
-        residentProfile2 = profileRepository.save(residentProfile2);
+        Profile residentProfile2 = profileRepository.findByCitizenId("012345678902").orElse(null);
+        if (residentProfile2 != null) {
+            residentProfile2.setAccount(residentAcc2);
+            residentProfile2.setFullName("Trần Minh Thảo");
+            residentProfile2.setEmail("thaotm@abms.com");
+            residentProfile2.setPhoneNumber("0919191919");
+            residentProfile2 = profileRepository.save(residentProfile2);
+        } else {
+            residentProfile2 = new Profile();
+            residentProfile2.setAccount(residentAcc2);
+            residentProfile2.setFullName("Trần Minh Thảo");
+            residentProfile2.setEmail("thaotm@abms.com");
+            residentProfile2.setPhoneNumber("0919191919");
+            residentProfile2.setCitizenId("012345678902");
+            residentProfile2.setNationality("Vietnam");
+            residentProfile2.setEthnicity("Kinh");
+            residentProfile2 = profileRepository.save(residentProfile2);
+        }
 
-        Profile staffProfile = new Profile();
-        staffProfile.setAccount(staffAcc);
-        staffProfile.setFullName("Hà Mạnh Luân");
-        staffProfile.setEmail("luanhm@abms.com");
-        staffProfile.setPhoneNumber("0934567890");
-        staffProfile.setCitizenId("000000000003");
-        staffProfile.setNationality("Vietnam");
-        staffProfile.setEthnicity("Kinh");
-        profileRepository.save(staffProfile);
+        Profile staffProfile = profileRepository.findByCitizenId("000000000003").orElse(null);
+        if (staffProfile != null) {
+            staffProfile.setAccount(staffAcc);
+            staffProfile.setFullName("Hà Mạnh Luân");
+            staffProfile.setEmail("luanhm@abms.com");
+            staffProfile.setPhoneNumber("0934567890");
+            staffProfile = profileRepository.save(staffProfile);
+        } else {
+            staffProfile = new Profile();
+            staffProfile.setAccount(staffAcc);
+            staffProfile.setFullName("Hà Mạnh Luân");
+            staffProfile.setEmail("luanhm@abms.com");
+            staffProfile.setPhoneNumber("0934567890");
+            staffProfile.setCitizenId("000000000003");
+            staffProfile.setNationality("Vietnam");
+            staffProfile.setEthnicity("Kinh");
+            staffProfile = profileRepository.save(staffProfile);
+        }
 
         // 4. Units (if empty)
         Unit hourUnit = unitRepository.findByUnitName("Hour").orElseGet(() -> {
@@ -247,66 +317,90 @@ public class DatabaseInitializer implements CommandLineRunner {
         residentApartmentRepository.save(ra2);
 
         // 6. Services (ServiceItem)
-        ServiceItem managementFee = new ServiceItem();
-        managementFee.setServiceName("Management Fee");
-        managementFee.setServiceType("Monthly Fee");
-        managementFee.setUnitPrice(new BigDecimal("50.00"));
-        managementFee.setUnit(monthUnit);
-        managementFee.setStatus(true);
-        serviceItemRepository.save(managementFee);
+        ServiceItem managementFee = serviceItemRepository.findByServiceName("Management Fee").orElse(null);
+        if (managementFee == null) {
+            managementFee = new ServiceItem();
+            managementFee.setServiceName("Management Fee");
+            managementFee.setServiceType("Monthly Fee");
+            managementFee.setUnitPrice(new BigDecimal("50.00"));
+            managementFee.setUnit(monthUnit);
+            managementFee.setStatus(true);
+            managementFee = serviceItemRepository.save(managementFee);
+        }
 
-        ServiceItem electricity = new ServiceItem();
-        electricity.setServiceName("Electricity");
-        electricity.setServiceType("Utility Usage");
-        electricity.setUnitPrice(new BigDecimal("0.15"));
-        electricity.setUnit(hourUnit);
-        electricity.setStatus(true);
-        serviceItemRepository.save(electricity);
+        ServiceItem electricity = serviceItemRepository.findByServiceName("Electricity").orElse(null);
+        if (electricity == null) {
+            electricity = new ServiceItem();
+            electricity.setServiceName("Electricity");
+            electricity.setServiceType("Utility Usage");
+            electricity.setUnitPrice(new BigDecimal("0.15"));
+            electricity.setUnit(hourUnit);
+            electricity.setStatus(true);
+            electricity = serviceItemRepository.save(electricity);
+        }
 
-        ServiceItem water = new ServiceItem();
-        water.setServiceName("Water");
-        water.setServiceType("Utility Usage");
-        water.setUnitPrice(new BigDecimal("2.50"));
-        water.setUnit(turnUnit);
-        water.setStatus(true);
-        serviceItemRepository.save(water);
+        ServiceItem water = serviceItemRepository.findByServiceName("Water").orElse(null);
+        if (water == null) {
+            water = new ServiceItem();
+            water.setServiceName("Water");
+            water.setServiceType("Utility Usage");
+            water.setUnitPrice(new BigDecimal("2.50"));
+            water.setUnit(turnUnit);
+            water.setStatus(true);
+            water = serviceItemRepository.save(water);
+        }
 
-        ServiceItem parkingFee = new ServiceItem();
-        parkingFee.setServiceName("Parking Fee");
-        parkingFee.setServiceType("Monthly Fee");
-        parkingFee.setUnitPrice(new BigDecimal("10.00"));
-        parkingFee.setUnit(monthUnit);
-        parkingFee.setStatus(true);
-        serviceItemRepository.save(parkingFee);
+        ServiceItem parkingFee = serviceItemRepository.findByServiceName("Parking Fee").orElse(null);
+        if (parkingFee == null) {
+            parkingFee = new ServiceItem();
+            parkingFee.setServiceName("Parking Fee");
+            parkingFee.setServiceType("Monthly Fee");
+            parkingFee.setUnitPrice(new BigDecimal("10.00"));
+            parkingFee.setUnit(monthUnit);
+            parkingFee.setStatus(true);
+            parkingFee = serviceItemRepository.save(parkingFee);
+        }
 
-        ServiceItem cleaningFee = new ServiceItem();
-        cleaningFee.setServiceName("Cleaning Service");
-        cleaningFee.setServiceType("Monthly Fee");
-        cleaningFee.setUnitPrice(new BigDecimal("5.00"));
-        cleaningFee.setUnit(monthUnit);
-        cleaningFee.setStatus(true);
-        serviceItemRepository.save(cleaningFee);
+        ServiceItem cleaningFee = serviceItemRepository.findByServiceName("Cleaning Service").orElse(null);
+        if (cleaningFee == null) {
+            cleaningFee = new ServiceItem();
+            cleaningFee.setServiceName("Cleaning Service");
+            cleaningFee.setServiceType("Monthly Fee");
+            cleaningFee.setUnitPrice(new BigDecimal("5.00"));
+            cleaningFee.setUnit(monthUnit);
+            cleaningFee.setStatus(true);
+            cleaningFee = serviceItemRepository.save(cleaningFee);
+        }
 
-        ServiceItem utilityBookingServiceItem = new ServiceItem();
-        utilityBookingServiceItem.setServiceName("Utility Booking");
-        utilityBookingServiceItem.setServiceType("Utility Booking");
-        utilityBookingServiceItem.setUnitPrice(BigDecimal.ZERO);
-        utilityBookingServiceItem.setUnit(turnUnit);
-        utilityBookingServiceItem.setStatus(true);
-        serviceItemRepository.save(utilityBookingServiceItem);
+        ServiceItem utilityBookingServiceItem = serviceItemRepository.findByServiceName("Utility Booking").orElse(null);
+        if (utilityBookingServiceItem == null) {
+            utilityBookingServiceItem = new ServiceItem();
+            utilityBookingServiceItem.setServiceName("Utility Booking");
+            utilityBookingServiceItem.setServiceType("Utility Booking");
+            utilityBookingServiceItem.setUnitPrice(BigDecimal.ZERO);
+            utilityBookingServiceItem.setUnit(turnUnit);
+            utilityBookingServiceItem.setStatus(true);
+            utilityBookingServiceItem = serviceItemRepository.save(utilityBookingServiceItem);
+        }
 
         // 7. Payment Methods
-        PaymentMethod cashMethod = new PaymentMethod();
-        cashMethod.setMethodName("Cash");
-        cashMethod.setIsOnline(false);
-        cashMethod.setStatus(true);
-        paymentMethodRepository.save(cashMethod);
+        PaymentMethod cashMethod = paymentMethodRepository.findByMethodName("Cash").orElse(null);
+        if (cashMethod == null) {
+            cashMethod = new PaymentMethod();
+            cashMethod.setMethodName("Cash");
+            cashMethod.setIsOnline(false);
+            cashMethod.setStatus(true);
+            cashMethod = paymentMethodRepository.saveAndFlush(cashMethod);
+        }
 
-        PaymentMethod vnPayMethod = new PaymentMethod();
-        vnPayMethod.setMethodName("VNPAY");
-        vnPayMethod.setIsOnline(true);
-        vnPayMethod.setStatus(true);
-        paymentMethodRepository.save(vnPayMethod);
+        PaymentMethod vnPayMethod = paymentMethodRepository.findByMethodName("VNPAY").orElse(null);
+        if (vnPayMethod == null) {
+            vnPayMethod = new PaymentMethod();
+            vnPayMethod.setMethodName("VNPAY");
+            vnPayMethod.setIsOnline(true);
+            vnPayMethod.setStatus(true);
+            vnPayMethod = paymentMethodRepository.saveAndFlush(vnPayMethod);
+        }
 
         // 8. Utilities Configuration (if empty in UtilityPrice)
         Utility gym = utilityRepository.findById(1).orElse(null);
@@ -404,7 +498,7 @@ public class DatabaseInitializer implements CommandLineRunner {
             payment1.setPaymentDate(LocalDateTime.now().minusDays(12));
             payment1.setStatus((byte) 1); // SUCCESS
             payment1.setTransactionCode("TXN-VNPAY-998877");
-            paymentRepository.save(payment1);
+            paymentRepository.saveAndFlush(payment1);
         }
 
         if (apt102 != null && managerAcc != null) {

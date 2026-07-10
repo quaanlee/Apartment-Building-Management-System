@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -74,6 +75,7 @@ public class Apartment {
     private List<MaintenanceRequest> maintenanceRequests = new ArrayList<>();
 
     @OneToMany(mappedBy = "apartment")
+    @OrderBy("isPrimary DESC, uploadedAt ASC")
     private List<ApartmentImage> apartmentImages = new ArrayList<>();
 
     @OneToMany(mappedBy = "apartment")

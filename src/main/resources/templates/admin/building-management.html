@@ -28,6 +28,7 @@
 
     <!-- Filter Box -->
     <div class="filter-box">
+
         <select id="statusFilter">
             <option value="all">All Status</option>
             <option value="0">Vacant</option>
@@ -77,9 +78,6 @@
                     <a th:href="@{/admin/apartments/edit/{id}(id=${apartment.apartmentId})}" title="Edit">
                         <i class="fa-solid fa-pen"></i>
                     </a>
-                    <a th:href="@{/admin/apartments/assign/{id}(id=${apartment.apartmentId})}" title="Assign Resident">
-                        <i class="fa-solid fa-user-plus"></i>
-                    </a>
                     <a th:href="@{/admin/apartments/detail/{id}(id=${apartment.apartmentId})}" title="View Detail">
                         <i class="fa-solid fa-eye"></i>
                     </a>
@@ -102,25 +100,53 @@
     <script>
         const statusFilter = document.getElementById("statusFilter");
         const floorFilter = document.getElementById("floorFilter");
+        const searchInput = document.querySelector(".search-input");
 
         function filterRows() {
             const selectedStatus = statusFilter.value;
             const selectedFloor = floorFilter.value;
+            const searchText = searchInput ? searchInput.value.toLowerCase().trim() : "";
             const rows = document.querySelectorAll("tbody tr[data-status]");
 
             rows.forEach(row => {
                 const rowStatus = row.getAttribute("data-status");
                 const rowFloor = row.getAttribute("data-floor");
 
+                const aptName = row.cells[0] ? row.cells[0].textContent.toLowerCase() : "";
+                const floorText = row.cells[1] ? row.cells[1].textContent.toLowerCase() : "";
+                const roomType = row.cells[2] ? row.cells[2].textContent.toLowerCase() : "";
+                
+                const statusBadge = row.cells[3] ? row.cells[3].querySelector(".badge") : null;
+                const statusText = statusBadge ? statusBadge.textContent.toLowerCase() : "";
+
                 const matchStatus = selectedStatus === "all" || selectedStatus === rowStatus;
                 const matchFloor = selectedFloor === "all" || selectedFloor === rowFloor;
+                
+                const matchSearch = searchText === "" ||
+                                    aptName.includes(searchText) ||
+                                    floorText.includes(searchText) ||
+                                    roomType.includes(searchText) ||
+                                    statusText.includes(searchText);
 
-                row.style.display = matchStatus && matchFloor ? "" : "none";
+                row.style.display = matchStatus && matchFloor && matchSearch ? "" : "none";
             });
         }
 
+        // Apply initial search filter if parameter exists in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('search');
+        if (searchQuery && searchInput) {
+            searchInput.value = searchQuery;
+        }
+
+        // Run initial filter
+        filterRows();
+
         statusFilter.addEventListener("change", filterRows);
         floorFilter.addEventListener("change", filterRows);
+        if (searchInput) {
+            searchInput.addEventListener("input", filterRows);
+        }
     </script>
 </main>
 

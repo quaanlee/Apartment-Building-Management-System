@@ -524,3 +524,76 @@ tr:hover td {
 .form-card select.is-invalid:focus {
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
 }
+
+/* Image Gallery Layout */
+.gallery-container {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+  height: 380px;
+}
+
+.gallery-main {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  min-height: 0;
+}
+
+.gallery-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.gallery-main img:hover {
+  transform: scale(1.015);
+}
+
+.gallery-side {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 16px;
+  min-height: 0;
+}
+
+.gallery-thumb {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  min-height: 0;
+}
+
+.gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.gallery-thumb img:hover {
+  transform: scale(1.025);
+}
+
+@media (max-width: 992px) {
+  .gallery-container {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .gallery-main {
+    height: 280px;
+  }
+
+  .gallery-side {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 140px;
+    height: 140px;
+  }
+}

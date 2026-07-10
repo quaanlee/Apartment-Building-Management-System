@@ -28,7 +28,7 @@
 
             <div th:if="${errorMessage}" class="alert error" th:text="${errorMessage}"></div>
 
-            <form th:action="@{${actionUrl}}" th:object="${apartment}" method="post" novalidate>
+            <form th:action="@{${actionUrl}}" th:object="${apartment}" method="post" enctype="multipart/form-data" novalidate>
 
                 <label>Apartment Number</label>
                 <input type="text" th:field="*{apartmentNumber}" required placeholder="e.g. A-101"
@@ -82,6 +82,77 @@
                 <span id="maxOccupancy-error" class="error-text"
                       th:text="${#fields.hasErrors('maxOccupancy')} ? ${#fields.firstError('maxOccupancy')} : ''"
                       th:style="${#fields.hasErrors('maxOccupancy')} ? 'display: block;' : 'display: none;'"></span>
+                <label style="margin-top: 20px;">Apartment Images</label>
+                <input type="hidden" name="deleteMainImage" id="deleteMainImage" value="false">
+                <input type="hidden" name="deleteSubImage1" id="deleteSubImage1" value="false">
+                <input type="hidden" name="deleteSubImage2" id="deleteSubImage2" value="false">
+                <div class="image-upload-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                    <!-- Main Image -->
+                    <div class="upload-box" style="border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 12px; text-align: center;">
+                        <span style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 8px;">Main Image (Primary)</span>
+                        <div class="preview-container" style="position: relative; width: 100%; height: 100px; background: #f3f4f6; border-radius: 8px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; justify-content: center;">
+                            <img id="main-preview" 
+                                 th:src="${apartment.apartmentImages != null && !apartment.apartmentImages.isEmpty()} ? ${apartment.apartmentImages.get(0).imageUrl} : ''"
+                                 th:style="${apartment.apartmentImages != null && !apartment.apartmentImages.isEmpty()} ? 'width:100%;height:100%;object-fit:cover;' : 'display:none;'" />
+                            <i id="main-placeholder" class="fa-regular fa-image" style="font-size: 24px; color: #9ca3af;" 
+                               th:style="${apartment.apartmentImages != null && !apartment.apartmentImages.isEmpty()} ? 'display:none;' : 'font-size: 24px; color: #9ca3af;'"></i>
+                            <button type="button" id="main-delete-btn" 
+                                    style="position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 10;"
+                                    th:style="${apartment.apartmentImages != null && !apartment.apartmentImages.isEmpty()} ? 'position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 10;' : 'display: none;'"
+                                    onclick="clearImage('mainImage', 'main-preview', 'main-placeholder', 'main-delete-btn', 'deleteMainImage')">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <input type="file" name="mainImage" id="mainImage" accept="image/*" style="display: none;" onchange="previewImage(this, 'main-preview', 'main-placeholder', 'main-delete-btn', 'deleteMainImage')">
+                        <button type="button" class="cancel-btn" style="padding: 6px 12px; font-size: 12px; width: 100%; text-align: center;" onclick="document.getElementById('mainImage').click();">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Choose File
+                        </button>
+                    </div>
+
+                    <!-- Sub Image 1 -->
+                    <div class="upload-box" style="border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 12px; text-align: center;">
+                        <span style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 8px;">Sub Image 1</span>
+                        <div class="preview-container" style="position: relative; width: 100%; height: 100px; background: #f3f4f6; border-radius: 8px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; justify-content: center;">
+                            <img id="sub1-preview" 
+                                 th:src="${apartment.apartmentImages != null && apartment.apartmentImages.size() > 1} ? ${apartment.apartmentImages.get(1).imageUrl} : ''"
+                                 th:style="${apartment.apartmentImages != null && apartment.apartmentImages.size() > 1} ? 'width:100%;height:100%;object-fit:cover;' : 'display:none;'" />
+                            <i id="sub1-placeholder" class="fa-regular fa-image" style="font-size: 24px; color: #9ca3af;" 
+                               th:style="${apartment.apartmentImages != null && apartment.apartmentImages.size() > 1} ? 'display:none;' : 'font-size: 24px; color: #9ca3af;'"></i>
+                            <button type="button" id="sub1-delete-btn" 
+                                    style="position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 10;"
+                                    th:style="${apartment.apartmentImages != null && apartment.apartmentImages.size() > 1} ? 'position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 10;' : 'display: none;'"
+                                    onclick="clearImage('subImage1', 'sub1-preview', 'sub1-placeholder', 'sub1-delete-btn', 'deleteSubImage1')">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <input type="file" name="subImage1" id="subImage1" accept="image/*" style="display: none;" onchange="previewImage(this, 'sub1-preview', 'sub1-placeholder', 'sub1-delete-btn', 'deleteSubImage1')">
+                        <button type="button" class="cancel-btn" style="padding: 6px 12px; font-size: 12px; width: 100%; text-align: center;" onclick="document.getElementById('subImage1').click();">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Choose File
+                        </button>
+                    </div>
+
+                    <!-- Sub Image 2 -->
+                    <div class="upload-box" style="border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 12px; text-align: center;">
+                        <span style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 8px;">Sub Image 2</span>
+                        <div class="preview-container" style="position: relative; width: 100%; height: 100px; background: #f3f4f6; border-radius: 8px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; justify-content: center;">
+                            <img id="sub2-preview" 
+                                 th:src="${apartment.apartmentImages != null && apartment.apartmentImages.size() > 2} ? ${apartment.apartmentImages.get(2).imageUrl} : ''"
+                                 th:style="${apartment.apartmentImages != null && apartment.apartmentImages.size() > 2} ? 'width:100%;height:100%;object-fit:cover;' : 'display:none;'" />
+                            <i id="sub2-placeholder" class="fa-regular fa-image" style="font-size: 24px; color: #9ca3af;" 
+                               th:style="${apartment.apartmentImages != null && apartment.apartmentImages.size() > 2} ? 'display:none;' : 'font-size: 24px; color: #9ca3af;'"></i>
+                            <button type="button" id="sub2-delete-btn" 
+                                    style="position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 10;"
+                                    th:style="${apartment.apartmentImages != null && apartment.apartmentImages.size() > 2} ? 'position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 10;' : 'display: none;'"
+                                    onclick="clearImage('subImage2', 'sub2-preview', 'sub2-placeholder', 'sub2-delete-btn', 'deleteSubImage2')">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <input type="file" name="subImage2" id="subImage2" accept="image/*" style="display: none;" onchange="previewImage(this, 'sub2-preview', 'sub2-placeholder', 'sub2-delete-btn', 'deleteSubImage2')">
+                        <button type="button" class="cancel-btn" style="padding: 6px 12px; font-size: 12px; width: 100%; text-align: center;" onclick="document.getElementById('subImage2').click();">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Choose File
+                        </button>
+                    </div>
+                </div>
 
                 <div class="form-actions" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
                     <a th:href="@{/admin/apartments}" class="cancel-btn" style="border: 1px solid var(--border-color); text-align: center;">Cancel</a>
@@ -232,6 +303,36 @@
                 }
             });
         });
+
+        function previewImage(input, previewId, placeholderId, deleteBtnId, hiddenInputId) {
+            const preview = document.getElementById(previewId);
+            const placeholder = document.getElementById(placeholderId);
+            const deleteBtn = document.getElementById(deleteBtnId);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    preview.style.width = '100%';
+                    preview.style.height = '100%';
+                    preview.style.objectFit = 'cover';
+                    placeholder.style.display = 'none';
+                    deleteBtn.style.display = 'flex';
+                    document.getElementById(hiddenInputId).value = "false";
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function clearImage(inputId, previewId, placeholderId, deleteBtnId, hiddenInputId) {
+            document.getElementById(inputId).value = "";
+            const preview = document.getElementById(previewId);
+            preview.src = "";
+            preview.style.display = 'none';
+            document.getElementById(placeholderId).style.display = 'block';
+            document.getElementById(deleteBtnId).style.display = 'none';
+            document.getElementById(hiddenInputId).value = "true";
+        }
     </script>
 </main>
 

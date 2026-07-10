@@ -2,6 +2,7 @@ package com.quan.apartment_building_management_system;
 
 import com.quan.apartment_building_management_system.entity.*;
 import com.quan.apartment_building_management_system.repository.*;
+import com.quan.apartment_building_management_system.util.DatabaseConstraintFixer;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,7 @@ public class DataInitializer implements CommandLineRunner {
     private final MaintenanceRequestRepository requestRepo;
     private final MaintenanceTaskRepository taskRepo;
     private final MaintenanceReportRepository reportRepo;
+    private final DatabaseConstraintFixer databaseConstraintFixer;
 
     public DataInitializer(RoleRepository roleRepository,
                            AccountRepository accountRepository,
@@ -40,7 +42,8 @@ public class DataInitializer implements CommandLineRunner {
                            BillDetailRepository billDetailRepository,
                            MaintenanceRequestRepository requestRepo,
                            MaintenanceTaskRepository taskRepo,
-                           MaintenanceReportRepository reportRepo) {
+                           MaintenanceReportRepository reportRepo,
+                           DatabaseConstraintFixer databaseConstraintFixer) {
         this.roleRepository = roleRepository;
         this.accountRepository = accountRepository;
         this.profileRepository = profileRepository;
@@ -54,10 +57,24 @@ public class DataInitializer implements CommandLineRunner {
         this.requestRepo = requestRepo;
         this.taskRepo = taskRepo;
         this.reportRepo = reportRepo;
+        this.databaseConstraintFixer = databaseConstraintFixer;
     }
 
     @Override
     public void run(String... args) {
+        // Fix UNIQUE constraints on nullable columns first
+        databaseConstraintFixer.fixConstraints();
+
+        System.out.println("=== DEBUGINFO: ALL SYSTEM ACCOUNTS IN DATABASE ===");
+        try {
+            accountRepository.findAll().forEach(acc -> {
+                System.out.println("[ACCOUNT] Username: '" + acc.getUsername() + "' | Password: '" + acc.getPassword() + "'");
+            });
+        } catch (Exception e) {
+            System.out.println("Failed to print accounts: " + e.getMessage());
+        }
+        System.out.println("=================================================");
+
         // 1. Initialize Roles
         if (roleRepository.count() == 0) {
             Role adminRole = new Role(); adminRole.setRoleName("Admin");

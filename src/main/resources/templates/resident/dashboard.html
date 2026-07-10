@@ -1,48 +1,116 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resident Dashboard | ABM System</title>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/resident/layout_resident :: resident-layout(~{::content}, 'dashboard')}">
+<body>
+
+<div th:fragment="content">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            margin: 0;
-            padding: 2rem;
+        .welcome-hero {
+            background: linear-gradient(135deg, #582BE8 0%, #31119F 100%);
+            border-radius: 16px;
+            padding: 40px;
+            color: white;
+            box-shadow: 0 10px 20px rgba(88, 43, 232, 0.15);
+            margin-bottom: 32px;
+        }
+        .welcome-hero h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: white;
+        }
+        .welcome-hero p {
+            font-size: 16px;
+            opacity: 0.9;
+            color: white;
+            line-height: 1.6;
+        }
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .action-card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
+            gap: 16px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border-color: #582BE8;
+        }
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background-color: #F0EDFE;
+            color: #582BE8;
+            display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            font-size: 20px;
         }
-        .card {
-            background: white;
-            padding: 3rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            text-align: center;
+        .action-card.services .action-icon { background-color: #ECFDF5; color: #10B981; }
+        .action-card.maintenance .action-icon { background-color: #FFF7ED; color: #F97316; }
+        
+        .action-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1E1B4B;
         }
-        h1 { color: #1e293b; margin-bottom: 1rem; }
-        p { color: #64748b; margin-bottom: 2rem; }
-        .btn-logout {
-            padding: 0.75rem 1.5rem;
-            background-color: #ef4444;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-        .btn-logout:hover {
-            background-color: #dc2626;
+        .action-desc {
+            font-size: 14px;
+            color: #6B7280;
+            line-height: 1.5;
         }
     </style>
-</head>
-<body>
-    <div class="card">
-        <h1>Resident Dashboard</h1>
-        <p>Welcome back, <span th:text="${session.currentUser != null ? session.currentUser.username : 'Resident'}">Resident</span>!</p>
-        <a th:href="@{/logout}" class="btn-logout">Logout</a>
+
+    <div class="welcome-hero">
+        <h1>Welcome Back, <span th:text="${session.currentUser != null ? session.currentUser.username : 'Resident'}">Resident</span>!</h1>
+        <p>Manage your apartment, explore building utility services, submit maintenance requests, and track payments through your premium Resident Portal.</p>
     </div>
+
+    <h2 class="section-title" style="font-size: 18px; font-weight: 700; color: #1E1B4B; margin-bottom: 16px;">Quick Actions</h2>
+    
+    <div class="quick-actions-grid">
+        <a th:href="@{/resident/apartments}" class="action-card">
+            <div class="action-icon">
+                <i class="fa-solid fa-building"></i>
+            </div>
+            <div>
+                <h3 class="action-title">Apartments Directory</h3>
+                <p class="action-desc">View building apartments list, check vacant units, and view your current accommodation specs.</p>
+            </div>
+        </a>
+
+        <a th:href="@{/resident/services}" class="action-card services">
+            <div class="action-icon">
+                <i class="fas fa-briefcase"></i>
+            </div>
+            <div>
+                <h3 class="action-title">Services & Utilities</h3>
+                <p class="action-desc">Browse monthly standard services tariffs (water, electricity) and check building amenities list.</p>
+            </div>
+        </a>
+
+        <a th:href="@{/resident/maintenance}" class="action-card maintenance">
+            <div class="action-icon">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+            <div>
+                <h3 class="action-title">Maintenance Requests</h3>
+                <p class="action-desc">Submit new repair tickets for issues in your room, and track assignments of maintenance staff.</p>
+            </div>
+        </a>
+    </div>
+</div>
+
 </body>
 </html>

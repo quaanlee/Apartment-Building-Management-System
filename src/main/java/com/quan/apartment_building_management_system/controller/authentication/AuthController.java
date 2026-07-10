@@ -45,8 +45,8 @@ public class AuthController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        if (username == null || !username.matches(EMAIL_REGEX)) {
-            redirectAttributes.addFlashAttribute("error", "Invalid email format. Please enter a valid email address.");
+        if (username == null || username.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Username cannot be empty.");
             return "redirect:/login";
         }
 

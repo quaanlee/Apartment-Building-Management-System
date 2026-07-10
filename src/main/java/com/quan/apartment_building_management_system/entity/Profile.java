@@ -46,7 +46,7 @@ public class Profile {
     @Column(name = "PlaceOfBirth", length = 100)
     private String placeOfBirth;
 
-    @Column(name = "CitizenID", unique = true, length = 20)
+    @Column(name = "CitizenID", length = 20)
     private String citizenId;
 
     @Column(name = "CitizenIDIssueDate")
