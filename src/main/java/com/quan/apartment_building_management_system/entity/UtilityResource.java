@@ -40,6 +40,7 @@ public class UtilityResource {
     private List<UtilityBooking> utilityBookings = new ArrayList<>();
 
     public UtilityResource() {
+        // Required by JPA
     }
 
     public Integer getResourceId() {

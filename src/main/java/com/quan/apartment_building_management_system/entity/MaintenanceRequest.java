@@ -1,15 +1,6 @@
 package com.quan.apartment_building_management_system.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -36,6 +27,9 @@ public class MaintenanceRequest {
     @Column(name = "Description", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String description;
 
+    @Column(name = "ImageURL", length = 500)
+    private String imageUrl;
+
     @Column(name = "RequestDate", nullable = false)
     private LocalDateTime requestDate = LocalDateTime.now();
 
@@ -45,10 +39,8 @@ public class MaintenanceRequest {
     @OneToOne(mappedBy = "maintenanceRequest", fetch = FetchType.LAZY)
     private MaintenanceTask maintenanceTask;
 
-    @OneToMany(mappedBy = "request")
-    private java.util.List<MaintenanceRequestImage> images = new java.util.ArrayList<>();
-
     public MaintenanceRequest() {
+        // Required by JPA
     }
 
     public Integer getRequestId() {
@@ -91,6 +83,14 @@ public class MaintenanceRequest {
         this.description = description;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public LocalDateTime getRequestDate() {
         return requestDate;
     }
@@ -113,13 +113,5 @@ public class MaintenanceRequest {
 
     public void setMaintenanceTask(MaintenanceTask maintenanceTask) {
         this.maintenanceTask = maintenanceTask;
-    }
-
-    public java.util.List<MaintenanceRequestImage> getImages() {
-        return images;
-    }
-
-    public void setImages(java.util.List<MaintenanceRequestImage> images) {
-        this.images = images;
     }
 }

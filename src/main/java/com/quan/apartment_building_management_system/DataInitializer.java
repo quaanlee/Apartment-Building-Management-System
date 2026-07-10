@@ -342,6 +342,42 @@ public class DataInitializer implements CommandLineRunner {
                 }
             }
         }
+
+        // Auto-repair missing profiles
+        for (Account account : accountRepository.findAll()) {
+            if (profileRepository.findByAccountAccountId(account.getAccountId()).isEmpty()) {
+                Profile profile = new Profile();
+                profile.setAccount(account);
+                
+                String username = account.getUsername();
+                String fullName = username;
+                if (username.contains("@")) {
+                    fullName = username.split("@")[0];
+                }
+                
+                String[] parts = fullName.split("\\.");
+                StringBuilder sb = new StringBuilder();
+                for (String part : parts) {
+                    if (!part.isEmpty()) {
+                        sb.append(Character.toUpperCase(part.charAt(0)))
+                          .append(part.substring(1))
+                          .append(" ");
+                    }
+                }
+                fullName = sb.toString().trim();
+                if (fullName.isEmpty()) {
+                    fullName = "Resident Profile";
+                }
+                
+                profile.setFullName(fullName);
+                profile.setEmail(username.contains("@") ? username : username + "@abms.com");
+                profile.setPhoneNumber("0900000000");
+                profile.setCitizenId(String.format("%012d", new java.util.Random().nextInt(100000000)));
+                
+                profileRepository.save(profile);
+                System.out.println("Auto-created missing profile for account: " + username);
+            }
+        }
     }
 }
 

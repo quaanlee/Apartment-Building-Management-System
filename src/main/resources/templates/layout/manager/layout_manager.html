@@ -64,9 +64,15 @@
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'vehicles' ? 'active' : ''}">
-                <a th:href="@{#}">
+                <a th:href="@{/manager/vehicles}">
                     <i class="fa-solid fa-car"></i>
                     <span>Vehicles</span>
+                </a>
+            </li>
+            <li class="sidebar-item" th:classappend="${activeTab == 'notifications' ? 'active' : ''}">
+                <a th:href="@{/manager/notifications}">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>Notifications</span>
                 </a>
             </li>
         </ul>

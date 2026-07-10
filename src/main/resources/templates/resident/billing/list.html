@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout/resident/layout_resident :: resident-layout(~{::#main-content}, 'billing')}"
+      th:with="pageTitle='My Billing'">
+<head>
+    <title>My Billing | ABM System</title>
+</head>
+<body>
+<div id="main-content">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        #main-content {
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+        }
+        .section-header {
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .section-desc {
+            font-size: 14px;
+            color: #64748b;
+        }
+        .custom-card {
+            background: white;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 20px;
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .stat-icon.unpaid {
+            background-color: #fffbeb;
+            color: #d97706;
+        }
+        .stat-icon.amount {
+            background-color: #f0fdf4;
+            color: #16a34a;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .table-custom th {
+            font-weight: 600;
+            color: #475569;
+            background-color: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 13px;
+        }
+        .table-custom td {
+            vertical-align: middle;
+            font-size: 14px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .btn-pay {
+            background-color: #582BE8;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-pay:hover {
+            background-color: #4a22c9;
+            color: white;
+        }
+        .btn-view-detail {
+            background-color: white;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-view-detail:hover {
+            background-color: #f8fafc;
+            color: #334155;
+            border-color: #94a3b8;
+        }
+        .badge-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-unpaid {
+            background-color: #fffbeb;
+            color: #d97706;
+        }
+        .badge-paid {
+            background-color: #f0fdf4;
+            color: #16a34a;
+        }
+        .badge-overdue {
+            background-color: #fef2f2;
+            color: #dc2626;
+        }
+        .alert-info-custom {
+            background-color: #f0edfe;
+            color: #582BE8;
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+
+    <div class="section-header">
+        <h1 class="section-title">My Billing</h1>
+        <p class="section-desc">View monthly apartment bills, check status, and process simulated payments online.</p>
+    </div>
+
+    <!-- Alert Message -->
+    <div th:if="${message != null}" class="alert alert-dismissible fade show border-0 mb-4" 
+         th:classappend="${messageType == 'success' ? 'alert-success' : (messageType == 'info' ? 'alert-info' : 'alert-danger')}" role="alert">
+        <i class="fa-solid" th:classappend="${messageType == 'success' ? 'fa-circle-check' : 'fa-circle-info'}"></i>
+        <span class="ms-2" th:text="${message}">Success message</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="stat-card">
+                <div class="stat-icon unpaid">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+                <div>
+                    <div class="stat-label">Unpaid Bills</div>
+                    <div class="stat-value" th:text="${bills != null ? bills.stream().filter(b -> b.status == 0 || b.status == 2).count() : 0}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="stat-card">
+                <div class="stat-icon amount">
+                    <i class="fa-solid fa-dollar-sign"></i>
+                </div>
+                <div>
+                    <div class="stat-label">Outstanding Amount</div>
+                    <div class="stat-value" th:text="'$' + ${bills != null ? bills.stream().filter(b -> b.status == 0 || b.status == 2).map(b -> b.totalAmount).reduce(T(java.math.BigDecimal).ZERO, (a, b) -> a.add(b)) : '0.00'}">$0.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apartment Info Summary -->
+    <div class="custom-card alert-info-custom d-flex align-items-center justify-content-between py-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <i class="fa-solid fa-building-user fa-xl"></i>
+            <div>
+                <span class="fw-semibold">Apartment: </span>
+                <span th:text="${apartment != null ? apartment.apartmentNumber : 'N/A'}">A-101</span>
+                <span class="mx-2">|</span>
+                <span class="fw-semibold">Resident Owner: </span>
+                <span th:text="${profile != null ? profile.fullName : 'Resident'}">John Doe</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bills Table Card -->
+    <div class="custom-card">
+        <h2 class="card-title" style="font-size: 18px; font-weight: 600; color: #0f172a; margin-bottom: 20px;">
+            <i class="fa-solid fa-list-check" style="margin-right: 8px; color: #582BE8;"></i> Billing History
+        </h2>
+        <div class="table-responsive">
+            <table class="table table-custom align-middle">
+                <thead>
+                    <tr>
+                        <th>Billing Period</th>
+                        <th>Issue Date</th>
+                        <th>Due Date</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th style="width: 250px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="bill : ${bills}">
+                        <td>
+                            <strong th:text="${#numbers.formatInteger(bill.billMonth, 2)} + '/' + ${bill.billYear}">06/2026</strong>
+                        </td>
+                        <td th:text="${#temporals.format(bill.createdDate, 'yyyy-MM-dd HH:mm')}">2026-06-01 08:00</td>
+                        <td th:text="${#temporals.format(bill.dueDate, 'yyyy-MM-dd HH:mm')}">2026-06-15 23:59</td>
+                        <td>
+                            <strong class="text-primary" th:text="'$' + ${bill.totalAmount}">$120.00</strong>
+                        </td>
+                        <td>
+                            <span th:if="${bill.status == 0}" class="badge-status badge-unpaid">Unpaid</span>
+                            <span th:if="${bill.status == 1}" class="badge-status badge-paid">Paid</span>
+                            <span th:if="${bill.status == 2}" class="badge-status badge-overdue">Overdue</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a th:if="${bill.status == 0 || bill.status == 2}" th:href="@{/resident/billing/{id}/pay(id=${bill.billId})}" class="btn-pay">
+                                    <i class="fa-solid fa-credit-card me-1"></i> Pay Now
+                                </a>
+                                <button type="button" class="btn-view-detail" data-bs-toggle="modal" th:data-bs-target="'#detailModal-' + ${bill.billId}">
+                                    <i class="fa-solid fa-eye me-1"></i> Details
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${bills == null || bills.isEmpty()}">
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            No billing statement records found for your apartment.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bill Detail Modals -->
+    <div th:each="bill : ${bills}" class="modal fade" th:id="'detailModal-' + ${bill.billId}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: 12px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" style="color: #0f172a;">
+                        Statement Details (<span th:text="${#numbers.formatInteger(bill.billMonth, 2)} + '/' + ${bill.billYear}">06/2026</span>)
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <span class="text-muted d-block font-size-13">Apartment Number</span>
+                            <strong style="color: #0f172a; font-size: 15px;" th:text="${bill.apartment.apartmentNumber}">A-101</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            <span class="text-muted d-block font-size-13">Payment Status</span>
+                            <span th:if="${bill.status == 0}" class="badge-status badge-unpaid">Unpaid</span>
+                            <span th:if="${bill.status == 1}" class="badge-status badge-paid">Paid</span>
+                            <span th:if="${bill.status == 2}" class="badge-status badge-overdue">Overdue</span>
+                        </div>
+                    </div>
+                    
+                    <h6 class="fw-bold mb-3" style="color: #475569; font-size: 14px;">Items Breakdown</h6>
+                    <div class="table-responsive mb-4" style="border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <table class="table table-borderless align-middle mb-0" style="font-size: 13px;">
+                            <thead style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                                <tr>
+                                    <th class="ps-3 py-2">Service Description</th>
+                                    <th class="text-center py-2" style="width: 100px;">Quantity</th>
+                                    <th class="text-end pe-3 py-2" style="width: 150px;">Line Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="detail : ${bill.billDetails}" style="border-bottom: 1px solid #f1f5f9;">
+                                    <td class="ps-3 py-3">
+                                        <div class="fw-semibold text-dark" th:text="${detail.serviceItem.serviceName}">Management Fee</div>
+                                        <div class="text-muted font-size-12" th:text="${detail.description}">Monthly service charge</div>
+                                    </td>
+                                    <td class="text-center py-3" th:text="${detail.quantity}">1.00</td>
+                                    <td class="text-end pe-3 py-3">
+                                        <strong th:text="'$' + ${detail.amount}">$50.00</strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot style="background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
+                                <tr>
+                                    <td colspan="2" class="ps-3 py-3 fw-bold text-dark text-end">Grand Total:</td>
+                                    <td class="text-end pe-3 py-3 fw-bold text-primary" style="font-size: 15px;" th:text="'$' + ${bill.totalAmount}">$120.00</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+</body>
+</html>
