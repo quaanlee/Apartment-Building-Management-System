@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::#main-content}, 'vehicles')}"
+      th:with="pageTitle='Manager Dashboard'">
+<head>
+    <title>Vehicles Management</title>
+</head>
+<body>
+<div id="main-content">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        #main-content { font-family: 'Inter', sans-serif; background-color: #f9fafb; padding: 24px;}
+        
+        .page-header {
+            margin-bottom: 24px;
+        }
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        .page-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Stats Cards */
+        .stats-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 16px;
+        }
+        .icon-purple {
+            background-color: #F0EDFE;
+            color: #582BE8;
+        }
+        .stats-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .stats-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .stats-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1;
+        }
+
+        /* Table Card */
+        .table-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-top: 24px;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .table-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+        }
+        .view-all-link {
+            color: #582BE8;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .view-all-link:hover {
+            text-decoration: underline;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+        .table th {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+        }
+        .table td {
+            padding: 16px 20px;
+            vertical-align: middle;
+            font-size: 14px;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .owner-name {
+            font-weight: 500;
+            color: #111827;
+        }
+        .vehicle-type {
+            color: #6b7280;
+        }
+
+        /* Action Buttons */
+        .btn-action-group {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-approve {
+            background-color: #582BE8;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .btn-approve:hover {
+            background-color: #4a22c9;
+            color: white;
+        }
+        .btn-reject {
+            background-color: white;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-reject:hover {
+            background-color: #fff5f5;
+        }
+        .btn-details {
+            background-color: white;
+            color: #582BE8;
+            border: 1px solid #582BE8;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-details:hover {
+            background-color: #f0edfe;
+            color: #4a22c9;
+            border-color: #4a22c9;
+        }
+        form {
+            margin: 0;
+        }
+    </style>
+
+    <div class="page-header">
+        <h1 class="page-title">Vehicles Management</h1>
+        <div class="page-subtitle">Manage resident vehicle registrations and parking status.</div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="stats-card">
+                <div class="icon-box icon-purple">
+                    <i class="fas fa-car-side"></i>
+                </div>
+                <div class="stats-info">
+                    <div class="stats-label">Total Registered</div>
+                    <div class="stats-value" th:text="${totalRegistered}">1,248</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="stats-card">
+                <div class="icon-box icon-purple">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="stats-info">
+                    <div class="stats-label">Pending Approvals</div>
+                    <div class="stats-value" th:text="${pendingApprovals}">24</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-card">
+        <div class="table-header">
+            <h2 class="table-title">Registration Requests</h2>
+            <a href="#" class="view-all-link">View All</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>OWNER</th>
+                        <th>APT</th>
+                        <th>VEHICLE</th>
+                        <th>PLATE</th>
+                        <th class="text-center">STATUS</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="vehicle : ${allVehicles}">
+                        <td>
+                            <div class="owner-name" th:text="${vehicle.profile != null ? vehicle.profile.fullName : 'N/A'}">Robert Fox</div>
+                        </td>
+                        <td>
+                            <span th:text="${vehicle.profile != null && vehicle.profile.apartment != null ? 'Apt ' + vehicle.profile.apartment.apartmentNumber : 'N/A'}">Apt 302</span>
+                        </td>
+                        <td>
+                            <div class="vehicle-type" th:text="${vehicle.brand + ' ' + vehicle.vehicleType}">Tesla Model 3</div>
+                        </td>
+                        <td th:text="${vehicle.licensePlate}">ABC-1234</td>
+                        <td class="text-center">
+                            <span th:if="${vehicle.status == 0}" class="badge bg-warning text-dark">Pending</span>
+                            <span th:if="${vehicle.status == 1}" class="badge bg-success">Approved</span>
+                            <span th:if="${vehicle.status == 2}" class="badge bg-danger">Rejected</span>
+                        </td>
+                        <td>
+                            <div class="btn-action-group">
+                                <form th:if="${vehicle.status == 0}" th:action="@{/manager/vehicles/{id}/approve(id=${vehicle.vehicleId})}" method="post">
+                                    <button type="submit" class="btn-approve">Approve</button>
+                                </form>
+                                <form th:if="${vehicle.status == 0}" th:action="@{/manager/vehicles/{id}/reject(id=${vehicle.vehicleId})}" method="post">
+                                    <button type="submit" class="btn-reject">Reject</button>
+                                </form>
+                                <form th:if="${vehicle.status == 1}" th:action="@{/manager/vehicles/{id}/revoke(id=${vehicle.vehicleId})}" method="post" onsubmit="return confirm('Are you sure you want to revoke this registration? It will be moved back to the pending requests.');">
+                                    <button type="submit" class="btn-reject">Revoke</button>
+                                </form>
+                                <form th:if="${vehicle.status == 2}" th:action="@{/manager/vehicles/{id}/revoke(id=${vehicle.vehicleId})}" method="post">
+                                    <button type="submit" class="btn-reject" style="color: #6c757d; border-color: #6c757d;">Re-evaluate</button>
+                                </form>
+                                 <button type="button" class="btn-details" data-bs-toggle="modal" th:data-bs-target="'#detailModal-' + ${vehicle.vehicleId}" title="View Details">
+                                     Details
+                                 </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${allVehicles == null || allVehicles.isEmpty()}">
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            No vehicle registrations found.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        </div>
+
+    <!-- Modals Container for Vehicle Details -->
+    <div th:each="vehicle : ${allVehicles}">
+        <div class="modal fade" th:id="'detailModal-' + ${vehicle.vehicleId}" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 8px; border: none; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
+                    <div class="modal-header" style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                        <h5 class="modal-title fw-bold" id="detailModalLabel" style="color: #111827;">Vehicle Registration Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <table class="table table-striped table-hover mb-0">
+                            <tbody>
+                                <tr>
+                                    <th class="text-secondary fw-semibold ps-4" style="width: 45%; border-top: none;">Owner Name</th>
+                                    <td class="fw-semibold text-dark" style="border-top: none;" th:text="${vehicle.profile != null ? vehicle.profile.fullName : 'N/A'}">Alex Mercer</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-secondary fw-semibold ps-4">Phone Number</th>
+                                    <td class="text-dark" th:text="${vehicle.profile != null ? vehicle.profile.phoneNumber : 'N/A'}">N/A</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-secondary fw-semibold ps-4">Citizen ID</th>
+                                    <td class="font-monospace text-dark" th:text="${vehicle.profile != null ? vehicle.profile.citizenId : 'N/A'}">N/A</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-secondary fw-semibold ps-4">Apartment</th>
+                                    <td class="text-dark" th:text="${vehicle.profile != null && vehicle.profile.apartment != null ? 'Apt ' + vehicle.profile.apartment.apartmentNumber : 'N/A'}">N/A</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-secondary fw-semibold ps-4">Brand</th>
+                                    <td class="text-dark" th:text="${vehicle.brand}">Tesla</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-secondary fw-semibold ps-4">Vehicle Type</th>
+                                    <td class="text-dark" th:text="${vehicle.vehicleType}">Model 3</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-secondary fw-semibold ps-4">Color</th>
+                                    <td class="text-dark" th:text="${vehicle.color}">Black</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-secondary fw-semibold ps-4">License Plate</th>
+                                    <td class="font-monospace fw-bold text-primary" th:text="${vehicle.licensePlate}">ABC-1234</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-secondary fw-semibold ps-4">Registered Date</th>
+                                    <td class="text-dark" th:text="${vehicle.registeredDate}">2026-07-07</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-secondary fw-semibold ps-4">Status</th>
+                                    <td>
+                                        <span th:if="${vehicle.status == 0}" class="badge bg-warning text-dark">Pending</span>
+                                        <span th:if="${vehicle.status == 1}" class="badge bg-success">Approved</span>
+                                        <span th:if="${vehicle.status == 2}" class="badge bg-danger">Rejected</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="text-secondary fw-semibold ps-4" style="border-bottom: none;">Document Attachment</th>
+                                    <td style="border-bottom: none;">
+                                        <a th:if="${vehicle.documentUrl != null && !vehicle.documentUrl.isEmpty()}" th:href="${vehicle.documentUrl}" target="_blank" class="btn btn-sm btn-primary py-1 px-3 fw-medium" style="background-color: #582BE8; border: none; font-size: 12px; border-radius: 4px;">View Document</a>
+                                        <span th:unless="${vehicle.documentUrl != null && !vehicle.documentUrl.isEmpty()}" class="text-muted" style="font-size: 13px;">No attachment uploaded</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer" style="background-color: #f9fafb; border-top: 1px solid #e5e7eb; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+                        <button type="button" class="btn btn-secondary py-1.5 px-4" data-bs-dismiss="modal" style="font-size: 13px; border-radius: 4px;">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+</body>
+</html>

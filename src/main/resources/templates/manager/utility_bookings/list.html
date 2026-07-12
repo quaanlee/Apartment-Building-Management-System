@@ -10,6 +10,57 @@
 
     <!-- Page-specific CSS (loaded via fragment injection) -->
     <link rel="stylesheet" th:href="@{/css/manager/utility_bookings/utility_bookings.css}">
+    
+    <style>
+        /* The switch - the box around the slider */
+        .switch {
+          position: relative;
+          display: inline-block;
+          width: 44px;
+          height: 24px;
+          margin: 0;
+        }
+
+        /* Hide default HTML checkbox */
+        .switch input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+
+        /* The slider */
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: #ccc;
+          transition: .4s;
+          border-radius: 24px;
+        }
+
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 18px;
+          width: 18px;
+          left: 3px;
+          bottom: 3px;
+          background-color: white;
+          transition: .4s;
+          border-radius: 50%;
+        }
+
+        input:checked + .slider {
+          background-color: var(--primary-color, #4f46e5);
+        }
+
+        input:checked + .slider:before {
+          transform: translateX(20px);
+        }
+    </style>
 
     <!-- Hidden state bridge for JavaScript -->
     <input type="hidden" id="ubTotalPages"  th:value="${totalPages}">
@@ -18,9 +69,18 @@
     <div class="ub-page">
 
         <!-- ── Page Header ──────────────────────────────────────── -->
-        <div class="ub-header">
-            <h2>Utility Booking Management</h2>
-            <p>Overview and administration of community amenity reservations.</p>
+        <div class="ub-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2>Utility Booking Management</h2>
+                <p>Overview and administration of community amenity reservations.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; background: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <span style="font-weight: 600; font-size: 14px; color: var(--text-primary);">Auto Approve</span>
+                <label class="switch">
+                    <input type="checkbox" id="autoApproveToggle" th:checked="${autoApproveEnabled}">
+                    <span class="slider round"></span>
+                </label>
+            </div>
         </div>
 
         <!-- ── Stat Cards ───────────────────────────────────────── -->

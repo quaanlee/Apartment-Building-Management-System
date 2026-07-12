@@ -6,6 +6,7 @@ import java.util.List;
 public class ApartmentDetailDTO extends ApartmentDTO {
     private List<ResidentInfo> currentResidents;
     private Integer availableSlots;
+    private List<String> imageUrls;
 
     public ApartmentDetailDTO() {}
 
@@ -17,6 +18,9 @@ public class ApartmentDetailDTO extends ApartmentDTO {
     public Integer getAvailableSlots() { return availableSlots; }
     public void setAvailableSlots(Integer availableSlots) { this.availableSlots = availableSlots; }
 
+    public List<String> getImageUrls() { return imageUrls; }
+    public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
+
     // Inner class
     public static class ResidentInfo {
         private Integer profileId;
@@ -26,6 +30,7 @@ public class ApartmentDetailDTO extends ApartmentDTO {
         private Boolean isHouseholdOwner;
         private LocalDate moveInDate;
         private String citizenId;
+        private String relationshipToOwner;
 
         public Integer getProfileId() { return profileId; }
         public void setProfileId(Integer profileId) { this.profileId = profileId; }
@@ -47,6 +52,9 @@ public class ApartmentDetailDTO extends ApartmentDTO {
 
         public String getCitizenId() { return citizenId; }
         public void setCitizenId(String citizenId) { this.citizenId = citizenId; }
+
+        public String getRelationshipToOwner() { return relationshipToOwner; }
+        public void setRelationshipToOwner(String relationshipToOwner) { this.relationshipToOwner = relationshipToOwner; }
 
         public String getOwnerBadge() {
             return isHouseholdOwner != null && isHouseholdOwner ? "👑 Owner" : "Member";

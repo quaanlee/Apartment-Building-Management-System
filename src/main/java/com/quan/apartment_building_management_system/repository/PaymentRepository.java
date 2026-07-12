@@ -31,4 +31,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
                                            @Param("startDate") LocalDateTime startDate,
                                            @Param("endDate") LocalDateTime endDate,
                                            Pageable pageable);
+
+    List<Payment> findByPaidByAccountId(Integer accountId);
 }

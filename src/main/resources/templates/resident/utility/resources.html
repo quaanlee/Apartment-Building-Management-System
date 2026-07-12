@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout/resident/layout_resident :: resident-layout(~{::main}, 'booking')}"
+      th:with="pageTitle='Danh Sách Tài Nguyên'">
+<head>
+    <title>Danh Sách Tài Nguyên</title>
+</head>
+<body>
+<main class="utility-container">
+    <link rel="stylesheet" th:href="@{/css/manager/utilities/utilities.css}">
+    
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav">
+        <a th:href="@{/resident/dashboard}">Dashboard</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <a th:href="@{/resident/utilities}">Tiện Ích</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span th:text="${utility.utilityName}">Utility Name</span>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="detail-header">
+        <div class="header-left">
+            <div class="title-badge-row">
+                <h1 th:text="${utility.utilityName}">Utility Name</h1>
+                <span class="badge-status active">Active</span>
+                <span class="badge-status" th:text="${utility.type} ? 'RESERVABLE' : 'FREE USE'">RESERVABLE</span>
+            </div>
+            <p class="subtitle-text" th:text="${utility.description}">Mô tả tiện ích</p>
+        </div>
+        <div class="header-right">
+            <a th:href="@{/resident/utilities}" class="btn-back-list">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to List
+            </a>
+        </div>
+    </div>
+    
+    <!-- Image Gallery (Only 1 main image) -->
+    <div class="gallery-single" style="width: 100%; height: 420px; border-radius: var(--radius-lg, 16px); overflow: hidden; margin-bottom: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);">
+        <img th:src="@{${!#strings.isEmpty(utility.imageUrl) ? utility.imageUrl : '/images/utilities/garden.jpg'}}" alt="Main Facility View" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+
+    <!-- Facility Overview -->
+    <div class="overview-section">
+        <h3>Facility Overview</h3>
+        <p th:text="${utility.description}">
+            Mô tả
+        </p>
+        <div class="location-box">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Central Area</span> <!-- Cư dân có thể không cần biết location của tiện ích tổng -->
+        </div>
+    </div>
+    
+    <!-- Database Entities Info Grid -->
+    <div class="operations-grid detail-operations-grid">
+        <!-- Resources Card -->
+        <div class="info-card">
+            <h4>PHYSICAL RESOURCES &amp; LOCATIONS</h4>
+            <div class="resources-list">
+                <div class="resource-row" th:each="res : ${resources}">
+                    <div class="resource-meta">
+                        <span class="resource-name" style="color: var(--primary-color); font-weight: 700;" th:text="${res.resourceName}">Tên Tài Nguyên</span>
+                        <span class="resource-location"><i class="fa-solid fa-location-dot"></i> <span th:text="${res.location}">Vị trí</span></span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span th:class="${res.status} ? 'badge-status active' : 'badge-status maintenance'" 
+                              th:text="${res.status} ? 'Ready' : 'Maintenance'" 
+                              style="font-size: 11px; padding: 4px 8px; margin-right: 8px;">Ready</span>
+                              
+                        <a th:href="@{/resident/utilities/resources/{id}(id=${res.resourceId})}" class="btn-secondary" style="font-size: 13px; padding: 6px 12px; border-radius: 6px; text-decoration: none;">
+                            View
+                        </a>
+                        
+                        <a th:if="${utility.type}" th:href="@{/resident/utilities/book/{id}(id=${res.resourceId})}" class="btn-primary" style="font-size: 13px; padding: 6px 12px; border-radius: 6px; text-decoration: none;" th:classappend="${!res.status} ? 'disabled' : ''" th:styleappend="${!res.status} ? 'pointer-events: none; opacity: 0.5;' : ''">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+                
+                <div th:if="${#lists.isEmpty(resources)}" class="utility-empty-state">
+                    Hiện tại không có khu vực nào khả dụng cho tiện ích này.
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

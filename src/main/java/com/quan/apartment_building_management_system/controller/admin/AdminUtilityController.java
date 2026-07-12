@@ -218,22 +218,12 @@ public class AdminUtilityController {
             });
         } else {
             // Add mode
-            if (resourceName == null || resourceName.trim().isEmpty()) {
-                redirectAttributes.addFlashAttribute("message", "First resource name is required.");
-                redirectAttributes.addFlashAttribute("messageType", "error");
-                return "redirect:/admin/utilities";
-            }
             if (utilityImage == null || utilityImage.isEmpty()) {
                 redirectAttributes.addFlashAttribute("message", "Utility main image is required.");
                 redirectAttributes.addFlashAttribute("messageType", "error");
                 return "redirect:/admin/utilities";
             }
-            String imageValidationError = validateResourceImages(primaryImage, secondaryImages);
-            if (imageValidationError != null) {
-                redirectAttributes.addFlashAttribute("message", imageValidationError);
-                redirectAttributes.addFlashAttribute("messageType", "error");
-                return "redirect:/admin/utilities";
-            }
+            
             try {
                 String mainUrl = cloudinaryUploadService.uploadUtilityImage(utilityImage);
                 utilityDTO.setImageUrl(mainUrl);
@@ -244,22 +234,9 @@ public class AdminUtilityController {
             }
 
             Utility utility = dtoHandler.toEntity(utilityDTO);
-            utility = utilityService.save(utility);
-            UtilityResource resource = new UtilityResource();
-            resource.setUtility(utility);
-            resource.setResourceName(resourceName.trim());
-            resource.setDescription(resourceDescription);
-            resource.setLocation(resourceLocation);
-            resource.setStatus(true);
-            resource = utilityResourceService.save(resource);
-            try {
-                saveResourceImages(resource, primaryImage, secondaryImages);
-            } catch (Exception e) {
-                redirectAttributes.addFlashAttribute("message", e.getMessage());
-                redirectAttributes.addFlashAttribute("messageType", "error");
-                return "redirect:/admin/utilities";
-            }
-            redirectAttributes.addFlashAttribute("message", "New utility added successfully!");
+            utilityService.save(utility);
+            
+            redirectAttributes.addFlashAttribute("message", "New utility added successfully! You can now add resources to it.");
             redirectAttributes.addFlashAttribute("messageType", "success");
         }
         redirectAttributes.addAttribute("query", query);
@@ -356,7 +333,7 @@ public class AdminUtilityController {
         redirectAttributes.addAttribute("page", page);
         redirectAttributes.addAttribute("pricePage", pricePage);
         redirectAttributes.addAttribute("priceQuery", priceQuery);
-        return "redirect:/admin/utilities";
+        return "redirect:/admin/utilities/" + utilityId;
     }
 
     @PostMapping("/manage-pricing")
@@ -405,6 +382,8 @@ public class AdminUtilityController {
 
     @PostMapping("/delete-pricing/{id}")
     public String deletePricing(@PathVariable("id") Integer id,
+                                @RequestParam(value = "fromResourceDetail", required = false, defaultValue = "false") Boolean fromResourceDetail,
+                                @RequestParam(value = "resourceId", required = false) Integer resourceId,
                                 @RequestParam(value = "query", required = false) String query,
                                 @RequestParam(value = "statusFilter", required = false) String statusFilter,
                                 @RequestParam(value = "page", defaultValue = "1") int page,
@@ -419,6 +398,9 @@ public class AdminUtilityController {
         redirectAttributes.addAttribute("page", page);
         redirectAttributes.addAttribute("pricePage", pricePage);
         redirectAttributes.addAttribute("priceQuery", priceQuery);
+        if (Boolean.TRUE.equals(fromResourceDetail) && resourceId != null) {
+            return "redirect:/admin/utilities/resources/" + resourceId;
+        }
         return "redirect:/admin/utilities";
     }
 

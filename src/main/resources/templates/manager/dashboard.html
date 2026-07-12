@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'dashboard')}">
+<head>
+    <title>Manager Dashboard - ABMS</title>
+</head>
+<body>
+
+<main>
+    <link rel="stylesheet" th:href="@{/css/manager/dashboard.css}">
+
+    <div class="dashboard-container">
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <h2>Bảng điều khiển Quản lý</h2>
+            <p>Tổng quan hoạt động của tòa nhà theo thời gian thực. Theo dõi cư dân, hóa đơn, bảo trì và đặt tiện ích tại đây.</p>
+        </div>
+
+        <!-- KPI Cards Grid -->
+        <div class="stats-grid">
+
+            <!-- Occupancy Card -->
+            <div class="kpi-card" style="flex-direction: column; align-items: flex-start; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 16px; width: 100%;">
+                    <div class="kpi-icon indigo">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Tỷ lệ lấp đầy</span>
+                        <span class="kpi-sub" th:text="${occupiedApartments + '/' + totalApartments + ' căn hộ có người ở'}">0/0 căn hộ có người ở</span>
+                    </div>
+                </div>
+                <div class="occupancy-bar" style="width: 100%;">
+                    <div class="occupancy-fill" th:style="'width: ' + ${occupancyRate} + '%'"></div>
+                </div>
+            </div>
+
+            <!-- Active Residents KPI -->
+            <div class="kpi-card">
+                <div class="kpi-icon teal">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Cư dân đang hoạt động</span>
+                    <span class="kpi-value" th:text="${activeResidentsCount}">0</span>
+                    <span class="kpi-sub">Tài khoản đã kích hoạt</span>
+                </div>
+            </div>
+
+            <!-- Pending Revenue KPI -->
+            <div class="kpi-card">
+                <div class="kpi-icon yellow">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Công nợ cần thu</span>
+                    <span class="kpi-value" style="font-size: 17px;"
+                          th:text="${#numbers.formatDecimal(pendingRevenue, 1, 'POINT', 0, 'COMMA') + ' đ'}">0 đ</span>
+                    <span class="kpi-sub">Chưa trả + Trễ hạn</span>
+                </div>
+            </div>
+
+            <!-- Pending Maintenance KPI -->
+            <div class="kpi-card">
+                <div class="kpi-icon red">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Yêu cầu bảo trì chờ xử lý</span>
+                    <span class="kpi-value" th:text="${pendingMaintenanceCount}">0</span>
+                    <span class="kpi-sub">Trạng thái: Chưa phân công</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+
+            <!-- Left: Recent Maintenance + Bookings -->
+            <div>
+                <!-- Recent Maintenance Requests -->
+                <div class="panel-card">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-triangle-exclamation" style="color: #F59E0B;"></i>
+                        Yêu cầu bảo trì gần đây
+                        <a th:href="@{/manager/maintenance}">Xem tất cả <i class="fa-solid fa-arrow-right fa-xs"></i></a>
+                    </div>
+                    <table class="dash-table" th:if="${not #lists.isEmpty(recentRequests)}">
+                        <thead>
+                            <tr>
+                                <th>Tiêu đề</th>
+                                <th>Căn hộ</th>
+                                <th>Ngày gửi</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="req : ${recentRequests}">
+                                <td th:text="${req.title}">Rò rỉ nước</td>
+                                <td th:text="${req.apartment != null ? req.apartment.apartmentNumber : 'N/A'}">A101</td>
+                                <td th:text="${#temporals.format(req.requestDate, 'dd/MM/yyyy')}">01/06/2026</td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${req.status == 0 ? 'badge-pending' :
+                                                          (req.status == 1 ? 'badge-assigned' :
+                                                          (req.status == 2 ? 'badge-done' : 'badge-cancelled'))}"
+                                          th:text="${req.status == 0 ? 'Chờ xử lý' :
+                                                   (req.status == 1 ? 'Đã phân công' :
+                                                   (req.status == 2 ? 'Hoàn thành' : 'Đã hủy'))}">
+                                        Trạng thái
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="no-data-alert" th:if="${#lists.isEmpty(recentRequests)}">
+                        <i class="fa-solid fa-check-circle" style="font-size: 24px; display: block; margin-bottom: 8px; color: #10B981;"></i>
+                        Không có yêu cầu bảo trì nào gần đây.
+                    </div>
+                </div>
+
+                <!-- Recent Utility Bookings -->
+                <div class="panel-card" style="margin-top: 24px;">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-calendar-check" style="color: #4F46E5;"></i>
+                        Đặt tiện ích gần đây
+                        <a th:href="@{/manager/utility-bookings}">Xem tất cả <i class="fa-solid fa-arrow-right fa-xs"></i></a>
+                    </div>
+                    <table class="dash-table" th:if="${not #lists.isEmpty(recentBookings)}">
+                        <thead>
+                            <tr>
+                                <th>Cư dân</th>
+                                <th>Tiện ích</th>
+                                <th>Bắt đầu</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="bk : ${recentBookings}">
+                                <td th:text="${bk.profile != null ? bk.profile.fullName : 'N/A'}">Nguyễn Văn A</td>
+                                <td th:text="${bk.resource != null ? bk.resource.resourceName : 'N/A'}">Hồ bơi</td>
+                                <td th:text="${#temporals.format(bk.startTime, 'dd/MM HH:mm')}">01/06 09:00</td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${bk.status == 0 ? 'badge-pending' :
+                                                          (bk.status == 1 ? 'badge-approved' :
+                                                          (bk.status == 2 ? 'badge-done' : 'badge-cancelled'))}"
+                                          th:text="${bk.status == 0 ? 'Chờ duyệt' :
+                                                   (bk.status == 1 ? 'Đã duyệt' :
+                                                   (bk.status == 2 ? 'Hoàn thành' : 'Đã hủy'))}">
+                                        Trạng thái
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="no-data-alert" th:if="${#lists.isEmpty(recentBookings)}">
+                        Chưa có lượt đặt tiện ích nào gần đây.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Apartment Summary & Quick Actions -->
+            <div>
+                <!-- Apartment status summary -->
+                <div class="panel-card">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-chart-pie" style="color: #0D9488;"></i>
+                        Tình trạng căn hộ
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #ECFDF5; border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-circle-check" style="color: #10B981;"></i>
+                                <span style="font-weight: 600; color: #065F46;">Có người ở</span>
+                            </div>
+                            <span style="font-size: 20px; font-weight: 700; color: #065F46;" th:text="${occupiedApartments}">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #F9FAFB; border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-circle-xmark" style="color: #9CA3AF;"></i>
+                                <span style="font-weight: 600; color: #374151;">Đang trống</span>
+                            </div>
+                            <span style="font-size: 20px; font-weight: 700; color: #374151;" th:text="${vacantApartments}">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #F0F9FF; border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-building" style="color: #0EA5E9;"></i>
+                                <span style="font-weight: 600; color: #0C4A6E;">Tổng số</span>
+                            </div>
+                            <span style="font-size: 20px; font-weight: 700; color: #0C4A6E;" th:text="${totalApartments}">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="panel-card" style="margin-top: 24px;">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-bolt" style="color: #F59E0B;"></i>
+                        Thao tác nhanh
+                    </div>
+                    <div class="actions-grid">
+                        <a th:href="@{/manager/profiles}" class="action-card">
+                            <i class="fa-solid fa-users" style="color: #0D9488;"></i>
+                            <span>Quản lý cư dân</span>
+                        </a>
+                        <a th:href="@{/manager/bills}" class="action-card">
+                            <i class="fa-solid fa-file-invoice-dollar" style="color: #4F46E5;"></i>
+                            <span>Tạo hóa đơn</span>
+                        </a>
+                        <a th:href="@{/manager/maintenance}" class="action-card">
+                            <i class="fa-solid fa-screwdriver-wrench" style="color: #EF4444;"></i>
+                            <span>Bảo trì</span>
+                        </a>
+                        <a th:href="@{/manager/utility-bookings}" class="action-card">
+                            <i class="fa-solid fa-calendar-check" style="color: #F59E0B;"></i>
+                            <span>Đặt tiện ích</span>
+                        </a>
+                        <a th:href="@{/manager/apartment}" class="action-card">
+                            <i class="fa-solid fa-building" style="color: #8B5CF6;"></i>
+                            <span>Căn hộ</span>
+                        </a>
+                        <a th:href="@{/manager/revenue}" class="action-card">
+                            <i class="fa-solid fa-chart-line" style="color: #10B981;"></i>
+                            <span>Báo cáo</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+</body>
+</html>

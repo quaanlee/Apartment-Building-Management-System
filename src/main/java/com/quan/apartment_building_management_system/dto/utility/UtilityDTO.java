@@ -284,14 +284,10 @@ public class UtilityDTO {
     }
 
     public String getImageUrl() {
-        if (utilityName == null) return "/images/utilities/default.jpg";
-        String name = utilityName.toLowerCase();
-        if (name.contains("swimming") || name.contains("pool")) return "/images/utilities/pool.jpg";
-        if (name.contains("gym") || name.contains("fitness")) return "/images/utilities/gym.jpg";
-        if (name.contains("lounge") || name.contains("club")) return "/images/utilities/lounge.jpg";
-        if (name.contains("cinema")) return "/images/utilities/cinema.jpg";
-        if (name.contains("garden") || name.contains("bbq")) return "/images/utilities/garden.jpg";
-        return "/images/utilities/default.jpg";
+        if (this.imageUrl != null && !this.imageUrl.trim().isEmpty()) {
+            return this.imageUrl;
+        }
+        return "/images/utilities/garden.jpg";
     }
 
     public String getLocation() {

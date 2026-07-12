@@ -1,55 +1,149 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/resident/layout_resident :: resident-layout(~{::#main-content}, 'dashboard')}"
-      th:with="pageTitle='Resident Dashboard'">
+      th:replace="~{layout/resident/layout_resident :: resident-layout(~{::#main-content}, 'dashboard')}">
 <head>
     <title>Resident Dashboard</title>
 </head>
 <body>
 <div id="main-content">
-    <style>
-        .dashboard-welcome-card {
-            background: white;
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid #E5E7EB;
-            text-align: center;
-            max-width: 600px;
-            margin: 40px auto;
-        }
-        .dashboard-welcome-card h1 {
-            color: #1E1B4B;
-            font-size: 24px;
-            margin-bottom: 12px;
-            font-weight: 700;
-        }
-        .dashboard-welcome-card p {
-            color: #6B7280;
-            font-size: 16px;
-            margin-bottom: 24px;
-        }
-        .btn-action-dash {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 20px;
-            background-color: #582BE8;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
-        .btn-action-dash:hover {
-            background-color: #4a22c9;
-        }
-    </style>
-    
-    <div class="dashboard-welcome-card">
-        <h1>Welcome Back!</h1>
-        <p>Hello, <strong th:text="${session.currentUser != null ? session.currentUser.username : 'Resident'}">Resident</strong>. Welcome to your ABMS Resident Portal.</p>
-        <a th:href="@{/resident/billing}" class="btn-action-dash">View My Bills</a>
+    <link rel="stylesheet" th:href="@{/css/resident/dashboard.css}">
+
+    <div class="dashboard-container">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <h2 th:text="${'Xin chào, ' + profile.fullName + '!'}">Xin chào, Resident!</h2>
+            <p th:text="${'Chào mừng bạn đến với Cổng thông tin Cư dân ABMS. Bạn đang quản lý các tiện ích và phí cho Căn hộ ' + apartment.apartmentNumber + '.'}">
+                Chào mừng bạn đến với Cổng thông tin Cư dân ABMS.
+            </p>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="stats-grid">
+            <!-- Unpaid Bills KPI -->
+            <div class="kpi-card">
+                <div class="kpi-icon purple">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Hóa đơn chưa thanh toán</span>
+                    <span class="kpi-value" th:text="${#numbers.formatDecimal(unpaidBalance, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</span>
+                </div>
+            </div>
+
+            <!-- Active Repairs KPI -->
+            <div class="kpi-card">
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Yêu cầu bảo trì đang mở</span>
+                    <span class="kpi-value" th:text="${activeRepairsCount + ' yêu cầu'}">0 yêu cầu</span>
+                </div>
+            </div>
+
+            <!-- Upcoming Bookings KPI -->
+            <div class="kpi-card">
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Tiện ích đã đặt sắp tới</span>
+                    <span class="kpi-value" th:text="${upcomingBookingsCount + ' lượt đặt'}">0 lượt đặt</span>
+                </div>
+            </div>
+
+            <!-- Household size KPI -->
+            <div class="kpi-card">
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-house-user"></i>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Thành viên & Phương tiện</span>
+                    <span class="kpi-value" th:text="${householdSize + ' người | ' + householdVehiclesCount + ' xe'}">0 người | 0 xe</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid (2 columns) -->
+        <div class="dashboard-grid">
+            <!-- Left: Notifications -->
+            <div class="panel-card">
+                <div class="panel-title">
+                    <i class="fa-solid fa-bell" style="color: #4F46E5;"></i> Thông báo mới nhất
+                </div>
+                <div class="announcement-list" th:if="${not #lists.isEmpty(recentNotifications)}">
+                    <div class="announcement-item" th:each="n : ${recentNotifications}">
+                        <div class="announcement-header">
+                            <span class="announcement-title" th:text="${n.title}">Thông báo bảo trì</span>
+                            <span class="announcement-date" th:text="${#temporals.format(n.createdAt, 'dd/MM/yyyy HH:mm')}">01/06/2026</span>
+                        </div>
+                        <div class="announcement-content" th:text="${n.content}">Nội dung thông báo</div>
+                    </div>
+                </div>
+                <div class="no-data-alert" th:if="${#lists.isEmpty(recentNotifications)}">
+                    <i class="fa-solid fa-bell-slash" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
+                    Hiện chưa có thông báo mới nào dành cho bạn.
+                </div>
+            </div>
+
+            <!-- Right Column: Recent Bills & Quick Actions -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <!-- Recent Bills panel -->
+                <div class="panel-card">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-receipt" style="color: #10B981;"></i> Hóa đơn gần đây
+                    </div>
+                    <table class="dash-table" th:if="${not #lists.isEmpty(recentBills)}">
+                        <thead>
+                            <tr>
+                                <th>Kỳ hóa đơn</th>
+                                <th>Số tiền</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="b : ${recentBills}">
+                                <td th:text="${'Tháng ' + b.billMonth + '/' + b.billYear}">Tháng 06/2026</td>
+                                <td th:text="${#numbers.formatDecimal(b.totalAmount, 1, 'POINT', 0, 'COMMA') + ' đ'}">120.000 đ</td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${b.status == 1 ? 'paid' : (b.status == 2 ? 'overdue' : 'unpaid')}"
+                                          th:text="${b.status == 1 ? 'Đã trả' : (b.status == 2 ? 'Trễ hạn' : 'Chưa trả')}">Chưa trả</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="no-data-alert" th:if="${#lists.isEmpty(recentBills)}">
+                        Hiện chưa có hóa đơn nào được phát hành cho căn hộ của bạn.
+                    </div>
+                </div>
+
+                <!-- Quick actions panel -->
+                <div class="panel-card">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-circle-play" style="color: #F97316;"></i> Thao tác nhanh
+                    </div>
+                    <div class="actions-list">
+                        <a th:href="@{/resident/maintenance}" class="action-card">
+                            <i class="fa-solid fa-screwdriver-wrench" style="color: #F97316;"></i>
+                            <span>Báo bảo trì</span>
+                        </a>
+                        <a th:href="@{/resident/booking}" class="action-card">
+                            <i class="fa-solid fa-calendar-plus" style="color: #10B981;"></i>
+                            <span>Đặt dịch vụ</span>
+                        </a>
+                        <a th:href="@{/resident/vehicles}" class="action-card">
+                            <i class="fa-solid fa-motorcycle" style="color: #3B82F6;"></i>
+                            <span>Đăng ký xe</span>
+                        </a>
+                        <a th:href="@{/resident/apartments}" class="action-card">
+                            <i class="fa-solid fa-users-gear" style="color: #8B5CF6;"></i>
+                            <span>Xem hộ gia đình</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>

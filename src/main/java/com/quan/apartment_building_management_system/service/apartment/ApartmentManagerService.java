@@ -3,6 +3,7 @@ package com.quan.apartment_building_management_system.service.apartment;
 import com.quan.apartment_building_management_system.dto.ApartmentDTO;
 import com.quan.apartment_building_management_system.dto.ApartmentDetailDTO;
 import com.quan.apartment_building_management_system.entity.Apartment;
+import com.quan.apartment_building_management_system.entity.ApartmentImage;
 import com.quan.apartment_building_management_system.entity.Profile;
 import com.quan.apartment_building_management_system.entity.ResidentApartment;
 import com.quan.apartment_building_management_system.exception.ResourceNotFoundException;
@@ -36,14 +37,22 @@ public class ApartmentManagerService {
         this.profileRepository = profileRepository;
     }
 
-    // 1. View Apartment List
+    // 1. View Apartment List (Legacy signature)
     public Page<ApartmentDTO> getFilteredApartments(
             String search, Byte floor, Byte status,
             BigDecimal minArea, BigDecimal maxArea,
             Pageable pageable) {
+        return getFilteredApartments(search, null, floor, status, minArea, maxArea, pageable);
+    }
+
+    // 1. View Apartment List (New signature with roomType)
+    public Page<ApartmentDTO> getFilteredApartments(
+            String search, String roomType, Byte floor, Byte status,
+            BigDecimal minArea, BigDecimal maxArea,
+            Pageable pageable) {
 
         Page<Apartment> apartments = apartmentRepository.findFiltered(
-                search, floor, status, minArea, maxArea, pageable);
+                search, roomType, floor, status, minArea, maxArea, pageable);
 
         return apartments.map(this::convertToDTO);
     }
@@ -239,6 +248,24 @@ public class ApartmentManagerService {
         dto.setStatus(apartment.getStatus());
         dto.setMaxOccupancy(apartment.getMaxOccupancy());
 
+        List<String> imageUrls = apartment.getApartmentImages().stream()
+                .sorted((img1, img2) -> {
+                    int primaryCompare = Boolean.compare(img2.getPrimary(), img1.getPrimary());
+                    if (primaryCompare != 0) {
+                        return primaryCompare;
+                    }
+                    if (img1.getUploadedAt() != null && img2.getUploadedAt() != null) {
+                        return img1.getUploadedAt().compareTo(img2.getUploadedAt());
+                    }
+                    if (img1.getImageId() != null && img2.getImageId() != null) {
+                        return img1.getImageId().compareTo(img2.getImageId());
+                    }
+                    return 0;
+                })
+                .map(ApartmentImage::getImageUrl)
+                .collect(Collectors.toList());
+        dto.setImageUrls(imageUrls);
+
         List<ResidentApartment> residents = residentApartmentRepository
                 .findCurrentResidentsByApartment(apartment.getApartmentId());
 
@@ -253,6 +280,7 @@ public class ApartmentManagerService {
                     info.setIsHouseholdOwner(p.getIsHouseholdOwner());
                     info.setMoveInDate(ra.getMoveInDate());
                     info.setCitizenId(p.getCitizenId());
+                    info.setRelationshipToOwner(p.getRelationshipToOwner());
                     return info;
                 })
                 .collect(Collectors.toList());

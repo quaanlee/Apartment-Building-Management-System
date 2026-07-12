@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::#main-content}, 'notifications')}"
+      th:with="pageTitle='Edit Notification'">
+<head>
+    <title>Edit Notification</title>
+</head>
+<body>
+<div id="main-content">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        #main-content {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            padding: 24px;
+            position: relative;
+            min-height: calc(100vh - 100px);
+        }
+        
+        .back-link {
+            color: #582BE8;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            transition: color 0.2s;
+        }
+        
+        .back-link:hover {
+            color: #4a22c9;
+            text-decoration: none;
+        }
+        
+        .page-title-custom {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .status-badge-green {
+            background-color: #DEF7EC;
+            color: #03543F;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .action-btn-custom {
+            color: #9ca3af;
+            font-size: 20px;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: color 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn-custom:hover {
+            color: #4b5563;
+        }
+        
+        .delete-btn-custom {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .delete-btn-custom:hover {
+            color: #dc3545;
+        }
+
+        /* Detail Cards Layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        @media (max-width: 991px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .detail-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .card-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+        }
+        
+        .format-text {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Left Card - Content */
+        .content-body {
+            font-size: 15px;
+            color: #4b5563;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        /* Right Card - Details */
+        .detail-item {
+            margin-bottom: 20px;
+        }
+        
+        .detail-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .detail-value i {
+            color: #4b5563;
+            font-size: 16px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Sender section */
+        .sender-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .sender-name {
+            font-weight: 700;
+            color: #111827;
+            font-size: 14px;
+        }
+        
+        .sender-role {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #F0EDFE;
+            color: #582BE8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Resend Button */
+        .btn-resend {
+            background-color: #EEECFC;
+            color: #582BE8;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        
+        .btn-resend:hover {
+            background-color: #e2dffa;
+        }
+
+        /* Faded Megaphone Icon background */
+        .background-icon {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            font-size: 200px;
+            color: #582BE8;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Form Inputs in Edit Mode */
+        .form-control-edit {
+            font-family: 'Inter', sans-serif;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            width: 100%;
+        }
+        .form-control-edit:focus {
+            border-color: #582BE8;
+            box-shadow: 0 0 0 3px rgba(88, 43, 232, 0.15);
+            outline: none;
+        }
+    </style>
+
+    <a th:href="@{/manager/notifications}" class="back-link">
+        <i class="fa-solid fa-arrow-left"></i> Back to Notifications
+    </a>
+
+    <!-- Single form wrapping the view / edit elements -->
+    <form th:action="@{/manager/notifications/{id}/edit(id=${notification.notificationId})}" method="post">
+        <!-- Header block with badge and actions -->
+        <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+            <!-- Static Title -->
+            <h1 id="staticTitle" class="page-title-custom m-0" th:text="${notification.title}">Annual Fire Safety Inspection</h1>
+            <!-- Edit Title Input (hidden by default) -->
+            <input type="text" id="editTitleInput" name="title" class="form-control-edit w-auto d-none" th:value="${notification.title}" required style="font-size: 28px; font-weight: 700; color: #111827; max-width: 500px;">
+            
+            <span class="status-badge-green">
+                <i class="fa-solid fa-circle-check"></i> Sent
+            </span>
+            <!-- Toggle Edit Mode Button -->
+            <button type="button" id="btnToggleEdit" class="action-btn-custom" title="Edit text">
+                <i class="fa-regular fa-pen-to-square"></i>
+            </button>
+            <!-- Delete Button (hidden in edit mode) -->
+            <button type="submit" th:formaction="@{/manager/notifications/{id}/delete(id=${notification.notificationId})}" id="btnDeleteNotification" class="action-btn-custom delete-btn-custom" title="Delete" onclick="return confirm('Are you sure you want to delete this notification?');">
+                <i class="fa-regular fa-trash-can"></i>
+            </button>
+        </div>
+
+        <div class="grid-container">
+            <!-- Message Content Card (Left) -->
+            <div class="detail-card">
+                <div class="card-header-area">
+                    <h2 class="card-section-title">Message Content</h2>
+                    <div class="format-text">Format: Plain Text</div>
+                </div>
+                <!-- Static content -->
+                <div id="staticContent" class="content-body" th:text="${notification.content}">
+                    Please be advised that the annual fire safety inspection for all blocks will take place on October 15, 2023, starting at 9:00 AM. Inspectors will need access to all units. Please ensure someone is home or contact the management office to provide entry permissions. Thank you for your cooperation.
+                </div>
+                <!-- Edit content textarea (hidden by default) -->
+                <textarea id="editContentTextarea" name="content" class="form-control-edit d-none" rows="8" th:text="${notification.content}" required></textarea>
+                
+                <!-- Action Buttons (hidden by default) -->
+                <div id="editActions" class="mt-4 gap-3 d-none">
+                    <button type="submit" class="btn btn-primary" style="background-color: #582BE8; border: none; font-weight: 600; padding: 10px 24px; border-radius: 8px;">Save Changes</button>
+                    <button type="button" id="btnCancelEdit" class="btn btn-light" style="border-radius: 8px; font-weight: 600; padding: 10px 24px; border: 1px solid #d1d5db;">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Details Card (Right) -->
+            <div class="detail-card">
+                <div class="card-header-area d-flex align-items-center">
+                    <i class="fa-solid fa-circle-info me-2 text-primary" style="font-size: 18px;"></i>
+                    <h2 class="card-section-title">Details</h2>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">Notification Type</span>
+                    <div class="detail-value">
+                        <i class="fa-solid fa-tower-broadcast"></i>
+                        <!-- Static Value -->
+                        <span id="staticType" th:text="${notification.notificationType == 1 ? 'Broadcast' : (notification.notificationType == 2 ? 'Alert' : 'General')}">Broadcast</span>
+                        <!-- Edit dropdown (hidden by default) -->
+                        <select id="editTypeSelect" name="notificationType" class="form-select form-select-sm d-none" required style="max-width: 150px;">
+                            <option value="1" th:selected="${notification.notificationType == 1}">Broadcast</option>
+                            <option value="2" th:selected="${notification.notificationType == 2}">Alert</option>
+                            <option value="3" th:selected="${notification.notificationType == 3}">Billing</option>
+                            <option value="4" th:selected="${notification.notificationType == 4}">General</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Status</span>
+                    <div class="detail-value">
+                        <span class="status-dot"></span> Sent
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Created At</span>
+                    <div class="detail-value">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span th:text="${#temporals.format(notification.createdAt, 'MMM dd, yyyy hh:mm a')}">Oct 12, 2023 09:00 AM</span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Recipient Group</span>
+                    <div class="detail-value">
+                        <i class="fa-solid fa-users"></i>
+                        <!-- Static Value -->
+                        <span id="staticGroup" th:text="${notification.relatedEntityType != null ? notification.relatedEntityType : 'All Residents'}">All Residents</span>
+                        <!-- Edit dropdown (hidden by default) -->
+                        <select id="editGroupSelect" name="relatedEntityType" class="form-select form-select-sm d-none" required style="max-width: 180px;">
+                            <option value="All Residents" th:selected="${notification.relatedEntityType == 'All Residents'}">All Residents</option>
+                            <option value="Building A" th:selected="${notification.relatedEntityType == 'Building A'}">Building A</option>
+                            <option value="Vehicle Owners" th:selected="${notification.relatedEntityType == 'Vehicle Owners'}">Vehicle Owners</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Sender Section -->
+                <div class="detail-item mt-4 pt-3 border-top">
+                    <span class="detail-label">Sender</span>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="sender-avatar">
+                            <img th:if="${notification.createdBy.profile != null && notification.createdBy.profile.fullName != null}" 
+                                 th:src="'https://ui-avatars.com/api/?name=' + ${#uris.escapePathSegment(notification.createdBy.profile.fullName)} + '&background=F0EDFE&color=582BE8&bold=true'" 
+                                 alt="Avatar" class="rounded-circle" width="40" height="40">
+                            <div th:unless="${notification.createdBy.profile != null && notification.createdBy.profile.fullName != null}" class="avatar-placeholder">M</div>
+                        </div>
+                        <div>
+                            <div class="sender-name" th:text="${notification.createdBy.profile != null ? notification.createdBy.profile.fullName : 'System'}">Jane Doe</div>
+                            <div class="sender-role" th:text="${notification.createdBy.role != null ? notification.createdBy.role.roleName : 'Manager'}">Facility Manager</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resend Button -->
+                <div class="mt-4 pt-2">
+                    <button type="button" class="btn-resend" onclick="alert('Notification resent to recipients who haven\'t opened it yet.');">
+                        <i class="fa-solid fa-rotate-left"></i> Resend to Non-Openers
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Faded background megaphone decoration -->
+    <div class="background-icon">
+        <i class="fa-solid fa-bullhorn"></i>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnToggleEdit = document.getElementById('btnToggleEdit');
+        const btnCancelEdit = document.getElementById('btnCancelEdit');
+
+        btnToggleEdit.addEventListener('click', function() {
+            toggleEditMode(true);
+        });
+
+        btnCancelEdit.addEventListener('click', function() {
+            toggleEditMode(false);
+        });
+
+        function toggleEditMode(isEdit) {
+            if (isEdit) {
+                // Hide static fields
+                document.getElementById('staticTitle').classList.add('d-none');
+                document.getElementById('staticContent').classList.add('d-none');
+                document.getElementById('staticType').classList.add('d-none');
+                document.getElementById('staticGroup').classList.add('d-none');
+                document.getElementById('btnDeleteNotification').classList.add('d-none');
+
+                // Show edit fields
+                document.getElementById('editTitleInput').classList.remove('d-none');
+                document.getElementById('editContentTextarea').classList.remove('d-none');
+                document.getElementById('editTypeSelect').classList.remove('d-none');
+                document.getElementById('editGroupSelect').classList.remove('d-none');
+                document.getElementById('editActions').classList.remove('d-none');
+                document.getElementById('editActions').classList.add('d-flex');
+            } else {
+                // Show static fields
+                document.getElementById('staticTitle').classList.remove('d-none');
+                document.getElementById('staticContent').classList.remove('d-none');
+                document.getElementById('staticType').classList.remove('d-none');
+                document.getElementById('staticGroup').classList.remove('d-none');
+                document.getElementById('btnDeleteNotification').classList.remove('d-none');
+
+                // Hide edit fields
+                document.getElementById('editTitleInput').classList.add('d-none');
+                document.getElementById('editContentTextarea').classList.add('d-none');
+                document.getElementById('editTypeSelect').classList.add('d-none');
+                document.getElementById('editGroupSelect').classList.add('d-none');
+                document.getElementById('editActions').classList.add('d-none');
+                document.getElementById('editActions').classList.remove('d-flex');
+            }
+        }
+    });
+</script>
+</div>
+</body>
+</html>

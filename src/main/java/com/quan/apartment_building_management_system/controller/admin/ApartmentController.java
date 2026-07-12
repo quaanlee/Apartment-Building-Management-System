@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
@@ -56,9 +57,15 @@ public class ApartmentController {
 
     @PostMapping("/save")
     public String saveApartment(@Valid @ModelAttribute("apartment") Apartment apartment,
-                                BindingResult bindingResult,
-                                Model model,
-                                RedirectAttributes redirectAttributes) {
+                                 BindingResult bindingResult,
+                                 @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
+                                 @RequestParam(value = "subImage1", required = false) MultipartFile subImage1,
+                                 @RequestParam(value = "subImage2", required = false) MultipartFile subImage2,
+                                 @RequestParam(value = "deleteMainImage", defaultValue = "false") boolean deleteMainImage,
+                                 @RequestParam(value = "deleteSubImage1", defaultValue = "false") boolean deleteSubImage1,
+                                 @RequestParam(value = "deleteSubImage2", defaultValue = "false") boolean deleteSubImage2,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("pageTitle", "Add New Unit");
@@ -79,7 +86,12 @@ public class ApartmentController {
             apartment.setStatus((byte) 0);
         }
 
-        apartmentService.save(apartment);
+        Apartment savedApartment = apartmentService.save(apartment);
+        try {
+            apartmentService.saveApartmentImages(savedApartment, mainImage, subImage1, subImage2, deleteMainImage, deleteSubImage1, deleteSubImage2);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error uploading images: " + e.getMessage());
+        }
         redirectAttributes.addFlashAttribute("successMessage", "Apartment added successfully!");
 
         return "redirect:/admin/apartments";
@@ -108,6 +120,12 @@ public class ApartmentController {
     public String updateApartment(@PathVariable Integer id,
                                   @Valid @ModelAttribute("apartment") Apartment apartment,
                                   BindingResult bindingResult,
+                                  @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
+                                  @RequestParam(value = "subImage1", required = false) MultipartFile subImage1,
+                                  @RequestParam(value = "subImage2", required = false) MultipartFile subImage2,
+                                  @RequestParam(value = "deleteMainImage", defaultValue = "false") boolean deleteMainImage,
+                                  @RequestParam(value = "deleteSubImage1", defaultValue = "false") boolean deleteSubImage1,
+                                  @RequestParam(value = "deleteSubImage2", defaultValue = "false") boolean deleteSubImage2,
                                   Model model,
                                   RedirectAttributes redirectAttributes) {
 
@@ -142,6 +160,11 @@ public class ApartmentController {
         updateApartment.setMaxOccupancy(apartment.getMaxOccupancy());
 
         apartmentService.save(updateApartment);
+        try {
+            apartmentService.saveApartmentImages(updateApartment, mainImage, subImage1, subImage2, deleteMainImage, deleteSubImage1, deleteSubImage2);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error uploading images: " + e.getMessage());
+        }
         redirectAttributes.addFlashAttribute("successMessage", "Apartment updated successfully!");
 
         return "redirect:/admin/apartments";
@@ -185,71 +208,4 @@ public class ApartmentController {
         return "redirect:/admin/apartments";
     }
 
-    @GetMapping("/assign/{apartmentId}")
-    public String showAssignResidentForm(@PathVariable Integer apartmentId,
-                                         Model model,
-                                         RedirectAttributes redirectAttributes) {
-
-        Optional<Apartment> apartment = apartmentService.findById(apartmentId);
-
-        if (apartment.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Apartment not found!");
-            return "redirect:/admin/apartments";
-        }
-
-        List<Profile> residents = profileRepository.findAll();
-
-        model.addAttribute("apartment", apartment.get());
-        model.addAttribute("residents", residents);
-
-        return "admin/assign-resident";
-    }
-
-    @PostMapping("/assign")
-    public String assignResident(@RequestParam Integer apartmentId,
-                                 @RequestParam Integer profileId,
-                                 @RequestParam String moveInDate,
-                                 RedirectAttributes redirectAttributes) {
-
-        Optional<Apartment> apartmentOptional = apartmentService.findById(apartmentId);
-        Optional<Profile> profileOptional = profileRepository.findById(profileId);
-
-        if (apartmentOptional.isEmpty() || profileOptional.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Apartment or resident not found!");
-            return "redirect:/admin/apartments";
-        }
-
-        Apartment apartment = apartmentOptional.get();
-        Profile profile = profileOptional.get();
-
-        List<ResidentApartment> currentResidents =
-                residentApartmentRepository.findByApartmentApartmentId(apartmentId)
-                        .stream()
-                        .filter(ra -> ra.getMoveOutDate() == null)
-                        .toList();
-
-        if (currentResidents.size() >= apartment.getMaxOccupancy()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "This apartment has reached maximum occupancy!");
-            return "redirect:/admin/apartments/assign/" + apartmentId;
-        }
-
-        ResidentApartment residentApartment = new ResidentApartment();
-        residentApartment.setApartment(apartment);
-        residentApartment.setProfile(profile);
-        residentApartment.setMoveInDate(LocalDate.parse(moveInDate));
-
-        residentApartmentRepository.save(residentApartment);
-
-        profile.setApartment(apartment);
-        profile.setMoveInDate(LocalDate.parse(moveInDate));
-        profile.setResidentStatus((byte) 1);
-        profileRepository.save(profile);
-
-        apartment.setStatus((byte) 1);
-        apartmentService.save(apartment);
-
-        redirectAttributes.addFlashAttribute("successMessage", "Resident assigned successfully!");
-
-        return "redirect:/admin/apartments/detail/" + apartmentId;
-    }
 }

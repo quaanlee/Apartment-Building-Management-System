@@ -34,7 +34,7 @@ public class Payment {
     @JoinColumn(name = "MethodID", nullable = false)
     private PaymentMethod paymentMethod;
 
-    @Column(name = "TransactionCode", unique = true, length = 100)
+    @Column(name = "TransactionCode", length = 100)
     private String transactionCode;
 
     @Column(name = "Amount", nullable = false, precision = 18, scale = 2)

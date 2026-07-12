@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/resident/layout_resident :: resident-layout(~{::main}, 'booking')}"
+    th:with="pageTitle='Đặt Tiện Ích'">
+
+<head>
+    <title>Đặt Tiện Ích</title>
+</head>
+
+<body>
+
+    <main class="utility-container">
+        <link rel="stylesheet" th:href="@{/css/resident/utility-resident.css}">
+
+        <!-- Breadcrumb & Back -->
+        <div class="detail-header-nav"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div class="breadcrumb-container" style="font-size: 14px; color: var(--text-secondary);">
+                <a th:href="@{/resident/utilities}" style="color: var(--primary-color); text-decoration: none;">Tiện
+                    Ích</a>
+                <span style="margin: 0 8px;">/</span>
+                <a th:href="@{/resident/utilities/{id}/resources(id=${utility.utilityId})}"
+                    th:text="${utility.utilityName}" style="color: var(--primary-color); text-decoration: none;">Utility
+                    Name</a>
+                <span style="margin: 0 8px;">/</span>
+                <span th:text="${resource.resourceName}"
+                    style="font-weight: 600; color: var(--text-primary);">Resource</span>
+                <span style="margin: 0 8px;">/</span>
+                <span style="font-weight: 600; color: var(--text-primary);">Booking Form</span>
+            </div>
+            <a th:href="@{/resident/utilities/{id}/resources(id=${utility.utilityId})}" class="btn-secondary"
+                style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-primary); font-weight: 500; font-size: 14px; background: white;">
+                <i class="fa-solid fa-arrow-left"></i> Back to Utility
+            </a>
+        </div>
+
+        <!-- Alerts -->
+        <div th:if="${errorMessage}" class="alert alert-danger"
+            style="background-color: #fee2e2; color: #dc2626; padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; border: 1px solid #fca5a5;">
+            <i class="fa-solid fa-circle-exclamation" style="margin-right: 8px;"></i><span
+                th:text="${errorMessage}"></span>
+        </div>
+
+        <form th:action="@{/resident/utilities/book}" method="post" th:object="${bookingRequest}" id="bookingForm">
+            <input type="hidden" name="utilityId" th:value="${resource.utilityId}">
+            <input type="hidden" id="resourceIdInput" name="resourceId" th:value="${resource.resourceId}">
+
+            <div class="booking-layout">
+                <!-- LEFT COLUMN: Form -->
+                <div>
+                    <!-- Header Info Card -->
+                    <div class="booking-header-card">
+                        <img th:src="@{${!#strings.isEmpty(resource.primaryImageUrl) ? resource.primaryImageUrl : (!#strings.isEmpty(utility.imageUrl) ? utility.imageUrl : '/images/utilities/garden.jpg')}}"
+                            alt="Header Image" class="booking-header-img">
+                        <div class="booking-header-info">
+                            <span class="badge-premium">PREMIUM</span>
+                            <span class="rating-stars">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                    class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                    class="fa-solid fa-star"></i>
+                            </span>
+                            <h3 th:text="${resource.resourceName}">Tên</h3>
+                            <p th:text="${resource.description}">Mô tả</p>
+                            <div class="booking-meta">
+                                <span><i class="fa-solid fa-location-dot"></i> <span
+                                        th:text="${resource.location}"></span></span>
+                                <span><i class="fa-regular fa-clock"></i> 06:00 - 22:00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1 -->
+                    <div class="step-indicator">
+                        <div class="step-number">1</div>
+                        <h4 class="step-title">Service Package</h4>
+                    </div>
+
+                    <div class="package-cards" style="display: flex; gap: 16px; align-items: stretch;">
+                        <div th:each="price, iterStat : ${resource.prices}" style="flex: 1;">
+                            <input type="radio" name="priceId" th:value="${price.utilityPriceId}" class="package-input"
+                                style="display: none;" th:id="${'price_' + price.utilityPriceId}"
+                                th:checked="${iterStat.index == 0}">
+                            <label class="package-card" th:for="${'price_' + price.utilityPriceId}"
+                                style="display: block; height: 100%; pointer-events: none; cursor: default; margin: 0; box-sizing: border-box; border: 1px solid var(--border-color) !important; box-shadow: none !important;">
+                                <h6 th:text="${price.unit.unitName}">Package Name</h6>
+                                <div class="price"
+                                    th:text="${#numbers.formatDecimal(price.price, 0, 'COMMA', 0, 'POINT')} + ' VND'">
+                                    Price</div>
+                                <p>Standard usage package.</p>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Availability Timeline -->
+                    <div
+                        style="margin-top: 32px; background: white; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                        <div
+                            style="font-size: 11px; color: #888; margin-bottom: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 4px;">
+                            <em>Debug info - selectedDate: <span th:text="${selectedDate}"></span> | Bookings found:
+                                <span th:text="${bookings.size()}"></span></em>
+                            <th:block th:each="b : ${bookings}">
+                                | [<span th:text="${b.startTime}"></span> to <span th:text="${b.endTime}"></span> (St:
+                                <span th:text="${b.status}"></span>)]
+                            </th:block>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">Availability
+                                on <span th:text="${#temporals.format(selectedDate, 'dd/MM/yyyy')}"></span>:</span>
+                            <div style="display: flex; gap: 12px; font-size: 12px; color: var(--text-secondary);">
+                                <span style="display: flex; align-items: center; gap: 4px;"><span
+                                        style="width: 12px; height: 12px; border-radius: 50%; background: var(--primary-color);"></span>
+                                    Booked</span>
+                                <span style="display: flex; align-items: center; gap: 4px;"><span
+                                        style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0;"></span>
+                                    Available</span>
+                            </div>
+                        </div>
+                        <div
+                            style="position: relative; height: 24px; background: #e2e8f0; border-radius: 4px; overflow: hidden; display: flex;">
+                            <!-- Assuming opening hours 06:00 to 22:00 (16 hours total) -->
+                            <th:block th:each="b : ${bookings}">
+                                <!-- calculate left % and width % based on start and end time -->
+                                <div th:if="${b.startTime.toLocalDate().isEqual(selectedDate)}"
+                                    style="position: absolute; height: 100%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-size: 9px; font-weight: bold; overflow: hidden; white-space: nowrap;"
+                                    th:with="
+                                     startHour=${b.startTime.hour + b.startTime.minute / 60.0},
+                                     endHour=${b.endTime.hour + b.endTime.minute / 60.0},
+                                     leftPercent=${(startHour - 6) / 16.0 * 100},
+                                     widthPercent=${(endHour - startHour) / 16.0 * 100}"
+                                    th:styleappend="|left: ${leftPercent < 0 ? 0 : leftPercent}%; width: ${widthPercent > 100 ? 100 : widthPercent}%;|">
+                                    <span
+                                        th:text="${#temporals.format(b.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(b.endTime, 'HH:mm')}"></span>
+                                </div>
+                            </th:block>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-light); margin-top: 8px;">
+                            <span>06:00</span>
+                            <span>10:00</span>
+                            <span>14:00</span>
+                            <span>18:00</span>
+                            <span>22:00</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="step-indicator">
+                        <div class="step-number">2</div>
+                        <h4 class="step-title">Select Date & Time</h4>
+                    </div>
+
+                    <div class="calendar-layout">
+                        <div class="form-field">
+                            <label>Select Date</label>
+                            <div style="display: flex; gap: 8px; align-items: stretch;">
+                                <input type="date" class="custom-input" name="bookingDate" required id="bookingDate"
+                                    th:value="${#temporals.format(bookingRequest.bookingDate, 'yyyy-MM-dd')}"
+                                    th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                                    style="flex-grow: 1;">
+                                <button type="button" class="btn-primary" 
+                                    onclick="var d = document.getElementById('bookingDate').value; var r = document.getElementById('resourceIdInput').value; if(d && r) { window.location.href = '/resident/utilities/book/' + r + '?date=' + d; } else { alert('Vui lòng chọn ngày!'); }"
+                                    style="padding: 10px 16px; border-radius: 8px; border: none; background: var(--primary-color); color: white; cursor: pointer; white-space: nowrap; font-weight: 500;">Change Date</button>
+                            </div>
+                        </div>
+                        <div class="datetime-grid">
+                            <div class="form-field">
+                                <label>Start Time</label>
+                                <input type="time" class="custom-input" name="startTime" required id="startTime"
+                                    th:value="${bookingRequest.startTime != null ? #temporals.format(bookingRequest.startTime, 'HH:mm') : ''}">
+                            </div>
+                            <div class="form-field">
+                                <label>End Time</label>
+                                <input type="time" class="custom-input" name="endTime" required id="endTime"
+                                    th:value="${bookingRequest.endTime != null ? #temporals.format(bookingRequest.endTime, 'HH:mm') : ''}">
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; text-align: right;">
+                            <button type="submit" th:formaction="@{/resident/utilities/calculate}" formmethod="post"
+                                class="btn-primary"
+                                style="padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; background-color: var(--primary-color); color: white; font-weight: 600;">Save
+                                All</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Summary sidebar -->
+                <div>
+                    <div class="booking-summary-card">
+                        <h4>Booking Summary</h4>
+
+                        <div class="summary-row">
+                            <div class="summary-col">
+                                <span>Service</span>
+                                <strong th:text="${resource.resourceName}">Tên</strong>
+                            </div>
+                            <div class="summary-col" style="text-align: right;">
+                                <span>Package</span>
+                                <strong id="summaryPackageName"
+                                    th:text="${calculatedPackageName != null ? calculatedPackageName : (!resource.prices.isEmpty() ? resource.prices[0].unit.unitName : 'Giờ')}">Giờ</strong>
+                            </div>
+                        </div>
+
+                        <div class="summary-datetime">
+                            <div><i class="fa-regular fa-calendar-days"></i> <span id="summaryDate"
+                                    th:text="${bookingRequest.bookingDate != null ? #temporals.format(bookingRequest.bookingDate, 'dd/MM/yyyy') : 'Select date'}">Select
+                                    date</span>
+                            </div>
+                            <div><i class="fa-regular fa-clock"></i> <span id="summaryTime"
+                                    th:text="${bookingRequest.startTime != null && bookingRequest.endTime != null ? #temporals.format(bookingRequest.startTime, 'HH:mm') + ' - ' + #temporals.format(bookingRequest.endTime, 'HH:mm') : '--:-- - --:--'}">--:--
+                                    - --:--</span></div>
+                        </div>
+
+                        <div class="summary-item">
+                            <span class="label">Subtotal:</span>
+                            <span class="value" id="summarySubtotal"
+                                th:text="${calculatedTotal != null ? #numbers.formatDecimal(calculatedTotal, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                                VND</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Service Fee:</span>
+                            <span class="value">0 VND</span>
+                        </div>
+
+                        <hr class="summary-divider">
+
+                        <div class="summary-total">
+                            <span class="label">Total:</span>
+                            <span class="value" id="summaryTotal"
+                                style="color: var(--primary-color); font-size: 18px; font-weight: bold;"
+                                th:text="${calculatedTotal != null ? #numbers.formatDecimal(calculatedTotal, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                                VND</span>
+                        </div>
+
+                        <!-- Add JS Debug Output here -->
+                        <div id="js-debug-info" style="margin-top: 10px; font-size: 10px; color: red;"></div>
+
+                        <div th:if="${!hasMembership}" class="payment-method-section" style="margin: 20px 0;">
+                            <h6 style="margin-bottom: 12px; font-size: 14px;">Payment Method</h6>
+                            <div style="display: flex; gap: 16px;">
+                                <label
+                                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
+                                    <input type="radio" name="paymentMethod" value="CASH"
+                                        th:checked="${bookingRequest.paymentMethod == null || bookingRequest.paymentMethod == 'CASH'}">
+                                    Cash
+                                </label>
+                                <label
+                                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
+                                    <input type="radio" name="paymentMethod" value="ONLINE"
+                                        th:checked="${bookingRequest.paymentMethod == 'ONLINE'}"> Online (PayOS)
+                                </label>
+                            </div>
+                        </div>
+                        <div th:if="${hasMembership}"
+                            style="margin: 20px 0; padding: 12px; background: #e0f2fe; border-radius: 8px; color: #0284c7; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-crown"></i>
+                            <span>Membership active. Booking is prepaid.</span>
+                            <input type="hidden" th:field="*{paymentMethod}" value="CASH">
+                        </div>
+
+                        <button type="submit" class="btn-primary btn-confirm-booking" onclick="return confirmBooking()"
+                            th:disabled="${errorMessage != null}"
+                            th:style="${errorMessage != null ? 'width: 100%; border-radius: 8px; padding: 12px; border: none; cursor: not-allowed; opacity: 0.6;' : 'width: 100%; border-radius: 8px; padding: 12px; border: none; cursor: pointer;'}">Confirm
+                            Booking</button>
+
+                        <div class="secure-payment-note">
+                            <i class="fa-solid fa-shield-halved"></i> Secure payment via Resident Pay
+                        </div>
+                    </div>
+
+                    <div class="cancellation-policy">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <div>
+                            <h6>Cancellation Policy</h6>
+                            <p>Free cancellation 24 hours prior. After that, the fee is 50% of the package value.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                // Find the first radio input and mark it checked to ensure it's selected
+                const firstPriceInput = document.querySelector('input[type="radio"].package-input');
+                if (firstPriceInput && !document.querySelector('input[type="radio"].package-input:checked')) {
+                    firstPriceInput.checked = true;
+                }
+            } catch (e) {
+                console.error("Error on DOMContentLoaded", e);
+            }
+        });
+
+        function reloadWithDate() {
+            try {
+                const dateInput = document.getElementById('bookingDate').value;
+                const resourceId = document.getElementById('resourceIdInput').value;
+                if (dateInput) {
+                    window.location.href = '/resident/utilities/book/' + resourceId + '?date=' + dateInput;
+                } else {
+                    alert('Vui lòng chọn ngày trước khi lưu.');
+                }
+            } catch (e) {
+                console.error("Lỗi khi chuyển ngày:", e);
+                alert("Đã xảy ra lỗi hệ thống: " + e.message);
+            }
+        }
+
+        function confirmBooking() {
+            const startDate = document.getElementById('bookingDate').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+
+            if (!startDate || !startTime || !endTime) {
+                alert('Please select date and time.');
+                return false;
+            }
+
+            const start = new Date(`${startDate}T${startTime}`);
+            const end = new Date(`${startDate}T${endTime}`);
+
+            if (start < new Date()) {
+                alert('Cannot book in the past.');
+                return false;
+            }
+
+            if (end <= start) {
+                alert('End time must be after start time.');
+                return false;
+            }
+
+            // Confirm modal via native alert since no bootstrap JS
+            return confirm('Are you sure you want to book this utility? Please double check your date and time before confirming.');
+        }
+    </script>
+</body>
+
+</html>

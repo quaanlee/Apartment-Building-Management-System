@@ -40,6 +40,32 @@ public class UtilityBookingServiceImpl implements UtilityBookingService {
         this.utilityBookingRepository = utilityBookingRepository;
     }
 
+    private static boolean autoApproveEnabled = false;
+
+    // ── Global settings ──────────────────────────────────────────────────────────
+
+    @Override
+    public boolean isAutoApproveEnabled() {
+        return autoApproveEnabled;
+    }
+
+    @Override
+    @Transactional
+    public void setAutoApproveEnabled(boolean enabled, Account actor) {
+        autoApproveEnabled = enabled;
+        if (enabled) {
+            // Auto approve all pending bookings that are from now into the future
+            LocalDateTime now = LocalDateTime.now();
+            List<UtilityBooking> pendingFutureBookings = utilityBookingRepository
+                    .findByStatusAndStartTimeGreaterThanEqual((byte) 0, now);
+            for (UtilityBooking booking : pendingFutureBookings) {
+                booking.setStatus((byte) 1);
+                booking.setApprovedBy(actor);
+                utilityBookingRepository.save(booking);
+            }
+        }
+    }
+
     // ── Existing methods ─────────────────────────────────────────────────────────
 
     @Override
