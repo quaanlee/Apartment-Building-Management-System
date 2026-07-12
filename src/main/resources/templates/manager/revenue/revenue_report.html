@@ -16,6 +16,12 @@
 
         <!-- *********************************************************** -->
 
+        <div th:if="${message != null}" class="toast-msg"
+             th:classappend="${messageType == 'success' ? ' toast-success' : ' toast-error'}"
+             style="padding:12px 20px;border-radius:8px;margin-bottom:16px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;background:${messageType == 'success' ? '#dcfce7' : '#fee2e2'};color:${messageType == 'success' ? '#15803d' : '#b91c1c'};">
+            <i th:class="${messageType == 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation'}"></i>
+            <span th:text="${message}">Message</span>
+        </div>
         <div class="rev-page-header">
 
             <h2 class="rev-page-title">Revenue Report</h2>

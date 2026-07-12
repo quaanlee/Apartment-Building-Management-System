@@ -10,15 +10,19 @@
         </div>
 
         <div class="request-details-card">
-            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="card-header">
                 <div>
                     <h3 th:text="${request.title}">Water leak</h3>
                     <span style="font-size:13px;color:#718096;margin-top:4px;display:block;" th:text="'Request #' + ${request.requestId}">Request #1</span>
                 </div>
-                <span class="status-badge"
+                <div style="display:flex;align-items:center;gap:10px;">
+                <a th:if="${request.status == 0}" th:href="@{/resident/maintenance/{id}/edit(id=${request.requestId})}" style="background:#4c51bf;color:#fff;padding:6px 14px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">
+                        <i class="fa-solid fa-pen"></i> Edit
+                    </a>
+<span class="status-badge"
                       th:classappend="${request.status == 0 ? ' pending' : request.status == 1 ? ' assigned' : request.status == 2 ? ' completed' : ' pending'}"
-                      th:text="${request.status == 0 ? 'Pending' : request.status == 1 ? 'In Progress' : request.status == 2 ? 'Done' : request.status == 3 ? 'Rejected' : 'Unknown'}">Pending</span>
-            </div>
+                      th:text="${request.status == 0 ? 'Pending' : request.status == 1 ? 'In Progress' : request.status == 2 ? 'Completed' : request.status == 3 ? 'Rejected' : 'Unknown'}">Pending</span>
+                </div>
             <div class="card-body">
                 <div class="detail-row-grid">
                     <div class="detail-row">
@@ -71,3 +75,5 @@
         </div>
     </div>
 </div>
+
+

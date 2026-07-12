@@ -29,9 +29,6 @@ public class MaintenanceRequest {
     @Column(name = "Description", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String description;
 
-    @Column(name = "ImageURL", length = 500)
-    private String imageUrl;
-
     @Column(name = "RequestDate", nullable = false)
     private LocalDateTime requestDate = LocalDateTime.now();
 
@@ -83,14 +80,6 @@ public class MaintenanceRequest {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
     }
 
     public LocalDateTime getRequestDate() {

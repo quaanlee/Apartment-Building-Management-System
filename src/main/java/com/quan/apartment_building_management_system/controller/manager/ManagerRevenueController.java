@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -49,7 +50,8 @@ public class ManagerRevenueController {
             @RequestParam(value = "status",      required = false) String statusStr,
             @RequestParam(value = "page",        defaultValue = "0") int page,
             @RequestParam(value = "month", required = false) Integer month,
-            Model model) {
+            RedirectAttributes redirectAttributes,
+             Model model) {
         Byte statusByte = parseStatus(statusStr);
         if (revenueType != null && revenueType.isBlank()) revenueType = null;
 
