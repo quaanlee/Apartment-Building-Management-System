@@ -54,12 +54,12 @@ public class ManagerRevenueController {
         if (revenueType != null && revenueType.isBlank()) revenueType = null;
 
         // Extract year/month from dates
-        java.time.LocalDate fromParsed = parseLocalDate(fromDateStr, null);
-        java.time.LocalDate toParsed   = parseLocalDate(toDateStr,   null);
-        Integer fromYear = fromParsed != null ? fromParsed.getYear() : null;
-        Integer fromMonth = fromParsed != null ? fromParsed.getMonthValue() : null;
-        Integer toYear = toParsed != null ? toParsed.getYear() : null;
-        Integer toMonth = toParsed != null ? toParsed.getMonthValue() : null;
+        java.time.LocalDate fromParsed = parseLocalDate(fromDateStr, LocalDate.now().minusMonths(1));
+        java.time.LocalDate toParsed   = parseLocalDate(toDateStr,   LocalDate.now());
+        Integer fromYear = fromParsed.getYear();
+        Integer fromMonth = fromParsed.getMonthValue();
+        Integer toYear = toParsed.getYear();
+        Integer toMonth = toParsed.getMonthValue();
 
         BigDecimal totalRev     = billRepository.sumTotalByDateRange(fromYear, fromMonth, toYear, toMonth, statusByte, revenueType);
         BigDecimal collected    = billRepository.sumCollectedByDateRange(fromYear, fromMonth, toYear, toMonth, revenueType);

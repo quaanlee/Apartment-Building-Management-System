@@ -34,7 +34,19 @@
 
                 <label class="rev-filter-label">From Date</label>
 
-                <input type="date" id="revFromDate" name="fromDate" class="rev-filter-select" th:value="${fromDate}">
+                <div class="rev-date-wrapper" id="revFromWrapper">
+
+                    <span class="material-symbols-outlined rev-date-icon">calendar_today</span>
+
+                    <input type="text" id="revFromDisplay" class="rev-date-display"
+
+                           th:value="${fromDate != null ? fromDate : ''}"
+
+                           placeholder="Select date" readonly>
+
+                    <input type="hidden" id="revFromDate" name="fromDate" th:value="${fromDate}">
+
+                </div>
 
                 <div class="rev-calendar-dropdown" id="revFromCal">
 
@@ -76,7 +88,19 @@
 
                 <label class="rev-filter-label">To Date</label>
 
-                <input type="date" id="revToDate" name="toDate" class="rev-filter-select" th:value="${toDate}">
+                <div class="rev-date-wrapper" id="revToWrapper">
+
+                    <span class="material-symbols-outlined rev-date-icon">calendar_today</span>
+
+                    <input type="text" id="revToDisplay" class="rev-date-display"
+
+                           th:value="${toDate != null ? toDate : ''}"
+
+                           placeholder="Select date" readonly>
+
+                    <input type="hidden" id="revToDate" name="toDate" th:value="${toDate}">
+
+                </div>
 
                 <div class="rev-calendar-dropdown" id="revToCal">
 
