@@ -14,11 +14,15 @@ import com.quan.apartment_building_management_system.repository.UtilityPriceRepo
 import com.quan.apartment_building_management_system.repository.UtilityRepository;
 import com.quan.apartment_building_management_system.repository.ProfileRepository;
 import com.quan.apartment_building_management_system.repository.UtilityBookingRepository;
+import com.quan.apartment_building_management_system.repository.NotificationRepository;
+import com.quan.apartment_building_management_system.repository.AccountNotificationRepository;
 import com.quan.apartment_building_management_system.entity.UtilityMembership;
 import com.quan.apartment_building_management_system.entity.UtilityPrice;
 import com.quan.apartment_building_management_system.entity.Utility;
 import com.quan.apartment_building_management_system.entity.Profile;
 import com.quan.apartment_building_management_system.entity.UtilityBooking;
+import com.quan.apartment_building_management_system.entity.Notification;
+import com.quan.apartment_building_management_system.entity.AccountNotification;
 import com.quan.apartment_building_management_system.dto.utility.BookingRequestDTO;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -55,6 +59,8 @@ public class PayOSService {
     private final UtilityRepository utilityRepository;
     private final ProfileRepository profileRepository;
     private final UtilityBookingRepository utilityBookingRepository;
+    private final NotificationRepository notificationRepository;
+    private final AccountNotificationRepository accountNotificationRepository;
 
     @Value("${payos.return-url}")
     private String returnUrl;
@@ -71,7 +77,9 @@ public class PayOSService {
             UtilityPriceRepository utilityPriceRepository,
             UtilityRepository utilityRepository,
             ProfileRepository profileRepository,
-            UtilityBookingRepository utilityBookingRepository) {
+            UtilityBookingRepository utilityBookingRepository,
+            NotificationRepository notificationRepository,
+            AccountNotificationRepository accountNotificationRepository) {
         this.payOS = payOS;
         this.billRepository = billRepository;
         this.paymentRepository = paymentRepository;
@@ -82,6 +90,8 @@ public class PayOSService {
         this.utilityRepository = utilityRepository;
         this.profileRepository = profileRepository;
         this.utilityBookingRepository = utilityBookingRepository;
+        this.notificationRepository = notificationRepository;
+        this.accountNotificationRepository = accountNotificationRepository;
     }
 
     /**
@@ -139,7 +149,8 @@ public class PayOSService {
      * Generates a temporary UtilityMembership with PaymentStatus = false.
      * Uses orderCode >= 900000000000L to differentiate from bill payments.
      */
-    public String createMembershipPaymentLink(Integer utilityId, Integer utilityPriceId, Integer accountId) throws Exception {
+    public String createMembershipPaymentLink(Integer utilityId, Integer utilityPriceId, Integer accountId)
+            throws Exception {
         Profile profile = profileRepository.findByAccountAccountId(accountId)
                 .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
@@ -155,7 +166,7 @@ public class PayOSService {
         membership.setUtility(utility);
         membership.setUtilityPrice(price);
         membership.setStartDate(LocalDate.now());
-        
+
         String unitName = price.getUnit().getUnitName().toLowerCase();
         if (unitName.contains("hour") || unitName.contains("day")) {
             membership.setEndDate(LocalDate.now());
@@ -164,7 +175,7 @@ public class PayOSService {
         } else {
             membership.setEndDate(LocalDate.now().plusYears(1));
         }
-        
+
         membership.setStatus(false);
         membership.setPaymentStatus(false);
         membership.setCreatedAt(LocalDateTime.now());
@@ -204,31 +215,31 @@ public class PayOSService {
 
         return response.getCheckoutUrl();
     }
-    
+
     public String createBookingPaymentLink(Integer bookingId) throws Exception {
         UtilityBooking booking = utilityBookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
-                
+
         long orderCode = 800000000000L + booking.getBookingId();
         long amount = booking.getTotalPrice().longValue();
-        
+
         if (amount < 2000) {
             throw new IllegalStateException("PayOS requires a minimum payment amount of 2000 VND.");
         }
-        
+
         String description = ("Book " + booking.getResource().getResourceName()).replaceAll("[^a-zA-Z0-9 ]", "");
         if (description.length() > 25) {
             description = description.substring(0, 25);
         }
-        
+
         PaymentLinkItem item = PaymentLinkItem.builder()
                 .name(description)
                 .quantity(1)
                 .price(amount)
                 .build();
-                
+
         long expiredAt = (System.currentTimeMillis() / 1000L) + (5 * 60); // 5 minutes expiration
-        
+
         CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
                 .orderCode(orderCode)
                 .amount(amount)
@@ -238,7 +249,7 @@ public class PayOSService {
                 .cancelUrl(cancelUrl)
                 .expiredAt(expiredAt)
                 .build();
-                
+
         CreatePaymentLinkResponse response = payOS.paymentRequests().create(paymentData);
         return response.getCheckoutUrl();
     }
@@ -359,10 +370,50 @@ public class PayOSService {
                 bill.setStatus((byte) 1);
                 bill.setPaidDate(LocalDateTime.now());
                 billRepository.save(bill);
+
+                Account residentAccount = payment.getPaidBy();
+                if (residentAccount != null) {
+                    sendBillPaymentSuccessNotification(residentAccount, bill);
+                }
             }
 
             paymentRepository.save(payment);
         });
+    }
+
+    private void sendBillPaymentSuccessNotification(Account residentAccount, Bill bill) {
+        try {
+            Account sender = accountRepository.findById(1).orElse(residentAccount);
+
+            Notification notification = new Notification();
+            notification.setTitle("Thanh toán hóa đơn thành công");
+
+            String content = String.format(
+                    "Hóa đơn kỳ tháng %d/%d cho căn hộ %s đã được thanh toán thành công số tiền %,.0f VNĐ.",
+                    bill.getBillMonth(),
+                    bill.getBillYear(),
+                    bill.getApartment().getApartmentNumber(),
+                    bill.getTotalAmount().doubleValue());
+            notification.setContent(content);
+            notification.setNotificationType((byte) 3); // 3: Hóa đơn
+            notification.setCreatedBy(sender);
+            notification.setRelatedEntityType("Bill");
+            notification.setReceiver(residentAccount);
+            notification.setRecipient("RESIDENT");
+            notification.setCreatedAt(LocalDateTime.now());
+
+            notification = notificationRepository.save(notification);
+
+            AccountNotification accountNotification = new AccountNotification();
+            accountNotification.setNotification(notification);
+            accountNotification.setAccount(residentAccount);
+            accountNotification.setIsRead(false);
+            accountNotification.setReadAt(null);
+
+            accountNotificationRepository.save(accountNotification);
+        } catch (Exception e) {
+            System.err.println("[Notification Error] Failed to create payment success notification: " + e.getMessage());
+        }
     }
 
     public Integer getResourceIdByMembershipOrderCode(String orderCode) {

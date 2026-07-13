@@ -164,7 +164,9 @@ public class ManagerMaintenanceController {
         response.put("requestDate", request.getRequestDate() != null ? request.getRequestDate().toString() : "N/A");
         response.put("residentName", request.getProfile() != null ? request.getProfile().getFullName() : "N/A");
         response.put("apartmentNumber", request.getApartment() != null ? request.getApartment().getApartmentNumber() : "N/A");
-//        response.put("imageUrl", request.getImageUrl());
+        if (request.getImages() != null && !request.getImages().isEmpty()) {
+            response.put("imageUrl", request.getImages().get(0).getImageUrl());
+        }
 
         Optional<MaintenanceTask> taskOpt = maintenanceTaskService.findByRequestId(requestId);
         if (taskOpt.isPresent()) {
