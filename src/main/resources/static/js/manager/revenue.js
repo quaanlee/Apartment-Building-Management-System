@@ -1,16 +1,9 @@
-﻿/* ================================================================
+/* ================================================================
    REVENUE REPORT - JavaScript
-   Features:
-   - Custom calendar date pickers (from/to)
-   - Bar chart (revenue by type)
-   - Invoice detail drawer (slide-in)
+   Custom calendar date pickers (from/to)
    ================================================================ */
 
 document.addEventListener('DOMContentLoaded', function () {
-
-    /* ============================================================
-       1. CALENDAR PICKER (Revenue page variant)
-       ============================================================ */
     const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
     function RevCalendarPicker(cfg) {
@@ -98,7 +91,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var today = new Date();
 
         for (var i = 0; i < firstDay; i++) {
-            var btn = this._makeDay(new Date(year, month, 0 - (firstDay-1-i)).getDate(), true, false, false);
+            var d = new Date(year, month, 0 - (firstDay-1-i)).getDate();
+            var btn = this._makeDay(d, true, false, false);
             this.daysEl.appendChild(btn);
         }
 
@@ -152,5 +146,4 @@ document.addEventListener('DOMContentLoaded', function () {
         monthYearId: 'revToMonthYear', daysId: 'revToDays',
         cancelId: 'revToCancel', applyId: 'revToApply'
     });
-
-    /* ============================================================
+});

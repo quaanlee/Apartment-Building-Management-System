@@ -20,7 +20,6 @@
                     <option value="0" th:selected="${selectedStatus == 0}">Pending</option>
                     <option value="1" th:selected="${selectedStatus == 1}">In Progress</option>
                     <option value="2" th:selected="${selectedStatus == 2}">Completed</option>
-                    <option value="3" th:selected="${selectedStatus == 3}">Rejected</option>
                 </select>
             </div>
             <div>
@@ -59,7 +58,7 @@
                             <td>
                                 <span class="status-badge"
                                       th:classappend="${item.status == 0 ? ' pending' : item.status == 1 ? ' assigned' : item.status == 2 ? ' completed' : ' pending'}"
-                                      th:text="${item.status == 0 ? 'Pending' : item.status == 1 ? 'In Progress' : item.status == 2 ? 'Completed' : item.status == 3 ? 'Rejected' : 'Unknown'}">Pending</span>
+                                      th:text="${item.status == 0 ? 'Pending' : item.status == 1 ? 'In Progress' : item.status == 2 ? 'Completed' : 'Unknown'}">Pending</span>
                             </td>
                             <td th:text="${item.staffName}">-</td>
                             <td>
