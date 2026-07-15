@@ -25,9 +25,9 @@ public class ProfileServiceImpl implements ProfileService {
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
 
-    public ProfileServiceImpl(ProfileRepository profileRepository, 
-                              AccountRepository accountRepository, 
-                              RoleRepository roleRepository) {
+    public ProfileServiceImpl(ProfileRepository profileRepository,
+            AccountRepository accountRepository,
+            RoleRepository roleRepository) {
         this.profileRepository = profileRepository;
         this.accountRepository = accountRepository;
         this.roleRepository = roleRepository;
@@ -69,10 +69,12 @@ public class ProfileServiceImpl implements ProfileService {
     public Page<UserDTO> findFiltered(String search, Integer roleId, Boolean status, Pageable pageable) {
         return profileRepository.findFiltered(search, roleId, status, pageable).map(UserDTO::new);
     }
+
     @Override
     public List<Profile> findActiveMaintenanceStaffs() {
         return profileRepository.findActiveMaintenanceStaffs();
     }
+
     @Override
     @Transactional
     public UserDTO saveUserDTO(UserDTO userDto) {
@@ -88,7 +90,8 @@ public class ProfileServiceImpl implements ProfileService {
         if (userDto.getProfileId() != null) {
             // Edit / Update Mode
             profile = profileRepository.findById(userDto.getProfileId())
-                    .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Profile not found with ID: " + userDto.getProfileId()));
+                    .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
+                            "Profile not found with ID: " + userDto.getProfileId()));
             account = profile.getAccount();
             if (account == null) {
                 account = new Account();
@@ -134,7 +137,8 @@ public class ProfileServiceImpl implements ProfileService {
             profile.setMoveInDate(userDto.getMoveInDate());
             profile.setMoveOutDate(userDto.getMoveOutDate());
             profile.setOccupation(null); // Clear occupation just in case
-        } else if ("MANAGER".equalsIgnoreCase(userDto.getRoleName()) || "MAINTENANCE_STAFF".equalsIgnoreCase(userDto.getRoleName())) {
+        } else if ("MANAGER".equalsIgnoreCase(userDto.getRoleName())
+                || "MAINTENANCE_STAFF".equalsIgnoreCase(userDto.getRoleName())) {
             profile.setOccupation(userDto.getOccupation());
             profile.setIsHouseholdOwner(false);
             profile.setResidentStatus((byte) 1);

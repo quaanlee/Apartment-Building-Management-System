@@ -1,9 +1,7 @@
 package com.quan.apartment_building_management_system.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 public class RevenueRecordDTO {
+    private Integer billId;
     private String invoiceId;
     private String residentName;
     private String initials;
@@ -17,9 +15,10 @@ public class RevenueRecordDTO {
 
     public RevenueRecordDTO() {}
 
-    public RevenueRecordDTO(String invoiceId, String residentName, String initials,
+    public RevenueRecordDTO(Integer billId, String invoiceId, String residentName, String initials,
                             String unitId, String revenueType, String amount,
                             String status, String dueDate, String paidDate, String note) {
+        this.billId = billId;
         this.invoiceId = invoiceId;
         this.residentName = residentName;
         this.initials = initials;
@@ -32,6 +31,8 @@ public class RevenueRecordDTO {
         this.note = note;
     }
 
+    public Integer getBillId() { return billId; }
+    public void setBillId(Integer billId) { this.billId = billId; }
     public String getInvoiceId() { return invoiceId; }
     public void setInvoiceId(String invoiceId) { this.invoiceId = invoiceId; }
     public String getResidentName() { return residentName; }

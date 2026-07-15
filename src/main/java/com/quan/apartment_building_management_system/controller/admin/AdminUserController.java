@@ -53,13 +53,16 @@ public class AdminUserController {
         List<Profile> allProfiles = profileService.findAll();
         long totalUsers = allProfiles.stream().filter(p -> p.getAccount() != null).count();
         long totalResidents = allProfiles.stream()
-                .filter(p -> p.getAccount() != null && "RESIDENT".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
+                .filter(p -> p.getAccount() != null
+                        && "RESIDENT".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
                 .count();
         long totalManagers = allProfiles.stream()
-                .filter(p -> p.getAccount() != null && "MANAGER".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
+                .filter(p -> p.getAccount() != null
+                        && "MANAGER".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
                 .count();
         long totalMaintenance = allProfiles.stream()
-                .filter(p -> p.getAccount() != null && "MAINTENANCE_STAFF".equalsIgnoreCase(p.getAccount().getRole().getRoleName().replace(" ", "_")))
+                .filter(p -> p.getAccount() != null && "MAINTENANCE_STAFF"
+                        .equalsIgnoreCase(p.getAccount().getRole().getRoleName().replace(" ", "_")))
                 .count();
 
         // Get list of all roles for filter dropdown
@@ -93,7 +96,8 @@ public class AdminUserController {
             account.setStatus(newStatus);
             accountService.save(account);
             String statusMsg = newStatus ? "unlocked" : "locked";
-            redirectAttributes.addFlashAttribute("message", "Account for " + account.getUsername() + " has been successfully " + statusMsg + "!");
+            redirectAttributes.addFlashAttribute("message",
+                    "Account for " + account.getUsername() + " has been successfully " + statusMsg + "!");
             redirectAttributes.addFlashAttribute("messageType", "info");
         }
         return "redirect:/admin/users";
@@ -118,7 +122,8 @@ public class AdminUserController {
     }
 
     @PostMapping("/admin/users/create")
-    public String createUser(@Valid @ModelAttribute("userDto") UserDTO userDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String createUser(@Valid @ModelAttribute("userDto") UserDTO userDto, BindingResult bindingResult,
+            Model model, RedirectAttributes redirectAttributes) {
         if (accountService.existsByUsername(userDto.getUsername())) {
             bindingResult.rejectValue("username", "error.userDto", "Username already exists!");
         }
@@ -137,7 +142,7 @@ public class AdminUserController {
                 bindingResult.rejectValue("moveOutDate", "error.userDto", "Move-out date must be after move-in date!");
             }
         }
-        
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("activeTab", "users");
             return "admin/form_user";
@@ -162,7 +167,8 @@ public class AdminUserController {
     }
 
     @PostMapping("/admin/users/edit/{id}")
-    public String updateUser(@PathVariable("id") Integer id, @Valid @ModelAttribute("userDto") UserDTO userDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String updateUser(@PathVariable("id") Integer id, @Valid @ModelAttribute("userDto") UserDTO userDto,
+            BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         // Validate duplicate CitizenID (excluding the profile currently being edited)
         if (userDto.getCitizenId() != null && !userDto.getCitizenId().isBlank()) {
             Optional<Profile> existingProfile = profileService.findByCitizenId(userDto.getCitizenId());

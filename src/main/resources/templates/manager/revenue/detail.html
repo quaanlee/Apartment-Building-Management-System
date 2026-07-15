@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'revenue')}">
+<head>
+    <title>Revenue Detail - ABMS</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <link rel="stylesheet" th:href="@{/css/manager/revenue/revenue.css}">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap">
+
+        <div class="rev-page-header" style="margin-bottom:16px;">
+            <div>
+                <h2 class="rev-page-title">Revenue Detail</h2>
+                <p class="rev-page-subtitle">Full invoice information for this transaction.</p>
+            </div>
+            <div class="rev-header-actions">
+                <a th:href="@{/manager/revenue}" class="rev-btn-secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to List
+                </a>
+                <button class="rev-btn-primary" onclick="window.print()">
+                    <span class="material-symbols-outlined" style="font-size:16px;">print</span>
+                    PRINT
+                </button>
+            </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--color-outline-variant);border-radius:12px;padding:32px;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:24px;border-bottom:2px solid var(--color-outline-variant);">
+                <div>
+                    <h1 style="font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--color-primary);margin:0 0 4px 0;">ABMS APARTMENT</h1>
+                    <p style="font-size:13px;color:var(--color-secondary);margin:0;">Revenue Invoice</p>
+                </div>
+                <div style="text-align:right;">
+                    <span class="rev-status-badge"
+                          th:classappend="${statusByte == 1} ? ' status-paid' : (${statusByte == 2} ? ' status-overdue' : ' status-pending')"
+                          th:text="${statusLabel}"></span>
+                    <p style="font-family:'Courier New',monospace;font-size:16px;font-weight:700;color:var(--color-on-surface);margin:8px 0 0 0;" th:text="${invoiceId}"></p>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;">
+                <div>
+                    <h4 style="font-size:12px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;margin:0 0 8px 0;">Resident &amp; Unit</h4>
+                    <div style="background:var(--color-surface-low);border-radius:8px;padding:16px;">
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+                            <span style="font-size:12px;color:var(--color-secondary);">Resident Name</span>
+                            <span style="font-size:13px;font-weight:600;color:var(--color-on-surface);" th:text="${residentName}"></span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+                            <span style="font-size:12px;color:var(--color-secondary);">Unit</span>
+                            <span style="font-size:13px;font-weight:600;color:var(--color-on-surface);" th:text="${aptNum}"></span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+                            <span style="font-size:12px;color:var(--color-secondary);">Revenue Type</span>
+                            <span style="font-size:13px;font-weight:600;color:var(--color-on-surface);" th:text="${revenueType}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="font-size:12px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;margin:0 0 8px 0;">Billing Period</h4>
+                    <div style="background:var(--color-surface-low);border-radius:8px;padding:16px;">
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+                            <span style="font-size:12px;color:var(--color-secondary);">Billing Month</span>
+                            <span style="font-size:13px;font-weight:600;color:var(--color-on-surface);" th:text="${billMonth}"></span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+                            <span style="font-size:12px;color:var(--color-secondary);">Created Date</span>
+                            <span style="font-size:13px;font-weight:600;color:var(--color-on-surface);" th:text="${createdDate}"></span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+                            <span style="font-size:12px;color:var(--color-secondary);">Due Date</span>
+                            <span style="font-size:13px;font-weight:700;color:#b91c1c;" th:text="${dueDate}"></span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:4px 0;" th:if="${paidDate != null}">
+                            <span style="font-size:12px;color:var(--color-secondary);">Paid Date</span>
+                            <span style="font-size:13px;font-weight:700;color:#15803d;" th:text="${paidDate}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom:24px;">
+                <h4 style="font-size:12px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;margin:0 0 8px 0;">Billing Items</h4>
+                <table style="width:100%;border-collapse:collapse;font-family:'Inter',sans-serif;">
+                    <thead>
+                        <tr style="background:var(--color-surface-low);">
+                            <th style="padding:12px 16px;font-size:11px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;text-align:left;">Item</th>
+                            <th style="padding:12px 16px;font-size:11px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;text-align:right;">Unit Price</th>
+                            <th style="padding:12px 16px;font-size:11px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;text-align:right;">Qty</th>
+                            <th style="padding:12px 16px;font-size:11px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;text-align:right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="detail : ${billDetails}" style="border-top:1px solid var(--color-outline-variant);">
+                            <td style="padding:12px 16px;font-size:13px;">
+                                <strong th:text="${detail.serviceItem.serviceName}"></strong>
+                                <div style="font-size:11px;color:var(--color-secondary);" th:text="${detail.description}"></div>
+                            </td>
+                            <td style="padding:12px 16px;font-size:13px;text-align:right;font-weight:500;" th:text="${detail.serviceItem.unitPrice} + ' VND'"></td>
+                            <td style="padding:12px 16px;font-size:13px;text-align:right;font-weight:500;" th:text="${detail.quantity}"></td>
+                            <td style="padding:12px 16px;font-size:13px;text-align:right;font-weight:600;" th:text="${detail.amount} + ' VND'"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;padding:16px 0;border-top:2px solid var(--color-outline-variant);margin-bottom:24px;">
+                <div style="min-width:200px;text-align:right;">
+                    <span style="font-size:14px;font-weight:600;color:var(--color-secondary);">Grand Total</span>
+                    <span style="display:block;font-size:24px;font-weight:700;color:var(--color-primary);" th:text="${totalAmount}"></span>
+                </div>
+            </div>
+
+            <div th:if="${note != null and !note.isEmpty()}" style="background:var(--color-surface-low);border-radius:8px;padding:16px;margin-bottom:24px;">
+                <h4 style="font-size:12px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;margin:0 0 6px 0;">Notes</h4>
+                <p style="font-size:13px;color:var(--color-on-surface);margin:0;" th:text="${note}"></p>
+            </div>
+
+            <div th:if="${payments != null and !payments.isEmpty()}">
+                <h4 style="font-size:12px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;margin:0 0 8px 0;">Payment History</h4>
+                <table style="width:100%;border-collapse:collapse;font-family:'Inter',sans-serif;">
+                    <thead>
+                        <tr style="background:var(--color-surface-low);">
+                            <th style="padding:12px 16px;font-size:11px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;text-align:left;">Transaction</th>
+                            <th style="padding:12px 16px;font-size:11px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;text-align:left;">Method</th>
+                            <th style="padding:12px 16px;font-size:11px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;text-align:right;">Amount</th>
+                            <th style="padding:12px 16px;font-size:11px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;text-align:right;">Date</th>
+                            <th style="padding:12px 16px;font-size:11px;font-weight:600;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;text-align:center;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${payments}" style="border-top:1px solid var(--color-outline-variant);">
+                            <td style="padding:12px 16px;font-size:12px;font-family:'Courier New',monospace;" th:text="${p.transactionCode}"></td>
+                            <td style="padding:12px 16px;font-size:13px;" th:text="${p.paymentMethod.methodName}"></td>
+                            <td style="padding:12px 16px;font-size:13px;text-align:right;font-weight:600;" th:text="${p.amount} + ' VND'"></td>
+                            <td style="padding:12px 16px;font-size:12px;text-align:right;" th:text="${#temporals.format(p.paymentDate, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td style="padding:12px 16px;text-align:center;">
+                                <span class="rev-status-badge" th:classappend="${p.status == 1} ? ' status-paid' : ' status-pending'"
+                                      th:text="${p.status == 1} ? 'SUCCESS' : 'PENDING'"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <footer style="margin-top:32px;padding-top:16px;border-top:1px solid var(--color-outline-variant);text-align:center;font-size:11px;color:var(--color-secondary);">
+                <p style="margin:0;">Please contact the Building Management Board if you have questions about this invoice.</p>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

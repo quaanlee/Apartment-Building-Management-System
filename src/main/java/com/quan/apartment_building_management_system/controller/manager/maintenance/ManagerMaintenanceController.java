@@ -164,9 +164,7 @@ public class ManagerMaintenanceController {
         response.put("requestDate", request.getRequestDate() != null ? request.getRequestDate().toString() : "N/A");
         response.put("residentName", request.getProfile() != null ? request.getProfile().getFullName() : "N/A");
         response.put("apartmentNumber", request.getApartment() != null ? request.getApartment().getApartmentNumber() : "N/A");
-        if (request.getImages() != null && !request.getImages().isEmpty()) {
-            response.put("imageUrl", request.getImages().get(0).getImageUrl());
-        }
+//        response.put("imageUrl", request.getImageUrl()); // removed - use MaintenanceRequestImage instead
 
         Optional<MaintenanceTask> taskOpt = maintenanceTaskService.findByRequestId(requestId);
         if (taskOpt.isPresent()) {
@@ -250,6 +248,44 @@ public class ManagerMaintenanceController {
             redirectAttributes.addFlashAttribute("message", "Error: " + e.getMessage());
             redirectAttributes.addFlashAttribute("messageType", "error");
         }
+        return "redirect:/manager/maintenance";
+    }
+
+    @GetMapping("/{requestId}/edit")
+    public String showEditForm(@PathVariable("requestId") Integer requestId, Model model) {
+        Optional<MaintenanceRequest> requestOpt = maintenanceRequestService.findById(requestId);
+        if (requestOpt.isEmpty()) {
+            return "redirect:/manager/maintenance";
+        }
+        MaintenanceRequest request = requestOpt.get();
+        if (request.getStatus() != 0) {
+            return "redirect:/manager/maintenance";
+        }
+        model.addAttribute("request", request);
+        model.addAttribute("pageTitle", "Edit Request");
+        return "manager/maintenance/edit";
+    }
+
+    @PostMapping("/{requestId}/edit")
+    public String updateRequest(@PathVariable("requestId") Integer requestId,
+                                 @RequestParam("title") String title,
+                                 @RequestParam("description") String description,
+                                 RedirectAttributes redirectAttributes) {
+        Optional<MaintenanceRequest> requestOpt = maintenanceRequestService.findById(requestId);
+        if (requestOpt.isEmpty()) {
+            return "redirect:/manager/maintenance";
+        }
+        MaintenanceRequest request = requestOpt.get();
+        if (request.getStatus() != 0) {
+            redirectAttributes.addFlashAttribute("message", "Cannot edit: request is not in Pending status");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/manager/maintenance";
+        }
+        request.setTitle(title);
+        request.setDescription(description);
+        maintenanceRequestService.save(request);
+        redirectAttributes.addFlashAttribute("message", "Request updated successfully");
+        redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/manager/maintenance";
     }
 }

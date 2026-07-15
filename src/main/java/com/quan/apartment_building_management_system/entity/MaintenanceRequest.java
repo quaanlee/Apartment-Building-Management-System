@@ -29,9 +29,6 @@ public class MaintenanceRequest {
     @Column(name = "Description", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String description;
 
-    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<MaintenanceRequestImage> images = new ArrayList<>();
-
     @Column(name = "RequestDate", nullable = false)
     private LocalDateTime requestDate = LocalDateTime.now();
 
@@ -83,14 +80,6 @@ public class MaintenanceRequest {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public List<MaintenanceRequestImage> getImages() {
-        return images;
-    }
-
-    public void setImages(List<MaintenanceRequestImage> images) {
-        this.images = images;
     }
 
     public LocalDateTime getRequestDate() {
