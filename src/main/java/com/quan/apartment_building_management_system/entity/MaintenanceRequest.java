@@ -38,6 +38,9 @@ public class MaintenanceRequest {
     @OneToOne(mappedBy = "maintenanceRequest", fetch = FetchType.LAZY)
     private MaintenanceTask maintenanceTask;
 
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<MaintenanceRequestImage> images = new ArrayList<>();
+
     public MaintenanceRequest() {
         // Required by JPA
     }
@@ -105,4 +108,13 @@ public class MaintenanceRequest {
     public void setMaintenanceTask(MaintenanceTask maintenanceTask) {
         this.maintenanceTask = maintenanceTask;
     }
+
+    public List<MaintenanceRequestImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<MaintenanceRequestImage> images) {
+        this.images = images;
+    }
 }
+

@@ -82,9 +82,12 @@ public class MaintenanceTaskServiceImpl implements MaintenanceTaskService {
     @org.springframework.beans.factory.annotation.Autowired
     private com.quan.apartment_building_management_system.repository.AccountNotificationRepository accountNotificationRepository;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.quan.apartment_building_management_system.repository.MaintenanceReportRepository maintenanceReportRepository;
+
     @Override
     @Transactional
-    public void assignTask(Integer requestId, Integer staffId, java.time.LocalDateTime deadline, Integer managerId) {
+    public void assignTask(Integer requestId, Integer staffId, java.time.LocalDateTime deadline, com.quan.apartment_building_management_system.entity.Account manager) {
         com.quan.apartment_building_management_system.entity.MaintenanceRequest req = maintenanceRequestRepository.findById(requestId).orElseThrow();
         
         // Resolve Profile to Account to fix matching bug and support busy check
@@ -99,8 +102,6 @@ public class MaintenanceTaskServiceImpl implements MaintenanceTaskService {
         if ("busy".equals(workStatus)) {
             throw new IllegalStateException("Nhân viên " + staffProfile.getFullName() + " đang có công việc chưa hoàn thành, không thể giao thêm việc!");
         }
-
-        com.quan.apartment_building_management_system.entity.Account manager = accountRepository.findById(managerId).orElseThrow();
 
         MaintenanceTask task = new MaintenanceTask();
         task.setMaintenanceRequest(req);
@@ -143,7 +144,8 @@ public class MaintenanceTaskServiceImpl implements MaintenanceTaskService {
         List<com.quan.apartment_building_management_system.dto.maintenance.StaffWorkStatusDTO> result = new java.util.ArrayList<>();
         List<com.quan.apartment_building_management_system.entity.Profile> profiles = profileRepository.findAll();
         for (com.quan.apartment_building_management_system.entity.Profile p : profiles) {
-            if (p.getAccount() != null && "MAINTENANCE_STAFF".equalsIgnoreCase(p.getAccount().getRole().getRoleName())) {
+            if (p.getAccount() != null && p.getAccount().getRole() != null && 
+                "MAINTENANCE_STAFF".equalsIgnoreCase(p.getAccount().getRole().getRoleName().replace(" ", "_"))) {
                 String status = getStaffWorkStatus(p.getAccount().getAccountId());
                 result.add(new com.quan.apartment_building_management_system.dto.maintenance.StaffWorkStatusDTO(p, status));
             }
@@ -156,4 +158,29 @@ public class MaintenanceTaskServiceImpl implements MaintenanceTaskService {
     public void deleteById(Integer id) {
         maintenanceTaskRepository.deleteById(id);
     }
+
+    @Override
+    @Transactional
+    public void unassignTask(Integer requestId) {
+        com.quan.apartment_building_management_system.entity.MaintenanceRequest req = maintenanceRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Maintenance request not found."));
+
+        Optional<MaintenanceTask> taskOpt = maintenanceTaskRepository.findByMaintenanceRequestRequestId(requestId);
+        if (taskOpt.isPresent()) {
+            MaintenanceTask task = taskOpt.get();
+            if (task.getMaintenanceReports() != null && !task.getMaintenanceReports().isEmpty()) {
+                maintenanceReportRepository.deleteAll(task.getMaintenanceReports());
+            }
+            
+            // Break bidirectional association to avoid TransientPropertyValueException on save/flush
+            req.setMaintenanceTask(null);
+            task.setMaintenanceRequest(null);
+            
+            maintenanceTaskRepository.delete(task);
+        }
+
+        req.setStatus((byte) 0); // Revert to Pending
+        maintenanceRequestRepository.save(req);
+    }
 }
+
