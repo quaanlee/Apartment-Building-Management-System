@@ -74,12 +74,17 @@
                 <h2>Utility Booking Management</h2>
                 <p>Overview and administration of community amenity reservations.</p>
             </div>
-            <div style="display: flex; align-items: center; gap: 12px; background: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                <span style="font-weight: 600; font-size: 14px; color: var(--text-primary);">Auto Approve</span>
-                <label class="switch">
-                    <input type="checkbox" id="autoApproveToggle" th:checked="${autoApproveEnabled}">
-                    <span class="slider round"></span>
-                </label>
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px; background: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <span style="font-weight: 600; font-size: 14px; color: var(--text-primary);">Auto Approve</span>
+                    <label class="switch">
+                        <input type="checkbox" id="autoApproveToggle" th:checked="${autoApproveEnabled}">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <a th:href="@{/manager/utility-bookings/utilities}" style="display: inline-flex; align-items: center; gap: 8px; background: var(--primary-color, #4f46e5); color: white; text-decoration: none; padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); transition: all 0.3s ease;">
+                    <i class="fas fa-plus"></i> Create Booking
+                </a>
             </div>
         </div>
 

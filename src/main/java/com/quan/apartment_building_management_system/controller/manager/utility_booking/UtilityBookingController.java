@@ -6,6 +6,9 @@ import com.quan.apartment_building_management_system.dto.booking.UtilityBookingR
 import com.quan.apartment_building_management_system.dto.booking.UtilityBookingStatsDto;
 import com.quan.apartment_building_management_system.entity.Account;
 import com.quan.apartment_building_management_system.entity.Utility;
+import com.quan.apartment_building_management_system.entity.UtilityBooking;
+import com.quan.apartment_building_management_system.dto.utility.BookingRequestDTO;
+import com.quan.apartment_building_management_system.service.utility.ResidentUtilityService;
 import com.quan.apartment_building_management_system.service.utility.UtilityBookingService;
 import com.quan.apartment_building_management_system.service.utility.UtilityService;
 import jakarta.servlet.http.HttpSession;
@@ -13,7 +16,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +36,14 @@ public class UtilityBookingController {
 
     private final UtilityBookingService utilityBookingService;
     private final UtilityService utilityService;
+    private final ResidentUtilityService residentUtilityService;
 
     public UtilityBookingController(UtilityBookingService utilityBookingService,
-                                    UtilityService utilityService) {
+                                    UtilityService utilityService,
+                                    ResidentUtilityService residentUtilityService) {
         this.utilityBookingService = utilityBookingService;
         this.utilityService = utilityService;
+        this.residentUtilityService = residentUtilityService;
     }
 
     // ── Page render ──────────────────────────────────────────────────────────────
@@ -86,6 +95,135 @@ public class UtilityBookingController {
             return result;
         } catch (Exception e) {
             return errorResponse(e.getMessage());
+        }
+    }
+
+    // ── Manager Create Booking Flow ──────────────────────────────────────────────
+
+    @GetMapping("/utilities")
+    public String listUtilities(Model model, HttpSession session) {
+        if (isUnauthorized(session)) return "redirect:/login";
+        model.addAttribute("utilities", residentUtilityService.getActiveUtilities());
+        return "manager/utility_bookings/booking/utilities";
+    }
+
+    @GetMapping("/utilities/{id}/resources")
+    public String listResources(@PathVariable Integer id, Model model, HttpSession session) {
+        if (isUnauthorized(session)) return "redirect:/login";
+        model.addAttribute("utility", residentUtilityService.getUtility(id));
+        model.addAttribute("resources", residentUtilityService.getActiveResources(id));
+        return "manager/utility_bookings/booking/resources";
+    }
+
+    @GetMapping("/resources/{id}")
+    public String viewResourceDetail(@PathVariable Integer id, Model model, HttpSession session) {
+        if (isUnauthorized(session)) return "redirect:/login";
+        var resource = residentUtilityService.getResourceDetail(id);
+        var utility = residentUtilityService.getUtility(resource.getUtilityId());
+        
+        model.addAttribute("resource", resource);
+        model.addAttribute("utility", utility);
+        model.addAttribute("utilityType", utility.getType());
+        
+        return "manager/utility_bookings/booking/resource_detail";
+    }
+
+    @GetMapping("/book/{id}")
+    public String bookResource(@PathVariable Integer id, 
+                               @RequestParam(required = false) String date,
+                               Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        if (isUnauthorized(session)) return "redirect:/login";
+        var resource = residentUtilityService.getResourceDetail(id);
+        var utility = residentUtilityService.getUtility(resource.getUtilityId());
+        
+        if (Boolean.FALSE.equals(utility.getType())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Tiện ích này không yêu cầu đặt trước.");
+            return "redirect:/manager/utility-bookings/utilities/" + utility.getUtilityId() + "/resources";
+        }
+        
+        LocalDate bookingDate = (date != null && !date.isEmpty()) ? LocalDate.parse(date) : LocalDate.now();
+        List<UtilityBooking> bookings = residentUtilityService.getBookingsForDate(id, bookingDate);
+        
+        model.addAttribute("resource", resource);
+        model.addAttribute("utility", utility);
+        model.addAttribute("bookings", bookings);
+        model.addAttribute("hasMembership", false);
+        model.addAttribute("selectedDate", bookingDate);
+        
+        BookingRequestDTO req = new BookingRequestDTO();
+        req.setBookingDate(bookingDate);
+        model.addAttribute("bookingRequest", req);
+        
+        return "manager/utility_bookings/booking/booking_form";
+    }
+
+    @PostMapping("/calculate")
+    public String calculateSummary(@ModelAttribute BookingRequestDTO request, Model model, HttpSession session) {
+        if (isUnauthorized(session)) return "redirect:/login";
+        var resource = residentUtilityService.getResourceDetail(request.getResourceId());
+        var utility = residentUtilityService.getUtility(resource.getUtilityId());
+        
+        LocalDate bookingDate = request.getBookingDate() != null ? request.getBookingDate() : LocalDate.now();
+        List<UtilityBooking> bookings = residentUtilityService.getBookingsForDate(request.getResourceId(), bookingDate);
+        
+        model.addAttribute("resource", resource);
+        model.addAttribute("utility", utility);
+        model.addAttribute("bookings", bookings);
+        model.addAttribute("hasMembership", false);
+        model.addAttribute("selectedDate", bookingDate);
+        model.addAttribute("bookingRequest", request);
+        
+        String packageName = "-";
+        java.math.BigDecimal total = java.math.BigDecimal.ZERO;
+        
+        if (request.getPriceId() != null) {
+            var priceOpt = resource.getPrices().stream().filter(p -> p.getUtilityPriceId().equals(request.getPriceId())).findFirst();
+            if (priceOpt.isPresent()) {
+                var price = priceOpt.get();
+                packageName = price.getUnit().getUnitName();
+                if (request.getStartTime() != null && request.getEndTime() != null) {
+                    try {
+                        LocalDateTime start = bookingDate.atTime(request.getStartTime());
+                        LocalDateTime end = bookingDate.atTime(request.getEndTime());
+                        if (Boolean.TRUE.equals(utility.getType())) {
+                            residentUtilityService.validateBookingTime(request.getResourceId(), start, end);
+                        }
+
+                        if (packageName.toLowerCase().contains("giờ") || packageName.toLowerCase().contains("hour")) {
+                            long diffMinutes = java.time.Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
+                            if (diffMinutes > 0) {
+                                java.math.BigDecimal hours = java.math.BigDecimal.valueOf(diffMinutes).divide(java.math.BigDecimal.valueOf(60), 2, java.math.RoundingMode.HALF_UP);
+                                total = price.getPrice().multiply(hours);
+                            }
+                        } else {
+                            total = price.getPrice();
+                        }
+                    } catch (IllegalArgumentException e) {
+                        model.addAttribute("errorMessage", e.getMessage());
+                    }
+                }
+            }
+        }
+        
+        model.addAttribute("calculatedPackageName", packageName);
+        model.addAttribute("calculatedTotal", total);
+        
+        return "manager/utility_bookings/booking/booking_form";
+    }
+
+    @PostMapping("/book")
+    public String submitBooking(@ModelAttribute BookingRequestDTO request, HttpSession session, RedirectAttributes redirectAttributes) {
+        if (isUnauthorized(session)) return "redirect:/login";
+        try {
+            residentUtilityService.submitBookingByManager(request);
+            redirectAttributes.addFlashAttribute("successMessage", "Tạo booking thành công!");
+            return "redirect:/manager/utility-bookings";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/manager/utility-bookings/book/" + request.getResourceId() + "?date=" + request.getBookingDate();
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Đã xảy ra lỗi, vui lòng thử lại.");
+            return "redirect:/manager/utility-bookings/book/" + request.getResourceId() + "?date=" + request.getBookingDate();
         }
     }
 

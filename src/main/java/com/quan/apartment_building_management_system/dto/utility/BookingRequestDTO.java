@@ -13,6 +13,7 @@ public class BookingRequestDTO {
     private LocalTime endTime;
     
     private String paymentMethod;
+    private String phoneNumber;
 
     public BookingRequestDTO() {
     }
@@ -71,5 +72,13 @@ public class BookingRequestDTO {
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }
