@@ -1,207 +1,388 @@
-<div th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'revenue')}">
+﻿<div th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'revenue')}">
 
     <div th:fragment="content">
 
+        <!-- Load custom page styling -->
+
         <link rel="stylesheet" th:href="@{/css/manager/revenue/revenue.css}">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap">
 
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
+
+
+
+       
         <div th:if="${message != null}" class="toast-msg"
-             th:classappend="${messageType == 'success' ? ' toast-success' : ' toast-error'}">
+             th:classappend="${messageType == 'success' ? ' toast-success' : ' toast-error'}"
+             style="padding:12px 20px;border-radius:8px;margin-bottom:16px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;background:${messageType == 'success' ? '#dcfce7' : '#fee2e2'};color:${messageType == 'success' ? '#15803d' : '#b91c1c'};">
             <i th:class="${messageType == 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation'}"></i>
-            <span th:text="${message}"></span>
+            <span th:text="${message}">Message</span>
         </div>
-
         <div class="rev-page-header">
+
             <h2 class="rev-page-title">Revenue Report</h2>
-            <p class="rev-page-subtitle">Financial overview and billing analytics for the apartment complex.</p>
-        </div>
+
+                <p class="rev-page-subtitle">Financial overview and billing analytics for the apartment complex.</p>
+
+            </div>
 
         <form method="get" th:action="@{/manager/revenue}" id="revFilterForm" class="rev-filter-bar">
-            <input type="hidden" name="month" id="hiddenMonth" th:value="${selectedMonth}">
+
+        <input type="hidden" name="month" id="hiddenMonth" th:value="${selectedMonth}">
+
+            <!-- From Date -->
 
             <div class="rev-filter-group">
+
                 <label class="rev-filter-label">From Date</label>
+
                 <div class="rev-date-wrapper" id="revFromWrapper">
+
                     <span class="material-symbols-outlined rev-date-icon">calendar_today</span>
+
                     <input type="text" id="revFromDisplay" class="rev-date-display"
+
                            th:value="${fromDate != null ? fromDate : ''}"
+
                            placeholder="Select date" readonly>
+
                     <input type="hidden" id="revFromDate" name="fromDate" th:value="${fromDate}">
+
                 </div>
+
                 <div class="rev-calendar-dropdown" id="revFromCal">
+
                     <div class="cal-header">
+
                         <button type="button" class="cal-nav" id="revFromPrev">&lt;</button>
+
                         <span class="cal-month-year" id="revFromMonthYear"></span>
+
                         <button type="button" class="cal-nav" id="revFromNext">&gt;</button>
+
                     </div>
-                    <div class="cal-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+
+                    <div class="cal-weekdays">
+
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+
+                    </div>
+
                     <div class="cal-days" id="revFromDays"></div>
+
                     <div class="cal-actions">
+
                         <button type="button" class="cal-cancel" id="revFromCancel">Cancel</button>
+
                         <button type="button" class="cal-apply" id="revFromApply">Apply</button>
+
                     </div>
+
                 </div>
+
             </div>
 
+
+
+            <!-- To Date -->
+
             <div class="rev-filter-group">
+
                 <label class="rev-filter-label">To Date</label>
+
                 <div class="rev-date-wrapper" id="revToWrapper">
+
                     <span class="material-symbols-outlined rev-date-icon">calendar_today</span>
+
                     <input type="text" id="revToDisplay" class="rev-date-display"
+
                            th:value="${toDate != null ? toDate : ''}"
+
                            placeholder="Select date" readonly>
+
                     <input type="hidden" id="revToDate" name="toDate" th:value="${toDate}">
+
                 </div>
+
                 <div class="rev-calendar-dropdown" id="revToCal">
+
                     <div class="cal-header">
+
                         <button type="button" class="cal-nav" id="revToPrev">&lt;</button>
+
                         <span class="cal-month-year" id="revToMonthYear"></span>
+
                         <button type="button" class="cal-nav" id="revToNext">&gt;</button>
+
                     </div>
-                    <div class="cal-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+
+                    <div class="cal-weekdays">
+
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+
+                    </div>
+
                     <div class="cal-days" id="revToDays"></div>
+
                     <div class="cal-actions">
+
                         <button type="button" class="cal-cancel" id="revToCancel">Cancel</button>
+
                         <button type="button" class="cal-apply" id="revToApply">Apply</button>
+
                     </div>
+
                 </div>
+
             </div>
 
+
+
+            <!-- Revenue Type -->
+
             <div class="rev-filter-group">
-                <label class="rev-filter-label">Status</label>
-                <select name="status" class="rev-filter-select">
-                    <option value="">All Status</option>
-                    <option value="PAID" th:selected="${status == 'PAID'}">Paid</option>
-                    <option value="PENDING" th:selected="${status == 'PENDING'}">Pending</option>
-                    <option value="OVERDUE" th:selected="${status == 'OVERDUE'}">Overdue</option>
+
+                <label class="rev-filter-label">Revenue Type</label>
+
+                <select name="revenueType" class="rev-filter-select">
+
+                    <option value="">All Types</option>
+
+                    <option value="RENT" th:selected="${revenueType == 'RENT'}">Rent</option>
+
+                    <option value="ELECTRICITY" th:selected="${revenueType == 'ELECTRICITY'}">Electricity</option>
+
+                    <option value="WATER" th:selected="${revenueType == 'WATER'}">Water</option>
+
+                    <option value="PARKING" th:selected="${revenueType == 'PARKING'}">Parking</option>
+
+                    <option value="SERVICE" th:selected="${revenueType == 'SERVICE'}">Service Fee</option>
+
+                    <option value="PENALTY" th:selected="${revenueType == 'PENALTY'}">Late Penalty</option>
+
                 </select>
+
             </div>
+
+
+
+            <!-- Status -->
+
+            <div class="rev-filter-group">
+
+                <label class="rev-filter-label">Status</label>
+
+                <select name="status" class="rev-filter-select">
+
+                    <option value="">All Status</option>
+
+                    <option value="PAID" th:selected="${status == 'PAID'}">Paid</option>
+
+                    <option value="PENDING" th:selected="${status == 'PENDING'}">Pending</option>
+
+                    <option value="OVERDUE" th:selected="${status == 'OVERDUE'}">Overdue</option>
+
+                    <option value="CANCELLED" th:selected="${status == 'CANCELLED'}">Cancelled</option>
+
+                </select>
+
+            </div>
+
+
 
             <div class="rev-filter-actions">
+
                 <button type="submit" class="rev-apply-btn">Apply Filters</button>
+
                 <a th:href="@{/manager/revenue}" class="rev-clear-btn">CLEAR ALL</a>
+
             </div>
+
         </form>
 
         <div class="rev-stats-grid">
+
+            <!-- Total Revenue -->
+
             <div class="rev-stat-card">
+
                 <div class="rev-stat-header">
+
                     <span class="rev-stat-label">TOTAL REVENUE</span>
-                    <div class="rev-stat-icon-wrap primary"><span class="material-symbols-outlined">payments</span></div>
+
+                    <div class="rev-stat-icon-wrap primary">
+
+                        <span class="material-symbols-outlined">payments</span>
+
+                    </div>
+
                 </div>
+
                 <div class="rev-stat-main">
-                    <span class="rev-stat-number" th:text="${totalRevenue}"></span>
+
+                    <span class="rev-stat-number" th:text="${totalRevenue != null ? totalRevenue : '0 VND'}">2,847,500,000  VND</span>
+
                 </div>
-            </div>
+
+                </div>
+
+            <!-- Collected -->
+
             <div class="rev-stat-card">
+
                 <div class="rev-stat-header">
+
                     <span class="rev-stat-label">COLLECTED</span>
-                    <div class="rev-stat-icon-wrap success"><span class="material-symbols-outlined">check_circle</span></div>
+
+                    <div class="rev-stat-icon-wrap success">
+
+                        <span class="material-symbols-outlined">check_circle</span>
+
+                    </div>
+
                 </div>
+
                 <div class="rev-stat-main">
-                    <span class="rev-stat-number success" th:text="${collected}"></span>
+
+                    <span class="rev-stat-number success" th:text="${collected != null ? collected : '0 VND'}">2,412,300,000  VND</span>
+
                 </div>
-            </div>
+
+                </div>
+
+            <!-- Outstanding -->
+
             <div class="rev-stat-card">
+
                 <div class="rev-stat-header">
+
                     <span class="rev-stat-label">OUTSTANDING</span>
-                    <div class="rev-stat-icon-wrap warning"><span class="material-symbols-outlined">schedule</span></div>
+
+                    <div class="rev-stat-icon-wrap warning">
+
+                        <span class="material-symbols-outlined">schedule</span>
+
+                    </div>
+
                 </div>
+
                 <div class="rev-stat-main">
-                    <span class="rev-stat-number warning" th:text="${outstanding}"></span>
+
+                    <span class="rev-stat-number warning" th:text="${outstanding != null ? outstanding : '0 VND'}">325,200,000  VND</span>
+
                 </div>
-            </div>
+
+                </div>
+
+            <!-- Overdue -->
+
             <div class="rev-stat-card">
+
                 <div class="rev-stat-header">
+
                     <span class="rev-stat-label">OVERDUE</span>
-                    <div class="rev-stat-icon-wrap error"><span class="material-symbols-outlined">warning</span></div>
+
+                    <div class="rev-stat-icon-wrap error">
+
+                        <span class="material-symbols-outlined">warning</span>
+
+                    </div>
+
                 </div>
+
                 <div class="rev-stat-main">
-                    <span class="rev-stat-number error" th:text="${overdue}"></span>
+
+                    <span class="rev-stat-number error" th:text="${overdue != null ? overdue : '0 VND'}">110,000,000  VND</span>
+
                 </div>
-            </div>
+
+                </div>
+
         </div>
 
-        <div class="rev-table-card">
+
+        
+<div class="rev-charts-row">
+<div class="rev-table-card">
             <div class="rev-table-header-row">
                 <h3 class="rev-table-title">Transaction Records</h3>
-                <span class="rev-table-count" th:text="${#lists.size(records) + ' record'}"></span>
+                <span class="rev-table-count" th:text="${totalRecords != null ? totalRecords + ' records' : '0 records'}">1,284 records</span>
             </div>
 
             <div class="rev-table-wrapper">
+
                 <table class="rev-table">
+
                     <thead>
+
                         <tr>
+
                             <th>INVOICE ID</th>
+
                             <th>RESIDENT</th>
+
                             <th>UNIT</th>
+
                             <th>TYPE</th>
+
                             <th>AMOUNT</th>
+
                             <th>STATUS</th>
+
                             <th>DUE DATE</th>
+
                             <th>PAID DATE</th>
-                            <th class="text-right">DETAILS</th>
+
+                            
+
                         </tr>
+
                     </thead>
-                    <tbody>
-                        <tr class="rev-table-row" th:each="rec : ${records}">
-                            <td class="rev-td-mono" th:text="${rec.invoiceId}"></td>
-                            <td>
-                                <div class="rev-resident-cell">
-                                    <span class="text-role-default" th:text="${rec.residentName}"></span>
-                                </div>
-                            </td>
-                            <td class="rev-td-mono rev-td-center" th:text="${rec.unitId}"></td>
-                            <td>
-                                <span class="rev-type-badge"
-                                      th:classappend="${rec.revenueType == 'RENT' ? ' type-rent' :
-                                                       rec.revenueType == 'ELECTRICITY' ? ' type-electricity' :
-                                                       rec.revenueType == 'WATER' ? ' type-water' :
-                                                       rec.revenueType == 'PARKING' ? ' type-parking' :
-                                                       rec.revenueType == 'SERVICE' ? ' type-service' :
-                                                       rec.revenueType == 'PENALTY' ? ' type-penalty' : ''}"
-                                      th:text="${rec.revenueType}"></span>
-                            </td>
-                            <td class="rev-td-amount" th:text="${rec.amount}"></td>
-                            <td>
-                                <span class="rev-status-badge"
-                                      th:classappend="${rec.status == 'PAID' ? ' status-paid' :
-                                                       rec.status == 'PENDING' ? ' status-pending' :
-                                                       rec.status == 'OVERDUE' ? ' status-overdue' : ''}"
-                                      th:text="${rec.status}"></span>
-                            </td>
-                            <td class="rev-td-secondary rev-td-nowrap" th:text="${rec.dueDate}"></td>
-                            <td class="rev-td-secondary rev-td-nowrap" th:text="${rec.paidDate != null ? rec.paidDate : '-'}"></td>
-                            <td class="text-right">
-                                <a th:href="@{/manager/revenue/detail/{id}(id=${rec.billId})}" class="rev-eye-btn" title="View Details">
-                                    <span class="material-symbols-outlined">visibility</span>
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
+
                 </table>
+
             </div>
 
-            <div class="rev-pagination-bar" th:if="${totalPages > 0}">
-                <span class="rev-pagination-info"></span>
+
+
+<div class="rev-pagination-bar">
+
+
                 <div class="rev-pagination-controls">
-                    <a class="rev-page-btn" th:href="@{/manager/revenue(page=${currentPage - 1}, fromDate=${fromDate}, toDate=${toDate}, status=${status})}"
-                       th:classappend="${currentPage <= 0 ? ' disabled' : ''}">
-                        <span class="material-symbols-outlined" style="font-size:16px;">chevron_left</span>
-                    </a>
-                    <a class="rev-page-btn" th:each="idx : ${#numbers.sequence(0, totalPages - 1)}"
-                       th:href="@{/manager/revenue(page=${idx}, fromDate=${fromDate}, toDate=${toDate}, status=${status})}"
-                       th:classappend="${idx == currentPage ? ' active' : ''}"
-                       th:text="${idx + 1}"></a>
-                    <a class="rev-page-btn" th:href="@{/manager/revenue(page=${currentPage + 1}, fromDate=${fromDate}, toDate=${toDate}, status=${status})}"
-                       th:classappend="${currentPage >= totalPages - 1 ? ' disabled' : ''}">
-                        <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
-                    </a>
-                </div>
-            </div>
-        </div>
 
-        <script th:src="@{/js/manager/revenue.js}"></script>
+                    <a class="rev-page-btn" th:href="@{/manager/revenue(page=${currentPage - 1}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
+
+                       th:classappend="${currentPage <= 0 ? ' disabled' : ''}">
+
+                        <span class="material-symbols-outlined" style="font-size:16px;">chevron_left</span>
+
+                    </a>
+
+                    <a class="rev-page-btn" th:each="idx : ${#numbers.sequence(0, totalPages - 1)}"
+
+                       th:href="@{/manager/revenue(page=${idx}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
+
+                       th:classappend="${idx == currentPage ? ' active' : ''}"
+
+                       th:text="${idx + 1}">1</a>
+
+                    <a class="rev-page-btn" th:href="@{/manager/revenue(page=${currentPage + 1}, fromDate=${fromDate}, toDate=${toDate}, revenueType=${revenueType}, status=${status})}"
+
+                       th:classappend="${currentPage >= totalPages - 1 ? ' disabled' : ''}">
+
+                    </a>
+
+                </div>
+
+
+        <!-- Scripts -->
+
+                <script th:src="@{/js/manager/revenue.js}"></script>
 
     </div>
+
 </div>
+
+
+
+
+

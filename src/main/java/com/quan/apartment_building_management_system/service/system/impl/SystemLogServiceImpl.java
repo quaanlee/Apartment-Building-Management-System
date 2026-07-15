@@ -144,5 +144,10 @@ public class SystemLogServiceImpl implements SystemLogService {
         return systemLogRepository.findFiltered(fromDate, toDate, role, action, search,
                 PageRequest.of(page, size));
     }
+    @Override
+    public List<Object[]> countLogsByRoleWithFilters(LocalDateTime fromDate, LocalDateTime toDate,
+                                                      String role, String action, String search) {
+        return systemLogRepository.countLogsByRoleWithFilters(fromDate, toDate, role, action, search);
+    }
 }
 

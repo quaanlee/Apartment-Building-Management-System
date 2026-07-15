@@ -62,7 +62,7 @@
                 <section class="logs-detail-section" th:if="${log.details != null and log.details != '{}' and log.details != ''}">
                     <h4 class="logs-detail-section-title">Log Content Details</h4>
                     <div class="logs-detail-json-box">
-                        <pre id="logDetailsJson" style="white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; margin: 0; background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 8px; overflow-x: auto;">{}</pre>
+                        <pre id="logDetailsJson" th:text="${log.details}" style="white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; margin: 0; background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 8px; overflow-x: auto;">{}</pre>
                     </div>
                 </section>
                 <script>

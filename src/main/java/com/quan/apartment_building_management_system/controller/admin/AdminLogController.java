@@ -59,7 +59,7 @@ public class AdminLogController {
         model.addAttribute("logs", dtos);
         model.addAttribute("totalLogs", logPage.getTotalElements());
         model.addAttribute("currentPage", logPage.getNumber() + 1);
-        model.addAttribute("totalPages", logPage.getTotalPages());
+        model.addAttribute("totalPages", logPage.getTotalPages() < 1 ? 1 : logPage.getTotalPages());
         model.addAttribute("pageSize", PAGE_SIZE);
 
         model.addAttribute("fromDate",  fromDateStr);
@@ -140,3 +140,4 @@ public class AdminLogController {
         return String.format("%,d", n);
     }
 }
+
