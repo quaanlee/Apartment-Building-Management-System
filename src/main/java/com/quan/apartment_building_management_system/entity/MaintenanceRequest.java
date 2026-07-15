@@ -29,8 +29,8 @@ public class MaintenanceRequest {
     @Column(name = "Description", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String description;
 
-    @Column(name = "ImageURL", length = 500)
-    private String imageUrl;
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MaintenanceRequestImage> images = new ArrayList<>();
 
     @Column(name = "RequestDate", nullable = false)
     private LocalDateTime requestDate = LocalDateTime.now();
@@ -85,12 +85,12 @@ public class MaintenanceRequest {
         this.description = description;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public List<MaintenanceRequestImage> getImages() {
+        return images;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImages(List<MaintenanceRequestImage> images) {
+        this.images = images;
     }
 
     public LocalDateTime getRequestDate() {
