@@ -80,18 +80,6 @@ public class AuthController {
         return "redirect:/login";
     }
 
-    @GetMapping("/admin/dashboard")
-    public String adminDashboard(HttpSession session) {
-        Account currentUser = (Account) session.getAttribute("currentUser");
-        if (currentUser == null)
-            return "redirect:/login";
-        String role = currentUser.getRole().getRoleName().toUpperCase();
-        if ("MANAGER".equals(role))
-            return "redirect:/manager/dashboard";
-        if (!"ADMIN".equals(role))
-            return "redirect:/login";
-        return "admin/dashboard";
-    }
 
     @GetMapping("/maintainer/dashboard")
     public String maintainerDashboard(HttpSession session) {

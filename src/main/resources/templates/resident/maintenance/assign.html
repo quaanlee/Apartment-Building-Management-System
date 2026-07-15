@@ -47,10 +47,12 @@
                     <div class="detail-description-box" th:text="${request.description}">Detailed issue goes here.</div>
                 </div>
 
-                <div class="detail-row full-width" th:if="${request.imageUrl != null and !request.imageUrl.isEmpty()}">
-                    <span class="detail-label">Attached Photo</span>
-                    <div class="attached-image-box">
-                        <img th:src="${request.imageUrl}" alt="Incident Image">
+                <div class="detail-row full-width" th:if="${request.images != null and !request.images.isEmpty()}">
+                    <span class="detail-label">Attached Photos</span>
+                    <div class="attached-images-container" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;">
+                        <div class="attached-image-box" th:each="img : ${request.images}">
+                            <img th:src="${img.imageUrl}" alt="Incident Image" style="max-width: 280px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                        </div>
                     </div>
                 </div>
             </div>

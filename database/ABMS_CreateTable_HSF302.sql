@@ -510,3 +510,32 @@ CREATE TABLE UtilityMembership (
     CONSTRAINT FK_UtilityMembership_UtilityPrice FOREIGN KEY (UtilityPriceID) REFERENCES UtilityPrice(UtilityPriceID)
 );
 GO
+CREATE TABLE EmployeeProfile (
+    EmployeeProfileID INT IDENTITY(1,1) PRIMARY KEY,
+
+    AccountID INT NOT NULL UNIQUE,
+
+    FullName NVARCHAR(100) NOT NULL,
+
+    Gender BIT NULL,                    -- 1: Nam, 0: Nữ
+
+    DateOfBirth DATE NULL,
+
+    PhoneNumber VARCHAR(15) NOT NULL,
+
+    Email VARCHAR(100) NULL,
+
+    Address NVARCHAR(255) NULL,
+
+    AvatarURL NVARCHAR(500) NULL,
+
+    Status BIT NOT NULL DEFAULT 1,      -- 1: Đang làm, 0: Nghỉ việc
+
+    CreatedAt DATETIME DEFAULT GETDATE(),
+
+    UpdatedAt DATETIME DEFAULT GETDATE(),
+
+    CONSTRAINT FK_EmployeeProfile_Account
+        FOREIGN KEY (AccountID)
+        REFERENCES Account(AccountID)
+);

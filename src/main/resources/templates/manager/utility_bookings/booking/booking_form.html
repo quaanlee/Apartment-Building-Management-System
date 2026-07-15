@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-    th:replace="~{layout/resident/layout_resident :: resident-layout(~{::main}, 'booking')}"
-    th:with="pageTitle='Đặt Tiện Ích'">
+    th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'bookings')}"
+    th:with="pageTitle='Manager Booking - Form'">
 
 <head>
     <title>Đặt Tiện Ích</title>
@@ -16,10 +16,9 @@
         <div class="detail-header-nav"
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <div class="breadcrumb-container" style="font-size: 14px; color: var(--text-secondary);">
-                <a th:href="@{/resident/utilities}" style="color: var(--primary-color); text-decoration: none;">Tiện
-                    Ích</a>
+                <a th:href="@{/manager/utility-bookings}" style="color: var(--primary-color); text-decoration: none;">Bookings</a>
                 <span style="margin: 0 8px;">/</span>
-                <a th:href="@{/resident/utilities/{id}/resources(id=${utility.utilityId})}"
+                <a th:href="@{/manager/utility-bookings/utilities/{id}/resources(id=${utility.utilityId})}"
                     th:text="${utility.utilityName}" style="color: var(--primary-color); text-decoration: none;">Utility
                     Name</a>
                 <span style="margin: 0 8px;">/</span>
@@ -28,7 +27,7 @@
                 <span style="margin: 0 8px;">/</span>
                 <span style="font-weight: 600; color: var(--text-primary);">Booking Form</span>
             </div>
-            <a th:href="@{/resident/utilities/{id}/resources(id=${utility.utilityId})}" class="btn-secondary"
+            <a th:href="@{/manager/utility-bookings/utilities/{id}/resources(id=${utility.utilityId})}" class="btn-secondary"
                 style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-primary); font-weight: 500; font-size: 14px; background: white;">
                 <i class="fa-solid fa-arrow-left"></i> Back to Utility
             </a>
@@ -41,7 +40,7 @@
                 th:text="${errorMessage}"></span>
         </div>
 
-        <form th:action="@{/resident/utilities/book}" method="post" th:object="${bookingRequest}" id="bookingForm">
+        <form th:action="@{/manager/utility-bookings/book}" method="post" th:object="${bookingRequest}" id="bookingForm">
             <input type="hidden" name="utilityId" th:value="${resource.utilityId}">
             <input type="hidden" id="resourceIdInput" name="resourceId" th:value="${resource.resourceId}">
 
@@ -147,9 +146,21 @@
                         </div>
                     </div>
 
-                    <!-- Step 2 -->
+                    <!-- Step 2: Resident Details -->
                     <div class="step-indicator">
                         <div class="step-number">2</div>
+                        <h4 class="step-title">Resident Details</h4>
+                    </div>
+                    <div class="form-field" style="margin-bottom: 32px;">
+                        <label>Resident Phone Number</label>
+                        <input type="text" class="custom-input" name="phoneNumber" required 
+                            placeholder="Enter resident's phone number"
+                            th:value="${bookingRequest.phoneNumber != null ? bookingRequest.phoneNumber : ''}">
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-indicator">
+                        <div class="step-number">3</div>
                         <h4 class="step-title">Select Date & Time</h4>
                     </div>
 
@@ -162,7 +173,7 @@
                                     th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
                                     style="flex-grow: 1;">
                                 <button type="button" class="btn-primary" 
-                                    onclick="var d = document.getElementById('bookingDate').value; var r = document.getElementById('resourceIdInput').value; if(d && r) { window.location.href = '/resident/utilities/book/' + r + '?date=' + d; } else { alert('Vui lòng chọn ngày!'); }"
+                                    onclick="var d = document.getElementById('bookingDate').value; var r = document.getElementById('resourceIdInput').value; if(d && r) { window.location.href = '/manager/utility-bookings/book/' + r + '?date=' + d; } else { alert('Vui lòng chọn ngày!'); }"
                                     style="padding: 10px 16px; border-radius: 8px; border: none; background: var(--primary-color); color: white; cursor: pointer; white-space: nowrap; font-weight: 500;">Change Date</button>
                             </div>
                         </div>
@@ -179,7 +190,7 @@
                             </div>
                         </div>
                         <div style="margin-top: 16px; text-align: right;">
-                            <button type="submit" th:formaction="@{/resident/utilities/calculate}" formmethod="post"
+                            <button type="submit" th:formaction="@{/manager/utility-bookings/calculate}" formmethod="post"
                                 class="btn-primary"
                                 style="padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; background-color: var(--primary-color); color: white; font-weight: 600;">Save
                                 All</button>
@@ -242,9 +253,15 @@
                             <h6 style="margin-bottom: 12px; font-size: 14px;">Payment Method</h6>
                             <div style="display: flex; gap: 16px;">
                                 <label
-                                    style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--primary-color); font-weight: 500;">
-                                    <input type="radio" name="paymentMethod" value="ONLINE" checked style="display: none;">
-                                    <i class="fa-solid fa-credit-card"></i> Online (PayOS)
+                                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
+                                    <input type="radio" name="paymentMethod" value="CASH"
+                                        th:checked="${bookingRequest.paymentMethod == null || bookingRequest.paymentMethod == 'CASH'}">
+                                    Cash (In-person)
+                                </label>
+                                <label
+                                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
+                                    <input type="radio" name="paymentMethod" value="ONLINE"
+                                        th:checked="${bookingRequest.paymentMethod == 'ONLINE'}"> Online (PayOS)
                                 </label>
                             </div>
                         </div>
@@ -295,7 +312,7 @@
                 const dateInput = document.getElementById('bookingDate').value;
                 const resourceId = document.getElementById('resourceIdInput').value;
                 if (dateInput) {
-                    window.location.href = '/resident/utilities/book/' + resourceId + '?date=' + dateInput;
+                    window.location.href = '/manager/utility-bookings/book/' + resourceId + '?date=' + dateInput;
                 } else {
                     alert('Vui lòng chọn ngày trước khi lưu.');
                 }

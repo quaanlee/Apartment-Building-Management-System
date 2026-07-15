@@ -13,4 +13,6 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     @org.springframework.data.jpa.repository.Query("SELECT COUNT(a) FROM Account a WHERE UPPER(a.role.roleName) = 'RESIDENT' AND a.status = true")
     long countActiveResidents();
+
+    long countByStatus(Boolean status);
 }

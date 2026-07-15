@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::#main-content}, 'bookings')}"
+      th:with="pageTitle='Manager Booking - Utilities'">
+<head>
+    <title>Tiện Ích Khu Dân Cư</title>
+</head>
+<body>
+<div id="main-content" class="utility-container">
+    <link rel="stylesheet" th:href="@{/css/resident/utility-resident.css}">
+    
+    <div class="utility-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <h1 class="page-header-title">Create Booking</h1>
+            <p class="page-header-subtitle">Select a utility to create a booking on behalf of a resident.</p>
+        </div>
+        <div style="display: flex; gap: 12px; margin-top: 10px;">
+            <a th:href="@{/manager/utility-bookings}" class="btn-secondary" style="border-radius: 8px; text-decoration: none;">
+                <i class="fa-solid fa-arrow-left" style="margin-right: 6px;"></i> Back to Bookings
+            </a>
+        </div>
+    </div>
+    
+    <div class="utility-grid">
+        <div class="utility-card" th:each="utility : ${utilities}">
+            <div class="utility-image-container">
+                <img th:src="@{${!#strings.isEmpty(utility.imageUrl) ? utility.imageUrl : '/images/utilities/garden.jpg'}}" class="utility-image" alt="Utility Image">
+            </div>
+            <div class="utility-card-body">
+                <div class="utility-card-header">
+                    <h3 class="utility-card-title" th:text="${utility.utilityName}">Tên Tiện Ích</h3>
+                    <span class="utility-price-badge" th:text="${utility.type} ? 'Booking' : 'Free Use'">Booking</span>
+                </div>
+                <p class="utility-card-desc" th:text="${utility.description}">Elevated aquatic serenity with...</p>
+                
+                <div class="utility-card-footer">
+                    <a th:href="@{/manager/utility-bookings/utilities/{id}/resources(id=${utility.utilityId})}" class="btn-primary btn-book-now">
+                        Book Now <i class="fas fa-calendar-alt" style="margin-left: 8px;"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(utilities)}" class="empty-state">
+            <h4 style="color: var(--text-muted);">Hiện tại chưa có tiện ích nào hoạt động.</h4>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -135,7 +135,8 @@ public class UserDTO {
                 this.accountId = profile.getAccount().getAccountId();
                 this.username = profile.getAccount().getUsername();
                 this.password = profile.getAccount().getPassword();
-                this.roleName = profile.getAccount().getRole() != null ? profile.getAccount().getRole().getRoleName() : null;
+                this.roleName = profile.getAccount().getRole() != null ? profile.getAccount().getRole().getRoleName()
+                        : null;
                 this.accountStatus = profile.getAccount().getStatus();
                 this.accountCreatedAt = profile.getAccount().getCreatedAt();
                 this.lockedUntil = profile.getAccount().getLockedUntil();

@@ -201,6 +201,18 @@ public class ResidentUtilityService {
         return null;
     }
 
+    @Transactional
+    public UtilityBooking submitBookingByManager(BookingRequestDTO req) {
+        Profile profile = profileRepository.findByPhoneNumber(req.getPhoneNumber())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy cư dân với số điện thoại này."));
+        
+        if (profile.getAccount() == null) {
+            throw new IllegalArgumentException("Cư dân này chưa có tài khoản hệ thống.");
+        }
+        
+        return submitBookingRequest(profile.getAccount().getAccountId(), req);
+    }
+
     public List<UtilityBooking> getBookingsForDate(Integer resourceId, LocalDate date) {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();

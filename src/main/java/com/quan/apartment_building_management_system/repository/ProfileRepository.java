@@ -21,6 +21,8 @@ public interface ProfileRepository extends JpaRepository<Profile, Integer> {
     Optional<Profile> findByAccountAccountId(Integer accountId);
 
     Optional<Profile> findByCitizenId(String citizenId);
+    
+    Optional<Profile> findByPhoneNumber(String phoneNumber);
 
     List<Profile> findByApartmentApartmentId(Integer apartmentId);
 

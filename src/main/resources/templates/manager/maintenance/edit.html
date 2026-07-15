@@ -1,0 +1,34 @@
+﻿<div th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'maintenance')}">
+    <div th:fragment="content">
+        <link rel="stylesheet" th:href="@{/css/manager/maintenance/maintenance.css}">
+
+        <div class="back-link-row">
+            <a th:href="@{/manager/maintenance}" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Requests</span>
+            </a>
+        </div>
+
+        <div class="request-details-card">
+            <div class="card-header">
+                <h3>Edit Maintenance Request</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" th:action="@{/manager/maintenance/{id}/edit(id=${request.requestId})}">
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" class="form-input" th:value="${request.title}" required maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-input" rows="4" required th:text="${request.description}"></textarea>
+                    </div>
+                    <div class="form-group" style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+                        <a th:href="@{/manager/maintenance}" class="back-btn">Cancel</a>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

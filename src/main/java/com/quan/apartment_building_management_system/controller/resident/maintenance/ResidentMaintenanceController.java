@@ -92,7 +92,7 @@ public class ResidentMaintenanceController {
             var taskOpt = taskRepo.findByMaintenanceRequestRequestId(req.getRequestId());
             if (taskOpt.isPresent()) {
                 MaintenanceTask task = taskOpt.get();
-                item.put("staffName", task.getStaff() != null ? task.getStaff().getUsername() : "-");
+                item.put("staffName", task.getStaff() != null && task.getStaff().getProfile() != null ? task.getStaff().getProfile().getFullName() : "-");
                 var reports = reportRepo.findByMaintenanceTaskTaskId(task.getTaskId());
                 if (!reports.isEmpty()) {
                     MaintenanceReport last = reports.get(reports.size() - 1);
@@ -203,7 +203,7 @@ public class ResidentMaintenanceController {
         var taskOpt = taskRepo.findByMaintenanceRequestRequestId(req.getRequestId());
         if (taskOpt.isPresent()) {
             MaintenanceTask task = taskOpt.get();
-            model.addAttribute("taskStaffName", task.getStaff() != null ? task.getStaff().getUsername() : "-");
+            model.addAttribute("taskStaffName", task.getStaff() != null && task.getStaff().getProfile() != null ? task.getStaff().getProfile().getFullName() : "-");
             model.addAttribute("taskDeadline", task.getDeadline());
             var reports = reportRepo.findByMaintenanceTaskTaskId(task.getTaskId());
             if (!reports.isEmpty()) {
@@ -224,6 +224,73 @@ public class ResidentMaintenanceController {
         model.addAttribute("images", images);
         model.addAttribute("pageTitle", "Request #" + id);
         return "resident/maintenance/detail";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String showEditForm(@PathVariable Integer id, HttpSession session, Model model) {
+        Profile profile = getProfile(session);
+        if (profile == null) return "redirect:/login";
+
+        MaintenanceRequest req = requestRepo.findById(id).orElse(null);
+        if (req == null || !req.getProfile().getProfileId().equals(profile.getProfileId())) {
+            return "redirect:/resident/maintenance";
+        }
+        if (req.getStatus() != 0) {
+            return "redirect:/resident/maintenance/" + id + "/detail";
+        }
+
+        model.addAttribute("request", req);
+        model.addAttribute("pageTitle", "Edit Request #" + id);
+        return "resident/maintenance/edit";
+    }
+
+    @PostMapping("/{id}/edit")
+    @Transactional
+    public String updateRequest(@PathVariable Integer id,
+                                 @RequestParam("description") String description,
+                                 @RequestParam(value = "images", required = false) List<MultipartFile> images,
+                                 HttpSession session,
+                                 RedirectAttributes redirect) {
+        Profile profile = getProfile(session);
+        if (profile == null) return "redirect:/login";
+
+        MaintenanceRequest req = requestRepo.findById(id).orElse(null);
+        if (req == null || !req.getProfile().getProfileId().equals(profile.getProfileId())) {
+            return "redirect:/resident/maintenance";
+        }
+        if (req.getStatus() != 0) {
+            redirect.addFlashAttribute("message", "Cannot edit: request is not pending");
+            redirect.addFlashAttribute("messageType", "error");
+            return "redirect:/resident/maintenance/" + id + "/detail";
+        }
+
+        req.setDescription(description);
+        requestRepo.save(req);
+
+        // Upload new images
+        if (images != null && !images.isEmpty()) {
+            for (MultipartFile image : images) {
+                if (!image.isEmpty()) {
+                    try {
+                        var uploadResult = cloudinary.uploader().upload(
+                            image.getBytes(),
+                            ObjectUtils.asMap("folder", "maintenance/resident")
+                        );
+                        String url = uploadResult.get("secure_url").toString();
+                        MaintenanceRequestImage img = new MaintenanceRequestImage();
+                        img.setRequest(req);
+                        img.setImageUrl(url);
+                        requestImageRepo.save(img);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        redirect.addFlashAttribute("message", "Request updated successfully");
+        redirect.addFlashAttribute("messageType", "success");
+        return "redirect:/resident/maintenance/" + id + "/detail";
     }
 }
 
