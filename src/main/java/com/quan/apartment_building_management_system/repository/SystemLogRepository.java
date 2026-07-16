@@ -23,7 +23,7 @@ public interface SystemLogRepository extends JpaRepository<SystemLog, Long> {
            "LEFT JOIN FETCH a.profile p " +
            "WHERE (COALESCE(:search, '') = '' OR " +
            "       LOWER(a.username) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "       LOWER(p.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "       LOWER(FUNCTION('TRANSLATE', p.fullName, 'áàảãạâấầẩẫậăắằẳẵặđéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵ', 'aaaaaaaaaaaaaaaaadeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyy')) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "       LOWER(s.action) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "       LOWER(s.entityType) LIKE LOWER(CONCAT('%', :search, '%'))) " +
            "AND (COALESCE(:roleName, '') = '' OR :roleName = 'All Roles' OR " +
@@ -49,7 +49,7 @@ public interface SystemLogRepository extends JpaRepository<SystemLog, Long> {
            "  AND (:action IS NULL OR sl.action = :action) " +
            "  AND (:search IS NULL OR :search = '' OR " +
            "       LOWER(a.username) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "       LOWER(p.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "       LOWER(FUNCTION('TRANSLATE', p.fullName, 'áàảãạâấầẩẫậăắằẳẵặđéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵ', 'aaaaaaaaaaaaaaaaadeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyy')) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "       LOWER(sl.action) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "       LOWER(sl.entityType) LIKE LOWER(CONCAT('%', :search, '%'))) " +
            "ORDER BY sl.createdAt DESC")
@@ -60,4 +60,29 @@ public interface SystemLogRepository extends JpaRepository<SystemLog, Long> {
             @Param("action") String action,
             @Param("search") String search,
             Pageable pageable);
+
+    @Query("SELECT COALESCE(r.roleName, 'System'), COUNT(sl) FROM SystemLog sl " +
+           "LEFT JOIN sl.account a " +
+           "LEFT JOIN a.role r " +
+           "LEFT JOIN a.profile p " +
+           "WHERE (:fromDate IS NULL OR sl.createdAt >= :fromDate) " +
+           "  AND (:toDate IS NULL OR sl.createdAt <= :toDate) " +
+           "  AND (:role IS NULL OR r.roleName = :role) " +
+           "  AND (:action IS NULL OR sl.action = :action) " +
+           "  AND (:search IS NULL OR :search = '' OR " +
+           "       LOWER(a.username) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "       LOWER(FUNCTION('TRANSLATE', p.fullName, 'áàảãạâấầẩẫậăắằẳẵặđéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵ', 'aaaaaaaaaaaaaaaaadeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyy')) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "       LOWER(sl.action) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "       LOWER(sl.entityType) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+           "GROUP BY r.roleName")
+    List<Object[]> countLogsByRoleWithFilters(
+            @Param("fromDate") LocalDateTime fromDate,
+            @Param("toDate") LocalDateTime toDate,
+            @Param("role") String role,
+            @Param("action") String action,
+            @Param("search") String search);
 }
+
+
+
+

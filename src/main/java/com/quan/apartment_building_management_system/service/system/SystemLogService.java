@@ -32,4 +32,6 @@ public interface SystemLogService {
 
     Page<SystemLog> findFiltered(LocalDateTime fromDate, LocalDateTime toDate,
                                  String role, String action, String search, int page, int size);
+
+    List<Object[]> countLogsByRoleWithFilters(LocalDateTime fromDate, LocalDateTime toDate, String role, String action, String search);
 }

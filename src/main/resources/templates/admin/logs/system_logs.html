@@ -9,10 +9,7 @@
         <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
         <div class="logs-page-header">
             <h2 class="logs-page-title">System Logs</h2>
-            <button class="logs-export-btn" id="exportBtn">
-                <span class="material-symbols-outlined">download</span>
-                EXPORT DATA
-            </button>
+            <!-- Export button removed -->
         </div>
 
         <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
@@ -132,12 +129,12 @@
                 <label class="logs-filter-label">User Role</label>
                 <select name="userRole" id="userRoleSelect" class="logs-filter-select">
                     <option value="" th:selected="${userRole == null or userRole == ''}">All Roles</option>
-                    <option value="Security Officer" th:selected="${userRole == 'Security Officer'}">Security Officer</option>
+                    
                     <option value="Admin" th:selected="${userRole == 'Admin'}">Admin</option>
                     <option value="Manager" th:selected="${userRole == 'Manager'}">Manager</option>
                     <option value="Maintenance Staff" th:selected="${userRole == 'Maintenance Staff'}">Maintenance Staff</option>
                     <option value="Resident" th:selected="${userRole == 'Resident'}">Resident</option>
-                    <option value="System" th:selected="${userRole == 'System'}">System</option>
+                    
                 </select>
             </div>
 
@@ -221,10 +218,10 @@
             <!-- Pagination -->
             <div class="logs-pagination-bar">
                 <span class="logs-pagination-info"
-                      th:text="${totalLogs != null ? 'Showing ' + ((currentPage - 1) * pageSize + 1) + ' to ' + (currentPage * pageSize < totalLogs ? currentPage * pageSize : totalLogs) + ' of ' + totalLogs + ' entries' : 'Showing 1 to 5 of 128,492 entries'}">
+                      th:text="${totalLogs != null and totalLogs > 0 ? 'Showing ' + ((currentPage - 1) * pageSize + 1) + ' to ' + (currentPage * pageSize < totalLogs ? currentPage * pageSize : totalLogs) + ' of ' + totalLogs + ' entries' : 'Showing 0 entries'}">
                     Showing 1 to 5 of 128,492 entries
                 </span>
-                                    <div class="logs-pagination-controls">
+                                    <div th:if="${totalPages > 0}" class="logs-pagination-controls">
                         <a class="logs-page-btn" th:href="@{/admin/logs(page=${currentPage - 2}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}"
                            th:classappend="${currentPage <= 1 ? ' disabled' : ''}">&lt;</a>
                         <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
@@ -247,3 +244,7 @@
         <script th:src="@{/js/admin/logs.js}"></script>
     </div>
 </div>
+
+
+
+
