@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title th:text="${userDto.profileId == null ? 'Create User' : 'Edit User'}">Create User</title>
+    <title th:text="${userDto.profileId == null ? 'Tạo người dùng' : 'Chỉnh sửa người dùng'}">Tạo người dùng</title>
 </head>
 
 <body>
@@ -16,11 +16,11 @@
         <div class="detail-header-actions"
             style="display: flex; justify-content: space-between; align-items: center; padding: 20px 32px; border-bottom: 1px solid var(--border-color); background-color: #F9FAFB; margin-bottom: 24px; border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
             <div class="detail-title" style="font-size: 20px; font-weight: 700; color: var(--text-primary);"
-                th:text="${userDto.profileId == null ? 'Create User Account' : 'Edit User Profile & Account'}">
-                Create User Account
+                th:text="${userDto.profileId == null ? 'Tạo tài khoản người dùng' : 'Chỉnh sửa hồ sơ & tài khoản người dùng'}">
+                Tạo tài khoản người dùng
             </div>
             <a th:href="@{/admin/users}" class="btn-secondary">
-                <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>Back to List
+                <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>Quay lại danh sách
             </a>
         </div>
 
@@ -29,13 +29,13 @@
             <!-- Tabs Header (Hidden in Edit Mode) -->
             <div class="tabs-header" th:if="${userDto.profileId == null}">
                 <button class="tab-btn active" data-tab="resident-tab">
-                    <i class="fa-solid fa-house-user" style="margin-right: 8px;"></i>Resident
+                    <i class="fa-solid fa-house-user" style="margin-right: 8px;"></i>Cư dân
                 </button>
                 <button class="tab-btn" data-tab="manager-tab">
-                    <i class="fa-solid fa-user-tie" style="margin-right: 8px;"></i>Manager
+                    <i class="fa-solid fa-user-tie" style="margin-right: 8px;"></i>Quản lý
                 </button>
                 <button class="tab-btn" data-tab="staff-tab">
-                    <i class="fa-solid fa-screwdriver-wrench" style="margin-right: 8px;"></i>Maintenance Staff
+                    <i class="fa-solid fa-screwdriver-wrench" style="margin-right: 8px;"></i>Nhân viên Bảo trì
                 </button>
             </div>
 
@@ -53,8 +53,8 @@
                         <input type="hidden" th:field="*{accountId}">
 
                         <div class="form-title"
-                            th:text="${userDto.profileId == null ? 'Resident Profile & Account Information' : 'Edit Resident Profile & Account'}">
-                            Resident Profile & Account Information
+                            th:text="${userDto.profileId == null ? 'Thông tin hồ sơ & tài khoản cư dân' : 'Chỉnh sửa hồ sơ & tài khoản cư dân'}">
+                            Thông tin hồ sơ & tài khoản cư dân
                         </div>
 
                         <!-- Form Fields Grid -->
@@ -62,29 +62,29 @@
 
 
                             <div class="form-group">
-                                <label for="res-fullname">Full Name<span class="required-star">*</span></label>
+                                <label for="res-fullname">Họ và tên<span class="required-star">*</span></label>
                                 <input type="text" id="res-fullname" th:field="*{fullName}" class="form-control"
                                     th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'"
-                                    placeholder="e.g. Tahani Al-Jamil">
+                                    placeholder="Ví dụ: Nguyễn Văn A">
                                 <span class="error-text" th:if="${#fields.hasErrors('fullName')}"
                                     th:errors="*{fullName}"></span>
                             </div>
 
                             <div class="form-group">
-                                <label for="res-gender">Gender<span class="required-star">*</span></label>
+                                <label for="res-gender">Giới tính<span class="required-star">*</span></label>
                                 <select id="res-gender" th:field="*{gender}" class="form-control"
                                     th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid'">
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="Male">Nam</option>
+                                    <option value="Female">Nữ</option>
+                                    <option value="Other">Khác</option>
                                 </select>
                                 <span class="error-text" th:if="${#fields.hasErrors('gender')}"
                                     th:errors="*{gender}"></span>
                             </div>
 
                             <div class="form-group">
-                                <label for="res-dob">Date of Birth</label>
+                                <label for="res-dob">Ngày sinh</label>
                                 <input type="date" id="res-dob" th:field="*{dateOfBirth}" class="form-control"
                                     th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid'">
                                 <span class="error-text" th:if="${#fields.hasErrors('dateOfBirth')}"
@@ -92,10 +92,10 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="res-phone">Phone Number<span class="required-star">*</span></label>
+                                <label for="res-phone">Số điện thoại<span class="required-star">*</span></label>
                                 <input type="text" id="res-phone" th:field="*{phoneNumber}" class="form-control"
                                     th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'"
-                                    placeholder="e.g. 0912345678">
+                                    placeholder="Ví dụ: 0912345678">
                                 <span class="error-text" th:if="${#fields.hasErrors('phoneNumber')}"
                                     th:errors="*{phoneNumber}"></span>
                             </div>
@@ -104,14 +104,14 @@
                                 <label for="res-email">Email<span class="required-star">*</span></label>
                                 <input type="text" id="res-email" th:field="*{email}" class="form-control"
                                     th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
-                                    placeholder="e.g. tahani@example.com">
+                                    placeholder="Ví dụ: nguyenvana@example.com">
                                 <span class="error-text" th:if="${#fields.hasErrors('email')}"
                                     th:errors="*{email}"></span>
                             </div>
 
                             <!-- Password field visible on create, hidden on edit -->
                             <div class="form-group" th:if="${userDto.profileId == null}">
-                                <label for="res-password">Password<span class="required-star">*</span></label>
+                                <label for="res-password">Mật khẩu<span class="required-star">*</span></label>
                                 <input type="password" id="res-password" th:field="*{password}" class="form-control"
                                     th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
                                     placeholder="••••••••">
@@ -121,25 +121,25 @@
                             <input type="hidden" th:field="*{password}" th:if="${userDto.profileId != null}">
 
                             <div class="form-group">
-                                <label for="res-placebirth">Place of Birth</label>
+                                <label for="res-placebirth">Nơi sinh</label>
                                 <input type="text" id="res-placebirth" th:field="*{placeOfBirth}" class="form-control"
                                     th:classappend="${#fields.hasErrors('placeOfBirth')} ? 'is-invalid'"
-                                    placeholder="e.g. Hanoi">
+                                    placeholder="Ví dụ: Hà Nội">
                                 <span class="error-text" th:if="${#fields.hasErrors('placeOfBirth')}"
                                     th:errors="*{placeOfBirth}"></span>
                             </div>
 
                             <div class="form-group">
-                                <label for="res-citizen">Citizen ID (CCCD)<span class="required-star">*</span></label>
+                                <label for="res-citizen">Số CCCD<span class="required-star">*</span></label>
                                 <input type="text" id="res-citizen" th:field="*{citizenId}" class="form-control"
                                     th:classappend="${#fields.hasErrors('citizenId')} ? 'is-invalid'"
-                                    placeholder="12-digit number">
+                                    placeholder="Số định danh 12 chữ số">
                                 <span class="error-text" th:if="${#fields.hasErrors('citizenId')}"
                                     th:errors="*{citizenId}"></span>
                             </div>
 
                             <div class="form-group">
-                                <label for="res-citizen-date">Issue Date</label>
+                                <label for="res-citizen-date">Ngày cấp</label>
                                 <input type="date" id="res-citizen-date" th:field="*{citizenIdIssueDate}"
                                     class="form-control"
                                     th:classappend="${#fields.hasErrors('citizenIdIssueDate')} ? 'is-invalid'">
@@ -148,46 +148,46 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="res-citizen-place">Issue Place</label>
+                                <label for="res-citizen-place">Nơi cấp</label>
                                 <input type="text" id="res-citizen-place" th:field="*{citizenIdIssuePlace}"
                                     class="form-control"
                                     th:classappend="${#fields.hasErrors('citizenIdIssuePlace')} ? 'is-invalid'"
-                                    placeholder="e.g. Cục QLHC về TTXH">
+                                    placeholder="Ví dụ: Cục QLHC về TTXH">
                                 <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssuePlace')}"
                                     th:errors="*{citizenIdIssuePlace}"></span>
                             </div>
                             <div class="form-group">
-                                <label for="res-nationality">Nationality</label>
+                                <label for="res-nationality">Quốc tịch</label>
                                 <input type="text" id="res-nationality" th:field="*{nationality}" class="form-control"
                                     th:classappend="${#fields.hasErrors('nationality')} ? 'is-invalid'">
                                 <span class="error-text" th:if="${#fields.hasErrors('nationality')}"
                                     th:errors="*{nationality}"></span>
                             </div>
                             <div class="form-group">
-                                <label for="res-ethnicity">Ethnicity</label>
+                                <label for="res-ethnicity">Dân tộc</label>
                                 <input type="text" id="res-ethnicity" th:field="*{ethnicity}" class="form-control"
                                     th:classappend="${#fields.hasErrors('ethnicity')} ? 'is-invalid'">
                                 <span class="error-text" th:if="${#fields.hasErrors('ethnicity')}"
                                     th:errors="*{ethnicity}"></span>
                             </div>
                             <div class="form-group">
-                                <label for="res-status">Resident Status<span class="required-star">*</span></label>
+                                <label for="res-status">Trạng thái cư dân<span class="required-star">*</span></label>
                                 <select id="res-status" th:field="*{residentStatus}" class="form-control" required>
-                                    <option value="1">Active / Live-in</option>
-                                    <option value="3">Temporary</option>
-                                    <option value="2">Moved out</option>
+                                    <option value="1">Thường trú / Đang ở</option>
+                                    <option value="3">Tạm trú</option>
+                                    <option value="2">Đã dọn đi</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
-                                <label for="res-movein">Move-in Date</label>
+                                <label for="res-movein">Ngày dọn vào</label>
                                 <input type="date" id="res-movein" th:field="*{moveInDate}" class="form-control"
                                     th:classappend="${#fields.hasErrors('moveInDate')} ? 'is-invalid'">
                                 <span class="error-text" th:if="${#fields.hasErrors('moveInDate')}"
                                     th:errors="*{moveInDate}"></span>
                             </div>
                             <div class="form-group">
-                                <label for="res-moveout">Move-out Date</label>
+                                <label for="res-moveout">Ngày dọn đi</label>
                                 <input type="date" id="res-moveout" th:field="*{moveOutDate}" class="form-control"
                                     th:classappend="${#fields.hasErrors('moveOutDate')} ? 'is-invalid'">
                                 <span class="error-text" th:if="${#fields.hasErrors('moveOutDate')}"
@@ -195,20 +195,20 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="res-emergency-name">Emergency Contact Name</label>
+                                <label for="res-emergency-name">Tên liên hệ khẩn cấp</label>
                                 <input type="text" id="res-emergency-name" th:field="*{emergencyContactName}"
                                     class="form-control"
                                     th:classappend="${#fields.hasErrors('emergencyContactName')} ? 'is-invalid'"
-                                    placeholder="e.g. Family member name">
+                                    placeholder="Ví dụ: Tên người thân">
                                 <span class="error-text" th:if="${#fields.hasErrors('emergencyContactName')}"
                                     th:errors="*{emergencyContactName}"></span>
                             </div>
                             <div class="form-group">
-                                <label for="res-emergency-phone">Emergency Contact Phone</label>
+                                <label for="res-emergency-phone">SĐT liên hệ khẩn cấp</label>
                                 <input type="text" id="res-emergency-phone" th:field="*{emergencyContactPhone}"
                                     class="form-control"
                                     th:classappend="${#fields.hasErrors('emergencyContactPhone')} ? 'is-invalid'"
-                                    placeholder="e.g. Phone number">
+                                    placeholder="Ví dụ: Số điện thoại">
                                 <span class="error-text" th:if="${#fields.hasErrors('emergencyContactPhone')}"
                                     th:errors="*{emergencyContactPhone}"></span>
                             </div>
@@ -217,26 +217,25 @@
                                 <div class="checkbox-group">
                                     <input type="checkbox" id="res-owner" th:field="*{isHouseholdOwner}"
                                         class="checkbox-control" value="true">
-                                    <label for="res-owner">Is Household Owner ?</label>
+                                    <label for="res-owner">Là chủ hộ ?</label>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="res-relation-to-owner">Relationship To Owner</label>
+                                <label for="res-relation-to-owner">Quan hệ với chủ hộ</label>
                                 <input type="text" id="res-relation-to-owner" th:field="*{relationshipToOwner}"
                                     class="form-control"
                                     th:classappend="${#fields.hasErrors('relationshipToOwner')} ? 'is-invalid'"
-                                    placeholder="e.g. Parents, Child, ...">
+                                    placeholder="Ví dụ: Bố mẹ, Vợ/Chồng, Con...">
                                 <span class="error-text" th:if="${#fields.hasErrors('relationshipToOwner')}"
                                     th:errors="*{relationshipToOwner}"></span>
                             </div>
                         </div>
 
                         <div class="form-actions">
-                            <a th:href="@{/admin/users}" class="btn-secondary">Cancel</a>
+                            <a th:href="@{/admin/users}" class="btn-secondary">Hủy bỏ</a>
                             <button type="submit" class="btn-primary"
-                                th:text="${userDto.profileId == null ? 'Save Resident' : 'Update Resident'}">Save
-                                Resident</button>
+                                th:text="${userDto.profileId == null ? 'Lưu cư dân' : 'Cập nhật cư dân'}">Lưu cư dân</button>
                         </div>
                     </form>
                 </div>
@@ -252,37 +251,37 @@
                         <input type="hidden" th:field="*{accountId}">
 
                         <div class="form-title"
-                            th:text="${userDto.profileId == null ? 'Manager Profile & Account Information' : 'Edit Manager Profile & Account'}">
-                            Manager Profile & Account Information
+                            th:text="${userDto.profileId == null ? 'Thông tin hồ sơ & tài khoản quản lý' : 'Chỉnh sửa hồ sơ & tài khoản quản lý'}">
+                            Thông tin hồ sơ & tài khoản quản lý
                         </div>
 
                         <div class="form-grid">
 
 
                             <div class="form-group">
-                                <label for="man-fullname">Full Name<span class="required-star">*</span></label>
+                                <label for="man-fullname">Họ và tên<span class="required-star">*</span></label>
                                 <input type="text" id="man-fullname" th:field="*{fullName}" class="form-control"
                                     th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'"
-                                    placeholder="e.g. Eleanor Shellstrop">
+                                    placeholder="Ví dụ: Nguyễn Văn B">
                                 <span class="error-text" th:if="${#fields.hasErrors('fullName')}"
                                     th:errors="*{fullName}"></span>
                             </div>
 
                             <div class="form-group">
-                                <label for="man-gender">Gender<span class="required-star">*</span></label>
+                                <label for="man-gender">Giới tính<span class="required-star">*</span></label>
                                 <select id="man-gender" th:field="*{gender}" class="form-control"
                                     th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid'">
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="Male">Nam</option>
+                                    <option value="Female">Nữ</option>
+                                    <option value="Other">Khác</option>
                                 </select>
                                 <span class="error-text" th:if="${#fields.hasErrors('gender')}"
                                     th:errors="*{gender}"></span>
                             </div>
 
                             <div class="form-group">
-                                <label for="man-dob">Date of Birth</label>
+                                <label for="man-dob">Ngày sinh</label>
                                 <input type="date" id="man-dob" th:field="*{dateOfBirth}" class="form-control"
                                     th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid'">
                                 <span class="error-text" th:if="${#fields.hasErrors('dateOfBirth')}"
@@ -290,10 +289,10 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="man-phone">Phone Number<span class="required-star">*</span></label>
+                                <label for="man-phone">Số điện thoại<span class="required-star">*</span></label>
                                 <input type="text" id="man-phone" th:field="*{phoneNumber}" class="form-control"
                                     th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'"
-                                    placeholder="e.g. 0912345678">
+                                    placeholder="Ví dụ: 0912345678">
                                 <span class="error-text" th:if="${#fields.hasErrors('phoneNumber')}"
                                     th:errors="*{phoneNumber}"></span>
                             </div>
@@ -302,14 +301,14 @@
                                 <label for="man-email">Email<span class="required-star">*</span></label>
                                 <input type="text" id="man-email" th:field="*{email}" class="form-control"
                                     th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
-                                    placeholder="e.g. eleanor@example.com">
+                                    placeholder="Ví dụ: manager@example.com">
                                 <span class="error-text" th:if="${#fields.hasErrors('email')}"
                                     th:errors="*{email}"></span>
                             </div>
 
                             <!-- Password field visible on create, hidden on edit -->
                             <div class="form-group" th:if="${userDto.profileId == null}">
-                                <label for="man-password">Password<span class="required-star">*</span></label>
+                                <label for="man-password">Mật khẩu<span class="required-star">*</span></label>
                                 <input type="password" id="man-password" th:field="*{password}" class="form-control"
                                     th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
                                     placeholder="••••••••">
@@ -321,10 +320,9 @@
                         </div>
 
                         <div class="form-actions">
-                            <a th:href="@{/admin/users}" class="btn-secondary">Cancel</a>
+                            <a th:href="@{/admin/users}" class="btn-secondary">Hủy bỏ</a>
                             <button type="submit" class="btn-primary"
-                                th:text="${userDto.profileId == null ? 'Save Manager' : 'Update Manager'}">Save
-                                Manager</button>
+                                th:text="${userDto.profileId == null ? 'Lưu quản lý' : 'Cập nhật quản lý'}">Lưu quản lý</button>
                         </div>
                     </form>
                 </div>
@@ -340,37 +338,37 @@
                         <input type="hidden" th:field="*{accountId}">
 
                         <div class="form-title"
-                            th:text="${userDto.profileId == null ? 'Maintenance Staff Profile & Account Information' : 'Edit Maintenance Staff Profile & Account'}">
-                            Maintenance Staff Profile & Account Information
+                            th:text="${userDto.profileId == null ? 'Thông tin hồ sơ & tài khoản nhân viên bảo trì' : 'Chỉnh sửa hồ sơ & tài khoản nhân viên bảo trì'}">
+                            Thông tin hồ sơ & tài khoản nhân viên bảo trì
                         </div>
 
                         <div class="form-grid">
 
 
                             <div class="form-group">
-                                <label for="st-fullname">Full Name<span class="required-star">*</span></label>
+                                <label for="st-fullname">Họ và tên<span class="required-star">*</span></label>
                                 <input type="text" id="st-fullname" th:field="*{fullName}" class="form-control"
                                     th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'"
-                                    placeholder="e.g. John Doe">
+                                    placeholder="Ví dụ: Nguyễn Văn C">
                                 <span class="error-text" th:if="${#fields.hasErrors('fullName')}"
                                     th:errors="*{fullName}"></span>
                             </div>
 
                             <div class="form-group">
-                                <label for="st-gender">Gender<span class="required-star">*</span></label>
+                                <label for="st-gender">Giới tính<span class="required-star">*</span></label>
                                 <select id="st-gender" th:field="*{gender}" class="form-control"
                                     th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid'">
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="Male">Nam</option>
+                                    <option value="Female">Nữ</option>
+                                    <option value="Other">Khác</option>
                                 </select>
                                 <span class="error-text" th:if="${#fields.hasErrors('gender')}"
                                     th:errors="*{gender}"></span>
                             </div>
 
                             <div class="form-group">
-                                <label for="st-dob">Date of Birth</label>
+                                <label for="st-dob">Ngày sinh</label>
                                 <input type="date" id="st-dob" th:field="*{dateOfBirth}" class="form-control"
                                     th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid'">
                                 <span class="error-text" th:if="${#fields.hasErrors('dateOfBirth')}"
@@ -378,10 +376,10 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="st-phone">Phone Number<span class="required-star">*</span></label>
+                                <label for="st-phone">Số điện thoại<span class="required-star">*</span></label>
                                 <input type="text" id="st-phone" th:field="*{phoneNumber}" class="form-control"
                                     th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'"
-                                    placeholder="e.g. 0912345678">
+                                    placeholder="Ví dụ: 0912345678">
                                 <span class="error-text" th:if="${#fields.hasErrors('phoneNumber')}"
                                     th:errors="*{phoneNumber}"></span>
                             </div>
@@ -390,14 +388,14 @@
                                 <label for="st-email">Email<span class="required-star">*</span></label>
                                 <input type="text" id="st-email" th:field="*{email}" class="form-control"
                                     th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
-                                    placeholder="e.g. staff@example.com">
+                                    placeholder="Ví dụ: staff@example.com">
                                 <span class="error-text" th:if="${#fields.hasErrors('email')}"
                                     th:errors="*{email}"></span>
                             </div>
 
                             <!-- Password field visible on create, hidden on edit -->
                             <div class="form-group" th:if="${userDto.profileId == null}">
-                                <label for="st-password">Password<span class="required-star">*</span></label>
+                                <label for="st-password">Mật khẩu<span class="required-star">*</span></label>
                                 <input type="password" id="st-password" th:field="*{password}" class="form-control"
                                     th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
                                     placeholder="••••••••">
@@ -409,10 +407,9 @@
                         </div>
 
                         <div class="form-actions">
-                            <a th:href="@{/admin/users}" class="btn-secondary">Cancel</a>
+                            <a th:href="@{/admin/users}" class="btn-secondary">Hủy bỏ</a>
                             <button type="submit" class="btn-primary"
-                                th:text="${userDto.profileId == null ? 'Save Staff' : 'Update Staff'}">Save
-                                Staff</button>
+                                th:text="${userDto.profileId == null ? 'Lưu nhân viên' : 'Cập nhật nhân viên'}">Lưu nhân viên</button>
                         </div>
                     </form>
                 </div>

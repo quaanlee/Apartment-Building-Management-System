@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maintainer Dashboard | ABM System</title>
+    <title>Bảng điều khiển Nhân viên | Hệ thống ABM</title>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -40,9 +40,9 @@
 </head>
 <body>
     <div class="card">
-        <h1>Maintainer Dashboard</h1>
-        <p>Welcome back, <span th:text="${session.currentUser != null ? session.currentUser.username : 'Maintainer'}">Maintainer</span>!</p>
-        <a th:href="@{/logout}" class="btn-logout">Logout</a>
+        <h1>Bảng điều khiển Nhân viên</h1>
+        <p>Chào mừng trở lại, <span th:text="${session.currentUser != null ? session.currentUser.username : 'Nhân viên'}">Nhân viên</span>!</p>
+        <a th:href="@{/logout}" class="btn-logout">Đăng xuất</a>
     </div>
 </body>
 </html>

@@ -146,7 +146,7 @@ public class ResidentMaintenanceController {
             }
         }
         if (apartment == null) {
-            redirect.addFlashAttribute("message", "No apartment assigned to your profile.");
+            redirect.addFlashAttribute("message", "Không có căn hộ nào được liên kết với hồ sơ của bạn.");
             redirect.addFlashAttribute("messageType", "error");
             return "redirect:/resident/maintenance";
         }
@@ -180,7 +180,7 @@ public class ResidentMaintenanceController {
             }
         }
 
-        redirect.addFlashAttribute("message", "Maintenance request created successfully.");
+        redirect.addFlashAttribute("message", "Yêu cầu bảo trì đã được tạo thành công.");
         redirect.addFlashAttribute("messageType", "success");
         return "redirect:/resident/maintenance";
     }
@@ -215,6 +215,7 @@ public class ResidentMaintenanceController {
                 model.addAttribute("progressPercent", 0);
                 model.addAttribute("latestReport", "");
             }
+            model.addAttribute("reports", reports);
             model.addAttribute("hasTask", true);
         } else {
             model.addAttribute("hasTask", false);
@@ -259,7 +260,7 @@ public class ResidentMaintenanceController {
             return "redirect:/resident/maintenance";
         }
         if (req.getStatus() != 0) {
-            redirect.addFlashAttribute("message", "Cannot edit: request is not pending");
+            redirect.addFlashAttribute("message", "Không thể chỉnh sửa: yêu cầu không ở trạng thái chờ duyệt");
             redirect.addFlashAttribute("messageType", "error");
             return "redirect:/resident/maintenance/" + id + "/detail";
         }
@@ -288,9 +289,8 @@ public class ResidentMaintenanceController {
             }
         }
 
-        redirect.addFlashAttribute("message", "Request updated successfully");
+        redirect.addFlashAttribute("message", "Yêu cầu đã được cập nhật thành công");
         redirect.addFlashAttribute("messageType", "success");
         return "redirect:/resident/maintenance/" + id + "/detail";
     }
 }
-

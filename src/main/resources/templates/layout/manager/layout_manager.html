@@ -20,68 +20,68 @@
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <h1>ABMS Manager</h1>
-                <p>Operations Portal</p>
+                <p>Cổng Vận Hành</p>
             </div>
 
             <ul class="sidebar-menu">
                 <li class="sidebar-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
                     <a th:href="@{/manager/dashboard}">
                         <i class="fas fa-th-large"></i>
-                        <span>Dashboard</span>
+                        <span>Trang chủ</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'profiles' ? 'active' : ''}">
                     <a th:href="@{/manager/profiles}">
                         <i class="fa-solid fa-address-book"></i>
-                        <span>Profiles Directory</span>
+                        <span>Danh bạ cư dân</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'apartments' ? 'active' : ''}">
                     <a th:href="@{/manager/apartments}">
                         <i class="fa-solid fa-building"></i>
-                        <span>Apartments</span>
+                        <span>Căn hộ</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'billing' ? 'active' : ''}">
                     <a th:href="@{/manager/bills}">
                         <i class="fa-solid fa-file-invoice-dollar"></i>
-                        <span>Billing & Payments</span>
+                        <span>Hóa đơn & Thanh toán</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'maintenance' ? 'active' : ''}">
                     <a th:href="@{/manager/maintenance}">
                         <i class="fa-solid fa-screwdriver-wrench"></i>
-                        <span>Maintenance</span>
+                        <span>Yêu cầu bảo trì</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'bookings' ? 'active' : ''}">
                     <a th:href="@{/manager/utility-bookings}">
                         <i class="fa-solid fa-calendar-check"></i>
-                        <span>Amenity Bookings</span>
+                        <span>Đặt tiện ích</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'service & utility' ? 'active' : ''}">
                     <a th:href="@{/manager/services}">
                         <i class="fas fa-briefcase"></i>
-                        <span>Service & Utility</span>
+                        <span>Dịch vụ & Tiện ích</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'vehicles' ? 'active' : ''}">
                     <a th:href="@{/manager/vehicles}">
                         <i class="fa-solid fa-car"></i>
-                        <span>Vehicles</span>
+                        <span>Phương tiện</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'revenue' ? 'active' : ''}">
                     <a th:href="@{/manager/revenue}">
                         <i class="fa-solid fa-chart-line"></i>
-                        <span>Revenue Report</span>
+                        <span>Báo cáo doanh thu</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'notifications' ? 'active' : ''}">
                     <a th:href="@{/manager/notifications}">
                         <i class="fa-solid fa-bell"></i>
-                        <span>Notifications</span>
+                        <span>Thông báo</span>
                     </a>
                 </li>
             </ul>
@@ -89,7 +89,7 @@
             <div class="sidebar-footer">
                 <a th:href="@{/logout}" class="logout-btn">
                     <i class="fa-solid fa-right-from-bracket"></i>
-                    <span>Logout</span>
+                    <span>Đăng xuất</span>
                 </a>
             </div>
 
@@ -106,20 +106,20 @@
                         <i class="fa-solid fa-bars"></i>
                     </button>
                     <span class="header-page-title"
-                        th:text="${pageTitle != null ? pageTitle : 'Manager Dashboard'}">Manager Dashboard</span>
+                        th:text="${pageTitle != null ? pageTitle : 'Trang chủ Quản lý'}">Trang chủ Quản lý</span>
                 </div>
 
                 <!-- Action Controls -->
                 <div class="header-actions">
-                    <button class="icon-btn" title="Notifications">
+                    <button class="icon-btn" title="Thông báo">
                         <i class="fa-solid fa-bell"></i>
                         <span class="badge"></span>
                     </button>
 
                     <a th:href="@{/manager/profiles}" class="user-profile-trigger" id="userProfileTrigger"
                         style="text-decoration: none;">
-                        <div class="user-avatar-placeholder">M</div>
-                        <span class="user-role">Manager Staff</span>
+                        <div class="user-avatar-placeholder">Q</div>
+                        <span class="user-role">Ban quản lý</span>
                     </a>
                 </div>
             </header>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
       th:replace="~{layout/manager/layout_manager :: manager-layout(~{::#main-content}, 'vehicles')}"
-      th:with="pageTitle='Manager Dashboard'">
+      th:with="pageTitle='Quản lý Phương tiện'">
 <head>
-    <title>Vehicles Management</title>
+    <title>Quản lý Phương tiện</title>
 </head>
 <body>
 <div id="main-content">
@@ -189,8 +189,8 @@
     </style>
 
     <div class="page-header">
-        <h1 class="page-title">Vehicles Management</h1>
-        <div class="page-subtitle">Manage resident vehicle registrations and parking status.</div>
+        <h1 class="page-title">Quản lý Phương tiện</h1>
+        <div class="page-subtitle">Quản lý đăng ký phương tiện và trạng thái đỗ xe của cư dân.</div>
     </div>
 
     <!-- Stats Row -->
@@ -201,7 +201,7 @@
                     <i class="fas fa-car-side"></i>
                 </div>
                 <div class="stats-info">
-                    <div class="stats-label">Total Registered</div>
+                    <div class="stats-label">Tổng số phương tiện</div>
                     <div class="stats-value" th:text="${totalRegistered}">1,248</div>
                 </div>
             </div>
@@ -212,7 +212,7 @@
                     <i class="fas fa-clipboard-list"></i>
                 </div>
                 <div class="stats-info">
-                    <div class="stats-label">Pending Approvals</div>
+                    <div class="stats-label">Yêu cầu chờ duyệt</div>
                     <div class="stats-value" th:text="${pendingApprovals}">24</div>
                 </div>
             </div>
@@ -222,61 +222,61 @@
     <!-- Table Section -->
     <div class="table-card">
         <div class="table-header">
-            <h2 class="table-title">Registration Requests</h2>
-            <a href="#" class="view-all-link">View All</a>
+            <h2 class="table-title">Yêu cầu đăng ký</h2>
+            <a href="#" class="view-all-link">Xem tất cả</a>
         </div>
         <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>OWNER</th>
-                        <th>APT</th>
-                        <th>VEHICLE</th>
-                        <th>PLATE</th>
-                        <th class="text-center">STATUS</th>
-                        <th>ACTIONS</th>
+                        <th>CHỦ SỞ HỮU</th>
+                        <th>CĂN HỘ</th>
+                        <th>PHƯƠNG TIỆN</th>
+                        <th>BIỂN SỐ</th>
+                        <th class="text-center">TRẠNG THÁI</th>
+                        <th>THAO TÁC</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="vehicle : ${allVehicles}">
                         <td>
-                            <div class="owner-name" th:text="${vehicle.profile != null ? vehicle.profile.fullName : 'N/A'}">Robert Fox</div>
+                            <div class="owner-name" th:text="${vehicle.profile != null ? vehicle.profile.fullName : 'Không khả dụng'}">Robert Fox</div>
                         </td>
                         <td>
-                            <span th:text="${vehicle.profile != null && vehicle.profile.apartment != null ? 'Apt ' + vehicle.profile.apartment.apartmentNumber : 'N/A'}">Apt 302</span>
+                            <span th:text="${vehicle.profile != null && vehicle.profile.apartment != null ? 'P.' + vehicle.profile.apartment.apartmentNumber : 'Không khả dụng'}">Apt 302</span>
                         </td>
                         <td>
                             <div class="vehicle-type" th:text="${vehicle.brand + ' ' + vehicle.vehicleType}">Tesla Model 3</div>
                         </td>
                         <td th:text="${vehicle.licensePlate}">ABC-1234</td>
                         <td class="text-center">
-                            <span th:if="${vehicle.status == 0}" class="badge bg-warning text-dark">Pending</span>
-                            <span th:if="${vehicle.status == 1}" class="badge bg-success">Approved</span>
-                            <span th:if="${vehicle.status == 2}" class="badge bg-danger">Rejected</span>
+                            <span th:if="${vehicle.status == 0}" class="badge bg-warning text-dark">Chờ duyệt</span>
+                            <span th:if="${vehicle.status == 1}" class="badge bg-success">Đã duyệt</span>
+                            <span th:if="${vehicle.status == 2}" class="badge bg-danger">Từ chối</span>
                         </td>
                         <td>
                             <div class="btn-action-group">
                                 <form th:if="${vehicle.status == 0}" th:action="@{/manager/vehicles/{id}/approve(id=${vehicle.vehicleId})}" method="post">
-                                    <button type="submit" class="btn-approve">Approve</button>
+                                    <button type="submit" class="btn-approve">Duyệt</button>
                                 </form>
                                 <form th:if="${vehicle.status == 0}" th:action="@{/manager/vehicles/{id}/reject(id=${vehicle.vehicleId})}" method="post">
-                                    <button type="submit" class="btn-reject">Reject</button>
+                                    <button type="submit" class="btn-reject">Từ chối</button>
                                 </form>
                                 <form th:if="${vehicle.status == 1}" th:action="@{/manager/vehicles/{id}/revoke(id=${vehicle.vehicleId})}" method="post" onsubmit="openRevokeModal(event, this)">
-                                    <button type="submit" class="btn-reject">Revoke</button>
+                                    <button type="submit" class="btn-reject">Thu hồi</button>
                                 </form>
                                 <form th:if="${vehicle.status == 2}" th:action="@{/manager/vehicles/{id}/revoke(id=${vehicle.vehicleId})}" method="post">
-                                    <button type="submit" class="btn-reject" style="color: #6c757d; border-color: #6c757d;">Re-evaluate</button>
+                                    <button type="submit" class="btn-reject" style="color: #6c757d; border-color: #6c757d;">Xét lại</button>
                                 </form>
-                                 <button type="button" class="btn-details" data-bs-toggle="modal" th:data-bs-target="'#detailModal-' + ${vehicle.vehicleId}" title="View Details">
-                                     Details
+                                 <button type="button" class="btn-details" data-bs-toggle="modal" th:data-bs-target="'#detailModal-' + ${vehicle.vehicleId}" title="Xem Chi tiết">
+                                     Chi tiết
                                  </button>
                             </div>
                         </td>
                     </tr>
                     <tr th:if="${allVehicles == null || allVehicles.isEmpty()}">
                         <td colspan="6" class="text-center py-4 text-muted">
-                            No vehicle registrations found.
+                            Không tìm thấy yêu cầu đăng ký phương tiện nào.
                         </td>
                     </tr>
                 </tbody>
@@ -290,68 +290,68 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content" style="border-radius: 8px; border: none; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
                     <div class="modal-header" style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; border-top-left-radius: 8px; border-top-right-radius: 8px;">
-                        <h5 class="modal-title fw-bold" id="detailModalLabel" style="color: #111827;">Vehicle Registration Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title fw-bold" id="detailModalLabel" style="color: #111827;">Chi tiết Đăng ký Phương tiện</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                     </div>
                     <div class="modal-body p-0">
                         <table class="table table-striped table-hover mb-0">
                             <tbody>
                                 <tr>
-                                    <th class="text-secondary fw-semibold ps-4" style="width: 45%; border-top: none;">Owner Name</th>
-                                    <td class="fw-semibold text-dark" style="border-top: none;" th:text="${vehicle.profile != null ? vehicle.profile.fullName : 'N/A'}">Alex Mercer</td>
+                                    <th class="text-secondary fw-semibold ps-4" style="width: 45%; border-top: none;">Tên chủ sở hữu</th>
+                                    <td class="fw-semibold text-dark" style="border-top: none;" th:text="${vehicle.profile != null ? vehicle.profile.fullName : 'Không khả dụng'}">Alex Mercer</td>
                                 </tr>
                                 <tr>
-                                    <th class="text-secondary fw-semibold ps-4">Phone Number</th>
-                                    <td class="text-dark" th:text="${vehicle.profile != null ? vehicle.profile.phoneNumber : 'N/A'}">N/A</td>
+                                    <th class="text-secondary fw-semibold ps-4">Số điện thoại</th>
+                                    <td class="text-dark" th:text="${vehicle.profile != null ? vehicle.profile.phoneNumber : 'Không khả dụng'}">N/A</td>
                                 </tr>
                                 <tr>
-                                    <th class="text-secondary fw-semibold ps-4">Citizen ID</th>
-                                    <td class="font-monospace text-dark" th:text="${vehicle.profile != null ? vehicle.profile.citizenId : 'N/A'}">N/A</td>
+                                    <th class="text-secondary fw-semibold ps-4">Số CCCD</th>
+                                    <td class="font-monospace text-dark" th:text="${vehicle.profile != null ? vehicle.profile.citizenId : 'Không khả dụng'}">N/A</td>
                                 </tr>
                                 <tr>
-                                    <th class="text-secondary fw-semibold ps-4">Apartment</th>
-                                    <td class="text-dark" th:text="${vehicle.profile != null && vehicle.profile.apartment != null ? 'Apt ' + vehicle.profile.apartment.apartmentNumber : 'N/A'}">N/A</td>
+                                    <th class="text-secondary fw-semibold ps-4">Căn hộ</th>
+                                    <td class="text-dark" th:text="${vehicle.profile != null && vehicle.profile.apartment != null ? 'P.' + vehicle.profile.apartment.apartmentNumber : 'Không khả dụng'}">N/A</td>
                                 </tr>
                                 <tr>
-                                    <th class="text-secondary fw-semibold ps-4">Brand</th>
+                                    <th class="text-secondary fw-semibold ps-4">Nhãn hiệu</th>
                                     <td class="text-dark" th:text="${vehicle.brand}">Tesla</td>
                                 </tr>
                                 <tr>
-                                    <th class="text-secondary fw-semibold ps-4">Vehicle Type</th>
+                                    <th class="text-secondary fw-semibold ps-4">Dòng xe / Loại xe</th>
                                     <td class="text-dark" th:text="${vehicle.vehicleType}">Model 3</td>
                                 </tr>
                                 <tr>
-                                    <th class="text-secondary fw-semibold ps-4">Color</th>
+                                    <th class="text-secondary fw-semibold ps-4">Màu xe</th>
                                     <td class="text-dark" th:text="${vehicle.color}">Black</td>
                                 </tr>
                                 <tr>
-                                    <th class="text-secondary fw-semibold ps-4">License Plate</th>
+                                    <th class="text-secondary fw-semibold ps-4">Biển kiểm soát</th>
                                     <td class="font-monospace fw-bold text-primary" th:text="${vehicle.licensePlate}">ABC-1234</td>
                                 </tr>
                                 <tr>
-                                    <th class="text-secondary fw-semibold ps-4">Registered Date</th>
+                                    <th class="text-secondary fw-semibold ps-4">Ngày đăng ký</th>
                                     <td class="text-dark" th:text="${vehicle.registeredDate}">2026-07-07</td>
                                 </tr>
                                 <tr>
-                                    <th class="text-secondary fw-semibold ps-4">Status</th>
+                                    <th class="text-secondary fw-semibold ps-4">Trạng thái</th>
                                     <td>
-                                        <span th:if="${vehicle.status == 0}" class="badge bg-warning text-dark">Pending</span>
-                                        <span th:if="${vehicle.status == 1}" class="badge bg-success">Approved</span>
-                                        <span th:if="${vehicle.status == 2}" class="badge bg-danger">Rejected</span>
+                                        <span th:if="${vehicle.status == 0}" class="badge bg-warning text-dark">Chờ duyệt</span>
+                                        <span th:if="${vehicle.status == 1}" class="badge bg-success">Đã duyệt</span>
+                                        <span th:if="${vehicle.status == 2}" class="badge bg-danger">Từ chối</span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="text-secondary fw-semibold ps-4" style="border-bottom: none;">Document Attachment</th>
+                                    <th class="text-secondary fw-semibold ps-4" style="border-bottom: none;">Giấy tờ đính kèm</th>
                                     <td style="border-bottom: none;">
-                                        <a th:if="${vehicle.documentUrl != null && !vehicle.documentUrl.isEmpty()}" th:href="${vehicle.documentUrl}" target="_blank" class="btn btn-sm btn-primary py-1 px-3 fw-medium" style="background-color: #582BE8; border: none; font-size: 12px; border-radius: 4px;">View Document</a>
-                                        <span th:unless="${vehicle.documentUrl != null && !vehicle.documentUrl.isEmpty()}" class="text-muted" style="font-size: 13px;">No attachment uploaded</span>
+                                        <a th:if="${vehicle.documentUrl != null && !vehicle.documentUrl.isEmpty()}" th:href="${vehicle.documentUrl}" target="_blank" class="btn btn-sm btn-primary py-1 px-3 fw-medium" style="background-color: #582BE8; border: none; font-size: 12px; border-radius: 4px;">Xem giấy tờ</a>
+                                        <span th:unless="${vehicle.documentUrl != null && !vehicle.documentUrl.isEmpty()}" class="text-muted" style="font-size: 13px;">Chưa tải lên tệp đính kèm</span>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="modal-footer" style="background-color: #f9fafb; border-top: 1px solid #e5e7eb; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
-                        <button type="button" class="btn btn-secondary py-1.5 px-4" data-bs-dismiss="modal" style="font-size: 13px; border-radius: 4px;">Close</button>
+                        <button type="button" class="btn btn-secondary py-1.5 px-4" data-bs-dismiss="modal" style="font-size: 13px; border-radius: 4px;">Đóng</button>
                     </div>
                 </div>
             </div>
@@ -363,7 +363,7 @@
         <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
             <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
                 <div class="modal-header" style="border-bottom: 1px solid #edf2f7; padding: 16px 24px;">
-                    <h5 class="modal-title fw-bold" id="confirmRevokeModalLabel" style="color: #1a202c; font-size: 16px; margin: 0;">Confirm Revocation</h5>
+                    <h5 class="modal-title fw-bold" id="confirmRevokeModalLabel" style="color: #1a202c; font-size: 16px; margin: 0;">Xác nhận Thu hồi</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center" style="padding: 32px 24px;">
@@ -371,12 +371,12 @@
                         <i class="fa-solid fa-triangle-exclamation"></i>
                     </div>
                     <p style="font-size: 14px; color: #4a5568; line-height: 1.6; margin: 0;">
-                        Are you sure you want to revoke this registration? It will be moved back to the pending requests.
+                        Bạn có chắc chắn muốn thu hồi đăng ký này không? Đăng ký sẽ được chuyển lại danh sách chờ duyệt.
                     </p>
                 </div>
                 <div class="modal-footer" style="background-color: #f8fafc; border-top: 1px solid #edf2f7; display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 6px; color: #4a5568; border: 1px solid #cbd5e0; background: #edf2f7;">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmRevokeBtn" style="font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 6px; background-color: #dc3545; border: none; color: white;">Revoke</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 6px; color: #4a5568; border: 1px solid #cbd5e0; background: #edf2f7;">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmRevokeBtn" style="font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 6px; background-color: #dc3545; border: none; color: white;">Thu hồi</button>
                 </div>
             </div>
         </div>

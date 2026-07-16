@@ -11,9 +11,9 @@
     
     <!-- Breadcrumb -->
     <nav class="breadcrumb-nav">
-        <a th:href="@{/resident/dashboard}">Dashboard</a>
+        <a th:href="@{/resident/dashboard}">Trang chủ</a>
         <i class="fa-solid fa-chevron-right"></i>
-        <a th:href="@{/resident/utilities}">Tiện Ích</a>
+        <a th:href="@{/resident/utilities}">Tiện ích</a>
         <i class="fa-solid fa-chevron-right"></i>
         <span th:text="${utility.utilityName}">Utility Name</span>
     </nav>
@@ -23,15 +23,15 @@
         <div class="header-left">
             <div class="title-badge-row">
                 <h1 th:text="${utility.utilityName}">Utility Name</h1>
-                <span class="badge-status active">Active</span>
-                <span class="badge-status" th:text="${utility.type} ? 'RESERVABLE' : 'FREE USE'">RESERVABLE</span>
+                <span class="badge-status active">Đang hoạt động</span>
+                <span class="badge-status" th:text="${utility.type} ? 'ĐẶT TRƯỚC' : 'SỰ DỤNG TỰ DO'">RESERVABLE</span>
             </div>
             <p class="subtitle-text" th:text="${utility.description}">Mô tả tiện ích</p>
         </div>
         <div class="header-right">
             <a th:href="@{/resident/utilities}" class="btn-back-list">
                 <i class="fa-solid fa-arrow-left"></i>
-                Back to List
+                Quay lại Danh sách
             </a>
         </div>
     </div>
@@ -43,13 +43,13 @@
 
     <!-- Facility Overview -->
     <div class="overview-section">
-        <h3>Facility Overview</h3>
+        <h3>Giới thiệu tiện ích</h3>
         <p th:text="${utility.description}">
             Mô tả
         </p>
         <div class="location-box">
             <i class="fa-solid fa-location-dot"></i>
-            <span>Central Area</span> <!-- Cư dân có thể không cần biết location của tiện ích tổng -->
+            <span>Khu vực trung tâm</span>
         </div>
     </div>
     
@@ -57,7 +57,7 @@
     <div class="operations-grid detail-operations-grid">
         <!-- Resources Card -->
         <div class="info-card">
-            <h4>PHYSICAL RESOURCES &amp; LOCATIONS</h4>
+            <h4>DANH SÁCH CÁC KHU VỰC &amp; VỊ TRÍ</h4>
             <div class="resources-list">
                 <div class="resource-row" th:each="res : ${resources}">
                     <div class="resource-meta">
@@ -67,15 +67,15 @@
                     
                     <div style="display: flex; gap: 8px; align-items: center;">
                         <span th:class="${res.status} ? 'badge-status active' : 'badge-status maintenance'" 
-                              th:text="${res.status} ? 'Ready' : 'Maintenance'" 
-                              style="font-size: 11px; padding: 4px 8px; margin-right: 8px;">Ready</span>
+                              th:text="${res.status} ? 'Sẵn sàng' : 'Bảo trì'" 
+                              style="font-size: 11px; padding: 4px 8px; margin-right: 8px;">Sẵn sàng</span>
                               
                         <a th:href="@{/resident/utilities/resources/{id}(id=${res.resourceId})}" class="btn-secondary" style="font-size: 13px; padding: 6px 12px; border-radius: 6px; text-decoration: none;">
-                            View
+                            Chi tiết
                         </a>
                         
                         <a th:if="${utility.type}" th:href="@{/resident/utilities/book/{id}(id=${res.resourceId})}" class="btn-primary" style="font-size: 13px; padding: 6px 12px; border-radius: 6px; text-decoration: none;" th:classappend="${!res.status} ? 'disabled' : ''" th:styleappend="${!res.status} ? 'pointer-events: none; opacity: 0.5;' : ''">
-                            Book Now
+                            Đặt ngay
                         </a>
                     </div>
                 </div>

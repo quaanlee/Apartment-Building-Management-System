@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'utilities')}" lang="en">
+      th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'utilities')}" lang="vi">
 <head>
 </head>
 <body>
@@ -11,7 +11,7 @@
     <!-- Breadcrumb & Back -->
     <div class="detail-header-nav" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <div class="breadcrumb-container" style="font-size: 14px; color: var(--text-secondary);">
-            <a th:href="@{/admin/utilities}" style="color: var(--primary-color); text-decoration: none;">Utility Management</a>
+            <a th:href="@{/admin/utilities}" style="color: var(--primary-color); text-decoration: none;">Quản lý tiện ích</a>
             <span style="margin: 0 8px;">/</span>
             <a th:href="@{/admin/utilities/{id}(id=${utility.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" 
                th:text="${utility.utilityName}" style="color: var(--primary-color); text-decoration: none;">Gym</a>
@@ -20,7 +20,7 @@
         </div>
         <a th:href="@{/admin/utilities/{id}(id=${utility.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" 
            class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 16px; border-radius: var(--radius-md); font-weight: 500; font-size: 14px;">
-            <i class="fa-solid fa-arrow-left"></i> Back to Utility
+            <i class="fa-solid fa-arrow-left"></i> Quay lại tiện ích
         </a>
     </div>
 
@@ -28,15 +28,15 @@
     <div class="main-header" style="margin-bottom: 24px;">
         <div class="title-section">
             <h2 th:text="${resource.resourceName}">Gym 1</h2>
-            <p th:text="'Resource of utility: ' + ${utility.utilityName}">Resource of Gym</p>
+            <p th:text="'Tài nguyên thuộc tiện ích: ' + ${utility.utilityName}">Resource of Gym</p>
         </div>
         <div style="display: flex; gap: 12px; align-items: center;">
             <span th:class="${resource.status} ? 'badge-status active' : 'badge-status maintenance'"
-                  th:text="${resource.status} ? 'Ready' : 'Maintenance'"
-                  style="font-size: 13px; padding: 6px 12px; font-weight: 600;">Ready</span>
+                  th:text="${resource.status} ? 'Sẵn sàng' : 'Bảo trì'"
+                  style="font-size: 13px; padding: 6px 12px; font-weight: 600;">Sẵn sàng</span>
             <button class="btn-primary" style="padding: 8px 16px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-md); border: none; cursor: pointer;" 
                     onclick="openEditResourceModal()">
-                <i class="fa-solid fa-pencil"></i> Edit Resource
+                <i class="fa-solid fa-pencil"></i> Chỉnh sửa tài nguyên
             </button>
         </div>
     </div>
@@ -59,8 +59,8 @@
 
     <!-- Overview Section -->
     <div class="overview-section" style="margin-bottom: 32px; background: white; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
-        <h3 style="margin-top: 0; margin-bottom: 12px; color: var(--text-primary); font-size: 18px;">Resource Overview</h3>
-        <p th:text="${resource.description != null && !resource.description.isEmpty() ? resource.description : 'No description provided for this resource.'}"
+        <h3 style="margin-top: 0; margin-bottom: 12px; color: var(--text-primary); font-size: 18px;">Tổng quan tài nguyên</h3>
+        <p th:text="${resource.description != null && !resource.description.isEmpty() ? resource.description : 'Không có mô tả nào cho tài nguyên này.'}"
            style="color: var(--text-secondary); line-height: 1.6; margin: 0;">
             Description details...
         </p>
@@ -70,20 +70,20 @@
     <div class="operations-grid" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; margin-bottom: 48px;">
         <!-- Location Card -->
         <div class="info-card" style="background: white; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
-            <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-primary); font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">LOCATION &amp; STATUS INFO</h4>
+            <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-primary); font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">THÔNG TIN VỊ TRÍ &amp; TRẠNG THÁI</h4>
             <div style="display: flex; flex-direction: column; gap: 16px;">
                 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
                     <i class="fa-solid fa-location-dot" style="font-size: 20px; color: var(--primary-color);"></i>
                     <div>
-                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">LOCATION</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">VỊ TRÍ</div>
                         <div style="font-weight: 700; color: var(--text-primary);" th:text="${resource.location}">Floor 2, Block A</div>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
                     <i class="fa-solid fa-signal" style="font-size: 20px; color: var(--primary-color);"></i>
                     <div>
-                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">OPERATIONAL STATUS</div>
-                        <div style="font-weight: 700; color: var(--text-primary);" th:text="${resource.status ? 'Available for booking' : 'Under Maintenance'}">Available for booking</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">TRẠNG THÁI HOẠT ĐỘNG</div>
+                        <div style="font-weight: 700; color: var(--text-primary);" th:text="${resource.status ? 'Có sẵn để đặt lịch' : 'Đang bảo trì'}">Available for booking</div>
                     </div>
                 </div>
             </div>
@@ -92,26 +92,26 @@
         <!-- Billing Rates Card -->
         <div class="info-card" style="background: white; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px;">
-                <h4 style="margin: 0; color: var(--text-primary); font-size: 16px; font-weight: 700;">BILLING RATES</h4>
+                <h4 style="margin: 0; color: var(--text-primary); font-size: 16px; font-weight: 700;">ĐƠN GIÁ TIỆN ÍCH</h4>
                 <button class="btn-primary" style="padding: 6px 12px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-md); border: none; cursor: pointer;" 
                         onclick="openPricingModal()">
-                    <i class="fa-solid fa-plus"></i> Configure Price
+                    <i class="fa-solid fa-plus"></i> Thiết lập giá
                 </button>
             </div>
             <div class="rates-list" style="display: flex; flex-direction: column; gap: 12px;">
                 <div th:each="price : ${resource.prices}" class="rate-row" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                    <span style="font-weight: 600; color: var(--text-primary);" th:text="'Rate (' + ${price.unit.unitName} + ')'">Rate (Hour)</span>
+                    <span style="font-weight: 600; color: var(--text-primary);" th:text="'Giá (' + ${price.unit.unitName == 'hour' ? 'Giờ' : (price.unit.unitName == 'day' ? 'Ngày' : (price.unit.unitName == 'month' ? 'Tháng' : price.unit.unitName))} + ')'">Rate (Hour)</span>
                     <div style="display: flex; align-items: center; gap: 16px;">
-                        <span style="font-weight: 700; color: var(--primary-color); font-size: 16px;" th:text="'$' + ${#numbers.formatDecimal(price.price, 1, 2)}">$5.00</span>
+                        <span style="font-weight: 700; color: var(--primary-color); font-size: 16px;" th:text="${#numbers.formatDecimal(price.price, 1, 'POINT', 0, 'COMMA') + ' đ'}">5.000 đ</span>
                         <form th:action="@{/admin/utilities/delete-pricing/{id}(id=${price.utilityPriceId}, fromResourceDetail=true, resourceId=${resource.resourceId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" style="margin:0;">
-                            <button type="button" class="icon-action-btn" style="color: #ef4444; background: none; border: none; cursor: pointer; padding: 4px; display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='none'" title="Delete Price" onclick="confirmDelete(this)">
+                            <button type="button" class="icon-action-btn" style="color: #ef4444; background: none; border: none; cursor: pointer; padding: 4px; display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='none'" title="Xóa mức giá" onclick="confirmDelete(this)">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </form>
                     </div>
                 </div>
                 <div th:if="${#lists.isEmpty(resource.prices)}" style="padding: 20px; text-align: center; color: var(--text-secondary);">
-                    No pricing configurations defined for this resource.
+                    Chưa có thiết lập đơn giá nào cho tài nguyên này.
                 </div>
             </div>
         </div>
@@ -120,7 +120,7 @@
     <div class="modal-overlay" id="pricingModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="pricingTitle" th:text="'Configure Pricing for ' + ${resource.resourceName}">Configure Pricing</h3>
+                <h3 id="pricingTitle" th:text="'Thiết lập đơn giá cho ' + ${resource.resourceName}">Configure Pricing</h3>
                 <button class="modal-close" onclick="closeModal('pricingModal')"><i class="fas fa-times"></i></button>
             </div>
             <form th:action="@{/admin/utilities/manage-pricing(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST">
@@ -128,23 +128,23 @@
                 <input type="hidden" name="fromResourceDetail" value="true">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Resource Name</label>
+                        <label>Tên tài nguyên</label>
                         <input type="text" th:value="${resource.resourceName}" class="form-control" disabled style="background: #f1f5f9; color: #475569; font-weight: 600;">
                     </div>
                     <div class="form-group">
-                        <label for="pricingUnitId">Pricing Unit</label>
+                        <label for="pricingUnitId">Đơn vị tính</label>
                         <select name="unitId" id="pricingUnitId" class="form-control" required>
-                            <option th:each="unit : ${allUnits}" th:value="${unit.unitId}" th:text="${unit.unitName}">hour</option>
+                            <option th:each="unit : ${allUnits}" th:value="${unit.unitId}" th:text="${unit.unitName == 'hour' ? 'Giờ' : (unit.unitName == 'day' ? 'Ngày' : (unit.unitName == 'month' ? 'Tháng' : unit.unitName))}">hour</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="pricingPrice">Price ($)</label>
-                        <input type="number" name="price" id="pricingPrice" step="0.01" min="0" class="form-control" placeholder="0.00" required>
+                        <label for="pricingPrice">Giá tiền (đ)</label>
+                        <input type="number" name="price" id="pricingPrice" step="1" min="0" class="form-control" placeholder="0" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('pricingModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Pricing</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('pricingModal')">Hủy bỏ</button>
+                    <button type="submit" class="btn-primary">Lưu đơn giá</button>
                 </div>
             </form>
         </div>
@@ -154,43 +154,43 @@
     <div class="modal-overlay" id="editResourceModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Edit Resource</h3>
+                <h3>Chỉnh sửa tài nguyên</h3>
                 <button class="modal-close" onclick="closeModal('editResourceModal')"><i class="fas fa-times"></i></button>
             </div>
             <form th:action="@{/admin/utilities/resources/edit(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="resourceId" th:value="${resource.resourceId}">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="resourceNameField">Resource Name</label>
-                        <input type="text" name="resourceName" id="resourceNameField" class="form-control" th:value="${resource.resourceName}" placeholder="e.g. Main Training Hall" maxlength="100" required>
+                        <label for="resourceNameField">Tên tài nguyên</label>
+                        <input type="text" name="resourceName" id="resourceNameField" class="form-control" th:value="${resource.resourceName}" placeholder="Ví dụ: Phòng tập Gym chính" maxlength="100" required>
                     </div>
                     <div class="form-group">
-                        <label for="resourceDescriptionField">Description</label>
-                        <textarea name="resourceDescription" id="resourceDescriptionField" class="form-control" th:text="${resource.description}" placeholder="e.g. Equipped with standard treadmills..." maxlength="255"></textarea>
+                        <label for="resourceDescriptionField">Mô tả</label>
+                        <textarea name="resourceDescription" id="resourceDescriptionField" class="form-control" th:text="${resource.description}" placeholder="Ví dụ: Được trang bị đầy đủ máy chạy bộ..." maxlength="255"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="resourceLocationField">Location</label>
-                        <input type="text" name="resourceLocation" id="resourceLocationField" class="form-control" th:value="${resource.location}" placeholder="e.g. Floor 2, Block A" maxlength="150" required>
+                        <label for="resourceLocationField">Vị trí</label>
+                        <input type="text" name="resourceLocation" id="resourceLocationField" class="form-control" th:value="${resource.location}" placeholder="Ví dụ: Tầng 2, Tòa A" maxlength="150" required>
                     </div>
                     <div class="form-group">
-                        <label for="resourcePrimaryImageField">Primary Image (Leave empty to keep current)</label>
+                        <label for="resourcePrimaryImageField">Ảnh chính (Để trống để giữ ảnh hiện tại)</label>
                         <input type="file" name="primaryImage" id="resourcePrimaryImageField" class="form-control" accept="image/*">
                     </div>
                     <div class="form-group">
-                        <label for="resourceSecondaryImagesField">Secondary Images (Leave empty to keep current, minimum 2 if uploading)</label>
+                        <label for="resourceSecondaryImagesField">Ảnh phụ (Để trống để giữ ảnh hiện tại, tối thiểu 2 ảnh nếu tải lên mới)</label>
                         <input type="file" name="secondaryImages" id="resourceSecondaryImagesField" class="form-control" accept="image/*" multiple>
                     </div>
                     <div class="form-group">
-                        <label for="resourceStatusField">Status</label>
+                        <label for="resourceStatusField">Trạng thái</label>
                         <select name="status" id="resourceStatusField" class="form-control">
-                             <option value="true" th:selected="${resource.status}">Ready</option>
-                             <option value="false" th:selected="${!resource.status}">Maintenance</option>
+                             <option value="true" th:selected="${resource.status}">Sẵn sàng</option>
+                             <option value="false" th:selected="${!resource.status}">Bảo trì</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('editResourceModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Changes</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('editResourceModal')">Hủy bỏ</button>
+                    <button type="submit" class="btn-primary">Lưu thay đổi</button>
                 </div>
             </form>
         </div>
@@ -200,15 +200,15 @@
     <div class="modal-overlay" id="confirmDeleteModal">
         <div class="modal-content" style="max-width: 400px;">
             <div class="modal-header">
-                <h3>Confirm Deletion</h3>
+                <h3>Xác nhận xóa</h3>
                 <button class="modal-close" onclick="closeModal('confirmDeleteModal')"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
-                <p style="margin: 0; color: var(--text-secondary); line-height: 1.5;">Are you sure you want to delete this price configuration? This action cannot be undone.</p>
+                <p style="margin: 0; color: var(--text-secondary); line-height: 1.5;">Bạn có chắc chắn muốn xóa cấu hình đơn giá này không? Hành động này không thể hoàn tác.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeModal('confirmDeleteModal')">Cancel</button>
-                <button type="button" class="btn-primary" style="background: #ef4444; border-color: #ef4444;" onclick="executeDelete()">Delete</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('confirmDeleteModal')">Hủy bỏ</button>
+                <button type="button" class="btn-primary" style="background: #ef4444; border-color: #ef4444;" onclick="executeDelete()">Xóa</button>
             </div>
         </div>
     </div>

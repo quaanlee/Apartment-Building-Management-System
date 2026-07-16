@@ -57,7 +57,7 @@ public class PaymentWebhookController {
             return "redirect:" + checkoutUrl;
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "Payment failed: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Thanh toán thất bại: " + e.getMessage());
             return "redirect:/resident/payment";
         }
     }
@@ -80,7 +80,7 @@ public class PaymentWebhookController {
             return "redirect:" + checkoutUrl;
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "Payment initiation failed: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Khởi tạo thanh toán thất bại: " + e.getMessage());
             return "redirect:/resident/utilities/resources/" + resourceId;
         }
     }
@@ -110,7 +110,7 @@ public class PaymentWebhookController {
         }
         
         if (isBooking) {
-            redirectAttributes.addFlashAttribute("successMessage", "Booking payment successful!");
+            redirectAttributes.addFlashAttribute("successMessage", "Thanh toán đặt tiện ích thành công!");
             return "redirect:/resident/utilities/history";
         }
         
@@ -119,14 +119,14 @@ public class PaymentWebhookController {
             if (orderCode != null) {
                 resourceId = payOSService.getResourceIdByMembershipOrderCode(String.valueOf(orderCode));
             }
-            redirectAttributes.addFlashAttribute("errorMessage", "Membership purchased successfully!");
+            redirectAttributes.addFlashAttribute("errorMessage", "Đăng ký gói thành viên thành công!");
             if (resourceId != null) {
                 return "redirect:/resident/utilities/resources/" + resourceId;
             }
             return "redirect:/resident/utilities";
         }
 
-        redirectAttributes.addFlashAttribute("message", "Bill payment successfully!");
+        redirectAttributes.addFlashAttribute("message", "Thanh toán hóa đơn thành công!");
         redirectAttributes.addFlashAttribute("messageType", "success");
         if (billId != null) {
             return "redirect:/resident/billing/detail/" + billId;
@@ -176,14 +176,14 @@ public class PaymentWebhookController {
             if (orderCode != null) {
                 resourceId = payOSService.getResourceIdByMembershipOrderCode(String.valueOf(orderCode));
             }
-            redirectAttributes.addFlashAttribute("errorMessage", "Membership payment has been canceled!");
+            redirectAttributes.addFlashAttribute("errorMessage", "Thanh toán gói thành viên đã bị hủy!");
             if (resourceId != null) {
                 return "redirect:/resident/utilities/resources/" + resourceId;
             }
             return "redirect:/resident/utilities";
         }
 
-        redirectAttributes.addFlashAttribute("message", "Transaction has been canceled!");
+        redirectAttributes.addFlashAttribute("message", "Giao dịch đã bị hủy!");
         redirectAttributes.addFlashAttribute("messageType", "warning");
         if (billId != null) {
             return "redirect:/resident/billing/detail/" + billId;

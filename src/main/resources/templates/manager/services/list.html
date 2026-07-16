@@ -8,13 +8,13 @@
         <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="page-title-row">
             <div class="page-title-left">
-                <h2 class="page-title">Service Catalog &amp; Pricing</h2>
-                <p class="page-subtitle">View utility types, service rates, and regional pricing configurations.</p>
+                <h2 class="page-title">Danh mục Dịch vụ &amp; Đơn giá</h2>
+                <p class="page-subtitle">Xem các loại tiện ích, đơn giá dịch vụ và cấu hình giá theo khu vực.</p>
             </div>
             <div class="page-title-right" style="display: flex; gap: 12px; align-items: center;">
                 <form id="searchForm" method="GET" style="display: flex; gap: 8px; margin: 0; align-items: center;">
                     <input type="hidden" name="status" th:value="${statusFilter}">
-                    <input type="text" name="keyword" th:value="${keyword}" class="search-input" placeholder="Search services..."
+                    <input type="text" name="keyword" th:value="${keyword}" class="search-input" placeholder="Tìm kiếm dịch vụ..."
                            style="padding: 10px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: var(--font-main); font-size: 14px; outline: none; min-width: 250px; background-color: var(--white); color: var(--text-primary);"
                            onfocus="this.style.borderColor='var(--primary-color)'" onblur="this.style.borderColor='var(--border-color)'">
                     <button type="submit" class="btn-primary" style="padding: 10px 16px; background-color: var(--primary-color); border-color: var(--primary-color); color: var(--white); border-radius: var(--radius-md); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; height: 38px;">
@@ -30,15 +30,15 @@
 
         <!-- Navigation Tab Bar -->
         <div class="tab-bar" style="display: flex; gap: 16px; margin-top: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-            <a th:href="@{/manager/services}" class="tab-item active" style="font-weight: 600; text-decoration: none; color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; font-family: var(--font-main);">Services Catalog</a>
-            <a th:href="@{/manager/utilities}" class="tab-item" style="font-weight: 500; text-decoration: none; color: var(--text-secondary); padding-bottom: 8px; transition: color 0.2s; font-family: var(--font-main);" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--text-secondary)'">Utilities &amp; Amenities</a>
+            <a th:href="@{/manager/services}" class="tab-item active" style="font-weight: 600; text-decoration: none; color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; font-family: var(--font-main);">Danh mục Dịch vụ</a>
+            <a th:href="@{/manager/utilities}" class="tab-item" style="font-weight: 500; text-decoration: none; color: var(--text-secondary); padding-bottom: 8px; transition: color 0.2s; font-family: var(--font-main);" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--text-secondary)'">Tiện ích &amp; Dịch vụ công cộng</a>
         </div>
 
         <!-- Toast notification (success / error) -->
         <div id="toastMsg" class="toast-msg" th:if="${param.success != null or param.error != null}"
              th:classappend="${param.success != null ? ' toast-success' : ' toast-error'}">
             <i th:class="${param.success != null ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation'}"></i>
-            <span th:if="${param.success != null}">Operation successful!</span>
+            <span th:if="${param.success != null}">Thực hiện thao tác thành công!</span>
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════ -->
@@ -47,13 +47,13 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-info">
-                    <span class="stat-label">TOTAL SERVICES</span>
+                    <span class="stat-label">TỔNG SỐ DỊCH VỤ</span>
                     <span class="stat-value" th:text="${totalServices}">0</span>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-info">
-                    <span class="stat-label">ACTIVE SERVICES</span>
+                    <span class="stat-label">DỊCH VỤ ĐANG HOẠT ĐỘNG</span>
                     <span class="stat-value" th:text="${activeServices}">0</span>
                 </div>
             </div>
@@ -85,10 +85,10 @@
 
                     <div class="service-meta-right">
                         <span th:class="${service.status ? 'status-badge active' : 'status-badge locked'}"
-                              th:text="${service.status ? 'ACTIVE' : 'LOCKED'}">ACTIVE</span>
+                              th:text="${service.status ? 'HOẠT ĐỘNG' : 'ĐÃ KHÓA'}">HOẠT ĐỘNG</span>
                         <span class="service-type-label"
                               th:classappend="'label-' + ${#strings.toLowerCase(service.serviceType)}"
-                              th:text="${#strings.toUpperCase(service.serviceType)}">ELECTRICITY</span>
+                              th:text="${service.serviceType == 'electricity' ? 'ĐIỆN' : (service.serviceType == 'water' ? 'NƯỚC' : (service.serviceType == 'cleaning' ? 'VỆ SINH' : (service.serviceType == 'parking' ? 'GỬI XE' : (service.serviceType == 'management' ? 'QUẢN LÝ' : (service.serviceType == 'internet' ? 'INTERNET' : #strings.toUpperCase(service.serviceType))))))}">ELECTRICITY</span>
                     </div>
                 </div>
 
@@ -98,11 +98,11 @@
                 <!-- Pricing details -->
                 <div class="pricing-details">
                     <div class="pricing-row">
-                        <span class="detail-label">Unit Price</span>
-                        <span class="detail-value" th:text="'$' + ${#numbers.formatDecimal(service.unitPrice, 1, 2)}">$0.18</span>
+                        <span class="detail-label">Đơn giá</span>
+                        <span class="detail-value" th:text="${#numbers.formatDecimal(service.unitPrice, 1, 'POINT', 0, 'COMMA')} + ' đ'">100 đ</span>
                     </div>
                     <div class="pricing-row">
-                        <span class="detail-label">Unit Name</span>
+                        <span class="detail-label">Đơn vị tính</span>
                         <span class="detail-value" th:text="${service.unitName}">kWh</span>
                     </div>
                 </div>
@@ -115,8 +115,8 @@
         <!-- Empty state -->
         <div class="no-results-card" th:if="${#lists.isEmpty(services)}" style="text-align: center; padding: 48px; background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-top: 24px;">
             <i class="fa-solid fa-box-open" style="font-size: 48px; color: var(--text-secondary); margin-bottom: 16px;"></i>
-            <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary);">No services found</h3>
-            <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">Try adjusting your search keyword or status filter.</p>
+            <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary);">Không tìm thấy dịch vụ nào</h3>
+            <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">Hãy thử thay đổi từ khóa tìm kiếm hoặc bộ lọc trạng thái.</p>
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════ -->
@@ -133,7 +133,7 @@
 
                 if (searchInput) {
                     searchInput.value       = keywordFromModel || "";
-                    searchInput.placeholder = "Search services...";
+                    searchInput.placeholder = "Tìm kiếm dịch vụ...";
                     searchInput.addEventListener("keypress", function (e) {
                         if (e.key === "Enter") {
                             e.preventDefault();
@@ -154,9 +154,9 @@
                     selectWrapper.innerHTML = `
                     <div class="status-select-container" style="position: relative; display: flex; align-items: center; gap: 8px;">
                         <select id="statusFilterSelect" class="status-select" style="padding: 10px 16px 10px 36px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: var(--font-main); font-size: 14px; color: var(--text-primary); background-color: var(--white); outline: none; cursor: pointer; appearance: none; -webkit-appearance: none;">
-                            <option value="" ${isAll ? "selected" : ""}>All Status</option>
-                            <option value="true" ${isActive ? "selected" : ""}>Active</option>
-                            <option value="false" ${isLocked ? "selected" : ""}>Locked</option>
+                            <option value="" ${isAll ? "selected" : ""}>Tất cả trạng thái</option>
+                            <option value="true" ${isActive ? "selected" : ""}>Đang hoạt động</option>
+                            <option value="false" ${isLocked ? "selected" : ""}>Đã khóa</option>
                         </select>
                         <i class="fa-solid fa-filter select-icon" style="position: absolute; left: 14px; color: var(--text-secondary); font-size: 14px;"></i>
                     </div>`;

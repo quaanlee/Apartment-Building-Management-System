@@ -14,7 +14,7 @@
             </div>
             <div class="metric-info">
                 <h3 th:text="${totalUnits}">0</h3>
-                <p>Total Apartments</p>
+                <p>Tổng số Căn hộ</p>
             </div>
         </div>
         <div class="metric-card">
@@ -23,7 +23,7 @@
             </div>
             <div class="metric-info">
                 <h3 th:text="${occupiedUnits}">0</h3>
-                <p>Occupied Units</p>
+                <p>Căn hộ đã ở</p>
             </div>
         </div>
         <div class="metric-card">
@@ -32,7 +32,7 @@
             </div>
             <div class="metric-info">
                 <h3 th:text="${vacantUnits}">0</h3>
-                <p>Available Units</p>
+                <p>Căn hộ trống</p>
             </div>
         </div>
         <div class="metric-card">
@@ -41,7 +41,7 @@
             </div>
             <div class="metric-info">
                 <h3 th:text="${maintenanceUnits}">0</h3>
-                <p>In Maintenance</p>
+                <p>Đang bảo trì</p>
             </div>
         </div>
     </div>
@@ -50,32 +50,32 @@
     <div class="my-apartment-section">
         <h2 class="section-title">
             <i class="fa-solid fa-circle-user"></i>
-            My Resident Accommodation
+            Thông tin cư trú của tôi
         </h2>
         
         <!-- If assigned to an apartment -->
         <div th:if="${myApartment != null}" class="my-apartment-card">
             <div class="my-apt-main">
-                <p>Active Accommodation</p>
-                <h2 th:text="'Unit ' + ${myApartment.apartmentNumber}">A-101</h2>
-                <span class="badge badge-occupied">Occupied by You</span>
+                <p>Căn hộ đang cư trú</p>
+                <h2 th:text="'Căn hộ ' + ${myApartment.apartmentNumber}">A-101</h2>
+                <span class="badge badge-occupied">Căn hộ của bạn</span>
             </div>
             <div class="my-apt-details">
                 <div class="detail-item">
-                    <span class="detail-label">Floor</span>
+                    <span class="detail-label">Tầng</span>
                     <span class="detail-value" th:text="${myApartment.floor} + 'F'">1F</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Apartment Size</span>
+                    <span class="detail-label">Diện tích</span>
                     <span class="detail-value" th:text="${myApartment.area} + ' m²'">75.00 m²</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Room Configuration</span>
-                    <span class="detail-value" th:text="${myApartment.roomType}">2BR</span>
+                    <span class="detail-label">Loại phòng</span>
+                    <span class="detail-value" th:text="${myApartment.roomType}">2 Phòng ngủ</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Max Occupants</span>
-                    <span class="detail-value" th:text="${myApartment.maxOccupancy} + ' People'">4 People</span>
+                    <span class="detail-label">Số người tối đa</span>
+                    <span class="detail-value" th:text="${myApartment.maxOccupancy} + ' người'">4 người</span>
                 </div>
             </div>
         </div>
@@ -83,8 +83,8 @@
         <!-- If NOT assigned to any apartment -->
         <div th:if="${myApartment == null}" class="my-apt-empty-card">
             <i class="fa-solid fa-house-laptop"></i>
-            <h3>No Accommodation Details Found</h3>
-            <p>You are currently not registered as an active occupant of any apartment in the system. Please contact the building manager if this is an error.</p>
+            <h3>Không tìm thấy thông tin cư trú</h3>
+            <p>Bạn hiện chưa được đăng ký làm cư dân chính thức của căn hộ nào trong hệ thống. Vui lòng liên hệ Ban quản lý nếu đây là lỗi.</p>
         </div>
     </div>
 
@@ -92,44 +92,44 @@
     <div class="filter-card">
         <form th:action="@{/resident/apartments}" method="get" class="filter-form">
             <div class="form-group">
-                <label for="search">Apartment Code</label>
-                <input type="text" id="search" name="search" th:value="${search}" class="form-control" placeholder="e.g. A-101">
+                <label for="search">Mã căn hộ</label>
+                <input type="text" id="search" name="search" th:value="${search}" class="form-control" placeholder="Ví dụ: A-101">
             </div>
             
             <div class="form-group">
-                <label for="floor">Floor Level</label>
+                <label for="floor">Tầng</label>
                 <select id="floor" name="floor" class="form-control">
-                    <option value="">All Floors</option>
-                    <option th:each="f : ${#numbers.sequence(1, 10)}" th:value="${f}" th:text="'Floor ' + ${f}" th:selected="${floor == f}"></option>
+                    <option value="">Tất cả các tầng</option>
+                    <option th:each="f : ${#numbers.sequence(1, 10)}" th:value="${f}" th:text="'Tầng ' + ${f}" th:selected="${floor == f}"></option>
                 </select>
             </div>
             
             <div class="form-group">
-                <label for="status">Availability</label>
+                <label for="status">Trạng thái</label>
                 <select id="status" name="status" class="form-control">
-                    <option value="">All Status</option>
-                    <option value="0" th:selected="${status == 0}">Available</option>
-                    <option value="1" th:selected="${status == 1}">Occupied</option>
-                    <option value="2" th:selected="${status == 2}">Maintenance</option>
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="0" th:selected="${status == 0}">Trống</option>
+                    <option value="1" th:selected="${status == 1}">Đã ở</option>
+                    <option value="2" th:selected="${status == 2}">Đang bảo trì</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="roomType">Room Type</label>
+                <label for="roomType">Loại phòng</label>
                 <select id="roomType" name="roomType" class="form-control">
-                    <option value="">All Types</option>
-                    <option value="1BR" th:selected="${roomType == '1BR'}">1 Bedroom</option>
-                    <option value="2BR" th:selected="${roomType == '2BR'}">2 Bedrooms</option>
-                    <option value="3BR" th:selected="${roomType == '3BR'}">3 Bedrooms</option>
+                    <option value="">Tất cả loại phòng</option>
+                    <option value="1BR" th:selected="${roomType == '1BR'}">1 Phòng ngủ</option>
+                    <option value="2BR" th:selected="${roomType == '2BR'}">2 Phòng ngủ</option>
+                    <option value="3BR" th:selected="${roomType == '3BR'}">3 Phòng ngủ</option>
                 </select>
             </div>
             
             <div class="form-group" style="flex-direction: row; gap: 8px; align-items: end;">
                 <button type="submit" class="btn-search">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    Filter
+                    Lọc
                 </button>
-                <a th:href="@{/resident/apartments}" class="btn-reset">Reset</a>
+                <a th:href="@{/resident/apartments}" class="btn-reset">Đặt lại</a>
             </div>
         </form>
     </div>
@@ -137,7 +137,7 @@
     <!-- Apartments Grid -->
     <h2 class="section-title">
         <i class="fa-solid fa-list-check"></i>
-        Building Directories
+        Danh sách Căn hộ
     </h2>
     
     <div class="apartments-grid">
@@ -146,26 +146,26 @@
                 <span class="apt-card-title" th:text="${apt.apartmentNumber}">A-101</span>
                 
                 <!-- Status Badge -->
-                <span th:if="${apt.status == 0}" class="badge badge-available">Available</span>
-                <span th:if="${apt.status == 1}" class="badge badge-occupied">Occupied</span>
-                <span th:if="${apt.status == 2}" class="badge badge-maintenance">Maintenance</span>
+                <span th:if="${apt.status == 0}" class="badge badge-available">Trống</span>
+                <span th:if="${apt.status == 1}" class="badge badge-occupied">Đã ở</span>
+                <span th:if="${apt.status == 2}" class="badge badge-maintenance">Đang bảo trì</span>
             </div>
             
             <div class="apt-card-body">
                 <div class="detail-item">
-                    <span class="detail-label">Floor</span>
+                    <span class="detail-label">Tầng</span>
                     <span class="detail-value" th:text="${apt.floor} + 'F'">1F</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Room Type</span>
+                    <span class="detail-label">Loại phòng</span>
                     <span class="detail-value" th:text="${apt.roomType}">2BR</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Area Size</span>
+                    <span class="detail-label">Diện tích</span>
                     <span class="detail-value" th:text="${apt.area} + ' m²'">75.00 m²</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Max Occupants</span>
+                    <span class="detail-label">Số người tối đa</span>
                     <span class="detail-value" th:text="${apt.maxOccupancy}">4</span>
                 </div>
             </div>
@@ -173,7 +173,7 @@
             <div class="apt-card-footer">
                 <a th:href="@{/resident/apartments/{id}(id=${apt.apartmentId})}" class="btn-details" style="text-decoration: none;">
                     <i class="fa-solid fa-circle-info"></i>
-                    Specs
+                    Xem chi tiết
                 </a>
             </div>
         </div>
@@ -182,15 +182,15 @@
     <!-- Empty State -->
     <div th:if="${#lists.isEmpty(apartments)}" class="my-apt-empty-card" style="margin-bottom: 32px;">
         <i class="fa-solid fa-folder-open"></i>
-        <h3>No Apartments Found</h3>
-        <p>No unit matching your search and filter parameters could be found in the system registry.</p>
+        <h3>Không tìm thấy căn hộ</h3>
+        <p>Không tìm thấy căn hộ nào khớp với tìm kiếm và bộ lọc của bạn trong hệ thống.</p>
     </div>
 
     <!-- Pagination Controls -->
     <div th:if="${totalPages > 1}" class="pagination-container">
         <div class="pagination-info">
-            Showing Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span>
-            (<span th:text="${totalItems}">0</span> total units)
+            Đang hiển thị trang <span th:text="${currentPage + 1}">1</span> trên <span th:text="${totalPages}">1</span>
+            (<span th:text="${totalItems}">0</span> tổng số căn hộ)
         </div>
         <div class="pagination-buttons">
             <!-- Previous Button -->
@@ -216,7 +216,7 @@
     <div class="modal-overlay" id="detailModal">
         <div class="modal-wrapper">
             <div class="modal-header">
-                <h2 id="modalAptNumber">Apartment Detail</h2>
+                <h2 id="modalAptNumber">Chi Tiết Căn Hộ</h2>
                 <button class="modal-close-btn" onclick="closeModal()">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -224,29 +224,29 @@
             <div class="modal-body">
                 <div class="modal-grid">
                     <div class="detail-item">
-                        <span class="detail-label">Floor level</span>
+                        <span class="detail-label">Số tầng</span>
                         <span class="detail-value" id="modalFloor">1F</span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Room configuration</span>
-                        <span class="detail-value" id="modalRoomType">2BR</span>
+                        <span class="detail-label">Loại phòng</span>
+                        <span class="detail-value" id="modalRoomType">2 Phòng ngủ</span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Area (Dimensions)</span>
+                        <span class="detail-label">Diện tích</span>
                         <span class="detail-value" id="modalArea">75 m²</span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Max Occupancy Limit</span>
-                        <span class="detail-value" id="modalMaxOccupancy">4 People</span>
+                        <span class="detail-label">Số người tối đa</span>
+                        <span class="detail-value" id="modalMaxOccupancy">4 Người</span>
                     </div>
                     <div class="detail-item modal-row">
-                        <span class="detail-label">Current availability status</span>
-                        <span class="detail-value" id="modalStatus" style="font-weight: 700;">Available</span>
+                        <span class="detail-label">Trạng thái hiện tại</span>
+                        <span class="detail-value" id="modalStatus" style="font-weight: 700;">Trống</span>
                     </div>
                     <div class="detail-item modal-row" style="border-top: none; padding-top: 0;">
-                        <span class="detail-label">Security Note</span>
+                        <span class="detail-label">Lưu ý an ninh</span>
                         <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
-                            This information is compiled directly from the building management database. To request leasing or report errors in this registry, please submit a service log or contact management directly.
+                            Thông tin này được tổng hợp trực tiếp từ cơ sở dữ liệu quản lý tòa nhà. Để yêu cầu thuê hoặc báo lỗi trong hồ sơ này, vui lòng gửi nhật ký dịch vụ hoặc liên hệ trực tiếp với ban quản lý.
                         </p>
                     </div>
                 </div>
@@ -257,21 +257,21 @@
     <!-- Modal script -->
     <script>
         function openDetailModal(number, floor, type, area, occupants, status) {
-            document.getElementById('modalAptNumber').innerText = 'Apartment Unit ' + number;
+            document.getElementById('modalAptNumber').innerText = 'Căn hộ ' + number;
             document.getElementById('modalFloor').innerText = floor + 'F';
             document.getElementById('modalRoomType').innerText = type;
             document.getElementById('modalArea').innerText = area + ' m²';
-            document.getElementById('modalMaxOccupancy').innerText = occupants + ' People';
+            document.getElementById('modalMaxOccupancy').innerText = occupants + ' Người';
             
             var statusVal = document.getElementById('modalStatus');
             if (status == '0') {
-                statusVal.innerText = 'Available';
+                statusVal.innerText = 'Trống';
                 statusVal.style.color = '#10B981';
             } else if (status == '1') {
-                statusVal.innerText = 'Occupied';
+                statusVal.innerText = 'Đã ở';
                 statusVal.style.color = '#582BE8';
             } else {
-                statusVal.innerText = 'Under Maintenance';
+                statusVal.innerText = 'Đang bảo trì';
                 statusVal.style.color = '#EF4444';
             }
             

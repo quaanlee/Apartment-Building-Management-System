@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
       th:replace="~{layout/manager/layout_manager :: manager-layout(~{::#main-content}, 'apartments')}"
-      th:with="pageTitle='Apartment Detail'">
+      th:with="pageTitle='Chi tiết Căn hộ'">
 <head>
-    <title>Apartment Detail</title>
+    <title>Chi tiết Căn hộ</title>
 </head>
 <body>
 <div id="main-content">
@@ -12,10 +12,10 @@
 
     <div class="detail-header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <div class="detail-title" style="font-size: 24px; font-weight: 700; color: var(--text-primary);">
-            Unit Details: <span th:text="${apartment.apartmentNumber}">A-405</span>
+            Chi tiết Căn hộ: <span th:text="${apartment.apartmentNumber}">A-405</span>
         </div>
         <a th:href="@{/manager/apartments}" class="cancel-btn" style="display: inline-flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-arrow-left"></i> Back to List
+            <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
         </a>
     </div>
 
@@ -38,44 +38,44 @@
                 <div style="display: flex; flex-direction: column; gap: 16px;">
                     <div class="info-grid" style="grid-template-columns: 1fr; gap: 12px; margin-top: 0;">
                         <div class="info-box">
-                            <span class="label">ROOM TYPE</span>
+                            <span class="label">LOẠI PHÒNG</span>
                             <span class="value" th:text="${apartment.roomType}">3 Bedrooms</span>
                         </div>
 
                         <div class="info-box">
-                            <span class="label">AREA</span>
+                            <span class="label">DIỆN TÍCH</span>
                             <span class="value" th:text="${apartment.area + ' m²'}">78.00 m²</span>
                         </div>
 
                         <div class="info-box">
-                            <span class="label">MAX OCCUPANCY</span>
-                            <span class="value" th:text="${apartment.maxOccupancy + ' Persons'}">6 Persons</span>
+                            <span class="label">SỐ CƯ DÂN TỐI ĐA</span>
+                            <span class="value" th:text="${apartment.maxOccupancy + ' Người'}">6 Persons</span>
                         </div>
 
                         <div class="info-box">
-                            <span class="label">CURRENT OCCUPANCY</span>
+                            <span class="label">SỐ CƯ DÂN HIỆN TẠI</span>
                             <span class="value">
                                 <span th:text="${apartment.currentOccupancy}">3</span>
                                 <span style="font-size: 13px; font-weight: normal; color: var(--text-secondary);">
-                                    (Available: <span th:text="${apartment.availableSlots}">3</span> slots)
+                                    (Còn trống: <span th:text="${apartment.availableSlots}">3</span> chỗ)
                                 </span>
                             </span>
                         </div>
                     </div>
 
                     <div style="background: #F4F5F7; border-radius: var(--radius-md); padding: 16px; display: flex; align-items: center; gap: 12px;">
-                        <strong style="color: var(--text-primary); font-size: 14px;">STATUS:</strong>
-                        <span th:if="${apartment.status == 0}" class="badge vacant">Vacant</span>
-                        <span th:if="${apartment.status == 1}" class="badge occupied">Occupied</span>
-                        <span th:if="${apartment.status == 2}" class="badge maintenance">Maintenance</span>
+                        <strong style="color: var(--text-primary); font-size: 14px;">TRẠNG THÁI:</strong>
+                        <span th:if="${apartment.status == 0}" class="badge vacant">Trống</span>
+                        <span th:if="${apartment.status == 1}" class="badge occupied">Đã ở</span>
+                        <span th:if="${apartment.status == 2}" class="badge maintenance">Bảo trì</span>
                     </div>
 
                     <div class="form-actions" style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; gap: 12px; justify-content: flex-start;">
                         <a th:href="@{/manager/apartments/{id}/edit-status(id=${apartment.apartmentId})}" class="cancel-btn" style="text-align: center; border: 1px solid var(--border-color); display: inline-flex; align-items: center; gap: 8px;">
-                            <i class="fa-solid fa-pen"></i> Edit Status
+                            <i class="fa-solid fa-pen"></i> Chỉnh sửa trạng thái
                         </a>
                         <a th:href="@{/manager/apartments/{id}/assign-resident(id=${apartment.apartmentId})}" class="save-btn" th:if="${apartment.availableSlots > 0}" style="text-align: center; display: inline-flex; align-items: center; gap: 8px;">
-                            <i class="fa-solid fa-user-plus"></i> Assign Resident
+                            <i class="fa-solid fa-user-plus"></i> Gán cư dân
                         </a>
                     </div>
                 </div>
@@ -84,17 +84,17 @@
             <!-- Residents Section -->
             <div style="margin-top: 32px;">
                 <h2 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-users" style="color: var(--primary-color);"></i> Current Residents
+                    <i class="fa-solid fa-users" style="color: var(--primary-color);"></i> Cư dân hiện tại
                 </h2>
 
                 <table class="detail-table">
                     <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Phone</th>
+                        <th>Họ và tên</th>
+                        <th>Số điện thoại</th>
                         <th>Email</th>
-                        <th>Move-in Date</th>
-                        <th>Action</th>
+                        <th>Ngày dọn vào</th>
+                        <th>Thao tác</th>
                     </tr>
                     </thead>
 
@@ -102,28 +102,28 @@
                     <tr th:each="resident : ${apartment.currentResidents}">
                         <td>
                             <span th:text="${resident.fullName}">John Doe</span>
-                            <span th:if="${resident.isHouseholdOwner}" class="badge" style="margin-left: 8px; font-size: 10px; padding: 2px 8px; background: var(--primary-light); color: var(--primary-color);">Owner</span>
+                            <span th:if="${resident.isHouseholdOwner}" class="badge" style="margin-left: 8px; font-size: 10px; padding: 2px 8px; background: var(--primary-light); color: var(--primary-color);">Chủ hộ</span>
                         </td>
                         <td th:text="${resident.phoneNumber != null ? resident.phoneNumber : '-'}">0123456789</td>
                         <td th:text="${resident.email != null ? resident.email : '-'}">john@example.com</td>
                         <td th:text="${resident.moveInDate}">2026-06-25</td>
                         <td class="actions">
-                            <a th:href="@{/manager/apartments/profiles/detail/{id}(id=${resident.profileId})}" title="View Resident Detail" style="margin-right: 8px;">
+                            <a th:href="@{/manager/apartments/profiles/detail/{id}(id=${resident.profileId})}" title="Xem chi tiết cư dân" style="margin-right: 8px;">
                                 <i class="fa-solid fa-eye"></i>
                             </a>
                             <form th:action="@{/manager/apartments/{apartmentId}/move-out/{profileId}(apartmentId=${apartment.apartmentId}, profileId=${resident.profileId})}"
                                   method="post"
-                                  onsubmit="return confirm('Are you sure you want to move out this resident?')"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn cho cư dân này dọn ra ngoài không?')"
                                   style="margin: 0; display: inline-block;">
                                 <button type="submit" class="cancel-btn" style="color: #DC2626; border: 1px solid #FEE2E2; background: #FFF5F5; padding: 6px 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border-radius: var(--radius-md); font-family: var(--font-main); font-weight: 600; transition: all 0.2s;">
-                                    <i class="fa-solid fa-right-from-bracket"></i> Move Out
+                                    <i class="fa-solid fa-right-from-bracket"></i> Dọn ra ngoài
                                 </button>
                             </form>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(apartment.currentResidents)}">
                         <td colspan="5" style="text-align: center; padding: 24px; color: var(--text-secondary);">
-                            No residents currently assigned.
+                            Chưa có cư dân nào trong căn hộ này.
                         </td>
                     </tr>
                     </tbody>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
     th:replace="~{layout/manager/layout_manager :: manager-layout(~{::#main-content}, 'apartments')}"
-    th:with="pageTitle='Apartment Inventory'">
+    th:with="pageTitle='Danh sách Căn hộ'">
 
 <head>
-    <title>Apartment Inventory</title>
+    <title>Danh sách Căn hộ</title>
 </head>
 
 <body>
@@ -165,7 +165,7 @@
             }
         </style>
 
-        <p class="text-muted small">Monitor and manage the status of all building units.</p>
+        <p class="text-muted small">Theo dõi và quản lý trạng thái của tất cả các căn hộ.</p>
 
         <!-- Statistics Cards -->
         <div class="row g-4 mb-4">
@@ -174,7 +174,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <div class="number" th:text="${totalUnits != null ? totalUnits : 0}">0</div>
-                            <div class="label">TOTAL UNITS</div>
+                            <div class="label">TỔNG SỐ CĂN HỘ</div>
                         </div>
                         <div class="icon text-primary"><i class="fas fa-building"></i></div>
                     </div>
@@ -185,7 +185,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <div class="number" th:text="${occupiedUnits != null ? occupiedUnits : 0}">0</div>
-                            <div class="label">OCCUPIED</div>
+                            <div class="label">ĐÃ Ở</div>
                         </div>
                         <div class="icon text-primary"><i class="fas fa-users"></i></div>
                     </div>
@@ -203,7 +203,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <div class="number text-success" th:text="${vacantUnits != null ? vacantUnits : 0}">0</div>
-                            <div class="label">VACANT</div>
+                            <div class="label">ĐANG TRỐNG</div>
                         </div>
                         <div class="icon text-success"><i class="fas fa-door-open"></i></div>
                     </div>
@@ -215,7 +215,7 @@
                         <div>
                             <div class="number text-warning"
                                 th:text="${maintenanceUnits != null ? maintenanceUnits : 0}">0</div>
-                            <div class="label">MAINTENANCE</div>
+                            <div class="label">BẢO TRÌ</div>
                         </div>
                         <div class="icon text-warning"><i class="fas fa-tools"></i></div>
                     </div>
@@ -228,34 +228,34 @@
             <div class="card-body">
                 <form th:action="@{/manager/apartments}" method="get" class="row g-3 align-items-end">
                     <div class="col-md-4">
-                        <label class="form-label small fw-bold text-muted">SEARCH</label>
+                        <label class="form-label small fw-bold text-muted">TÌM KIẾM</label>
                         <input type="text" name="search" class="form-control form-control-sm search-box"
-                            placeholder="Search by Unit, Block, or Floor..." th:value="${search}">
+                            placeholder="Tìm theo căn hộ, block, tầng..." th:value="${search}">
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">FLOOR</label>
+                        <label class="form-label small fw-bold text-muted">TẦNG</label>
                         <select name="floor" class="form-select form-select-sm">
-                            <option value="">All Floors</option>
+                            <option value="">Tất cả các tầng</option>
                             <option th:each="i : ${#numbers.sequence(1, 30)}" th:value="${i}" th:text="${i}"
                                 th:selected="${floor == i}"></option>
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">STATUS</label>
+                        <label class="form-label small fw-bold text-muted">TRẠNG THÁI</label>
                         <select name="status" class="form-select form-select-sm">
-                            <option value="">All Status</option>
-                            <option value="0" th:selected="${status == 0}">Vacant</option>
-                            <option value="1" th:selected="${status == 1}">Occupied</option>
-                            <option value="2" th:selected="${status == 2}">Maintenance</option>
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="0" th:selected="${status == 0}">Trống</option>
+                            <option value="1" th:selected="${status == 1}">Đã ở</option>
+                            <option value="2" th:selected="${status == 2}">Bảo trì</option>
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">MIN AREA</label>
+                        <label class="form-label small fw-bold text-muted">DIỆN TÍCH TỐI THIỂU</label>
                         <input type="number" name="minArea" class="form-control form-control-sm" placeholder="m²"
                             th:value="${minArea}" step="0.01">
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">MAX AREA</label>
+                        <label class="form-label small fw-bold text-muted">DIỆN TÍCH TỐI ĐA</label>
                         <div class="input-group">
                             <input type="number" name="maxArea" class="form-control form-control-sm" placeholder="m²"
                                 th:value="${maxArea}" step="0.01">
@@ -276,14 +276,14 @@
                         <thead>
                             <tr>
                                 <th style="width: 50px;">#</th>
-                                <th>APARTMENT</th>
-                                <th>BLOCK</th>
-                                <th>FLOOR</th>
-                                <th>ROOM TYPE</th>
-                                <th>AREA</th>
-                                <th>RESIDENTS</th>
-                                <th>STATUS</th>
-                                <th style="width: 130px;">ACTIONS</th>
+                                <th>CĂN HỘ</th>
+                                <th>TÒA (BLOCK)</th>
+                                <th>TẦNG</th>
+                                <th>LOẠI PHÒNG</th>
+                                <th>DIỆN TÍCH</th>
+                                <th>SỐ CƯ DÂN</th>
+                                <th>TRẠNG THÁI</th>
+                                <th style="width: 130px;">THAO TÁC</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -297,21 +297,21 @@
                                 <td th:text="${apartment.area} + ' m²'"></td>
                                 <td th:text="${apartment.occupancyDisplay}"></td>
                                 <td>
-                                    <span th:if="${apartment.status == 0}" class="status-badge status-vacant"
-                                        th:text="${apartment.statusDisplay}"></span>
-                                    <span th:if="${apartment.status == 1}" class="status-badge status-occupied"
-                                        th:text="${apartment.statusDisplay}"></span>
-                                    <span th:if="${apartment.status == 2}" class="status-badge status-maintenance"
-                                        th:text="${apartment.statusDisplay}"></span>
+                                     <span th:if="${apartment.status == 0}" class="status-badge status-vacant"
+                                         th:text="${apartment.statusDisplay}"></span>
+                                     <span th:if="${apartment.status == 1}" class="status-badge status-occupied"
+                                         th:text="${apartment.statusDisplay}"></span>
+                                     <span th:if="${apartment.status == 2}" class="status-badge status-maintenance"
+                                         th:text="${apartment.statusDisplay}"></span>
                                 </td>
                                 <td>
                                     <div class="actions">
                                         <a th:href="@{/manager/apartments/{id}(id=${apartment.apartmentId})}"
-                                            title="View Details"><i class="fas fa-eye"></i></a>
+                                            title="Xem chi tiết"><i class="fas fa-eye"></i></a>
                                         <a th:href="@{/manager/apartments/{id}/edit-status(id=${apartment.apartmentId})}"
-                                            title="Edit Status"><i class="fas fa-edit"></i></a>
+                                            title="Chỉnh sửa trạng thái"><i class="fas fa-edit"></i></a>
                                         <a th:href="@{/manager/apartments/{id}/assign-resident(id=${apartment.apartmentId})}"
-                                            title="Assign Resident"><i class="fas fa-user-plus"></i></a>
+                                            title="Gán cư dân"><i class="fas fa-user-plus"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -319,8 +319,8 @@
                                 <td colspan="9" class="text-center py-4">
                                     <div class="text-muted">
                                         <i class="fas fa-building fa-2x mb-2 d-block"></i>
-                                        <p class="mb-0">No apartments found</p>
-                                        <small>Try adjusting your search criteria</small>
+                                        <p class="mb-0">Không tìm thấy căn hộ nào</p>
+                                        <small>Hãy thử thay đổi điều kiện tìm kiếm của bạn</small>
                                     </div>
                                 </td>
                             </tr>
@@ -332,10 +332,10 @@
                 <div th:if="${totalPages > 0}" class="d-flex justify-content-between align-items-center p-3 border-top">
                     <div>
                         <span class="text-muted small">
-                            Showing <span th:text="${currentPage * size + 1}"></span>
-                            to <span
+                            Hiển thị từ <span th:text="${currentPage * size + 1}"></span>
+                            đến <span
                                 th:text="${(currentPage + 1) * size > totalItems ? totalItems : (currentPage + 1) * size}"></span>
-                            of <span th:text="${totalItems}"></span> entries
+                            trên tổng số <span th:text="${totalItems}"></span> căn hộ
                         </span>
                     </div>
                     <nav>
@@ -370,7 +370,7 @@
         </div>
 
         <div class="text-center text-muted small mt-3">
-            <span>Manager Staff • Admin Level</span>
+            <span>Ban quản lý • ABMS</span>
         </div>
     </div>
 </body>

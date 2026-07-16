@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'utilities')}" lang="en">
+      th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'utilities')}" lang="vi">
 <head>
 </head>
 <body>
@@ -12,12 +12,12 @@
     <!-- Title Section -->
     <div class="main-header">
         <div class="title-section">
-            <h2>Utility Management</h2>
-            <p>View and manage all available amenities in your resident community.</p>
+            <h2>Quản lý tiện ích</h2>
+            <p>Xem và quản lý tất cả các tiện ích có sẵn trong khu dân cư.</p>
         </div>
 
         <button class="btn-primary" onclick="openAddUtilityModal()">
-            <i class="fas fa-plus"></i> Add Utility
+            <i class="fas fa-plus"></i> Thêm tiện ích
         </button>
     </div>
 
@@ -26,7 +26,7 @@
         <!-- Total Utilities -->
         <div class="stats-card card-1">
             <div class="stats-card-content">
-                <div class="stats-card-label">Total Utilities</div>
+                <div class="stats-card-label">Tổng số tiện ích</div>
                 <div class="stats-card-value" th:text="${totalUtilities}">0</div>
             </div>
             <div class="stats-card-icon-wrapper">
@@ -36,7 +36,7 @@
         <!-- Active Utilities -->
         <div class="stats-card card-2">
             <div class="stats-card-content">
-                <div class="stats-card-label">Active Utilities</div>
+                <div class="stats-card-label">Tiện ích hoạt động</div>
                 <div class="stats-card-value" th:text="${activeUtilities}">0</div>
             </div>
             <div class="stats-card-icon-wrapper">
@@ -46,7 +46,7 @@
         <!-- Total Resources -->
         <div class="stats-card card-3">
             <div class="stats-card-content">
-                <div class="stats-card-label">Total Resources</div>
+                <div class="stats-card-label">Tổng số tài nguyên</div>
                 <div class="stats-card-value" th:text="${totalResources}">0</div>
             </div>
             <div class="stats-card-icon-wrapper">
@@ -56,7 +56,7 @@
         <!-- Pricing Tiers -->
         <div class="stats-card card-4">
             <div class="stats-card-content">
-                <div class="stats-card-label">Pricing Configurations</div>
+                <div class="stats-card-label">Thiết lập đơn giá</div>
                 <div class="stats-card-value" th:text="${totalPricing}">0</div>
             </div>
             <div class="stats-card-icon-wrapper">
@@ -68,19 +68,19 @@
     <!-- Filters Bar Card -->
     <div class="filter-bar-card">
         <div class="filter-left">
-            <span class="filter-label">Status:</span>
+            <span class="filter-label">Trạng thái:</span>
             <div class="status-select-container">
                 <select id="statusFilter" class="status-select" onchange="filterByStatus()">
-                    <option value="all" th:selected="${statusFilter == 'all'}">All</option>
-                    <option value="active" th:selected="${statusFilter == 'active'}">Active</option>
-                    <option value="maintenance" th:selected="${statusFilter == 'maintenance'}">Maintenance</option>
+                    <option value="all" th:selected="${statusFilter == 'all'}">Tất cả</option>
+                    <option value="active" th:selected="${statusFilter == 'active'}">Hoạt động</option>
+                    <option value="maintenance" th:selected="${statusFilter == 'maintenance'}">Bảo trì</option>
                 </select>
                 <i class="fa-solid fa-chevron-down"></i>
             </div>
         </div>
         <div class="filter-right">
-            <button id="gridViewBtn" class="view-toggle-btn" title="Grid View" onclick="setViewMode('grid')"><i class="fa-solid fa-grip"></i></button>
-            <button id="listViewBtn" class="view-toggle-btn active" title="List View" onclick="setViewMode('list')"><i class="fa-solid fa-list-ul"></i></button>
+            <button id="gridViewBtn" class="view-toggle-btn" title="Xem dạng lưới" onclick="setViewMode('grid')"><i class="fa-solid fa-grip"></i></button>
+            <button id="listViewBtn" class="view-toggle-btn active" title="Xem dạng danh sách" onclick="setViewMode('list')"><i class="fa-solid fa-list-ul"></i></button>
         </div>
     </div>
 
@@ -91,7 +91,7 @@
             <div class="card-image-box">
                 <img th:src="${util.imageUrl}" alt="Utility Image">
                 <span th:class="${util.status} ? 'badge-on-image active' : 'badge-on-image maintenance'"
-                      th:text="${util.status} ? 'ACTIVE' : 'MAINTENANCE'">ACTIVE</span>
+                      th:text="${util.status} ? 'HOẠT ĐỘNG' : 'BẢO TRÌ'">HOẠT ĐỘNG</span>
             </div>
 
             <!-- Middle: Details & Admin Actions -->
@@ -100,10 +100,10 @@
 
                 <div class="location-row" style="margin-top: 4px;">
                     <i class="fa-solid fa-circle-info"></i>
-                    <span th:text="${util.typeLabel}">RESERVABLE</span>
+                    <span th:text="${util.typeLabel == 'RESERVABLE' ? 'ĐĂNG KÝ TRƯỚC' : (util.typeLabel == 'FREE USE' ? 'SỬ DỤNG MIỄN PHÍ' : util.typeLabel)}">RESERVABLE</span>
                 </div>
                 <div class="card-actions-row">
-                    <a th:href="@{/admin/utilities/{id}(id=${util.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" class="btn-detail-link">Details</a>
+                    <a th:href="@{/admin/utilities/{id}(id=${util.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" class="btn-detail-link">Chi tiết</a>
 
                     <button class="icon-action-btn" 
                             th:data-id="${util.utilityId}"
@@ -112,11 +112,11 @@
                             th:data-status="${util.status}"
                             th:data-type="${util.type}"
                             onclick="openEditUtilityModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-desc'), this.getAttribute('data-status') === 'true', this.getAttribute('data-type') === 'true')"
-                            title="Edit Utility">
+                            title="Chỉnh sửa tiện ích">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
                     <form th:action="@{/admin/utilities/toggle-status/{id}(id=${util.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" style="display:inline;">
-                        <button type="submit" class="icon-action-btn toggle-lock" th:classappend="${util.status} ? 'active' : 'inactive'" title="Toggle Lock Status">
+                        <button type="submit" class="icon-action-btn toggle-lock" th:classappend="${util.status} ? 'active' : 'inactive'" title="Bật/Tắt trạng thái hoạt động">
                             <i th:class="${util.status} ? 'fas fa-lock-open' : 'fas fa-lock'"></i>
                         </button>
                     </form>
@@ -129,13 +129,13 @@
         </div>
 
         <div th:if="${#lists.isEmpty(utilities)}" style="padding: 40px; text-align: center; color: var(--text-secondary); background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-top: 16px;">
-            No utilities found matching selected search or status criteria.
+            Không tìm thấy tiện ích nào khớp với tìm kiếm hoặc bộ lọc trạng thái.
         </div>
     </div>
 
     <!-- Pagination Row -->
     <div class="pagination-container-row" th:if="${totalPages > 1}">
-        <span class="pagination-info" th:text="'Showing page ' + ${currentPage} + ' of ' + ${totalPages}">Showing page 1 of 3</span>
+        <span class="pagination-info" th:text="'Hiển thị trang ' + ${currentPage} + ' trên ' + ${totalPages}">Hiển thị trang 1 trên 3</span>
         <div class="pagination-pages-box">
             <a th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage - 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
                class="page-nav-btn" th:classappend="${currentPage == 1} ? 'disabled'"><i class="fa-solid fa-chevron-left"></i></a>
@@ -159,42 +159,42 @@
     <div class="modal-overlay" id="utilityModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="utilityModalTitle">Add New Utility</h3>
+                <h3 id="utilityModalTitle">Thêm tiện ích mới</h3>
                 <button class="modal-close" onclick="closeModal('utilityModal')"><i class="fas fa-times"></i></button>
             </div>
             <form th:action="@{/admin/utilities/save(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="utilityId" id="utilityIdField">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="utilityNameField">Utility Name</label>
-                        <input type="text" name="utilityName" id="utilityNameField" class="form-control" placeholder="e.g. Gym, Swimming Pool" maxlength="100" required>
+                        <label for="utilityNameField">Tên tiện ích</label>
+                        <input type="text" name="utilityName" id="utilityNameField" class="form-control" placeholder="Ví dụ: Gym, Hồ bơi" maxlength="100" required>
                     </div>
                     <div class="form-group">
-                        <label for="utilityDescField">Description</label>
-                        <textarea name="description" id="utilityDescField" class="form-control" placeholder="e.g. Fitness and wellness facility..." maxlength="100" required></textarea>
+                        <label for="utilityDescField">Mô tả</label>
+                        <textarea name="description" id="utilityDescField" class="form-control" placeholder="Ví dụ: Khu vực tập luyện thể dục..." maxlength="100" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="utilityImageField">Utility Main Image</label>
+                        <label for="utilityImageField">Ảnh chính tiện ích</label>
                         <input type="file" name="utilityImage" id="utilityImageField" class="form-control" accept="image/*">
                     </div>
                     <div class="form-group">
-                        <label for="utilityTypeField">Type</label>
+                        <label for="utilityTypeField">Loại tiện ích</label>
                         <select name="type" id="utilityTypeField" class="form-control">
-                            <option value="true">Need to book (Reservable)</option>
-                            <option value="false">No need to book (Free Use)</option>
+                            <option value="true">Cần đặt trước (Đăng ký)</option>
+                            <option value="false">Sử dụng tự do (Miễn phí)</option>
                         </select>
                     </div>
                     <div class="form-group" style="display: none;">
-                        <label for="utilityStatusField">Status</label>
+                        <label for="utilityStatusField">Trạng thái</label>
                         <select name="status" id="utilityStatusField" class="form-control">
-                            <option value="true">Active</option>
-                            <option value="false">Stopped</option>
+                            <option value="true">Hoạt động</option>
+                            <option value="false">Dừng hoạt động</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('utilityModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Changes</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('utilityModal')">Hủy bỏ</button>
+                    <button type="submit" class="btn-primary">Lưu thay đổi</button>
                 </div>
             </form>
         </div>
@@ -204,31 +204,31 @@
     <div class="modal-overlay" id="resourceModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="resourceTitle">Add Resource</h3>
+                <h3 id="resourceTitle">Thêm tài nguyên</h3>
                 <button class="modal-close" onclick="closeModal('resourceModal')"><i class="fas fa-times"></i></button>
             </div>
             <form th:action="@{/admin/utilities/add-resource(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST">
                 <input type="hidden" name="utilityId" id="resourceUtilityId">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="resourceName">Resource Name</label>
-                        <input type="text" name="resourceName" id="resourceName" class="form-control" placeholder="e.g. Main Training Hall" maxlength="100" required>
+                        <label for="resourceName">Tên tài nguyên</label>
+                        <input type="text" name="resourceName" id="resourceName" class="form-control" placeholder="Ví dụ: Phòng tập số 1" maxlength="100" required>
                     </div>
                     <div class="form-group">
-                        <label for="resourceLocation">Location</label>
-                        <input type="text" name="resourceLocation" id="resourceLocation" class="form-control" placeholder="e.g. Floor 1, Outdoor" maxlength="100" required>
+                        <label for="resourceLocation">Vị trí</label>
+                        <input type="text" name="resourceLocation" id="resourceLocation" class="form-control" placeholder="Ví dụ: Tầng 1, ngoài trời" maxlength="100" required>
                     </div>
                     <div class="form-group">
-                        <label for="resourceStatus">Status</label>
+                        <label for="resourceStatus">Trạng thái</label>
                         <select name="status" id="resourceStatus" class="form-control">
-                            <option value="true">Ready</option>
-                            <option value="false">Maintenance</option>
+                            <option value="true">Sẵn sàng</option>
+                            <option value="false">Bảo trì</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('resourceModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Add Resource</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('resourceModal')">Hủy bỏ</button>
+                    <button type="submit" class="btn-primary">Thêm tài nguyên</button>
                 </div>
             </form>
         </div>
@@ -238,31 +238,31 @@
     <div class="modal-overlay" id="pricingModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="pricingTitle">Configure Pricing</h3>
+                <h3 id="pricingTitle">Thiết lập đơn giá</h3>
                 <button class="modal-close" onclick="closeModal('pricingModal')"><i class="fas fa-times"></i></button>
             </div>
             <form th:action="@{/admin/utilities/manage-pricing(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="pricingUtilityId">Select Utility</label>
+                        <label for="pricingUtilityId">Chọn tiện ích</label>
                         <select name="utilityId" id="pricingUtilityId" class="form-control">
                             <option th:each="util : ${allUtilities}" th:value="${util.utilityId}" th:text="${util.utilityName}">Gym</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="pricingUnitId">Pricing Unit</label>
+                        <label for="pricingUnitId">Đơn vị tính</label>
                         <select name="unitId" id="pricingUnitId" class="form-control">
-                            <option th:each="unit : ${allUnits}" th:value="${unit.unitId}" th:text="${unit.unitName}">hour</option>
+                            <option th:each="unit : ${allUnits}" th:value="${unit.unitId}" th:text="${unit.unitName == 'hour' ? 'Giờ' : (unit.unitName == 'day' ? 'Ngày' : (unit.unitName == 'month' ? 'Tháng' : unit.unitName))}">hour</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="pricingPrice">Price ($)</label>
-                        <input type="number" name="price" id="pricingPrice" step="0.01" min="0" class="form-control" placeholder="0.00" required>
+                        <label for="pricingPrice">Giá tiền (đ)</label>
+                        <input type="number" name="price" id="pricingPrice" step="1" min="0" class="form-control" placeholder="0" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('pricingModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Pricing</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('pricingModal')">Hủy bỏ</button>
+                    <button type="submit" class="btn-primary">Lưu mức giá</button>
                 </div>
             </form>
         </div>
@@ -304,7 +304,7 @@
 
             if (searchInput) {
                 searchInput.value = queryFromModel || "";
-                searchInput.placeholder = "Search utilities...";
+                searchInput.placeholder = "Tìm kiếm tiện ích...";
                 searchInput.addEventListener("keypress", function (e) {
                     if (e.key === "Enter") {
                         e.preventDefault();
@@ -321,7 +321,7 @@
 
         // Modals Functions
         function openAddUtilityModal() {
-            document.getElementById("utilityModalTitle").innerText = "Add New Utility";
+            document.getElementById("utilityModalTitle").innerText = "Thêm tiện ích mới";
             document.getElementById("utilityIdField").value = "";
             document.getElementById("utilityNameField").value = "";
             document.getElementById("utilityDescField").value = "";
@@ -332,8 +332,9 @@
             showModal("utilityModal");
         }
 
+        // Dịch edit modal
         function openEditUtilityModal(id, name, desc, status, type) {
-            document.getElementById("utilityModalTitle").innerText = "Edit Utility";
+            document.getElementById("utilityModalTitle").innerText = "Chỉnh sửa tiện ích";
             document.getElementById("utilityIdField").value = id;
             document.getElementById("utilityNameField").value = name;
             document.getElementById("utilityDescField").value = desc;
@@ -345,7 +346,7 @@
         }
 
         function openAddResourceModal(utilityId, utilityName) {
-            document.getElementById("resourceTitle").innerText = "Add Resource for " + utilityName;
+            document.getElementById("resourceTitle").innerText = "Thêm tài nguyên cho " + utilityName;
             document.getElementById("resourceUtilityId").value = utilityId;
             document.getElementById("resourceName").value = "";
             document.getElementById("resourceLocation").value = "";
@@ -354,7 +355,7 @@
         }
 
         function openConfigurePricingModal() {
-            document.getElementById("pricingTitle").innerText = "Configure Pricing";
+            document.getElementById("pricingTitle").innerText = "Thiết lập đơn giá";
             document.getElementById("pricingUtilityId").disabled = false;
             document.getElementById("pricingUnitId").disabled = false;
             document.getElementById("pricingPrice").value = "";
@@ -362,7 +363,7 @@
         }
 
         function openEditPricingModal(utilityId, unitId, price) {
-            document.getElementById("pricingTitle").innerText = "Edit Pricing Configuration";
+            document.getElementById("pricingTitle").innerText = "Chỉnh sửa thiết lập đơn giá";
             const utilitySelect = document.getElementById("pricingUtilityId");
             const unitSelect = document.getElementById("pricingUnitId");
             utilitySelect.value = utilityId;
@@ -382,14 +383,14 @@
             h1.value = utilityId;
             h1.className = "temp-hidden";
             form.appendChild(h1);
-
+ 
             let h2 = document.createElement("input");
             h2.type = "hidden";
             h2.name = "unitId";
             h2.value = unitId;
             h2.className = "temp-hidden";
             form.appendChild(h2);
-
+ 
             showModal("pricingModal");
         }
 

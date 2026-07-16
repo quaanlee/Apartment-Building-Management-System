@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'billing')}">
 <head>
-    <title>Generate Monthly Bill - ABMS</title>
+    <title>Tạo Hóa đơn Hàng tháng - ABMS</title>
 </head>
 <body>
 
@@ -9,17 +9,17 @@
     <link rel="stylesheet" th:href="@{/css/manager/bills/bills.css}">
     <div class="page-header">
         <div>
-            <h2>Generate Monthly Service Bill</h2>
-            <p>Set billing period, enter usage quantities, and include approved amenity bookings.</p>
+            <h2>Tạo Hóa đơn Dịch vụ Hàng tháng</h2>
+            <p>Thiết lập chu kỳ hóa đơn, nhập số lượng sử dụng và bao gồm các dịch vụ tiện ích đã phê duyệt.</p>
         </div>
         <a th:href="@{/manager/bills}" class="billing-btn secondary">
             <i class="fa-solid fa-arrow-left"></i>
-            Back to Bills
+            Quay lại Hóa đơn
         </a>
     </div>
 
     <div th:if="${message}" class="alert" th:classappend="${messageType == 'error'} ? ' alert-danger' : ' alert-success'" th:text="${message}">
-        Alert message
+        Thông báo
     </div>
 
     <div class="bill-form-layout">
@@ -27,34 +27,34 @@
             <form th:action="@{/manager/bills/generate}" th:object="${billDto}" method="post" id="billGenForm">
                 <div class="form-grid">
                     <div class="billing-field">
-                        <label for="apartmentId">Apartment *</label>
+                        <label for="apartmentId">Căn hộ *</label>
                         <select th:field="*{apartmentId}" id="apartmentId" required onchange="updateBookingPreview()">
-                            <option value="">Select apartment</option>
+                            <option value="">Chọn căn hộ</option>
                             <option th:each="apt : ${apartments}"
                                     th:value="${apt.apartmentId}"
                                     th:text="${apt.apartmentNumber} + ' (' + ${@managerBillController.getOwnerName(apt)} + ')'"></option>
                         </select>
-                        <span th:if="${#fields.hasErrors('apartmentId')}" th:errors="*{apartmentId}" class="form-error">Error</span>
+                        <span th:if="${#fields.hasErrors('apartmentId')}" th:errors="*{apartmentId}" class="form-error">Lỗi</span>
                     </div>
 
                     <div class="billing-field">
-                        <label for="billingMonth">Billing Month *</label>
+                        <label for="billingMonth">Tháng Hóa đơn *</label>
                         <select th:field="*{month}" id="billingMonth" required onchange="updateBookingPreview()">
                             <option th:each="m : ${#numbers.sequence(1, 12)}"
                                     th:value="${m}"
                                     th:text="${m}">1</option>
                         </select>
-                        <span th:if="${#fields.hasErrors('month')}" th:errors="*{month}" class="form-error">Error</span>
+                        <span th:if="${#fields.hasErrors('month')}" th:errors="*{month}" class="form-error">Lỗi</span>
                     </div>
 
                     <div class="billing-field">
-                        <label for="billingYear">Billing Year *</label>
+                        <label for="billingYear">Năm Hóa đơn *</label>
                         <input type="number" th:field="*{year}" id="billingYear" required onchange="updateBookingPreview()">
-                        <span th:if="${#fields.hasErrors('year')}" th:errors="*{year}" class="form-error">Error</span>
+                        <span th:if="${#fields.hasErrors('year')}" th:errors="*{year}" class="form-error">Lỗi</span>
                     </div>
                 </div>
 
-                <h3 class="section-title">Standard Services &amp; Usage Quantities</h3>
+                <h3 class="section-title">Dịch vụ Tiêu chuẩn &amp; Số lượng Sử dụng</h3>
                 <div class="service-list">
                     <div th:each="service : ${services}" class="service-row">
                         <div>
@@ -63,27 +63,27 @@
                             <small th:text="${service.serviceType}">Monthly fee</small>
                         </div>
 
-                        <div class="numeric" th:text="'$' + ${#numbers.formatDecimal(service.unitPrice, 1, 2)} + ' / ' + ${service.unit.unitName}">
-                            $50.00 / Month
+                        <div class="numeric" th:text="${#numbers.formatDecimal(service.unitPrice, 1, 'POINT', 0, 'COMMA')} + ' đ / ' + ${service.unit.unitName}">
+                            50.000 đ / Tháng
                         </div>
 
                         <div class="billing-field">
-                            <label th:for="'qty-' + ${service.serviceId}">Quantity</label>
+                            <label th:for="'qty-' + ${service.serviceId}">Số lượng</label>
                             <input th:id="'qty-' + ${service.serviceId}" type="number" name="quantities" min="0" step="0.01" value="0.00" class="qty-input" th:data-price="${service.unitPrice}" oninput="recalculateTotal()">
                         </div>
 
                         <div class="billing-field">
-                            <label th:for="'desc-' + ${service.serviceId}">Note</label>
-                            <input th:id="'desc-' + ${service.serviceId}" type="text" name="descriptions" placeholder="Optional note">
+                            <label th:for="'desc-' + ${service.serviceId}">Mô tả/Ghi chú</label>
+                            <input th:id="'desc-' + ${service.serviceId}" type="text" name="descriptions" placeholder="Ghi chú thêm (không bắt buộc)">
                         </div>
                     </div>
                 </div>
 
                 <div class="billing-actions form-footer">
-                    <a th:href="@{/manager/bills}" class="billing-btn secondary">Cancel</a>
+                    <a th:href="@{/manager/bills}" class="billing-btn secondary">Hủy</a>
                     <button type="submit" class="billing-btn primary">
                         <i class="fa-solid fa-square-plus"></i>
-                        Generate Bill Now
+                        Tạo Hóa đơn Ngay
                     </button>
                 </div>
             </form>
@@ -91,26 +91,26 @@
 
         <aside class="summary-stack">
             <section class="summary-card">
-                <h3>Live Price Calculation</h3>
+                <h3>Tính toán Chi phí Trực tiếp</h3>
                 <div class="summary-line">
-                    <span>Standard Services</span>
-                    <strong id="servicesTotal">$0.00</strong>
+                    <span>Dịch vụ Tiêu chuẩn</span>
+                    <strong id="servicesTotal">0 đ</strong>
                 </div>
                 <div class="summary-line">
-                    <span>Amenity Bookings</span>
-                    <strong id="bookingsTotal">$0.00</strong>
+                    <span>Đặt tiện ích</span>
+                    <strong id="bookingsTotal">0 đ</strong>
                 </div>
                 <div class="summary-line total">
-                    <span>Estimated Total</span>
-                    <strong id="grandTotal">$0.00</strong>
+                    <span>Tổng cộng Dự kiến</span>
+                    <strong id="grandTotal">0 đ</strong>
                 </div>
             </section>
 
             <section class="summary-card">
-                <h3>Amenity Bookings Included</h3>
-                <p class="muted-text summary-note">Approved bookings for the selected apartment and billing period are fetched automatically.</p>
+                <h3>Tiện ích Bao gồm</h3>
+                <p class="muted-text summary-note">Các yêu cầu đặt tiện ích đã phê duyệt cho căn hộ và khoảng thời gian đã chọn sẽ tự động được lấy.</p>
                 <div id="bookingListContainer" class="booking-list">
-                    <div class="booking-preview-empty">Select an apartment to preview utility bookings.</div>
+                    <div class="booking-preview-empty">Chọn một căn hộ để xem trước đặt tiện ích.</div>
                 </div>
             </section>
         </aside>
@@ -118,6 +118,10 @@
 
     <script th:inline="javascript">
         let bookingSum = 0;
+
+        function formatVND(val) {
+            return val.toLocaleString('vi-VN') + " đ";
+        }
 
         function setBookingEmpty(message) {
             document.getElementById("bookingListContainer").innerHTML = `<div class="booking-preview-empty">${message}</div>`;
@@ -130,14 +134,14 @@
             const container = document.getElementById("bookingListContainer");
 
             if (!apartmentId || !month || !year) {
-                setBookingEmpty("Select an apartment to preview utility bookings.");
+                setBookingEmpty("Chọn một căn hộ để xem trước đặt tiện ích.");
                 bookingSum = 0;
-                document.getElementById("bookingsTotal").innerText = "$0.00";
+                document.getElementById("bookingsTotal").innerText = "0 đ";
                 recalculateTotal();
                 return;
             }
 
-            container.innerHTML = `<div class="booking-preview-loading"><i class="fa-solid fa-spinner fa-spin"></i> Fetching bookings...</div>`;
+            container.innerHTML = `<div class="booking-preview-loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải đặt tiện ích...</div>`;
 
             fetch(`/manager/bills/generate/preview?apartmentId=${apartmentId}&month=${month}&year=${year}`)
                 .then(response => response.json())
@@ -146,31 +150,31 @@
                     bookingSum = 0;
 
                     if (data.length === 0) {
-                        setBookingEmpty("No utility bookings found for this period.");
+                        setBookingEmpty("Không tìm thấy đặt tiện ích nào trong giai đoạn này.");
                     } else {
                         data.forEach(item => {
-                            const priceMatch = item.match(/\$([0-9.]+)/);
-                            const label = item.split(": $")[0];
+                            const priceMatch = item.match(/: ([0-9.]+)/);
+                            const label = item.split(": ")[0];
                             const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
                             bookingSum += price;
 
                             container.innerHTML += `
                                 <div class="booking-preview-item">
                                     <span>${label}</span>
-                                    <strong>$${price.toFixed(2)}</strong>
+                                    <strong>${formatVND(price)}</strong>
                                 </div>
                             `;
                         });
                     }
 
-                    document.getElementById("bookingsTotal").innerText = `$${bookingSum.toFixed(2)}`;
+                    document.getElementById("bookingsTotal").innerText = formatVND(bookingSum);
                     recalculateTotal();
                 })
                 .catch(err => {
                     console.error("Error fetching bookings:", err);
-                    container.innerHTML = `<div class="booking-preview-error">Failed to load bookings.</div>`;
+                    container.innerHTML = `<div class="booking-preview-error">Không thể tải danh sách đặt tiện ích.</div>`;
                     bookingSum = 0;
-                    document.getElementById("bookingsTotal").innerText = "$0.00";
+                    document.getElementById("bookingsTotal").innerText = "0 đ";
                     recalculateTotal();
                 });
         }
@@ -185,8 +189,8 @@
                 serviceSum += qty * price;
             });
 
-            document.getElementById("servicesTotal").innerText = `$${serviceSum.toFixed(2)}`;
-            document.getElementById("grandTotal").innerText = `$${(serviceSum + bookingSum).toFixed(2)}`;
+            document.getElementById("servicesTotal").innerText = formatVND(serviceSum);
+            document.getElementById("grandTotal").innerText = formatVND(serviceSum + bookingSum);
         }
 
         document.getElementById("billGenForm").addEventListener("submit", function(e) {
@@ -202,7 +206,7 @@
             const total = serviceSum + bookingSum;
             if (total <= 0) {
                 e.preventDefault();
-                alert("Cannot generate a bill with a total amount of $0.00 or less. Please enter quantity for at least one service or select an apartment with pending amenity bookings.");
+                alert("Không thể tạo hóa đơn có tổng số tiền bằng 0 hoặc nhỏ hơn. Vui lòng nhập số lượng cho ít nhất một dịch vụ hoặc chọn căn hộ có đặt tiện ích đang chờ xử lý.");
             }
         });
     </script>

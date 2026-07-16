@@ -40,16 +40,16 @@ public class UtilityMembershipHistoryDTO {
 
     public String getStatusLabel() {
         if (Boolean.TRUE.equals(status) && LocalDate.now().isBefore(endDate.plusDays(1))) {
-            return "Active";
+            return "Đang hoạt động";
         }
-        return "Expired";
+        return "Hết hạn";
     }
 
     public Boolean getPaymentStatus() { return paymentStatus; }
     public void setPaymentStatus(Boolean paymentStatus) { this.paymentStatus = paymentStatus; }
     
     public String getPaymentStatusLabel() {
-        return Boolean.TRUE.equals(paymentStatus) ? "Paid" : "Unpaid";
+        return Boolean.TRUE.equals(paymentStatus) ? "Đã thanh toán" : "Chưa thanh toán";
     }
 
     public LocalDateTime getCreatedAt() { return createdAt; }

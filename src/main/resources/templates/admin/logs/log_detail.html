@@ -4,63 +4,63 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
 
         <div class="logs-page-header">
-            <h2 class="logs-page-title">System Log Detail</h2>
+            <h2 class="logs-page-title">Chi tiết nhật ký hệ thống</h2>
             <a th:href="@{/admin/logs}" class="logs-export-btn" style="text-decoration: none; color: inherit; background-color: var(--surface-hover);">
                 <span class="material-symbols-outlined">arrow_back</span>
-                BACK TO LOGS
+                QUAY LẠI NHẬT KÝ
             </a>
         </div>
 
         <div class="logs-detail-panel" style="position: static; width: 100%; max-width: 100%; box-shadow: none; border-radius: 8px; transform: none; border: 1px solid var(--color-outline-variant);">
             <div class="logs-detail-header">
                 <div>
-                    <h3 class="logs-detail-title">Event Log Details</h3>
-                    <p class="logs-detail-id" th:text="'ID: LOG-' + ${log.logId}">ID: LOG-1</p>
+                    <h3 class="logs-detail-title">Chi tiết nhật ký sự kiện</h3>
+                    <p class="logs-detail-id" th:text="'Mã số: LOG-' + ${log.logId}">Mã số: LOG-1</p>
                 </div>
             </div>
             <div class="logs-detail-body" style="height: auto;">
                 <section class="logs-detail-section">
-                    <h4 class="logs-detail-section-title">Audit Summary</h4>
+                    <h4 class="logs-detail-section-title">Tóm tắt kiểm toán</h4>
                     <div class="logs-detail-grid">
                         <div>
-                            <p class="logs-detail-field-label">Created At</p>
+                            <p class="logs-detail-field-label">Thời gian tạo</p>
                             <p class="logs-detail-field-value" th:text="${log.createdAt}">2023-10-31 14:23:11</p>
                         </div>
                         <div>
-                            <p class="logs-detail-field-label">Action Performed</p>
+                            <p class="logs-detail-field-label">Hành động thực hiện</p>
                             <p class="logs-detail-field-value bold logs-action-badge" th:text="${log.action}" style="display: inline-block;">LOGIN</p>
                         </div>
                         <div>
-                            <p class="logs-detail-field-label">Account Role</p>
-                            <p class="logs-detail-field-value" th:text="${log.role}">Admin</p>
+                            <p class="logs-detail-field-label">Vai trò tài khoản</p>
+                            <p class="logs-detail-field-value" th:text="${log.role == 'Admin' ? 'Quản trị viên' : (log.role == 'Resident' ? 'Cư dân' : (log.role == 'Manager' ? 'Quản lý' : (log.role == 'Staff' ? 'Nhân viên bảo trì' : log.role)))}">Admin</p>
                         </div>
                         <div>
-                            <p class="logs-detail-field-label">Target Entity</p>
-                            <p class="logs-detail-field-value" th:text="${log.entityType}">Account</p>
+                            <p class="logs-detail-field-label">Đối tượng tác động</p>
+                            <p class="logs-detail-field-value" th:text="${log.entityType == 'Account' ? 'Tài khoản' : (log.entityType == 'Apartment' ? 'Căn hộ' : (log.entityType == 'Request' ? 'Yêu cầu' : (log.entityType == 'Utility' ? 'Tiện ích' : (log.entityType == 'Resource' ? 'Tài nguyên' : log.entityType))))}">Account</p>
                         </div>
                     </div>
                 </section>
                 
                 <section class="logs-detail-section">
-                    <h4 class="logs-detail-section-title">Context Information</h4>
+                    <h4 class="logs-detail-section-title">Thông tin ngữ cảnh</h4>
                     <div class="logs-detail-context-box">
                         <div class="logs-detail-context-row">
-                            <span class="logs-detail-field-label">Account Name</span>
+                            <span class="logs-detail-field-label">Tên tài khoản</span>
                             <span class="logs-detail-field-value" th:text="${log.accountName}">Alex Mercer</span>
                         </div>
                         <div class="logs-detail-context-row" th:if="${log.entityId != null}">
-                            <span class="logs-detail-field-label">Target Entity ID</span>
+                            <span class="logs-detail-field-label">ID đối tượng tác động</span>
                             <span class="logs-detail-field-value mono bold" th:text="${log.entityId}">1</span>
                         </div>
                         <div class="logs-detail-context-row" th:if="${log.ipAddress != null}">
-                            <span class="logs-detail-field-label">IP Address</span>
+                            <span class="logs-detail-field-label">Địa chỉ IP</span>
                             <span class="logs-detail-field-value mono" th:text="${log.ipAddress}">192.168.1.1</span>
                         </div>
                     </div>
                 </section>
                 
                 <section class="logs-detail-section" th:if="${log.details != null and log.details != '{}' and log.details != ''}">
-                    <h4 class="logs-detail-section-title">Log Content Details</h4>
+                    <h4 class="logs-detail-section-title">Chi tiết nội dung nhật ký</h4>
                     <div class="logs-detail-json-box">
                         <pre id="logDetailsJson" th:text="${log.details}" style="white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; margin: 0; background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 8px; overflow-x: auto;">{}</pre>
                     </div>
@@ -80,11 +80,11 @@
                     })();
                     function highlightJson(json) {
                         var e = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                        e = e.replace(/"([^"]+)":/g, "<span style=""color:#89b4fa;"">$&</span>");
-                        e = e.replace(/: "([^"]*)"/g, ": <span style=""color:#a6e3a1;"">$&</span>");
-                        e = e.replace(/: (\d+\.?\d*)/g, ": <span style=""color:#fab387;"">$1</span>");
-                        e = e.replace(/: (true|false)/g, ": <span style=""color:#cba6f7;"">$1</span>");
-                        e = e.replace(/: (null)/g, ": <span style=""color:#f38ba8;"">$1</span>");
+                        e = e.replace(/"([^"]+)":/g, "<span style=\"color:#89b4fa;\">$&</span>");
+                        e = e.replace(/: "([^"]*)"/g, ": <span style=\"color:#a6e3a1;\">$&</span>");
+                        e = e.replace(/: (\d+\.?\d*)/g, ": <span style=\"color:#fab387;\">$1</span>");
+                        e = e.replace(/: (true|false)/g, ": <span style=\"color:#cba6f7;\">$1</span>");
+                        e = e.replace(/: (null)/g, ": <span style=\"color:#f38ba8;\">$1</span>");
                         return e;
                     }
                 </script>

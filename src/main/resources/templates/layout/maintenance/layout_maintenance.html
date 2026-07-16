@@ -19,26 +19,26 @@
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <h1>ABMS Maintenance</h1>
-                <p>Staff Portal</p>
+                <p>Cổng Nhân Viên</p>
             </div>
             
             <ul class="sidebar-menu">
                 <li class="sidebar-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
                     <a th:href="@{/maintenance_staff/dashboard}">
                         <i class="fa-solid fa-chart-line"></i>
-                        <span>Dashboard</span>
+                        <span>Trang chủ</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'tasks' ? 'active' : ''}">
                     <a th:href="@{/maintenance_staff/tasks}">
                         <i class="fa-solid fa-screwdriver-wrench"></i>
-                        <span>Assigned Task</span>
+                        <span>Nhiệm vụ được giao</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'history' ? 'active' : ''}">
                     <a th:href="@{/maintenance_staff/history}">
                         <i class="fa-solid fa-clock-rotate-left"></i>
-                        <span>Task History</span>
+                        <span>Lịch sử nhiệm vụ</span>
                     </a>
                 </li>
             </ul>
@@ -46,7 +46,7 @@
             <div class="sidebar-footer">
                 <a th:href="@{/logout}" class="logout-btn">
                     <i class="fa-solid fa-right-from-bracket"></i>
-                    <span>Logout</span>
+                    <span>Đăng xuất</span>
                 </a>
             </div>
 
@@ -62,19 +62,19 @@
                     <button class="sidebar-toggle-btn" id="sidebarToggle">
                         <i class="fa-solid fa-bars"></i>
                     </button>
-                    <span class="header-page-title" th:text="${pageTitle != null ? pageTitle : 'Maintenance Portal'}">Maintenance Portal</span>
+                    <span class="header-page-title" th:text="${pageTitle != null ? pageTitle : 'Cổng bảo trì'}">Cổng bảo trì</span>
                 </div>
                 
                 <!-- Action Controls -->
                 <div class="header-actions">
-                    <a th:href="@{/maintenance_staff/notifications}" class="icon-btn" id="notificationBellBtn" title="Notifications" style="position: relative; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; color: #475569; border: none; cursor: pointer; transition: all 0.2s;">
+                    <a th:href="@{/maintenance_staff/notifications}" class="icon-btn" id="notificationBellBtn" title="Thông báo" style="position: relative; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; color: #475569; border: none; cursor: pointer; transition: all 0.2s;">
                         <i class="fa-solid fa-bell"></i>
                         <span class="badge" id="notificationBadge" style="display: none;">0</span>
                     </a>
                     
                     <a href="#" class="user-profile-trigger" id="userProfileTrigger" style="text-decoration: none;">
-                        <div class="user-avatar-placeholder">S</div>
-                        <span class="user-role">Maintenance Staff</span>
+                        <div class="user-avatar-placeholder">NV</div>
+                        <span class="user-role">Nhân viên bảo trì</span>
                     </a>
                 </div>
             </header>

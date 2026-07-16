@@ -142,7 +142,7 @@ public class AdminUtilityController {
                                      RedirectAttributes redirectAttributes) {
         Utility utility = utilityService.findById(id).orElse(null);
         if (utility == null) {
-            redirectAttributes.addFlashAttribute("message", "Utility not found.");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy tiện ích.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/admin/utilities";
         }
@@ -179,7 +179,7 @@ public class AdminUtilityController {
                               @RequestParam(value = "priceQuery", required = false) String priceQuery,
                               RedirectAttributes redirectAttributes) {
         if (utilityDTO.getUtilityName() == null || utilityDTO.getUtilityName().trim().isEmpty() || utilityDTO.getUtilityName().trim().length() > 100) {
-            redirectAttributes.addFlashAttribute("message", "Utility name must not be empty and must be under 100 characters.");
+            redirectAttributes.addFlashAttribute("message", "Tên tiện ích không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             redirectAttributes.addAttribute("query", query);
             redirectAttributes.addAttribute("statusFilter", statusFilter);
@@ -189,7 +189,7 @@ public class AdminUtilityController {
             return "redirect:/admin/utilities";
         }
         if (utilityDTO.getDescription() == null || utilityDTO.getDescription().trim().isEmpty() || utilityDTO.getDescription().trim().length() > 100) {
-            redirectAttributes.addFlashAttribute("message", "Description must not be empty and must be under 100 characters.");
+            redirectAttributes.addFlashAttribute("message", "Mô tả không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             redirectAttributes.addAttribute("query", query);
             redirectAttributes.addAttribute("statusFilter", statusFilter);
@@ -208,18 +208,18 @@ public class AdminUtilityController {
                         String mainUrl = cloudinaryUploadService.uploadUtilityImage(utilityImage);
                         existing.setImageUrl(mainUrl);
                     } catch (Exception e) {
-                        redirectAttributes.addFlashAttribute("message", "Failed to upload utility main image: " + e.getMessage());
+                        redirectAttributes.addFlashAttribute("message", "Không tải được ảnh chính tiện ích: " + e.getMessage());
                         redirectAttributes.addFlashAttribute("messageType", "error");
                     }
                 }
                 utilityService.save(existing);
-                redirectAttributes.addFlashAttribute("message", "Utility updated successfully!");
+                redirectAttributes.addFlashAttribute("message", "Cập nhật tiện ích thành công!");
                 redirectAttributes.addFlashAttribute("messageType", "success");
             });
         } else {
             // Add mode
             if (utilityImage == null || utilityImage.isEmpty()) {
-                redirectAttributes.addFlashAttribute("message", "Utility main image is required.");
+                redirectAttributes.addFlashAttribute("message", "Ảnh chính tiện ích là bắt buộc.");
                 redirectAttributes.addFlashAttribute("messageType", "error");
                 return "redirect:/admin/utilities";
             }
@@ -228,7 +228,7 @@ public class AdminUtilityController {
                 String mainUrl = cloudinaryUploadService.uploadUtilityImage(utilityImage);
                 utilityDTO.setImageUrl(mainUrl);
             } catch (Exception e) {
-                redirectAttributes.addFlashAttribute("message", "Failed to upload utility main image: " + e.getMessage());
+                redirectAttributes.addFlashAttribute("message", "Không tải được ảnh chính tiện ích: " + e.getMessage());
                 redirectAttributes.addFlashAttribute("messageType", "error");
                 return "redirect:/admin/utilities";
             }
@@ -236,7 +236,7 @@ public class AdminUtilityController {
             Utility utility = dtoHandler.toEntity(utilityDTO);
             utilityService.save(utility);
             
-            redirectAttributes.addFlashAttribute("message", "New utility added successfully! You can now add resources to it.");
+            redirectAttributes.addFlashAttribute("message", "Thêm tiện ích mới thành công! Bạn có thể thêm tài nguyên cho tiện ích này.");
             redirectAttributes.addFlashAttribute("messageType", "success");
         }
         redirectAttributes.addAttribute("query", query);
@@ -258,7 +258,7 @@ public class AdminUtilityController {
         utilityService.findById(id).ifPresent(u -> {
             u.setStatus(!u.getStatus());
             utilityService.save(u);
-            redirectAttributes.addFlashAttribute("message", "Utility status updated successfully!");
+            redirectAttributes.addFlashAttribute("message", "Cập nhật trạng thái tiện ích thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         });
         redirectAttributes.addAttribute("query", query);
@@ -284,7 +284,7 @@ public class AdminUtilityController {
                               @RequestParam(value = "priceQuery", required = false) String priceQuery,
                               RedirectAttributes redirectAttributes) {
         if (resourceName == null || resourceName.trim().isEmpty() || resourceName.trim().length() > 100) {
-            redirectAttributes.addFlashAttribute("message", "Resource name must not be empty and must be under 100 characters.");
+            redirectAttributes.addFlashAttribute("message", "Tên tài nguyên không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             redirectAttributes.addAttribute("query", query);
             redirectAttributes.addAttribute("statusFilter", statusFilter);
@@ -294,7 +294,7 @@ public class AdminUtilityController {
             return "redirect:/admin/utilities/" + utilityId;
         }
         if (location == null || location.trim().isEmpty() || location.trim().length() > 100) {
-            redirectAttributes.addFlashAttribute("message", "Resource location must not be empty and must be under 100 characters.");
+            redirectAttributes.addFlashAttribute("message", "Vị trí tài nguyên không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             redirectAttributes.addAttribute("query", query);
             redirectAttributes.addAttribute("statusFilter", statusFilter);
@@ -321,7 +321,7 @@ public class AdminUtilityController {
             resource = utilityResourceService.save(resource);
             try {
                 saveResourceImages(resource, primaryImage, secondaryImages);
-                redirectAttributes.addFlashAttribute("message", "New resource added successfully!");
+                redirectAttributes.addFlashAttribute("message", "Thêm tài nguyên mới thành công!");
                 redirectAttributes.addFlashAttribute("messageType", "success");
             } catch (Exception e) {
                 redirectAttributes.addFlashAttribute("message", e.getMessage());
@@ -362,7 +362,7 @@ public class AdminUtilityController {
                         });
                 targetPrice.setPrice(price);
                 utilityPriceService.save(targetPrice);
-                redirectAttributes.addFlashAttribute("message", "Pricing configuration saved successfully!");
+                redirectAttributes.addFlashAttribute("message", "Lưu cấu hình đơn giá thành công!");
                 redirectAttributes.addFlashAttribute("messageType", "success");
             });
         });
@@ -391,7 +391,7 @@ public class AdminUtilityController {
                                 @RequestParam(value = "priceQuery", required = false) String priceQuery,
                                 RedirectAttributes redirectAttributes) {
         utilityPriceService.deleteById(id);
-        redirectAttributes.addFlashAttribute("message", "Pricing configuration deleted successfully!");
+        redirectAttributes.addFlashAttribute("message", "Xóa cấu hình đơn giá thành công!");
         redirectAttributes.addFlashAttribute("messageType", "success");
         redirectAttributes.addAttribute("query", query);
         redirectAttributes.addAttribute("statusFilter", statusFilter);
@@ -419,7 +419,7 @@ public class AdminUtilityController {
             if (r.getUtility() != null) {
                 utilityIdHolder[0] = r.getUtility().getUtilityId();
             }
-            redirectAttributes.addFlashAttribute("message", "Resource status updated successfully!");
+            redirectAttributes.addFlashAttribute("message", "Cập nhật trạng thái tài nguyên thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         });
         redirectAttributes.addAttribute("query", query);
@@ -448,12 +448,12 @@ public class AdminUtilityController {
                                @RequestParam(value = "priceQuery", required = false) String priceQuery,
                                RedirectAttributes redirectAttributes) {
         if (resourceName == null || resourceName.trim().isEmpty() || resourceName.trim().length() > 100) {
-            redirectAttributes.addFlashAttribute("message", "Resource name must not be empty and must be under 100 characters.");
+            redirectAttributes.addFlashAttribute("message", "Tên tài nguyên không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/admin/utilities/resources/" + resourceId;
         }
         if (location == null || location.trim().isEmpty() || location.trim().length() > 100) {
-            redirectAttributes.addFlashAttribute("message", "Resource location must not be empty and must be under 100 characters.");
+            redirectAttributes.addFlashAttribute("message", "Vị trí tài nguyên không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/admin/utilities/resources/" + resourceId;
         }
@@ -483,7 +483,7 @@ public class AdminUtilityController {
                     primary.setPrimary(true);
                     utilityImageService.save(primary);
                 } catch (Exception e) {
-                    redirectAttributes.addFlashAttribute("message", "Failed to update primary image: " + e.getMessage());
+                    redirectAttributes.addFlashAttribute("message", "Không cập nhật được ảnh chính: " + e.getMessage());
                     redirectAttributes.addFlashAttribute("messageType", "error");
                 }
             }
@@ -515,11 +515,11 @@ public class AdminUtilityController {
                         utilityImageService.save(secondary);
                     }
                 } catch (Exception e) {
-                    redirectAttributes.addFlashAttribute("message", "Failed to update secondary images: " + e.getMessage());
+                    redirectAttributes.addFlashAttribute("message", "Không cập nhật được ảnh phụ: " + e.getMessage());
                     redirectAttributes.addFlashAttribute("messageType", "error");
                 }
             }
-            redirectAttributes.addFlashAttribute("message", "Resource updated successfully!");
+            redirectAttributes.addFlashAttribute("message", "Cập nhật tài nguyên thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         });
 
@@ -542,7 +542,7 @@ public class AdminUtilityController {
                                       RedirectAttributes redirectAttributes) {
         UtilityResource resource = utilityResourceService.findById(id).orElse(null);
         if (resource == null) {
-            redirectAttributes.addFlashAttribute("message", "Resource not found.");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy tài nguyên.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/admin/utilities";
         }
@@ -591,10 +591,10 @@ public class AdminUtilityController {
                 .filter(file -> file != null && !file.isEmpty())
                 .count();
         if (primaryImage == null || primaryImage.isEmpty()) {
-            return "Primary image is required for each resource.";
+            return "Ảnh chính là bắt buộc cho mỗi tài nguyên.";
         }
         if (secondaryCount < 2) {
-            return "Each resource requires at least 2 secondary images.";
+            return "Mỗi tài nguyên cần ít nhất 2 ảnh phụ.";
         }
         return null;
     }

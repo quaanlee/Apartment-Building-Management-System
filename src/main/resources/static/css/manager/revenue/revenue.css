@@ -386,6 +386,23 @@
     white-space: nowrap;
 }
 .rev-resident-cell { display: flex; align-items: center; gap: 10px; }
+.rev-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--color-primary-fixed);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+.rev-resident-name {
+    font-weight: 500;
+    color: var(--color-on-surface);
+}
 
 /* --- Type Badges --- */
 .rev-type-badge {

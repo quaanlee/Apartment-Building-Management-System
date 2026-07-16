@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
       th:replace="~{layout/resident/layout_resident :: resident-layout(~{::#main-content}, 'notification')}"
-      th:with="pageTitle='Notification Details'">
+      th:with="pageTitle='Chi Tiết Thông Báo'">
 <head>
-    <title>Notification Details | ABM System</title>
+    <title>Chi Tiết Thông Báo | Hệ thống ABM</title>
 </head>
 <body>
 <div id="main-content">
@@ -90,15 +90,15 @@
 
     <div class="container-fluid p-0">
         <a th:href="@{/resident/notifications}" class="back-link">
-            <i class="fa-solid fa-arrow-left"></i> Back to Notifications
+            <i class="fa-solid fa-arrow-left"></i> Quay lại Danh sách
         </a>
 
         <div class="detail-card">
             <div class="detail-header">
                 <div>
                     <span class="badge-type" th:classappend="${accountNotification.notification.notificationType == 1 ? 'badge-broadcast' : (accountNotification.notification.notificationType == 2 ? 'badge-alert' : (accountNotification.notification.notificationType == 3 ? 'badge-billing' : 'badge-general'))}"
-                          th:text="${accountNotification.notification.notificationType == 1 ? 'Broadcast' : (accountNotification.notification.notificationType == 2 ? 'Alert' : (accountNotification.notification.notificationType == 3 ? 'Billing' : 'General'))}">
-                        Broadcast
+                          th:text="${accountNotification.notification.notificationType == 1 ? 'Thông tin' : (accountNotification.notification.notificationType == 2 ? 'Cảnh báo' : (accountNotification.notification.notificationType == 3 ? 'Hóa đơn' : 'Chung'))}">
+                        Thông tin
                     </span>
                 </div>
                 <h1 class="detail-title" th:text="${accountNotification.notification.title}">Notification Title</h1>
@@ -106,16 +106,16 @@
                 <div class="meta-row">
                     <div class="meta-item">
                         <i class="fa-solid fa-calendar"></i>
-                        <span th:text="${#temporals.format(accountNotification.notification.createdAt, 'dd MMMM yyyy, HH:mm')}">12 June 2026, 09:30</span>
+                        <span th:text="${#temporals.format(accountNotification.notification.createdAt, 'dd/MM/yyyy, HH:mm')}">12/06/2026, 09:30</span>
                     </div>
                     <div class="meta-item">
                         <i class="fa-solid fa-user-tie"></i>
-                        <span>Sender: </span>
+                        <span>Người gửi: </span>
                         <strong class="ms-1" th:text="${accountNotification.notification.createdBy.profile != null ? accountNotification.notification.createdBy.profile.fullName : accountNotification.notification.createdBy.username}">Management Office</strong>
                     </div>
                     <div class="meta-item" th:if="${accountNotification.isRead}">
                         <i class="fa-solid fa-circle-check text-success"></i>
-                        <span class="text-success">Opened on: <span th:text="${#temporals.format(accountNotification.readAt, 'dd MMM, HH:mm')}">12 Jun, 09:40</span></span>
+                        <span class="text-success">Đã đọc vào: <span th:text="${#temporals.format(accountNotification.readAt, 'dd/MM/yyyy, HH:mm')}">12/06/2026, 09:40</span></span>
                     </div>
                 </div>
             </div>

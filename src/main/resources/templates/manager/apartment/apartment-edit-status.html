@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
       th:replace="~{layout/manager/layout_manager :: manager-layout(~{::#main-content}, 'apartments')}"
-      th:with="pageTitle='Edit Apartment Status'">
+      th:with="pageTitle='Chỉnh sửa trạng thái Căn hộ'">
 <head>
-    <title>Edit Apartment Status</title>
+    <title>Chỉnh sửa trạng thái Căn hộ</title>
 </head>
 <body>
 <div id="main-content">
@@ -156,41 +156,41 @@
 
     <!-- Page Actions -->
     <div class="header-actions-row">
-        <h5>Edit Status</h5>
+        <h5>Chỉnh sửa Trạng thái</h5>
         <div>
             <a th:href="@{/manager/apartments/{id}(id=${apartment.apartmentId})}" class="btn btn-secondary btn-sm">
-                <i class="fas fa-arrow-left"></i> Back
+                <i class="fas fa-arrow-left"></i> Quay lại
             </a>
         </div>
     </div>
 
     <div class="form-card">
         <h4>
-            Apartment: <span th:text="${apartment.apartmentNumber}"></span>
+            Căn hộ: <span th:text="${apartment.apartmentNumber}"></span>
         </h4>
 
         <form th:action="@{/manager/apartments/{id}/update-status(id=${apartment.apartmentId})}" method="post">
             <div style="margin-bottom: 20px;">
-                <label class="fw-bold" style="display: block; margin-bottom: 8px; font-size: 14px;">New Status</label>
+                <label class="fw-bold" style="display: block; margin-bottom: 8px; font-size: 14px;">Trạng thái Mới</label>
                 <div class="status-option">
                     <input class="form-check-input" type="radio" name="status" value="0" id="statusAvailable" th:checked="${apartment.status == 0}">
                     <label class="form-check-label" for="statusAvailable">
-                        <span class="badge bg-success">Available</span>
-                        <small class="text-muted d-block">Apartment is ready for new residents</small>
+                        <span class="badge bg-success">Trống</span>
+                        <small class="text-muted d-block">Căn hộ sẵn sàng cho cư dân mới dọn vào</small>
                     </label>
                 </div>
                 <div class="status-option">
                     <input class="form-check-input" type="radio" name="status" value="1" id="statusOccupied" th:checked="${apartment.status == 1}">
                     <label class="form-check-label" for="statusOccupied">
-                        <span class="badge bg-primary">Occupied</span>
-                        <small class="text-muted d-block">Apartment has residents living in</small>
+                        <span class="badge bg-primary">Đã ở</span>
+                        <small class="text-muted d-block">Căn hộ hiện đang có cư dân sinh sống</small>
                     </label>
                 </div>
                 <div class="status-option">
                     <input class="form-check-input" type="radio" name="status" value="2" id="statusMaintenance" th:checked="${apartment.status == 2}">
                     <label class="form-check-label" for="statusMaintenance">
-                        <span class="badge bg-warning">Maintenance</span>
-                        <small class="text-muted d-block">Apartment is under maintenance</small>
+                        <span class="badge bg-warning">Bảo trì</span>
+                        <small class="text-muted d-block">Căn hộ đang được sửa chữa, bảo trì</small>
                     </label>
                 </div>
             </div>
@@ -198,17 +198,17 @@
             <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i>
                 <span th:if="${apartment.currentOccupancy > 0}">
-                    This apartment currently has <strong th:text="${apartment.currentOccupancy}"></strong>
-                    residents. Setting status to "Available" will not remove them.
+                    Căn hộ này hiện đang có <strong th:text="${apartment.currentOccupancy}"></strong>
+                    cư dân. Chuyển trạng thái sang "Trống" sẽ không xóa thông tin cư dân.
                 </span>
                 <span th:unless="${apartment.currentOccupancy > 0}">
-                    This apartment currently has no residents.
+                    Căn hộ này hiện không có cư dân nào.
                 </span>
             </div>
 
             <div class="flex-end-gap-2">
-                <a th:href="@{/manager/apartments/{id}(id=${apartment.apartmentId})}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Status</button>
+                <a th:href="@{/manager/apartments/{id}(id=${apartment.apartmentId})}" class="btn btn-secondary">Hủy</a>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Cập nhật Trạng thái</button>
             </div>
         </form>
     </div>

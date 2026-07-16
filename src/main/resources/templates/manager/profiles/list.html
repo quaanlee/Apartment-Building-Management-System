@@ -3,7 +3,7 @@
       th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'profiles')}">
 <head>
     <meta charset="UTF-8">
-    <title>Profile Directory</title>
+    <title>Danh bạ Hồ sơ</title>
 </head>
 <body>
 
@@ -14,8 +14,8 @@
     <!-- Directory Header and Cards -->
     <div class="directory-header-section">
         <div class="title-area">
-            <h2>Profile Directory</h2>
-            <p>View information and search profiles.</p>
+            <h2>Danh bạ Hồ sơ</h2>
+            <p>Xem thông tin và tìm kiếm hồ sơ.</p>
         </div>
         <div class="stats-grid">
             <div class="stat-card">
@@ -23,7 +23,7 @@
                     <i class="fa-solid fa-users"></i>
                 </div>
                 <div class="stat-info">
-                    <span class="stat-title">TOTAL RESIDENTS</span>
+                    <span class="stat-title">TỔNG SỐ CƯ DÂN</span>
                     <span class="stat-value" th:text="${totalResidents}">0</span>
                 </div>
             </div>
@@ -32,7 +32,7 @@
                     <i class="fa-solid fa-screwdriver-wrench"></i>
                 </div>
                 <div class="stat-info">
-                    <span class="stat-title">TOTAL MAINTENANCE STAFF</span>
+                    <span class="stat-title">TỔNG SỐ NHÂN VIÊN BẢO TRÌ</span>
                     <span class="stat-value" th:text="${totalMaintenance}">0</span>
                 </div>
             </div>
@@ -46,12 +46,12 @@
             <a th:href="@{/manager/profiles(type='resident', search=${search})}" 
                class="tab-btn" 
                th:classappend="${type == 'resident' ? 'active' : ''}">
-                Residents
+                Cư dân
             </a>
             <a th:href="@{/manager/profiles(type='staff', search=${search})}" 
                class="tab-btn" 
                th:classappend="${type == 'staff' ? 'active' : ''}">
-                Maintenance Staff
+                Nhân viên Bảo trì
             </a>
         </div>
         <!-- Search Box -->
@@ -59,7 +59,7 @@
             <input type="hidden" name="type" th:value="${type}">
             <div class="search-wrapper">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" name="search" th:value="${search}" class="search-input" placeholder="Search by Name or Apartment...">
+                <input type="text" name="search" th:value="${search}" class="search-input" placeholder="Tìm theo Tên hoặc Căn hộ...">
             </div>
         </form>
     </div>
@@ -69,26 +69,26 @@
         <table class="data-table">
             <thead>
                 <tr th:if="${type == 'resident'}">
-                    <th>RESIDENT NAME</th>
-                    <th>APARTMENT</th>
-                    <th>PHONE</th>
+                    <th>HỌ VÀ TÊN CƯ DÂN</th>
+                    <th>CĂN HỘ</th>
+                    <th>SỐ ĐIỆN THOẠI</th>
                     <th>EMAIL</th>
-                    <th>LEASE START</th>
-                    <th>STATUS</th>
-                    <th class="text-right">ACTIONS</th>
+                    <th>NGÀY DỌN VÀO</th>
+                    <th>TRẠNG THÁI</th>
+                    <th class="text-right">THAO TÁC</th>
                 </tr>
                 <tr th:if="${type == 'staff'}">
-                    <th>STAFF NAME</th>
-                    <th>PHONE</th>
+                    <th>HỌ VÀ TÊN NHÂN VIÊN</th>
+                    <th>SỐ ĐIỆN THOẠI</th>
                     <th>EMAIL</th>
-                    <th>SPECIALTY / OCCUPATION</th>
-                    <th>STATUS</th>
-                    <th class="text-right">ACTIONS</th>
+                    <th>CHUYÊN MÔN / CÔNG VIỆC</th>
+                    <th>TRẠNG THÁI</th>
+                    <th class="text-right">THAO TÁC</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:if="${#lists.isEmpty(profiles)}">
-                    <td colspan="7" class="text-center no-data">No profiles found matching search criteria.</td>
+                    <td colspan="7" class="text-center no-data">Không tìm thấy hồ sơ nào khớp với tiêu chí tìm kiếm.</td>
                 </tr>
                 <tr th:each="p : ${profiles}">
                     <!-- Name & Avatar Initials -->
@@ -100,26 +100,26 @@
                     </td>
                     
                     <!-- Conditional columns based on type -->
-                    <td th:if="${type == 'resident'}" th:text="${p.apartmentNumber != null ? 'Apt ' + p.apartmentNumber : 'Unassigned'}">Apt 101</td>
+                    <td th:if="${type == 'resident'}" th:text="${p.apartmentNumber != null ? 'Căn hộ ' + p.apartmentNumber : 'Chưa gán'}">Apt 101</td>
                     <td th:text="${p.phoneNumber}">0912345678</td>
                     <td th:text="${p.email}">email@domain.com</td>
                     
                     <!-- Date fields / Specialty fields -->
-                    <td th:if="${type == 'resident'}" th:text="${p.moveInDate != null ? #temporals.format(p.moveInDate, 'MMM dd, yyyy') : 'N/A'}">Oct 12, 2022</td>
-                    <td th:if="${type == 'staff'}" th:text="${p.occupation != null ? p.occupation : 'General Maintenance'}">Plumber</td>
+                    <td th:if="${type == 'resident'}" th:text="${p.moveInDate != null ? #temporals.format(p.moveInDate, 'dd/MM/yyyy') : 'N/A'}">Oct 12, 2022</td>
+                    <td th:if="${type == 'staff'}" th:text="${p.occupation != null ? p.occupation : 'Bảo trì chung'}">Plumber</td>
 
                     <!-- Status -->
                     <td>
                         <span class="status-badge" 
                               th:classappend="${p.accountStatus ? 'active' : 'inactive'}"
-                              th:text="${p.accountStatus ? 'Active' : 'Locked'}">
+                              th:text="${p.accountStatus ? 'Hoạt động' : 'Bị khóa'}">
                             Active
                         </span>
                     </td>
                     
                     <!-- Actions -->
                     <td class="text-right actions-column">
-                        <a th:href="@{'/manager/profiles/' + ${p.accountId}}" class="action-btn-view" title="View details">
+                        <a th:href="@{'/manager/profiles/' + ${p.accountId}}" class="action-btn-view" title="Xem chi tiết">
                             <i class="fa-solid fa-eye"></i>
                         </a>
                     </td>

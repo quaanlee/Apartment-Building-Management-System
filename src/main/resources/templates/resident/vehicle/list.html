@@ -130,8 +130,8 @@
 
         <div class="section-header d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="section-title">My Vehicles</h1>
-                <p class="section-desc">Manage and register your personal vehicles for building access</p>
+                <h1 class="section-title">Phương tiện của Tôi</h1>
+                <p class="section-desc">Quản lý và đăng ký phương tiện cá nhân của bạn để ra vào tòa nhà</p>
             </div>
         </div>
 
@@ -140,23 +140,23 @@
             <div class="col-lg-8">
                 <div class="custom-card">
                     <h2 class="card-title">
-                        <i class="fa-solid fa-car-rear"></i> Registered Vehicles
+                        <i class="fa-solid fa-car-rear"></i> Phương tiện đã đăng ký
                     </h2>
                     
                     <div th:if="${#lists.isEmpty(vehicles)}" class="text-center py-5">
                         <i class="fa-solid fa-car-side text-muted mb-3" style="font-size: 48px;"></i>
-                        <p class="text-muted mb-0">No vehicles registered yet. Submit the registration form to add one.</p>
+                        <p class="text-muted mb-0">Chưa có phương tiện nào được đăng ký. Vui lòng gửi mẫu đăng ký để thêm mới.</p>
                     </div>
 
                     <div th:if="${!#lists.isEmpty(vehicles)}" class="table-responsive">
                         <table class="table align-middle">
                             <thead>
                                 <tr>
-                                    <th>Vehicle</th>
-                                    <th>License Plate</th>
-                                    <th>Brand / Color</th>
-                                    <th>Registered Date</th>
-                                    <th>Status</th>
+                                    <th>Loại xe</th>
+                                    <th>Biển số xe</th>
+                                    <th>Hãng xe / Màu sắc</th>
+                                    <th>Ngày đăng ký</th>
+                                    <th>Trạng thái</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -168,7 +168,8 @@
                                                    th:classappend="${v.vehicleType == 'Car' ? 'fa-car' : (v.vehicleType == 'Motorcycle' ? 'fa-motorcycle' : 'fa-bicycle')}"></i>
                                             </div>
                                             <div>
-                                                <span class="fw-semibold text-dark" th:text="${v.vehicleType}">Car</span>
+                                                <span class="fw-semibold text-dark" 
+                                                      th:text="${v.vehicleType == 'Car' ? 'Ô tô' : (v.vehicleType == 'Motorcycle' ? 'Xe máy' : (v.vehicleType == 'Bicycle' ? 'Xe đạp' : v.vehicleType))}">Ô tô</span>
                                             </div>
                                         </div>
                                     </td>
@@ -178,12 +179,12 @@
                                     <td>
                                         <span th:text="${v.brand + ' - ' + v.color}">Toyota - Black</span>
                                     </td>
-                                    <td th:text="${v.registeredDate}">2026-07-07</td>
+                                    <td th:text="${#temporals.format(v.registeredDate, 'dd/MM/yyyy')}">01/07/2026</td>
                                     <td>
                                         <span class="status-badge" 
                                               th:classappend="${v.status == 0 ? 'status-pending' : (v.status == 1 ? 'status-approved' : 'status-rejected')}"
-                                              th:text="${v.status == 0 ? 'Pending' : (v.status == 1 ? 'Approved' : 'Rejected/Revoked')}">
-                                            Pending
+                                              th:text="${v.status == 0 ? 'Chờ duyệt' : (v.status == 1 ? 'Đã duyệt' : 'Từ chối/Thu hồi')}">
+                                            Chờ duyệt
                                         </span>
                                     </td>
                                 </tr>
@@ -197,45 +198,45 @@
             <div class="col-lg-4">
                 <div class="custom-card">
                     <h2 class="card-title">
-                        <i class="fa-solid fa-file-signature"></i> Register Vehicle
+                        <i class="fa-solid fa-file-signature"></i> Đăng ký phương tiện
                     </h2>
                     
                     <form th:action="@{/resident/vehicles/register}" method="POST" enctype="multipart/form-data">
                         <div class="mb-3">
-                            <label for="licensePlate" class="form-label">License Plate <span class="text-danger">*</span></label>
+                            <label for="licensePlate" class="form-label">Biển số xe <span class="text-danger">*</span></label>
                             <input type="text" id="licensePlate" name="licensePlate" class="form-control" 
-                                   placeholder="e.g. 29A-123.45" required>
+                                   placeholder="Ví dụ: 29A-123.45" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="vehicleType" class="form-label">Vehicle Type <span class="text-danger">*</span></label>
+                            <label for="vehicleType" class="form-label">Loại xe <span class="text-danger">*</span></label>
                             <select id="vehicleType" name="vehicleType" class="form-select" required>
-                                <option value="" disabled selected>Select Type</option>
-                                <option value="Car">Car</option>
-                                <option value="Motorcycle">Motorcycle</option>
-                                <option value="Bicycle">Bicycle</option>
+                                <option value="" disabled selected>Chọn loại xe</option>
+                                <option value="Car">Ô tô</option>
+                                <option value="Motorcycle">Xe máy</option>
+                                <option value="Bicycle">Xe đạp</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label for="brand" class="form-label">Brand / Model <span class="text-danger">*</span></label>
+                            <label for="brand" class="form-label">Hãng xe / Dòng xe <span class="text-danger">*</span></label>
                             <input type="text" id="brand" name="brand" class="form-control" 
-                                   placeholder="e.g. Honda, Toyota, VinFast" required>
+                                   placeholder="Ví dụ: Honda, Toyota, VinFast" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="color" class="form-label">Color <span class="text-danger">*</span></label>
+                            <label for="color" class="form-label">Màu sắc <span class="text-danger">*</span></label>
                             <input type="text" id="color" name="color" class="form-control" 
-                                   placeholder="e.g. White, Black, Red" required>
+                                   placeholder="Ví dụ: Trắng, Đen, Đỏ" required>
                         </div>
 
                         <div class="mb-4">
-                            <label for="documentFile" class="form-label">Ownership Document File (Image/PDF)</label>
+                            <label for="documentFile" class="form-label">Giấy tờ sở hữu xe (Ảnh/PDF)</label>
                             <input type="file" id="documentFile" name="documentFile" class="form-control" accept="image/*,application/pdf">
                         </div>
 
                         <button type="submit" class="btn btn-purple w-100">
-                            <i class="fa-solid fa-paper-plane me-2"></i> Submit Request
+                            <i class="fa-solid fa-paper-plane me-2"></i> Gửi yêu cầu
                         </button>
                     </form>
                 </div>

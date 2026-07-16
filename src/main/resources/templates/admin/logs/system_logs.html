@@ -4,21 +4,20 @@
         <link rel="stylesheet" th:href="@{/css/admin/logs.css}">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
 
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
         <!-- PAGE HEADER                                                  -->
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="logs-page-header">
-            <h2 class="logs-page-title">System Logs</h2>
-            <!-- Export button removed -->
+            <h2 class="logs-page-title">Nhật ký hệ thống</h2>
         </div>
 
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-        <!-- STATS CARDS                                                 -->
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- STATS CARDS                                                  -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="logs-stats-grid">
             <div class="logs-stat-card">
                 <div class="logs-stat-header">
-                    <span class="logs-stat-label">TOTAL EVENTS</span>
+                    <span class="logs-stat-label">TỔNG SỰ KIỆN</span>
                     <span class="material-symbols-outlined logs-stat-icon primary">analytics</span>
                 </div>
                 <div class="logs-stat-value-row">
@@ -27,7 +26,7 @@
             </div>
             <div class="logs-stat-card">
                 <div class="logs-stat-header">
-                    <span class="logs-stat-label">RESIDENT LOGS</span>
+                    <span class="logs-stat-label">NHẬT KÝ CƯ DÂN</span>
                     <span class="material-symbols-outlined logs-stat-icon" style="color: #6366f1;">person</span>
                 </div>
                 <div class="logs-stat-value-row">
@@ -36,7 +35,7 @@
             </div>
             <div class="logs-stat-card">
                 <div class="logs-stat-header">
-                    <span class="logs-stat-label">MANAGER LOGS</span>
+                    <span class="logs-stat-label">NHẬT KÝ QUẢN LÝ</span>
                     <span class="material-symbols-outlined logs-stat-icon" style="color: #f59e0b;">manage_accounts</span>
                 </div>
                 <div class="logs-stat-value-row">
@@ -45,7 +44,7 @@
             </div>
             <div class="logs-stat-card">
                 <div class="logs-stat-header">
-                    <span class="logs-stat-label">MAINTENANCE LOGS</span>
+                    <span class="logs-stat-label">NHẬT KÝ BẢO TRÌ</span>
                     <span class="material-symbols-outlined logs-stat-icon" style="color: #10b981;">build</span>
                 </div>
                 <div class="logs-stat-value-row">
@@ -54,29 +53,29 @@
             </div>
         </div>
 
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
         <!-- FILTER BAR                                                   -->
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
         <form method="get" th:action="@{/admin/logs}" id="filterForm" class="logs-filter-bar">
             <!-- Search -->
             <div class="logs-filter-group">
-                <label class="logs-filter-label">Search</label>
+                <label class="logs-filter-label">Tìm kiếm</label>
                 <div class="logs-search-wrapper">
                     <span class="material-symbols-outlined logs-search-icon">search</span>
                     <input type="text" name="search" id="searchInput" class="logs-search-input"
                            th:value="${search != null ? search : ''}"
-                           placeholder="Search by name, action...">
+                           placeholder="Tìm theo tên, hành động...">
                 </div>
             </div>
 
             <!-- From Date -->
             <div class="logs-filter-group">
-                <label class="logs-filter-label">From Date</label>
+                <label class="logs-filter-label">Từ ngày</label>
                 <div class="logs-date-input-wrapper" id="fromDateWrapper">
                     <span class="material-symbols-outlined logs-date-icon">calendar_today</span>
                     <input type="text" id="fromDateDisplay" class="logs-date-display"
                            th:value="${fromDate != null ? fromDate : ''}"
-                           placeholder="Select date" readonly>
+                           placeholder="Chọn ngày" readonly>
                     <input type="hidden" id="fromDate" name="fromDate" th:value="${fromDate}">
                 </div>
                 <!-- Calendar Picker -->
@@ -87,24 +86,24 @@
                         <button type="button" class="cal-nav" id="fromNext">&gt;</button>
                     </div>
                     <div class="cal-weekdays">
-                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                        <span>CN</span><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span>
                     </div>
                     <div class="cal-days" id="fromDays"></div>
                     <div class="cal-actions">
-                        <button type="button" class="cal-cancel" id="fromCancel">Cancel</button>
-                        <button type="button" class="cal-apply" id="fromApply">Apply</button>
+                        <button type="button" class="cal-cancel" id="fromCancel">Hủy</button>
+                        <button type="button" class="cal-apply" id="fromApply">Áp dụng</button>
                     </div>
                 </div>
             </div>
 
             <!-- To Date -->
             <div class="logs-filter-group">
-                <label class="logs-filter-label">To Date</label>
+                <label class="logs-filter-label">Đến ngày</label>
                 <div class="logs-date-input-wrapper" id="toDateWrapper">
                     <span class="material-symbols-outlined logs-date-icon">calendar_today</span>
                     <input type="text" id="toDateDisplay" class="logs-date-display"
                            th:value="${toDate != null ? toDate : ''}"
-                           placeholder="Select date" readonly>
+                           placeholder="Chọn ngày" readonly>
                     <input type="hidden" id="toDate" name="toDate" th:value="${toDate}">
                 </div>
                 <div class="logs-calendar-dropdown" id="toCalendar">
@@ -114,35 +113,33 @@
                         <button type="button" class="cal-nav" id="toNext">&gt;</button>
                     </div>
                     <div class="cal-weekdays">
-                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                        <span>CN</span><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span>
                     </div>
                     <div class="cal-days" id="toDays"></div>
                     <div class="cal-actions">
-                        <button type="button" class="cal-cancel" id="toCancel">Cancel</button>
-                        <button type="button" class="cal-apply" id="toApply">Apply</button>
+                        <button type="button" class="cal-cancel" id="toCancel">Hủy</button>
+                        <button type="button" class="cal-apply" id="toApply">Áp dụng</button>
                     </div>
                 </div>
             </div>
 
             <!-- User Role -->
             <div class="logs-filter-group">
-                <label class="logs-filter-label">User Role</label>
+                <label class="logs-filter-label">Vai trò</label>
                 <select name="userRole" id="userRoleSelect" class="logs-filter-select">
-                    <option value="" th:selected="${userRole == null or userRole == ''}">All Roles</option>
-                    
-                    <option value="Admin" th:selected="${userRole == 'Admin'}">Admin</option>
-                    <option value="Manager" th:selected="${userRole == 'Manager'}">Manager</option>
-                    <option value="Maintenance Staff" th:selected="${userRole == 'Maintenance Staff'}">Maintenance Staff</option>
-                    <option value="Resident" th:selected="${userRole == 'Resident'}">Resident</option>
-                    
+                    <option value="" th:selected="${userRole == null or userRole == ''}">Tất cả vai trò</option>
+                    <option value="Admin" th:selected="${userRole == 'Admin'}">Quản trị viên</option>
+                    <option value="Manager" th:selected="${userRole == 'Manager'}">Quản lý</option>
+                    <option value="Maintenance Staff" th:selected="${userRole == 'Maintenance Staff'}">Nhân viên bảo trì</option>
+                    <option value="Resident" th:selected="${userRole == 'Resident'}">Cư dân</option>
                 </select>
             </div>
 
             <!-- Action Type -->
             <div class="logs-filter-group">
-                <label class="logs-filter-label">Action</label>
+                <label class="logs-filter-label">Hành động</label>
                 <select name="action" id="actionSelect" class="logs-filter-select">
-                    <option value="" th:selected="${action == null or action == ''}">All Actions</option>
+                    <option value="" th:selected="${action == null or action == ''}">Tất cả hành động</option>
                     <option value="LOGIN" th:selected="${action == 'LOGIN'}">LOGIN</option>
                     <option value="LOGOUT" th:selected="${action == 'LOGOUT'}">LOGOUT</option>
                     <option value="CREATE_BILL" th:selected="${action == 'CREATE_BILL'}">CREATE_BILL</option>
@@ -155,29 +152,29 @@
             </div>
 
             <div class="logs-filter-actions">
-                <button type="submit" class="logs-apply-btn">Apply Filters</button>
-                <a th:href="@{/admin/logs}" class="logs-clear-btn">CLEAR ALL FILTERS</a>
+                <button type="submit" class="logs-apply-btn">Áp dụng bộ lọc</button>
+                <a th:href="@{/admin/logs}" class="logs-clear-btn">XÓA TẤT CẢ BỘ LỌC</a>
             </div>
         </form>
 
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
         <!-- DATA TABLE                                                   -->
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="logs-table-card">
             <div class="logs-table-wrapper">
                 <table class="logs-table">
                     <thead>
                         <tr>
-                            <th>ACCOUNT NAME</th>
-                            <th>ROLE</th>
-                            <th>ACTION</th>
-                            <th>TARGET ENTITY</th>
-                            <th>CREATED AT</th>
-                            <th class="text-right">DETAILS</th>
+                            <th>TÊN TÀI KHOẢN</th>
+                            <th>VAI TRÒ</th>
+                            <th>HÀNH ĐỘNG</th>
+                            <th>ĐỐI TƯỢNG TÁC ĐỘNG</th>
+                            <th>THỜI GIAN TẠO</th>
+                            <th class="text-right">CHI TIẾT</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Thymeleaf loop: th:each="log : ${logs}" -->
+                        <!-- Thymeleaf loop -->
                         <tr class="logs-table-row" th:each="log : ${logs}">
                             <td>
                                 <span class="logs-account-name"
@@ -195,21 +192,42 @@
                                                        log.role == 'Security Officer' ? ' role-security' : log.role == 'Maintenance Staff' ? ' role-maintainer' :
                                                        log.role == 'Resident' ? ' role-resident' :
                                                        log.role == 'System' ? ' role-system' : ' role-default'}"
-                                      th:text="${log.role}">Admin</span>
+                                      th:text="${log.role == 'Admin' ? 'Quản trị viên' :
+                                                (log.role == 'Manager' ? 'Quản lý' :
+                                                (log.role == 'Maintenance Staff' ? 'Nhân viên bảo trì' :
+                                                (log.role == 'Resident' ? 'Cư dân' :
+                                                (log.role == 'System' ? 'Hệ thống' : log.role))))}">Admin</span>
                             </td>
                             <td>
-                                <span class="logs-action-badge" th:classappend="${log.action == 'LOGIN' ? ' action-login' : log.action == 'LOGOUT' ? ' action-logout' : log.action == 'CREATE_BILL' ? ' action-create_bill' : log.action == 'LOCK_ACCOUNT' ? ' action-lock_account' : log.action == 'DELETE_BOOKING' ? ' action-delete_booking' : log.action == 'CANCEL_BOOKING' ? ' action-cancel_booking' : log.action == 'UPDATE_PERMISSIONS' ? ' action-update_permissions' : log.action == 'DAILY_BACKUP' ? ' action-daily_backup' : ''}" th:text="${log.action}">LOGIN</span>
+                                <span class="logs-action-badge"
+                                      th:classappend="${log.action == 'LOGIN' ? ' action-login' :
+                                                        log.action == 'LOGOUT' ? ' action-logout' :
+                                                        log.action == 'CREATE_BILL' ? ' action-create_bill' :
+                                                        log.action == 'LOCK_ACCOUNT' ? ' action-lock_account' :
+                                                        log.action == 'DELETE_BOOKING' ? ' action-delete_booking' :
+                                                        log.action == 'CANCEL_BOOKING' ? ' action-cancel_booking' :
+                                                        log.action == 'UPDATE_PERMISSIONS' ? ' action-update_permissions' :
+                                                        log.action == 'DAILY_BACKUP' ? ' action-daily_backup' : ''}"
+                                      th:text="${log.action}">LOGIN</span>
                             </td>
-                            <td class="logs-td-secondary" th:text="${log.entityType}">Account</td>
+                            <td class="logs-td-secondary"
+                                th:text="${log.entityType == 'Account' ? 'Tài khoản' :
+                                          (log.entityType == 'Apartment' ? 'Căn hộ' :
+                                          (log.entityType == 'Request' ? 'Yêu cầu' :
+                                          (log.entityType == 'Utility' ? 'Tiện ích' :
+                                          (log.entityType == 'Resource' ? 'Tài nguyên' :
+                                          (log.entityType == 'Booking' ? 'Đặt chỗ' :
+                                          (log.entityType == 'Bill' ? 'Hóa đơn' : log.entityType))))))}">Account</td>
                             <td class="logs-td-secondary logs-td-nowrap" th:text="${log.createdAt}">2023-10-31 14:23:11</td>
                             <td class="text-right">
-                                <a class="logs-eye-btn" title="View Details" style="text-decoration: none;" th:href="@{/admin/logs/detail/{id}(id=${log.logId})}">
+                                <a class="logs-eye-btn" title="Xem chi tiết" style="text-decoration: none;"
+                                   th:href="@{/admin/logs/detail/{id}(id=${log.logId})}">
                                     <span class="material-symbols-outlined">visibility</span>
                                 </a>
                             </td>
                         </tr>
                         <tr class="logs-table-row" th:if="${logs == null or logs.isEmpty()}">
-                            <td colspan="6" class="text-center">No logs found</td>
+                            <td colspan="6" class="text-center">Không tìm thấy nhật ký nào</td>
                         </tr>
                     </tbody>
                 </table>
@@ -218,33 +236,34 @@
             <!-- Pagination -->
             <div class="logs-pagination-bar">
                 <span class="logs-pagination-info"
-                      th:text="${totalLogs != null and totalLogs > 0 ? 'Showing ' + ((currentPage - 1) * pageSize + 1) + ' to ' + (currentPage * pageSize < totalLogs ? currentPage * pageSize : totalLogs) + ' of ' + totalLogs + ' entries' : 'Showing 0 entries'}">
-                    Showing 1 to 5 of 128,492 entries
+                      th:text="${totalLogs != null and totalLogs > 0 ?
+                                 'Hiển thị ' + ((currentPage - 1) * pageSize + 1) + ' đến ' +
+                                 (currentPage * pageSize < totalLogs ? currentPage * pageSize : totalLogs) +
+                                 ' trong tổng số ' + totalLogs + ' bản ghi' :
+                                 'Hiển thị 0 bản ghi'}">
+                    Hiển thị 1 đến 5 trong tổng số 128.492 bản ghi
                 </span>
-                                    <div th:if="${totalPages > 0}" class="logs-pagination-controls">
-                        <a class="logs-page-btn" th:href="@{/admin/logs(page=${currentPage - 2}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}"
-                           th:classappend="${currentPage <= 1 ? ' disabled' : ''}">&lt;</a>
-                        <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
-                            <a th:if="${i == currentPage}" class="logs-page-btn active" th:text="${i}"
-                               th:href="@{/admin/logs(page=${i - 1}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}">1</a>
-                            <a th:if="${i != currentPage}" class="logs-page-btn" th:text="${i}"
-                               th:href="@{/admin/logs(page=${i - 1}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}">2</a>
-                        </th:block>
-                        <a class="logs-page-btn" th:href="@{/admin/logs(page=${currentPage}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}"
-                           th:classappend="${currentPage >= totalPages ? ' disabled' : ''}">&gt;</a>
-                    </div>
+                <div th:if="${totalPages > 0}" class="logs-pagination-controls">
+                    <a class="logs-page-btn"
+                       th:href="@{/admin/logs(page=${currentPage - 2}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}"
+                       th:classappend="${currentPage <= 1 ? ' disabled' : ''}">&lt;</a>
+                    <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+                        <a th:if="${i == currentPage}" class="logs-page-btn active" th:text="${i}"
+                           th:href="@{/admin/logs(page=${i - 1}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}">1</a>
+                        <a th:if="${i != currentPage}" class="logs-page-btn" th:text="${i}"
+                           th:href="@{/admin/logs(page=${i - 1}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}">2</a>
+                    </th:block>
+                    <a class="logs-page-btn"
+                       th:href="@{/admin/logs(page=${currentPage}, fromDate=${fromDate}, toDate=${toDate}, userRole=${userRole}, action=${action}, search=${search})}"
+                       th:classappend="${currentPage >= totalPages ? ' disabled' : ''}">&gt;</a>
+                </div>
             </div>
         </div>
 
-
-
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
         <!-- JAVASCRIPT                                                   -->
-        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
         <script th:src="@{/js/admin/logs.js}"></script>
     </div>
+
 </div>
-
-
-
-

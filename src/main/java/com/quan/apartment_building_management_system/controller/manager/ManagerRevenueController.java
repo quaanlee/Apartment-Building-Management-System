@@ -58,7 +58,7 @@ public class ManagerRevenueController {
             LocalDate from = parseLocalDate(fromDateStr, null);
             LocalDate to = parseLocalDate(toDateStr, null);
             if (from != null && to != null && from.isAfter(to)) {
-                redirectAttributes.addFlashAttribute("message", "From Date must be before To Date");
+                redirectAttributes.addFlashAttribute("message", "Từ ngày phải trước hoặc bằng Đến ngày.");
                 redirectAttributes.addFlashAttribute("messageType", "error");
                 return "redirect:/manager/revenue";
             }

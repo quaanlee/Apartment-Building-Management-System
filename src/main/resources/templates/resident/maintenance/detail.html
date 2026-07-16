@@ -1,88 +1,129 @@
-﻿<div th:replace="~{layout/resident/layout_resident :: resident-layout(~{::content}, 'maintenance-requests')}">
+<div th:replace="~{layout/resident/layout_resident :: resident-layout(~{::content}, 'maintenance-requests')}">
     <div th:fragment="content">
         <link rel="stylesheet" th:href="@{/css/manager/maintenance/maintenance.css}">
 
         <div class="back-link-row">
             <a th:href="@{/resident/maintenance}" class="back-btn">
                 <i class="fa-solid fa-arrow-left"></i>
-                <span>Back to Requests</span>
+                <span>Quay lại Danh sách</span>
             </a>
         </div>
 
         <div class="request-details-card">
-            <div class="card-header" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-                <!-- HÃƒÂ ng 1: Title + #ID -->
-                <div class="header-row header-row-title">
-                    <h3 th:text="${request.title}" style="margin:0;font-size:18px;">Water leak</h3>
-                    <span style="font-size:13px;color:#718096;margin-top:4px;display:block;" th:text="'Request #' + ${request.requestId}">Request #1</span>
+            <!-- Header layout with Title/ID on left, Badge/Actions on right -->
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; padding:20px 24px; border-bottom:1px solid #edf2f7; gap:16px; flex-wrap:wrap;">
+                <!-- Left side: Title & ID Info -->
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <h3 th:text="${request.title}" style="margin:0; font-size:20px; font-weight:700; color:#2d3748; line-height:1.2;">Water leak</h3>
+                    <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#718096; margin-top:2px;">
+                        <span th:text="'Yêu cầu #' + ${request.requestId}">Yêu cầu #1</span>
+                        <span>•</span>
+                        <span th:if="${request.status == 0}">Đang chờ Ban quản lý phê duyệt</span>
+                        <span th:if="${request.status == 1}">Đã giao cho nhân viên bảo trì</span>
+                        <span th:if="${request.status == 2}">Yêu cầu đã được giải quyết xong</span>
+                    </div>
                 </div>
 
-                <!-- HÃƒÂ ng 2: Edit + Status badge -->
-                <div class="header-row header-row-actions" style="display:flex;align-items:center;gap:10px;">
-                    <a th:if="${request.status == 0}" th:href="@{/resident/maintenance/{id}/edit(id=${request.requestId})}" style="background:#4c51bf;color:#fff;padding:6px 14px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-pen"></i> Edit
-                    </a>
+                <!-- Right side: Status Badge & Actions -->
+                <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
                     <span class="status-badge"
                           th:classappend="${request.status == 0 ? ' pending' : request.status == 1 ? ' assigned' : request.status == 2 ? ' completed' : ' pending'}"
-                          th:text="${request.status == 0 ? 'Pending' : request.status == 1 ? 'In Progress' : request.status == 2 ? 'Completed' : 'Unknown'}">Pending</span>
-                </div>
-
-                <!-- HÃƒÂ ng 3: Status label -->
-                <div class="header-row header-row-status-label" style="font-size:13px;color:#718096;">
-                    <span th:if="${request.status == 0}">Waiting for manager approval</span>
-                    <span th:if="${request.status == 1}">Assigned to maintenance staff</span>
-                    <span th:if="${request.status == 2}">Issue has been resolved</span>
+                          th:text="${request.status == 0 ? 'Chờ xử lý' : request.status == 1 ? 'Đang xử lý' : request.status == 2 ? 'Đã hoàn thành' : 'Không rõ'}"
+                          style="margin:0; font-size:12px; font-weight:700; padding:6px 12px; border-radius:9999px;">Chờ xử lý</span>
+                    
+                    <a th:if="${request.status == 0}" th:href="@{/resident/maintenance/{id}/edit(id=${request.requestId})}" style="background:#4c51bf; color:#fff; padding:8px 16px; border-radius:6px; text-decoration:none; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:6px; border:none; transition:background 0.2s ease;">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>Chỉnh sửa Yêu cầu</span>
+                    </a>
                 </div>
             </div>
 
-            <div class="card-body">
-                <div class="detail-row-grid">
-                    <div class="detail-row">
-                        <span class="detail-label">Apartment</span>
-                        <span class="detail-value" th:text="${request.apartment?.apartmentNumber ?: '-'}">A-101</span>
+            <!-- Body Layout -->
+            <div class="card-body" style="padding:24px; display:flex; flex-direction:column; gap:20px;">
+                <div class="detail-row-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px;">
+                    <div class="detail-row" style="display:flex; flex-direction:column; gap:4px;">
+                        <span class="detail-label" style="font-size:11px; font-weight:700; color:#a0aec0; text-transform:uppercase; letter-spacing:0.05em;">Căn hộ</span>
+                        <span class="detail-value" th:text="${request.apartment?.apartmentNumber ?: '-'}" style="font-size:15px; font-weight:600; color:#2d3748;">A-101</span>
                     </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Request Date</span>
-                        <span class="detail-value" th:text="${#temporals.format(request.requestDate, 'yyyy-MM-dd HH:mm')}">2026-07-01</span>
+                    <div class="detail-row" style="display:flex; flex-direction:column; gap:4px;">
+                        <span class="detail-label" style="font-size:11px; font-weight:700; color:#a0aec0; text-transform:uppercase; letter-spacing:0.05em;">Ngày tạo</span>
+                        <span class="detail-value" th:text="${#temporals.format(request.requestDate, 'dd/MM/yyyy HH:mm')}" style="font-size:15px; font-weight:600; color:#2d3748;">01/07/2026 16:15</span>
                     </div>
                 </div>
-                <div class="detail-row full-width" style="margin-top:16px;">
-                    <span class="detail-label">Description</span>
-                    <div class="detail-description-box" th:text="${request.description}">Description here</div>
-                </div>
-
-                <!-- Task Progress Section -->
-                <div class="detail-row full-width" style="margin-top:16px;" th:if="${hasTask}">
-                    <span class="detail-label">Task Progress</span>
-                    <div style="background:#f7fafc;border:1px solid #edf2f7;border-radius:8px;padding:16px;margin-top:8px;">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-                            <span style="font-size:13px;color:#4a5568;"><strong>Staff:</strong> <span th:text="${taskStaffName}">-</span></span>
-                            <span style="font-size:13px;color:#4a5568;"><strong>Deadline:</strong> <span th:if="${taskDeadline != null}" th:text="${#temporals.format(taskDeadline, 'yyyy-MM-dd')}">-</span><span th:if="${taskDeadline == null}">-</span></span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                            <div style="flex:1;height:8px;background:#edf2f7;border-radius:4px;">
-                                <div th:style="'width:' + ${progressPercent} + '%;height:100%;border-radius:4px;background:' + ${progressPercent >= 80 ? '#38a169' : progressPercent >= 50 ? '#d69e2e' : '#e53e3e'}"></div>
-                            </div>
-                            <span style="font-size:14px;font-weight:700;color:#4a5568;" th:text="${progressPercent + '%'}">0%</span>
-                        </div>
-                        <div th:if="${latestReport != null and latestReport != ''}" style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:12px;">
-                            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                                <span style="font-size:11px;font-weight:600;color:#718096;text-transform:uppercase;">Latest Report</span>
-                                <span style="font-size:11px;color:#a0aec0;" th:if="${latestReportDate != null}" th:text="${#temporals.format(latestReportDate, 'yyyy-MM-dd HH:mm')}">-</span>
-                            </div>
-                            <p style="font-size:13px;color:#2d3748;margin:0;line-height:1.5;" th:text="${latestReport}">Report content here</p>
-                        </div>
-                    </div>
+                
+                <div class="detail-row full-width" style="display:flex; flex-direction:column; gap:6px;">
+                    <span class="detail-label" style="font-size:11px; font-weight:700; color:#a0aec0; text-transform:uppercase; letter-spacing:0.05em;">Mô tả chi tiết</span>
+                    <div class="detail-description-box" th:text="${request.description}" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px; font-size:14px; color:#4a5568; line-height:1.6; white-space:pre-wrap;">Description here</div>
                 </div>
 
-                <div class="detail-row full-width" style="margin-top:16px;" th:if="${not #lists.isEmpty(images)}">
-                    <span class="detail-label">Images</span>
-                    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;">
-                        <div th:each="img : ${images}">
-                            <img th:src="${img.imageUrl}" style="max-width:280px;max-height:280px;border-radius:8px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                <!-- Request Attached Images -->
+                <div class="detail-row full-width" style="display:flex; flex-direction:column; gap:8px;" th:if="${not #lists.isEmpty(images)}">
+                    <span class="detail-label" style="font-size:11px; font-weight:700; color:#a0aec0; text-transform:uppercase; letter-spacing:0.05em;">Hình ảnh đính kèm</span>
+                    <div style="display:flex; flex-wrap:wrap; gap:16px; margin-top:4px;">
+                        <div th:each="img : ${images}" style="border:1px solid #edf2f7; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.06); transition:transform 0.2s ease;">
+                            <img th:src="${img.imageUrl}" style="max-width:320px; max-height:240px; display:block; object-fit:cover;">
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Progress History Section -->
+        <div class="timeline-section">
+            <h4 class="timeline-title">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Lịch sử Tiến độ</span>
+            </h4>
+
+            <div th:if="${hasTask}">
+                <!-- Staff info -->
+                <div style="margin-bottom:20px;background:#f7fafc;border:1px solid #edf2f7;border-radius:8px;padding:16px;font-size:13px;color:#4a5568;">
+                    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                        <span><strong>Nhân viên thực hiện:</strong> <span th:text="${taskStaffName}">-</span></span>
+                        <span><strong>Hạn hoàn thành:</strong> <span th:if="${taskDeadline != null}" th:text="${#temporals.format(taskDeadline, 'dd/MM/yyyy')}">-</span><span th:if="${taskDeadline == null}">-</span></span>
+                    </div>
+                    <!-- Overall Progress Bar -->
+                    <div style="margin-top:12px;">
+                        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:#718096;margin-bottom:4px;">
+                            <span>TIẾN ĐỘ THỰC HIỆN</span>
+                            <span th:text="${progressPercent + '%'}">0%</span>
+                        </div>
+                        <div style="width:100%;height:8px;background:#edf2f7;border-radius:4px;overflow:hidden;">
+                            <div th:style="'width:' + ${progressPercent} + '%;height:100%;background:' + ${progressPercent >= 80 ? '#38a169' : progressPercent >= 50 ? '#d69e2e' : '#e53e3e'}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Updates List -->
+                <div class="timeline-container" th:if="${not #lists.isEmpty(reports)}">
+                    <div th:each="report, iter : ${reports}" class="timeline-item">
+                        <!-- Color badge based on completion -->
+                        <div class="timeline-badge" th:style="${report.progressPercent == 100} ? 'background:#38a169;box-shadow:0 0 0 2px #38a169;' : 'background:#3182ce;box-shadow:0 0 0 2px #3182ce;'"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <span class="timeline-time" th:text="${#temporals.format(report.createdAt, 'dd/MM/yyyy HH:mm')}">Date</span>
+                                <span class="timeline-progress" th:style="${report.progressPercent == 100} ? 'background:#38a169;' : 'background:#3182ce;'" th:text="'Tiến độ: ' + ${report.progressPercent + '%'}">50% Progress</span>
+                            </div>
+                            <p class="timeline-desc" th:text="${report.reportContent}">Report content here</p>
+
+                            <!-- Report Attached Images -->
+                            <div class="timeline-images" th:if="${not #lists.isEmpty(report.images)}">
+                                <div th:each="rImg : ${report.images}">
+                                    <img th:src="${rImg.imageUrl}" class="timeline-img">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(reports)}" style="text-align:center;padding:32px;color:#a0aec0;font-size:13px;background:#f7fafc;border-radius:8px;border:1px dashed #e2e8f0;">
+                    Đã giao việc. Đang chờ nhân viên bảo trì gửi báo cáo cập nhật tiến độ đầu tiên.
+                </div>
+            </div>
+
+            <!-- Fallback when no task has been assigned yet -->
+            <div th:if="${not hasTask}" style="text-align:center;padding:32px;color:#a0aec0;font-size:13px;background:#f7fafc;border-radius:8px;border:1px dashed #e2e8f0;">
+                Yêu cầu đã được gửi lên. Đang chờ Ban quản lý xem xét và giao việc cho nhân viên bảo trì.
             </div>
         </div>
     </div>

@@ -9,7 +9,7 @@
         <div class="back-link-row">
             <a th:href="@{/manager/maintenance}" class="back-btn">
                 <i class="fa-solid fa-arrow-left"></i>
-                <span>Back to Maintenance Requests</span>
+                <span>Quay lại Danh sách Yêu cầu Bảo trì</span>
             </a>
         </div>
 
@@ -19,36 +19,36 @@
         <div class="request-details-card">
             <div class="card-header">
                 <i class="fa-solid fa-circle-info header-icon"></i>
-                <h3>Request Details</h3>
+                <h3>Chi tiết Yêu cầu</h3>
             </div>
             <div class="card-body">
                 <div class="detail-row">
-                    <span class="detail-label">Request Title</span>
+                    <span class="detail-label">Tiêu đề Yêu cầu</span>
                     <span class="detail-value title-value" th:text="${request.title}">Leaking Water Pipe</span>
                 </div>
                 
                 <div class="detail-row-grid">
                     <div class="detail-row">
-                        <span class="detail-label">Apartment</span>
-                        <span class="detail-value" th:text="${request.apartment != null ? request.apartment.apartmentNumber : 'Unassigned'}">Apt A-101</span>
+                        <span class="detail-label">Căn hộ</span>
+                        <span class="detail-value" th:text="${request.apartment != null ? request.apartment.apartmentNumber : 'Chưa gán'}">Apt A-101</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Resident Name</span>
+                        <span class="detail-label">Tên Cư dân</span>
                         <span class="detail-value" th:text="${request.profile != null ? request.profile.fullName : 'N/A'}">Nguyen Van A</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Reported On</span>
+                        <span class="detail-label">Ngày báo cáo</span>
                         <span class="detail-value" th:text="${#temporals.format(request.requestDate, 'dd/MM/yyyy HH:mm')}">29/06/2026 14:20</span>
                     </div>
                 </div>
 
                 <div class="detail-row full-width">
-                    <span class="detail-label">Description</span>
+                    <span class="detail-label">Mô tả sự cố</span>
                     <div class="detail-description-box" th:text="${request.description}">Detailed issue goes here.</div>
                 </div>
 
                 <div class="detail-row full-width" th:if="${request.images != null and !request.images.isEmpty()}">
-                    <span class="detail-label">Attached Photos</span>
+                    <span class="detail-label">Ảnh đính kèm</span>
                     <div class="attached-images-container" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;">
                         <div class="attached-image-box" th:each="img : ${request.images}">
                             <img th:src="${img.imageUrl}" alt="Incident Image" style="max-width: 280px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
@@ -64,8 +64,8 @@
         <div class="staff-assignment-section">
             <div class="section-header">
                 <div class="section-header-left">
-                    <h3 class="section-title">Available Maintenance Staff</h3>
-                    <p class="section-subtitle">Select a technician to assign to this request. Busy staff are currently handling active incomplete tasks.</p>
+                    <h3 class="section-title">Nhân viên Bảo trì Sẵn sàng</h3>
+                    <p class="section-subtitle">Chọn một nhân viên kỹ thuật để phân công yêu cầu này. Nhân viên bận đang xử lý các công việc chưa hoàn thành khác.</p>
                 </div>
             </div>
 
@@ -73,9 +73,9 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Work Status</th>
-                            <th>Actions</th>
+                            <th>Họ và tên</th>
+                            <th>Trạng thái công việc</th>
+                            <th style="text-align: right; padding-right: 24px;">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -83,13 +83,13 @@
                             <td>
                                 <div class="staff-name-cell">
                                     <div class="staff-avatar-circle" th:text="${staff.profile.fullName != null and !staff.profile.fullName.isEmpty() ? #strings.substring(staff.profile.fullName, 0, 1) : 'S'}">W</div>
-                                    <span th:text="${staff.profile.fullName != null ? staff.profile.fullName : 'Unknown'}">Worker A</span>
+                                    <span th:text="${staff.profile.fullName != null ? staff.profile.fullName : 'Không rõ'}">Worker A</span>
                                 </div>
                             </td>
                             <td>
                                 <!-- Work Status Badge -->
-                                <span th:if="${staff.workStatus == 'available'}" class="status-badge completed">AVAILABLE</span>
-                                <span th:if="${staff.workStatus == 'busy'}" class="status-badge pending">BUSY</span>
+                                <span th:if="${staff.workStatus == 'available'}" class="status-badge completed">SẴN SÀNG</span>
+                                <span th:if="${staff.workStatus == 'busy'}" class="status-badge pending">ĐANG BẬN</span>
                             </td>
                             <td>
                                 <div class="action-buttons-group" style="display: flex; gap: 10px; align-items: center; justify-content: flex-end;">
@@ -101,20 +101,20 @@
                                           style="margin: 0;">
                                         <button type="submit" class="action-btn" th:disabled="${staff.workStatus == 'busy'}" th:style="${staff.workStatus == 'busy' ? 'background-color: #cbd5e0; color: #718096; padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: not-allowed; display: inline-flex; align-items: center; gap: 6px;' : 'background-color: #4c51bf; color: #ffffff; padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;'}">
                                             <i class="fa-solid fa-check-double"></i>
-                                            <span>Assign</span>
+                                            <span>Phân công</span>
                                         </button>
                                     </form>
                                     
-                                    <a href="#" class="action-btn" style="background-color: #edf2f7; color: #4a5568; padding: 8px 14px; border-radius: 6px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                    <a th:href="@{'/manager/profiles/' + ${staff.profile.account.accountId}}" class="action-btn" style="background-color: #edf2f7; color: #4a5568; padding: 8px 14px; border-radius: 6px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                                         <i class="fa-solid fa-user-gear"></i>
-                                        <span>View Profile</span>
+                                        <span>Xem hồ sơ</span>
                                     </a>
                                 </div>
                             </td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(staffs)}">
                             <td colspan="3" style="text-align: center; color: #a0aec0; padding: 24px;">
-                                No active maintenance staff registered.
+                                Chưa có nhân viên bảo trì đang hoạt động nào được đăng ký.
                             </td>
                         </tr>
                     </tbody>
@@ -126,7 +126,7 @@
         <div class="modal-overlay" id="assignConfirmModal" role="dialog" aria-modal="true" aria-labelledby="assignModalTitle">
             <div class="modal-box" style="max-width: 440px;">
                 <div class="modal-header">
-                    <h3 class="modal-title" id="assignModalTitle">Confirm Assignment</h3>
+                    <h3 class="modal-title" id="assignModalTitle">Xác nhận Phân công</h3>
                     <button class="modal-close-btn" type="button" onclick="closeAssignModal()" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -138,8 +138,8 @@
                     <p id="assignModalText" style="font-size: 15px; color: #4a5568; line-height: 1.6; margin: 0;"></p>
                 </div>
                 <div class="modal-footer" style="background-color: #f8fafc; display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px;">
-                    <button class="modal-cancel-btn" type="button" onclick="closeAssignModal()">Cancel</button>
-                    <button class="modal-submit-btn" type="button" id="confirmAssignSubmitBtn" style="background-color: #4c51bf; color: white;">Assign</button>
+                    <button class="modal-cancel-btn" type="button" onclick="closeAssignModal()">Hủy</button>
+                    <button class="modal-submit-btn" type="button" id="confirmAssignSubmitBtn" style="background-color: #4c51bf; color: white;">Phân công</button>
                 </div>
             </div>
         </div>
@@ -151,7 +151,7 @@
                 event.preventDefault();
                 assignFormToSubmit = form;
                 const staffName = form.getAttribute('data-staff-name');
-                document.getElementById('assignModalText').textContent = 'Are you sure you want to assign ' + staffName + ' to this request?';
+                document.getElementById('assignModalText').textContent = 'Bạn có chắc chắn muốn phân công công việc này cho ' + staffName + ' không?';
                 const modal = document.getElementById('assignConfirmModal');
                 modal.classList.add('is-open');
                 document.body.classList.add('modal-open');

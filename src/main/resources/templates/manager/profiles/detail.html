@@ -3,7 +3,7 @@
       th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'profiles')}">
 <head>
     <meta charset="UTF-8">
-    <title>Profile Details</title>
+    <title>Chi tiết Hồ sơ</title>
 </head>
 <body>
 
@@ -14,10 +14,10 @@
     <!-- Breadcrumb Actions -->
     <div class="detail-header-actions">
         <div class="detail-title">
-            <span class="muted-text">Profiles Directory /</span> Profile Details
+            <span class="muted-text">Danh bạ Hồ sơ /</span> Chi tiết Hồ sơ
         </div>
         <a th:href="@{/manager/profiles}" class="btn-secondary">
-            <i class="fa-solid fa-arrow-left"></i> Back to List
+            <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
         </a>
     </div>
 
@@ -31,7 +31,7 @@
             </div>
             <div class="header-details">
                 <h3 class="user-fullname" th:text="${user.fullName != null && !user.fullName.isEmpty() ? user.fullName : 'N/A'}">Sarah Jenkins</h3>
-                <p class="user-role-badge" th:text="${user.roleName != null ? user.roleName : 'NO ACCOUNT'}">Manager Staff</p>
+                <p class="user-role-badge" th:text="${user.roleName != null ? (user.roleName == 'RESIDENT' ? 'Cư dân' : (user.roleName == 'MANAGER' ? 'Ban quản lý' : 'Nhân viên bảo trì')) : 'CHƯA CÓ TÀI KHOẢN'}">Manager Staff</p>
             </div>
         </div>
 
@@ -40,10 +40,10 @@
             <!-- Tabs Menu -->
             <div class="subtabs-menu">
                 <button class="subtab-btn active" data-subtab="personal-details">
-                    <i class="fa-solid fa-user-gear"></i> Personal Details
+                    <i class="fa-solid fa-user-gear"></i> Thông tin cá nhân
                 </button>
                 <button class="subtab-btn" data-subtab="operational-records">
-                    <i class="fa-solid fa-folder-open"></i> Operational Records
+                    <i class="fa-solid fa-folder-open"></i> Lịch sử hoạt động
                 </button>
             </div>
 
@@ -54,81 +54,81 @@
                 <div id="personal-details" class="subtab-panel active">
                     
                     <!-- Contact & Account Info -->
-                    <h4 class="section-title">Contact & Account Info</h4>
+                    <h4 class="section-title">Thông tin liên hệ & tài khoản</h4>
                     <div class="info-grid" style="margin-bottom: 28px;">
                         <div class="info-item">
-                            <span class="info-label">Email Address</span>
+                            <span class="info-label">Địa chỉ Email</span>
                             <span class="info-value" th:text="${user.email != null && user.email != '' ? user.email : 'N/A'}">N/A</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Phone Number</span>
+                            <span class="info-label">Số điện thoại</span>
                             <span class="info-value" th:text="${user.phoneNumber != null && user.phoneNumber != '' ? user.phoneNumber : 'N/A'}">N/A</span>
                         </div>
                         <div class="info-item" th:if="${account != null}">
-                            <span class="info-label">Username</span>
+                            <span class="info-label">Tên đăng nhập</span>
                             <span class="info-value" th:text="${account.username != null && account.username != '' ? account.username : 'N/A'}">N/A</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Account Status</span>
+                            <span class="info-label">Trạng thái tài khoản</span>
                             <span class="info-value">
                                 <span class="status-indicator" th:classappend="${user.accountStatus != null && user.accountStatus ? 'active' : 'inactive'}"></span>
-                                <span th:text="${user.accountStatus != null && user.accountStatus ? 'Active' : 'Locked'}" style="margin-left: 6px; font-weight: 700;">Active</span>
+                                <span th:text="${user.accountStatus != null && user.accountStatus ? 'Hoạt động' : 'Bị khóa'}" style="margin-left: 6px; font-weight: 700;">Active</span>
                             </span>
                         </div>
                     </div>
 
-                    <h4 class="section-title">Identity & Origin</h4>
+                    <h4 class="section-title">Thông tin cá nhân & nguồn gốc</h4>
                     <div class="info-grid" style="margin-bottom: 28px;">
                         <div class="info-item">
-                            <span class="info-label">Gender</span>
+                            <span class="info-label">Giới tính</span>
                             <span class="info-value" th:text="${user.gender != null && user.gender != '' ? user.gender : 'N/A'}">N/A</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Date of Birth</span>
+                            <span class="info-label">Ngày sinh</span>
                             <span class="info-value" th:text="${user.dateOfBirth != null ? #temporals.format(user.dateOfBirth, 'dd/MM/yyyy') : 'N/A'}">N/A</span>
                         </div>
                         <div class="info-item" th:if="${#strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
-                            <span class="info-label">Place of Birth</span>
+                            <span class="info-label">Nơi sinh</span>
                             <span class="info-value" th:text="${user.placeOfBirth != null && user.placeOfBirth != '' ? user.placeOfBirth : 'N/A'}">N/A</span>
                         </div>
                         <div class="info-item" th:if="${#strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
-                            <span class="info-label">Nationality</span>
+                            <span class="info-label">Quốc tịch</span>
                             <span class="info-value" th:text="${user.nationality != null && user.nationality != '' ? user.nationality : 'N/A'}">N/A</span>
                         </div>
                         <div class="info-item" th:if="${#strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
-                            <span class="info-label">Ethnicity</span>
+                            <span class="info-label">Dân tộc</span>
                             <span class="info-value" th:text="${user.ethnicity != null && user.ethnicity != '' ? user.ethnicity : 'N/A'}">N/A</span>
                         </div>
                     </div>
 
-                    <h4 class="section-title">Citizen Identification</h4>
+                    <h4 class="section-title">Căn cước công dân</h4>
                     <div class="info-grid" style="margin-bottom: 28px;">
                         <div class="info-item">
-                            <span class="info-label">Citizen ID (CCCD)</span>
+                            <span class="info-label">Số CCCD/CMND</span>
                             <span class="info-value" th:text="${user.citizenId != null && user.citizenId != '' ? user.citizenId : 'N/A'}">N/A</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Issue Date</span>
+                            <span class="info-label">Ngày cấp</span>
                             <span class="info-value" th:text="${user.citizenIdIssueDate != null ? #temporals.format(user.citizenIdIssueDate, 'dd/MM/yyyy') : 'N/A'}">N/A</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Issue Place</span>
+                            <span class="info-label">Nơi cấp</span>
                             <span class="info-value" th:text="${user.citizenIdIssuePlace != null && user.citizenIdIssuePlace != '' ? user.citizenIdIssuePlace : 'N/A'}">N/A</span>
                         </div>
                     </div>
 
-                    <h4 class="section-title">Emergency & Secondary Contact</h4>
+                    <h4 class="section-title">Liên hệ khẩn cấp</h4>
                     <div class="info-grid">
                         <div class="info-item">
-                            <span class="info-label">Contact Name</span>
+                            <span class="info-label">Tên người liên hệ</span>
                             <span class="info-value" th:text="${user.emergencyContactName != null && user.emergencyContactName != '' ? user.emergencyContactName : 'N/A'}">N/A</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Contact Phone</span>
+                            <span class="info-label">Số điện thoại liên hệ</span>
                             <span class="info-value" th:text="${user.emergencyContactPhone != null && user.emergencyContactPhone != '' ? user.emergencyContactPhone : 'N/A'}">N/A</span>
                         </div>
                         <div class="info-item" th:if="${isResident}">
-                            <span class="info-label">Relationship to Owner</span>
+                            <span class="info-label">Quan hệ với chủ hộ</span>
                             <span class="info-value" th:text="${user.relationshipToOwner != null && user.relationshipToOwner != '' ? user.relationshipToOwner : 'N/A'}">N/A</span>
                         </div>
                     </div>
@@ -141,24 +141,24 @@
                     <div th:if="${isResident}">
                         
                         <!-- Apartment & Household Members Section -->
-                        <h4 class="section-title">Apartment & Household Members</h4>
+                        <h4 class="section-title">Căn hộ & Thành viên hộ gia đình</h4>
                         <div th:if="${apartment != null}">
                             <div class="info-grid" style="margin-bottom: 20px;">
                                 <div class="info-item">
-                                    <span class="info-label">Apartment Number</span>
+                                    <span class="info-label">Số căn hộ</span>
                                     <span class="info-value" th:text="${apartment.apartmentNumber != null && apartment.apartmentNumber != '' ? apartment.apartmentNumber : 'N/A'}" style="font-weight: 700; color: var(--primary-color);">N/A</span>
                                 </div>
                                 <div class="info-item">
-                                    <span class="info-label">Floor</span>
+                                    <span class="info-label">Tầng</span>
                                     <span class="info-value" th:text="${apartment.floor != null ? apartment.floor : 'N/A'}">N/A</span>
                                 </div>
                                 <div class="info-item">
-                                    <span class="info-label">Room Type</span>
+                                    <span class="info-label">Loại phòng</span>
                                     <span class="info-value" th:text="${apartment.roomType != null && apartment.roomType != '' ? apartment.roomType : 'N/A'}">N/A</span>
                                 </div>
                                 <div class="info-item">
-                                    <span class="info-label">Area (sqm)</span>
-                                    <span class="info-value" th:text="${apartment.area != null ? apartment.area + ' ㎡' : 'N/A'}">N/A</span>
+                                    <span class="info-label">Diện tích</span>
+                                    <span class="info-value" th:text="${apartment.area != null ? apartment.area + ' m²' : 'N/A'}">N/A</span>
                                 </div>
                             </div>
                             
@@ -166,28 +166,28 @@
                                 <table class="sub-table">
                                     <thead>
                                         <tr>
-                                            <th>Full Name</th>
-                                            <th>Phone Number</th>
-                                            <th>Email Address</th>
-                                            <th>Relation</th>
-                                            <th>Status</th>
+                                            <th>Họ và tên</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Địa chỉ Email</th>
+                                            <th>Quan hệ</th>
+                                            <th>Trạng thái</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr th:each="m : ${householdMembers}" th:classappend="${m.isHouseholdOwner ? 'household-owner-row' : ''}">
                                             <td style="font-weight: 600;">
                                                 <span th:text="${m.fullName != null && m.fullName != '' ? m.fullName : 'N/A'}">N/A</span>
-                                                <span th:if="${m.profileId == user.profileId}" class="self-badge">(You)</span>
+                                                <span th:if="${m.profileId == user.profileId}" class="self-badge">(Bản thân)</span>
                                             </td>
                                             <td th:text="${m.phoneNumber != null && m.phoneNumber != '' ? m.phoneNumber : 'N/A'}">N/A</td>
                                             <td th:text="${m.email != null && m.email != '' ? m.email : 'N/A'}">N/A</td>
                                             <td>
                                                 <span class="relation-badge" th:classappend="${m.isHouseholdOwner ? 'owner' : 'member'}" 
-                                                      th:text="${m.isHouseholdOwner ? 'Chủ hộ (Owner)' : (m.relationshipToOwner != null && m.relationshipToOwner != '' ? m.relationshipToOwner : 'Thành viên')}">Thành viên</span>
+                                                      th:text="${m.isHouseholdOwner ? 'Chủ hộ' : (m.relationshipToOwner != null && m.relationshipToOwner != '' ? m.relationshipToOwner : 'Thành viên')}">Thành viên</span>
                                             </td>
                                             <td>
                                                 <span class="sub-status-badge" th:classappend="${m.account != null && m.account.status ? 'approved' : 'rejected'}"
-                                                      th:text="${m.account != null && m.account.status ? 'Active' : 'Locked'}">Locked</span>
+                                                      th:text="${m.account != null && m.account.status ? 'Hoạt động' : 'Bị khóa'}">Locked</span>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -195,43 +195,43 @@
                             </div>
                         </div>
                         <div th:if="${apartment == null}" class="no-apartment-banner">
-                            <i class="fa-solid fa-circle-info"></i> No apartment currently assigned to this resident.
+                            <i class="fa-solid fa-circle-info"></i> Cư dân này hiện chưa được gán cho căn hộ nào.
                         </div>
 
                         <!-- Residence Dates -->
-                        <h4 class="section-title">Lease & Occupancy info</h4>
+                        <h4 class="section-title">Thông tin cư trú & dọn vào</h4>
                         <div class="info-grid" style="margin-bottom: 24px;">
                             <div class="info-item">
-                                <span class="info-label">Move-In Date</span>
+                                <span class="info-label">Ngày dọn vào</span>
                                 <span class="info-value" th:text="${user.moveInDate != null ? #temporals.format(user.moveInDate, 'dd/MM/yyyy') : 'N/A'}">N/A</span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Move-Out Date</span>
-                                <span class="info-value" th:text="${user.moveOutDate != null ? #temporals.format(user.moveOutDate, 'dd/MM/yyyy') : 'Not scheduled'}">Not scheduled</span>
+                                <span class="info-label">Ngày dọn ra</span>
+                                <span class="info-value" th:text="${user.moveOutDate != null ? #temporals.format(user.moveOutDate, 'dd/MM/yyyy') : 'Chưa có lịch'}">Chưa có lịch</span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Household Owner?</span>
-                                <span class="info-value" th:text="${user.isHouseholdOwner != null && user.isHouseholdOwner ? 'Yes (Chủ hộ)' : 'No (Thành viên)'}">No</span>
+                                <span class="info-label">Có phải chủ hộ không?</span>
+                                <span class="info-value" th:text="${user.isHouseholdOwner != null && user.isHouseholdOwner ? 'Có (Chủ hộ)' : 'Không (Thành viên)'}">No</span>
                             </div>
                         </div>
 
                         <!-- Vehicles Table -->
-                        <h4 class="section-title">Registered Vehicles</h4>
+                        <h4 class="section-title">Phương tiện đã đăng ký</h4>
                         <div class="sub-table-wrapper" style="margin-bottom: 28px;">
                             <table class="sub-table">
                                 <thead>
                                     <tr>
-                                        <th>License Plate</th>
-                                        <th>Vehicle Type</th>
-                                        <th>Brand</th>
-                                        <th>Color</th>
-                                        <th>Registered Date</th>
-                                        <th>Status</th>
+                                        <th>Biển kiểm soát</th>
+                                        <th>Loại xe</th>
+                                        <th>Hãng xe</th>
+                                        <th>Màu sắc</th>
+                                        <th>Ngày đăng ký</th>
+                                        <th>Trạng thái</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr th:if="${#lists.isEmpty(vehicles)}">
-                                        <td colspan="5" class="no-data">No vehicles registered.</td>
+                                        <td colspan="6" class="no-data">Chưa đăng ký phương tiện nào.</td>
                                     </tr>
                                     <tr th:each="v : ${vehicles}">
                                         <td th:text="${v.licensePlate != null && v.licensePlate != '' ? v.licensePlate : 'N/A'}" style="font-weight: 600;">N/A</td>
@@ -242,7 +242,7 @@
                                         <td>
                                             <span class="sub-status-badge" 
                                                   th:classappend="${v.status == 1 ? 'approved' : (v.status == 2 ? 'rejected' : (v.status == 3 ? 'neutral' : 'pending'))}" 
-                                                  th:text="${v.status == 0 ? 'Pending' : (v.status == 1 ? 'Approved' : (v.status == 2 ? 'Rejected' : 'Inactive'))}">Pending</span>
+                                                  th:text="${v.status == 0 ? 'Chờ duyệt' : (v.status == 1 ? 'Đã duyệt' : (v.status == 2 ? 'Từ chối' : 'Không hoạt động'))}">Pending</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -250,33 +250,33 @@
                         </div>
 
                         <!-- Amenity Bookings Table -->
-                        <h4 class="section-title">Amenity Bookings</h4>
+                        <h4 class="section-title">Đặt tiện ích</h4>
                         <div class="sub-table-wrapper" style="margin-bottom: 28px;">
                             <table class="sub-table">
                                 <thead>
                                     <tr>
-                                        <th>Resource</th>
-                                        <th>Start Time</th>
-                                        <th>End Time</th>
-                                        <th>Total Price</th>
-                                        <th>Cancel Reason</th>
-                                        <th>Status</th>
+                                        <th>Tiện ích</th>
+                                        <th>Bắt đầu</th>
+                                        <th>Kết thúc</th>
+                                        <th>Tổng chi phí</th>
+                                        <th>Lý do hủy</th>
+                                        <th>Trạng thái</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr th:if="${#lists.isEmpty(bookings)}">
-                                        <td colspan="5" class="no-data">No bookings registered.</td>
+                                        <td colspan="6" class="no-data">Không có lịch đặt tiện ích nào.</td>
                                     </tr>
                                     <tr th:each="b : ${bookings}">
                                         <td th:text="${b.resource != null && b.resource.resourceName != null ? b.resource.resourceName : 'N/A'}" style="font-weight: 600;">N/A</td>
                                         <td th:text="${b.startTime != null ? #temporals.format(b.startTime, 'dd/MM/yyyy HH:mm') : 'N/A'}">N/A</td>
                                         <td th:text="${b.endTime != null ? #temporals.format(b.endTime, 'dd/MM/yyyy HH:mm') : 'N/A'}">N/A</td>
-                                        <td th:text="${b.totalPrice != null ? #numbers.formatDecimal(b.totalPrice, 1, 'POINT', 0, 'COMMA') + ' VNĐ' : 'N/A'}">N/A</td>
+                                        <td th:text="${b.totalPrice != null ? #numbers.formatDecimal(b.totalPrice, 1, 'POINT', 0, 'COMMA') + ' đ' : 'N/A'}">N/A</td>
                                         <td th:text="${b.cancelReason != null && b.cancelReason != '' ? b.cancelReason : 'N/A'}">N/A</td>
                                         <td>
                                             <span class="sub-status-badge" 
                                                   th:classappend="${b.status == 1 ? 'approved' : (b.status == 2 ? 'rejected' : (b.status == 3 ? 'neutral' : 'pending'))}" 
-                                                  th:text="${b.status == 0 ? 'Pending' : (b.status == 1 ? 'Approved' : (b.status == 2 ? 'Rejected' : 'Canceled'))}">Pending</span>
+                                                  th:text="${b.status == 0 ? 'Chờ duyệt' : (b.status == 1 ? 'Đã duyệt' : (b.status == 2 ? 'Từ chối' : 'Đã hủy'))}">Pending</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -284,31 +284,31 @@
                         </div>
 
                         <!-- Bills Table -->
-                        <h4 class="section-title">Recent Bills</h4>
+                        <h4 class="section-title">Hóa đơn gần đây</h4>
                         <div class="sub-table-wrapper" style="margin-bottom: 28px;">
                             <table class="sub-table">
                                 <thead>
                                     <tr>
-                                        <th>Bill Month</th>
-                                        <th>Bill Year</th>
-                                        <th>Total Amount</th>
-                                        <th>Due Date</th>
-                                        <th>Status</th>
+                                        <th>Tháng</th>
+                                        <th>Năm</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Hạn thanh toán</th>
+                                        <th>Trạng thái</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr th:if="${#lists.isEmpty(bills)}">
-                                        <td colspan="5" class="no-data">No bills generated.</td>
+                                        <td colspan="5" class="no-data">Không có hóa đơn nào được tạo.</td>
                                     </tr>
                                     <tr th:each="bill : ${bills}">
                                         <td th:text="${bill.billMonth != null ? bill.billMonth : 'N/A'}" style="font-weight: 600;">N/A</td>
                                         <td th:text="${bill.billYear != null ? bill.billYear : 'N/A'}">N/A</td>
-                                        <td th:text="${bill.totalAmount != null ? #numbers.formatDecimal(bill.totalAmount, 1, 'POINT', 0, 'COMMA') + ' VNĐ' : 'N/A'}">N/A</td>
+                                        <td th:text="${bill.totalAmount != null ? #numbers.formatDecimal(bill.totalAmount, 1, 'POINT', 0, 'COMMA') + ' đ' : 'N/A'}">N/A</td>
                                         <td th:text="${bill.dueDate != null ? #temporals.format(bill.dueDate, 'dd/MM/yyyy') : 'N/A'}">N/A</td>
                                         <td>
                                             <span class="sub-status-badge" 
                                                   th:classappend="${bill.status == 1 ? 'approved' : (bill.status == 2 ? 'rejected' : 'pending')}" 
-                                                  th:text="${bill.status == 0 ? 'Unpaid' : (bill.status == 1 ? 'Paid' : 'Overdue')}">Unpaid</span>
+                                                  th:text="${bill.status == 0 ? 'Chưa thanh toán' : (bill.status == 1 ? 'Đã thanh toán' : 'Trễ hạn')}">Unpaid</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -316,19 +316,19 @@
                         </div>
 
                         <!-- Maintenance Requests Table -->
-                        <h4 class="section-title">Maintenance Requests</h4>
+                        <h4 class="section-title">Yêu cầu bảo trì</h4>
                         <div class="sub-table-wrapper">
                             <table class="sub-table">
                                 <thead>
                                     <tr>
-                                        <th>Title</th>
-                                        <th>Request Date</th>
-                                        <th>Status</th>
+                                        <th>Tiêu đề</th>
+                                        <th>Ngày gửi</th>
+                                        <th>Trạng thái</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr th:if="${#lists.isEmpty(requests)}">
-                                        <td colspan="3" class="no-data">No maintenance requests submitted.</td>
+                                        <td colspan="3" class="no-data">Chưa gửi yêu cầu bảo trì nào.</td>
                                     </tr>
                                     <tr th:each="r : ${requests}">
                                         <td th:text="${r.title != null && r.title != '' ? r.title : 'N/A'}" style="font-weight: 600;">N/A</td>
@@ -336,7 +336,7 @@
                                         <td>
                                             <span class="sub-status-badge" 
                                                   th:classappend="${r.status == 2 ? 'approved' : (r.status == 1 ? 'info' : 'pending')}" 
-                                                  th:text="${r.status == 0 ? 'Pending' : (r.status == 1 ? 'Assigned' : 'Completed')}">Pending</span>
+                                                  th:text="${r.status == 0 ? 'Chờ xử lý' : (r.status == 1 ? 'Đã gán' : 'Hoàn thành')}">Pending</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -346,29 +346,29 @@
 
                     <!-- STAFF DATA SECTIONS -->
                     <div th:if="${!isResident}">
-                        <h4 class="section-title">Specialty / Occupation</h4>
+                        <h4 class="section-title">Chuyên môn / Công việc</h4>
                         <div class="info-grid" style="margin-bottom: 24px;">
                             <div class="info-item">
-                                <span class="info-label">Specialty</span>
+                                <span class="info-label">Chuyên môn</span>
                                 <span class="info-value" th:text="${profile.occupation != null && profile.occupation != '' ? profile.occupation : 'N/A'}">N/A</span>
                             </div>
                         </div>
 
-                        <h4 class="section-title">Assigned Maintenance Tasks</h4>
+                        <h4 class="section-title">Công việc bảo trì được giao</h4>
                         <div class="sub-table-wrapper">
                             <table class="sub-table">
                                 <thead>
                                     <tr>
-                                        <th>Task ID</th>
-                                        <th>Request Title</th>
-                                        <th>Assigned Date</th>
-                                        <th>Deadline</th>
-                                        <th>Status</th>
+                                        <th>Mã công việc</th>
+                                        <th>Tiêu đề yêu cầu</th>
+                                        <th>Ngày giao</th>
+                                        <th>Hạn chót</th>
+                                        <th>Trạng thái</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr th:if="${#lists.isEmpty(tasks)}">
-                                        <td colspan="5" class="no-data">No tasks assigned.</td>
+                                        <td colspan="5" class="no-data">Không có công việc nào được giao.</td>
                                     </tr>
                                     <tr th:each="t : ${tasks}">
                                         <td th:text="${t.taskId != null ? t.taskId : 'N/A'}">N/A</td>
@@ -378,7 +378,7 @@
                                         <td>
                                             <span class="sub-status-badge" 
                                                   th:classappend="${t.status == 3 ? 'approved' : (t.status == 2 ? 'pending' : 'info')}" 
-                                                  th:text="${t.status == 1 ? 'Assigned' : (t.status == 2 ? 'In Progress' : 'Completed')}">Assigned</span>
+                                                  th:text="${t.status == 1 ? 'Đã gán' : (t.status == 2 ? 'Đang thực hiện' : 'Hoàn thành')}">Assigned</span>
                                         </td>
                                     </tr>
                                 </tbody>

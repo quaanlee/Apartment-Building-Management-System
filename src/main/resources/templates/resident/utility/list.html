@@ -11,15 +11,15 @@
     
     <div class="utility-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
         <div>
-            <h1 class="page-header-title">Curate Your Experience</h1>
-            <p class="page-header-subtitle">Reserve exclusive access to premium facilities designed for the modern intellectual.</p>
+            <h1 class="page-header-title">Tiện Ích Khu Dân Cư</h1>
+            <p class="page-header-subtitle">Đặt chỗ trước các dịch vụ, tiện ích cao cấp dành riêng cho cư dân tòa nhà.</p>
         </div>
         <div style="display: flex; gap: 12px; margin-top: 10px;">
             <a th:href="@{/resident/utilities/history}" class="btn-secondary" style="border-radius: 8px; text-decoration: none;">
-                <i class="fa-solid fa-clock-rotate-left" style="margin-right: 6px;"></i> Booking History
+                <i class="fa-solid fa-clock-rotate-left" style="margin-right: 6px;"></i> Lịch Sử Đặt Chỗ
             </a>
             <a th:href="@{/resident/utilities/memberships}" class="btn-secondary" style="border-radius: 8px; text-decoration: none;">
-                <i class="fa-solid fa-id-card" style="margin-right: 6px;"></i> Utility Memberships
+                <i class="fa-solid fa-id-card" style="margin-right: 6px;"></i> Gói Thành Viên
             </a>
         </div>
     </div>
@@ -32,13 +32,13 @@
             <div class="utility-card-body">
                 <div class="utility-card-header">
                     <h3 class="utility-card-title" th:text="${utility.utilityName}">Tên Tiện Ích</h3>
-                    <span class="utility-price-badge" th:text="${utility.type} ? 'Booking' : 'Free Use'">Booking</span>
+                    <span class="utility-price-badge" th:text="${utility.type} ? 'Đặt trước' : 'Miễn phí'">Đặt trước</span>
                 </div>
                 <p class="utility-card-desc" th:text="${utility.description}">Elevated aquatic serenity with...</p>
                 
                 <div class="utility-card-footer">
                     <a th:href="@{/resident/utilities/{id}/resources(id=${utility.utilityId})}" class="btn-primary btn-book-now">
-                        Book Now <i class="fas fa-calendar-alt" style="margin-left: 8px;"></i>
+                        Đặt Ngay <i class="fas fa-calendar-alt" style="margin-left: 8px;"></i>
                     </a>
                 </div>
             </div>

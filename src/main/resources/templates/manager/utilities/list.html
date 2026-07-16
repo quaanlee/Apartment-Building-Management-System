@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'service_utility')}" lang="en">
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'service_utility')}" lang="vi">
 <head>
 </head>
 <body>
@@ -12,8 +12,8 @@
     <!-- Title Section -->
     <div class="main-header">
         <div class="title-section">
-            <h2>Service &amp; Utility Management</h2>
-            <p>View facility availability, resource status, and pricing configurations.</p>
+            <h2>Quản lý Dịch vụ &amp; Tiện ích</h2>
+            <p>Xem thông tin trạng thái và cấu hình mức giá các tiện ích dịch vụ.</p>
         </div>
         <div class="title-right">
             <!-- Read-only view for Manager -->
@@ -22,8 +22,8 @@
 
     <!-- Navigation Tab Bar -->
     <div class="utility-tabs">
-        <a th:href="@{/manager/services}" class="tab-item">Services Catalog</a>
-        <a th:href="@{/manager/utilities}" class="tab-item active">Utilities &amp; Amenities</a>
+        <a th:href="@{/manager/services}" class="tab-item">Danh mục Dịch vụ</a>
+        <a th:href="@{/manager/utilities}" class="tab-item active">Tiện ích &amp; Dịch vụ công cộng</a>
     </div>
 
     <!-- KPI Stats Row -->
@@ -31,7 +31,7 @@
         <!-- Total Utilities -->
         <div class="stats-card card-1">
             <div class="stats-card-content">
-                <div class="stats-card-label">Total Utilities</div>
+                <div class="stats-card-label">Tổng số tiện ích</div>
                 <div class="stats-card-value" th:text="${totalUtilities}">0</div>
             </div>
             <div class="stats-card-icon-wrapper">
@@ -41,7 +41,7 @@
         <!-- Active Utilities -->
         <div class="stats-card card-2">
             <div class="stats-card-content">
-                <div class="stats-card-label">Active Utilities</div>
+                <div class="stats-card-label">Tiện ích đang hoạt động</div>
                 <div class="stats-card-value" th:text="${activeUtilities}">0</div>
             </div>
             <div class="stats-card-icon-wrapper">
@@ -51,7 +51,7 @@
         <!-- Total Resources -->
         <div class="stats-card card-3">
             <div class="stats-card-content">
-                <div class="stats-card-label">Total Resources</div>
+                <div class="stats-card-label">Tổng số tài nguyên</div>
                 <div class="stats-card-value" th:text="${totalResources}">0</div>
             </div>
             <div class="stats-card-icon-wrapper">
@@ -61,7 +61,7 @@
         <!-- Pricing Tiers -->
         <div class="stats-card card-4">
             <div class="stats-card-content">
-                <div class="stats-card-label">Pricing Configurations</div>
+                <div class="stats-card-label">Cấu hình mức giá</div>
                 <div class="stats-card-value" th:text="${totalPricing}">0</div>
             </div>
             <div class="stats-card-icon-wrapper">
@@ -73,19 +73,19 @@
     <!-- Filters Bar Card -->
     <div class="filter-bar-card">
         <div class="filter-left">
-            <span class="filter-label">Status:</span>
+            <span class="filter-label">Trạng thái:</span>
             <div class="status-select-container">
                 <select id="statusFilter" class="status-select" onchange="filterByStatus()">
-                    <option value="all" th:selected="${statusFilter == 'all'}">All</option>
-                    <option value="active" th:selected="${statusFilter == 'active'}">Active</option>
-                    <option value="maintenance" th:selected="${statusFilter == 'maintenance'}">Maintenance</option>
+                    <option value="all" th:selected="${statusFilter == 'all'}">Tất cả</option>
+                    <option value="active" th:selected="${statusFilter == 'active'}">Hoạt động</option>
+                    <option value="maintenance" th:selected="${statusFilter == 'maintenance'}">Bảo trì</option>
                 </select>
                 <i class="fa-solid fa-chevron-down"></i>
             </div>
         </div>
         <div class="filter-right">
-            <button id="gridViewBtn" class="view-toggle-btn" title="Grid View" onclick="setViewMode('grid')"><i class="fa-solid fa-grip"></i></button>
-            <button id="listViewBtn" class="view-toggle-btn active" title="List View" onclick="setViewMode('list')"><i class="fa-solid fa-list-ul"></i></button>
+            <button id="gridViewBtn" class="view-toggle-btn" title="Xem dạng lưới" onclick="setViewMode('grid')"><i class="fa-solid fa-grip"></i></button>
+            <button id="listViewBtn" class="view-toggle-btn active" title="Xem dạng danh sách" onclick="setViewMode('list')"><i class="fa-solid fa-list-ul"></i></button>
         </div>
     </div>
 
@@ -96,7 +96,7 @@
             <div class="card-image-box">
                 <img th:src="${util.imageUrl}" alt="Utility Image">
                 <span th:class="${util.status} ? 'badge-on-image active' : 'badge-on-image maintenance'"
-                      th:text="${util.status} ? 'ACTIVE' : 'MAINTENANCE'">ACTIVE</span>
+                      th:text="${util.status} ? 'HOẠT ĐỘNG' : 'BẢO TRÌ'">HOẠT ĐỘNG</span>
             </div>
 
             <!-- Middle: Details -->
@@ -108,28 +108,28 @@
                 </div>
                 <div class="location-row" style="margin-top: 4px;">
                     <i class="fa-solid fa-circle-info"></i>
-                    <span th:text="${util.typeLabel}">RESERVABLE</span>
+                    <span th:text="${util.typeLabel == 'RESERVABLE' ? 'ĐẶT TRƯỚC' : (util.typeLabel == 'FREE' ? 'MIỄN PHÍ' : util.typeLabel)}">ĐẶT TRƯỚC</span>
                 </div>
                 <div class="card-actions-row">
-                    <a th:href="@{/manager/utilities/{id}(id=${util.utilityId}, query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" class="btn-detail-link">Details</a>
+                    <a th:href="@{/manager/utilities/{id}(id=${util.utilityId}, query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" class="btn-detail-link">Xem Chi tiết</a>
                 </div>
             </div>
 
             <!-- Right: Bookings stats -->
             <div class="card-stats-box">
                 <span class="stats-number" th:text="${util.bookingsPerMonth}">142</span>
-                <span class="stats-label">Bookings/month</span>
+                <span class="stats-label">Lượt đặt/tháng</span>
             </div>
         </div>
 
         <div th:if="${#lists.isEmpty(utilities)}" class="utility-list-empty">
-            No utilities found matching selected search or status criteria.
+            Không tìm thấy tiện ích nào khớp với điều kiện tìm kiếm hoặc trạng thái đã chọn.
         </div>
     </div>
 
     <!-- Pagination Row -->
     <div class="pagination-container-row" th:if="${totalPages > 1}">
-        <span class="pagination-info" th:text="'Showing page ' + ${currentPage} + ' of ' + ${totalPages}">Showing page 1 of 3</span>
+        <span class="pagination-info" th:text="'Hiển thị trang ' + ${currentPage} + ' trên ' + ${totalPages}">Hiển thị trang 1 trên 3</span>
         <div class="pagination-pages-box">
             <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage - 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
                class="page-nav-btn" th:classappend="${currentPage == 1} ? 'disabled'"><i class="fa-solid fa-chevron-left"></i></a>
@@ -183,7 +183,7 @@
 
         if (searchInput) {
             searchInput.value = queryFromModel || "";
-            searchInput.placeholder = "Search utilities...";
+            searchInput.placeholder = "Tìm kiếm tiện ích...";
             searchInput.addEventListener("keypress", function (e) {
                 if (e.key === "Enter") {
                     e.preventDefault();

@@ -11,18 +11,18 @@
         <link rel="stylesheet" th:href="@{/css/resident/billing.css}">
 
         <div class="page-header">
-            <h2 class="page-title">Service Bill Details</h2>
-            <p class="page-subtitle">Review individual service item charges and transaction history</p>
+            <h2 class="page-title">Chi tiết Hóa đơn Dịch vụ</h2>
+            <p class="page-subtitle">Xem thông tin chi tiết các khoản phí dịch vụ và lịch sử giao dịch</p>
         </div>
 
         <!-- Back and Pay Buttons -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <a th:href="@{/resident/billing}" class="btn btn-secondary">
-                <i class="fa-solid fa-arrow-left"></i> Back to List
+                <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
             </a>
             <div th:if="${bill.status == 0 || bill.status == 2}">
                 <a th:href="@{/payment/bill/{id}(id=${bill.billId})}" class="btn btn-success">
-                    <i class="fa-solid fa-credit-card"></i> Pay This Bill
+                    <i class="fa-solid fa-credit-card"></i> Thanh toán hóa đơn này
                 </a>
             </div>
         </div>
@@ -31,43 +31,41 @@
         <section class="invoice-sheet">
             <div class="invoice-top">
                 <div class="invoice-brand">
-                    <h1>ABMS APARTMENT</h1>
-                    <p>Building Management Board Invoice Center</p>
+                    <h1>CĂN HỘ ABMS</h1>
+                    <p>Trung tâm Hóa đơn Ban Quản lý Tòa nhà</p>
                 </div>
                 <div class="text-right">
                     <div>
                         <span class="status-badge"
                             th:classappend="${bill.status == 1 ? 'paid' : (bill.status == 2 ? 'overdue' : 'unpaid')}"
-                            th:text="${bill.status == 1 ? 'Paid' : (bill.status == 2 ? 'Overdue' : 'Unpaid')}">Unpaid</span>
+                            th:text="${bill.status == 1 ? 'Đã thanh toán' : (bill.status == 2 ? 'Quá hạn' : 'Chưa thanh toán')}">Chưa thanh toán</span>
                     </div>
                 </div>
             </div>
 
             <div class="invoice-meta">
                 <div>
-                    <h4>Billed For You</h4>
+                    <h4>Thông tin Người nhận</h4>
                     <p>
-                        Apartment: <strong th:text="${apartment.apartmentNumber}">A-101</strong><br>
-                        Floor: <span th:text="${apartment.floor}">1</span>,
-                        Area: <span th:text="${apartment.area} + ' m²'">75.5 m²</span>
+                        Căn hộ: <strong th:text="${apartment.apartmentNumber}">A-101</strong><br>
+                        Tầng: <span th:text="${apartment.floor}">1</span>,
+                        Diện tích: <span th:text="${apartment.area} + ' m²'">75.5 m²</span>
                     </p>
                 </div>
                 <div class="text-right">
-                    <h4>Billing Details</h4>
+                    <h4>Thông tin Hóa đơn</h4>
                     <p>
-                        Billing Month: <strong th:text="${bill.billMonth} + '/' + ${bill.billYear}">06/2026</strong><br>
-                        Created Date: <span
+                        Kỳ hóa đơn: <strong th:text="${bill.billMonth} + '/' + ${bill.billYear}">06/2026</strong><br>
+                        Ngày tạo: <span
                             th:text="${bill.createdDate != null ? #temporals.format(bill.createdDate, 'dd/MM/yyyy') : 'N/A'}">01/06/2026</span><br>
-                        Due Date: <strong style="color: #EF4444;"
+                        Hạn thanh toán: <strong style="color: #EF4444;"
                             th:text="${bill.dueDate != null ? #temporals.format(bill.dueDate, 'dd/MM/yyyy') : 'N/A'}">15/06/2026</strong><br>
                         <span th:if="${bill.paidDate != null}">
-                            Paid Date: <strong style="color: #10B981;"
-                                th:text="${#temporals.format(bill.paidDate, 'dd/MM/yyyy HH:mm')}">12/06/2026
-                                14:00</strong><br>
+                            Ngày thanh toán: <strong style="color: #10B981;"
+                                th:text="${#temporals.format(bill.paidDate, 'dd/MM/yyyy HH:mm')}">12/06/2026 14:00</strong><br>
                             <th:block th:each="p : ${bill.payments}" th:if="${p.status == 1}">
-                                Paid By: <strong style="color: #10B981;"
-                                    th:text="${p.paidBy != null ? (p.paidBy.profile != null ? p.paidBy.profile.fullName : p.paidBy.username) : 'N/A'}">Resident
-                                    Name</strong>
+                                Người thanh toán: <strong style="color: #10B981;"
+                                    th:text="${p.paidBy != null ? (p.paidBy.profile != null ? p.paidBy.profile.fullName : p.paidBy.username) : 'N/A'}">Resident Name</strong>
                             </th:block>
                         </span>
                     </p>
@@ -79,10 +77,10 @@
                 <table class="billing-table">
                     <thead>
                         <tr>
-                            <th>Billing Item &amp; Description</th>
-                            <th class="right">Unit Price</th>
-                            <th class="right">Qty</th>
-                            <th class="right">Subtotal</th>
+                            <th>Khoản phí &amp; Mô tả</th>
+                            <th class="right">Đơn giá</th>
+                            <th class="right">Số lượng</th>
+                            <th class="right">Thành tiền</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -90,8 +88,8 @@
                         <tr th:each="detail : ${bill.billDetails}" th:if="${detail.booking == null}">
                             <td>
                                 <div class="detail-stack">
-                                    <strong th:text="${detail.serviceItem.serviceName}">Management Fee</strong>
-                                    <span th:text="${detail.description}">Monthly maintenance fee</span>
+                                    <strong th:text="${detail.serviceItem.serviceName}">Phí Quản Lý</strong>
+                                    <span th:text="${detail.description}">Phí quản lý bảo trì hàng tháng</span>
                                 </div>
                             </td>
                             <td class="right"
@@ -110,15 +108,14 @@
 
             <div class="invoice-total">
                 <div class="invoice-total-box">
-                    <span class="invoice-total-label">Grand Total</span>
+                    <span class="invoice-total-label">Tổng cộng</span>
                     <span class="invoice-total-value"
-                        th:text="${#numbers.formatDecimal(bill.totalAmount, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0
-                        VNĐ</span>
+                        th:text="${#numbers.formatDecimal(bill.totalAmount, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</span>
                 </div>
             </div>
 
             <footer class="invoice-footer">
-                <p>Please contact the Building Management Board if you have questions about this invoice.</p>
+                <p>Vui lòng liên hệ với Ban Quản lý Tòa nhà nếu bạn có thắc mắc về hóa đơn này.</p>
             </footer>
         </section>
 

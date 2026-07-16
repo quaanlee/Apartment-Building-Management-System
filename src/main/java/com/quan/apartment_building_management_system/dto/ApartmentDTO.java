@@ -12,11 +12,12 @@ public class ApartmentDTO {
     private Byte maxOccupancy;
     private Integer currentOccupancy;
 
-    public ApartmentDTO() {}
+    public ApartmentDTO() {
+    }
 
     public ApartmentDTO(Integer apartmentId, String apartmentNumber, Byte floor,
-                        BigDecimal area, String roomType, Byte status,
-                        Byte maxOccupancy, Integer currentOccupancy) {
+            BigDecimal area, String roomType, Byte status,
+            Byte maxOccupancy, Integer currentOccupancy) {
         this.apartmentId = apartmentId;
         this.apartmentNumber = apartmentNumber;
         this.floor = floor;
@@ -28,48 +29,98 @@ public class ApartmentDTO {
     }
 
     // Getters and Setters
-    public Integer getApartmentId() { return apartmentId; }
-    public void setApartmentId(Integer apartmentId) { this.apartmentId = apartmentId; }
+    public Integer getApartmentId() {
+        return apartmentId;
+    }
 
-    public String getApartmentNumber() { return apartmentNumber; }
-    public void setApartmentNumber(String apartmentNumber) { this.apartmentNumber = apartmentNumber; }
+    public void setApartmentId(Integer apartmentId) {
+        this.apartmentId = apartmentId;
+    }
 
-    public Byte getFloor() { return floor; }
-    public void setFloor(Byte floor) { this.floor = floor; }
+    public String getApartmentNumber() {
+        return apartmentNumber;
+    }
 
-    public BigDecimal getArea() { return area; }
-    public void setArea(BigDecimal area) { this.area = area; }
+    public void setApartmentNumber(String apartmentNumber) {
+        this.apartmentNumber = apartmentNumber;
+    }
 
-    public String getRoomType() { return roomType; }
-    public void setRoomType(String roomType) { this.roomType = roomType; }
+    public Byte getFloor() {
+        return floor;
+    }
 
-    public Byte getStatus() { return status; }
-    public void setStatus(Byte status) { this.status = status; }
+    public void setFloor(Byte floor) {
+        this.floor = floor;
+    }
 
-    public Byte getMaxOccupancy() { return maxOccupancy; }
-    public void setMaxOccupancy(Byte maxOccupancy) { this.maxOccupancy = maxOccupancy; }
+    public BigDecimal getArea() {
+        return area;
+    }
 
-    public Integer getCurrentOccupancy() { return currentOccupancy; }
-    public void setCurrentOccupancy(Integer currentOccupancy) { this.currentOccupancy = currentOccupancy; }
+    public void setArea(BigDecimal area) {
+        this.area = area;
+    }
+
+    public String getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
+    }
+
+    public Byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
+    public Byte getMaxOccupancy() {
+        return maxOccupancy;
+    }
+
+    public void setMaxOccupancy(Byte maxOccupancy) {
+        this.maxOccupancy = maxOccupancy;
+    }
+
+    public Integer getCurrentOccupancy() {
+        return currentOccupancy;
+    }
+
+    public void setCurrentOccupancy(Integer currentOccupancy) {
+        this.currentOccupancy = currentOccupancy;
+    }
 
     // Helper methods
     public String getStatusDisplay() {
-        if (status == null) return "Unknown";
+        if (status == null)
+            return "Unknown";
         switch (status) {
-            case 0: return "Available";
-            case 1: return "Occupied";
-            case 2: return "Maintenance";
-            default: return "Unknown";
+            case 0:
+                return "Available";
+            case 1:
+                return "Occupied";
+            case 2:
+                return "Maintenance";
+            default:
+                return "Unknown";
         }
     }
 
     public String getStatusBadgeClass() {
-        if (status == null) return "secondary";
+        if (status == null)
+            return "secondary";
         switch (status) {
-            case 0: return "success";
-            case 1: return "primary";
-            case 2: return "warning";
-            default: return "secondary";
+            case 0:
+                return "success";
+            case 1:
+                return "primary";
+            case 2:
+                return "warning";
+            default:
+                return "secondary";
         }
     }
 

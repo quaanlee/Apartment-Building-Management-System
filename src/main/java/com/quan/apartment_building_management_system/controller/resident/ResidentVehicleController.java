@@ -110,14 +110,14 @@ public class ResidentVehicleController {
         }
         Profile profile = profileService.findByAccountId(currentUser.getAccountId()).orElse(null);
         if (profile == null) {
-            redirectAttributes.addFlashAttribute("message", "Profile not found.");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy hồ sơ cư dân.");
             redirectAttributes.addFlashAttribute("messageType", "danger");
             return "redirect:/resident/vehicles";
         }
 
         // Validate unique license plate
         if (vehicleService.findByLicensePlate(licensePlate).isPresent()) {
-            redirectAttributes.addFlashAttribute("message", "License plate is already registered!");
+            redirectAttributes.addFlashAttribute("message", "Biển số xe đã được đăng ký!");
             redirectAttributes.addFlashAttribute("messageType", "danger");
             return "redirect:/resident/vehicles";
         }
@@ -128,7 +128,7 @@ public class ResidentVehicleController {
             try {
                 documentUrl = cloudinaryService.uploadFile(documentFile);
             } catch (Exception e) {
-                redirectAttributes.addFlashAttribute("message", "Failed to upload document file: " + e.getMessage());
+                redirectAttributes.addFlashAttribute("message", "Tải lên tài liệu sở hữu thất bại: " + e.getMessage());
                 redirectAttributes.addFlashAttribute("messageType", "danger");
                 return "redirect:/resident/vehicles";
             }
@@ -146,7 +146,7 @@ public class ResidentVehicleController {
 
         vehicleService.save(vehicle);
 
-        redirectAttributes.addFlashAttribute("message", "Vehicle registration request submitted successfully!");
+        redirectAttributes.addFlashAttribute("message", "Yêu cầu đăng ký phương tiện đã được gửi thành công!");
         redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/resident/vehicles";
     }

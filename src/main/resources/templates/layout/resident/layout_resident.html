@@ -22,62 +22,62 @@
     <aside class="sidebar">
         <div class="sidebar-brand">
             <h1>ABMS Resident</h1>
-            <p>Resident Portal</p>
+            <p>Cổng Cư Dân</p>
         </div>
 
         <ul class="sidebar-menu">
             <li class="sidebar-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
                 <a th:href="@{/resident/dashboard}">
                     <i class="fa-solid fa-chart-pie"></i>
-                    <span>Dashboard</span>
+                    <span>Trang chủ</span>
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'apartments' ? 'active' : ''}">
                 <a th:href="@{/resident/apartments}">
                     <i class="fa-solid fa-building"></i>
-                    <span>Apartments</span>
+                    <span>Căn hộ</span>
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'services' ? 'active' : ''}">
                 <a th:href="@{/resident/services}">
                     <i class="fas fa-briefcase"></i>
-                    <span>Services</span>
+                    <span>Dịch vụ</span>
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'maintenance-requests' ? 'active' : ''}">
                 <a th:href="@{/resident/maintenance}">
                     <i class="fa-solid fa-screwdriver-wrench"></i>
-                    <span>Maintenance</span>
+                    <span>Bảo trì</span>
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'billing' ? 'active' : ''}">
                 <a th:href="@{/resident/billing}">
                     <i class="fa-solid fa-file-invoice-dollar"></i>
-                    <span>Billing</span>
+                    <span>Hóa đơn</span>
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'payment' ? 'active' : ''}">
                 <a th:href="@{/resident/payment}">
                     <i class="fa-solid fa-credit-card"></i>
-                    <span>Payment</span>
+                    <span>Thanh toán</span>
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'booking' ? 'active' : ''}">
                 <a th:href="@{/resident/utilities}">
                     <i class="fa-solid fa-calendar-check"></i>
-                    <span>Amenity Bookings</span>
+                    <span>Đặt tiện ích</span>
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'vehicles' ? 'active' : ''}">
                 <a th:href="@{/resident/vehicles}">
                     <i class="fa-solid fa-car"></i>
-                    <span>Vehicles</span>
+                    <span>Phương tiện</span>
                 </a>
             </li>
             <li class="sidebar-item" th:classappend="${activeTab == 'notification' ? 'active' : ''}">
                 <a th:href="@{/resident/notifications}">
                     <i class="fa-solid fa-bell"></i>
-                    <span>Notifications</span>
+                    <span>Thông báo</span>
                 </a>
             </li>
 
@@ -86,7 +86,7 @@
         <div class="sidebar-footer">
             <a th:href="@{/logout}" class="logout-btn">
                 <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Logout</span>
+                <span>Đăng xuất</span>
             </a>
         </div>
 
@@ -102,19 +102,19 @@
                 <button class="sidebar-toggle-btn" id="sidebarToggle">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-                <span class="header-page-title" th:text="${pageTitle != null ? pageTitle : 'Resident Dashboard'}">Resident Dashboard</span>
+                <span class="header-page-title" th:text="${pageTitle != null ? pageTitle : 'Trang chủ Cư dân'}">Trang chủ Cư dân</span>
             </div>
 
             <!-- Action Controls -->
             <div class="header-actions">
-                <button class="icon-btn" title="Notifications">
+                <button class="icon-btn" title="Thông báo">
                     <i class="fa-solid fa-bell"></i>
                     <span class="badge"></span>
                 </button>
 
                 <a th:href="@{/resident/profile}" class="user-profile-trigger" id="userProfileTrigger" style="text-decoration: none;">
-                    <div class="user-avatar-placeholder">R</div>
-                    <span class="user-role">Resident</span>
+                    <div class="user-avatar-placeholder">C</div>
+                    <span class="user-role">Cư dân</span>
                 </a>
             </div>
         </header>

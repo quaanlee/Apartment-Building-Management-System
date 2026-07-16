@@ -10,7 +10,7 @@
     <div class="detail-header-action">
         <a th:href="@{/resident/apartments}" class="btn-back-link">
             <i class="fa-solid fa-arrow-left"></i>
-            Back to Apartments Directory
+            Quay lại Danh sách Căn hộ
         </a>
     </div>
 
@@ -21,7 +21,7 @@
             <img th:src="${apartment.imageUrls != null && !apartment.imageUrls.isEmpty()} 
                           ? ${apartment.imageUrls.get(0)} 
                           : 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80'" 
-                 alt="Apartment Main View">
+                 alt="Căn hộ nhìn chính">
         </div>
         
         <!-- Stacked Side Thumbnails -->
@@ -31,14 +31,14 @@
                 <img th:src="${apartment.imageUrls != null && apartment.imageUrls.size() > 1} 
                               ? ${apartment.imageUrls.get(1)} 
                               : 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'" 
-                     alt="Living Area View">
+                     alt="Phòng khách">
             </div>
             <!-- Sub Image 2 -->
             <div class="gallery-thumb">
                 <img th:src="${apartment.imageUrls != null && apartment.imageUrls.size() > 2} 
                               ? ${apartment.imageUrls.get(2)} 
                               : 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80'" 
-                     alt="Bedroom View">
+                     alt="Phòng ngủ">
             </div>
         </div>
     </div>
@@ -48,35 +48,35 @@
         <!-- Left Main Specs Content -->
         <div class="specs-detail-card">
             <div class="specs-title-row">
-                <h1 th:text="'Unit ' + ${apartment.apartmentNumber}">Unit A-101</h1>
+                <h1 th:text="'Căn hộ ' + ${apartment.apartmentNumber}">Căn hộ A-101</h1>
                 
                 <!-- Status badge matching style -->
-                <span th:if="${apartment.status == 0}" class="badge badge-available">Available</span>
-                <span th:if="${apartment.status == 1}" class="badge badge-occupied">Occupied</span>
-                <span th:if="${apartment.status == 2}" class="badge badge-maintenance">Maintenance</span>
+                <span th:if="${apartment.status == 0}" class="badge badge-available">Trống</span>
+                <span th:if="${apartment.status == 1}" class="badge badge-occupied">Đã có người ở</span>
+                <span th:if="${apartment.status == 2}" class="badge badge-maintenance">Đang bảo trì</span>
             </div>
 
             <!-- Specs Mini Grid -->
             <div class="specs-overview-cards">
                 <div class="spec-mini-card">
                     <i class="fa-solid fa-layer-group"></i>
-                    <span class="spec-val" th:text="${apartment.floor} + 'F'">1F</span>
-                    <span class="spec-lbl">Floor Level</span>
+                    <span class="spec-val" th:text="'Tầng ' + ${apartment.floor}">Tầng 1</span>
+                    <span class="spec-lbl">Tầng số</span>
                 </div>
                 <div class="spec-mini-card">
                     <i class="fa-solid fa-ruler-combined"></i>
                     <span class="spec-val" th:text="${apartment.area} + ' m²'">75.00 m²</span>
-                    <span class="spec-lbl">Area Size</span>
+                    <span class="spec-lbl">Diện tích</span>
                 </div>
                 <div class="spec-mini-card">
                     <i class="fa-solid fa-bed"></i>
-                    <span class="spec-val" th:text="${apartment.roomType}">2BR</span>
-                    <span class="spec-lbl">Configuration</span>
+                    <span class="spec-val" th:text="${apartment.roomType}">2 Phòng ngủ</span>
+                    <span class="spec-lbl">Loại căn hộ</span>
                 </div>
                 <div class="spec-mini-card">
                     <i class="fa-solid fa-users"></i>
-                    <span class="spec-val" th:text="${apartment.maxOccupancy} + ' Pax'">4 Pax</span>
-                    <span class="spec-lbl">Max Capacity</span>
+                    <span class="spec-val" th:text="${apartment.maxOccupancy} + ' người'">4 người</span>
+                    <span class="spec-lbl">Sức chứa tối đa</span>
                 </div>
             </div>
 
@@ -84,21 +84,21 @@
             <div class="specs-description">
                 <h3>
                     <i class="fa-solid fa-circle-info"></i>
-                    Property Description
+                    Mô tả Căn hộ
                 </h3>
                 
                 <p th:if="${apartment.roomType == '1BR' || apartment.roomType == 'Studio' || apartment.roomType == '1 Bedroom'}">
-                    This premium 1 Bedroom / Studio apartment features a compact and open layout, offering maximum space utilization and cozy modern design. Perfect for singles or couples, it boasts high-quality wooden flooring, smart energy-saving fixtures, and large double-glazed windows that fill the living spaces with bright natural daylight. The kitchen is fully integrated with elegant marble countertops and built-in cabinet storage.
+                    Căn hộ 1 phòng ngủ / Studio cao cấp này sở hữu thiết kế nhỏ gọn, tối ưu hóa không gian sử dụng và phong cách hiện đại ấm cúng. Rất phù hợp cho người độc thân hoặc cặp đôi, căn hộ được trang bị sàn gỗ chất lượng cao, các thiết bị tiết kiệm năng lượng thông minh và cửa sổ kính hộp hai lớp lớn giúp không gian tràn ngập ánh sáng tự nhiên. Nhà bếp được thiết kế liền kề với mặt đá cẩm thạch sang trọng và tủ bếp âm tường tiện dụng.
                 </p>
                 <p th:if="${apartment.roomType == '2BR' || apartment.roomType == '2 Bedrooms'}">
-                    Designed with modern families in mind, this elegant 2 Bedroom residence offers a perfect balance of privacy and shared living. It features a spacious open-concept living area connected to a private balcony overlooking beautiful urban scenery. The master bedroom includes an en-suite bathroom with luxury sanitary ware, while the secondary bedroom is highly versatile for children or as a dedicated workspace/home office.
+                    Được thiết kế dành riêng cho các gia đình hiện đại, căn hộ 2 phòng ngủ thanh lịch này mang lại sự cân bằng hoàn hảo giữa sự riêng tư và không gian sinh hoạt chung. Căn hộ có phòng khách thiết kế mở kết nối trực tiếp với ban công riêng ngắm cảnh quan thành phố tuyệt đẹp. Phòng ngủ chính đi kèm phòng tắm khép kín với thiết bị vệ sinh cao cấp, trong khi phòng ngủ thứ hai rất linh hoạt để làm phòng cho trẻ nhỏ hoặc góc làm việc chuyên dụng.
                 </p>
                 <p th:if="${apartment.roomType == '3BR' || apartment.roomType == '3 Bedrooms'}">
-                    Our signature 3 Bedroom luxury apartment is the epitome of comfort and premium living. It features a grand living room, a separate formal dining area, and a fully equipped chef's kitchen. With three expansive bedrooms and two bathroom suites, it offers ample room for larger families. Large wrap-around windows offer panoramic city views, creating a dramatic sense of space and premium luxury.
+                    Căn hộ 3 phòng ngủ hạng sang của chúng tôi là biểu tượng của sự tiện nghi và sống đẳng cấp. Căn hộ sở hữu phòng khách rộng rãi, khu vực ăn uống riêng biệt lịch sự và nhà bếp đầy đủ tiện nghi cho đầu bếp chuyên nghiệp. Với ba phòng ngủ lớn và hai phòng tắm cao cấp, căn hộ mang lại không gian sống thoải mái cho các gia đình nhiều thế hệ. Hệ thống cửa sổ kính bao quanh căn hộ mở ra tầm nhìn toàn cảnh thành phố tráng lệ, tạo cảm giác vô cùng rộng rãi và sang trọng.
                 </p>
                 <!-- Fallback description -->
                 <p th:if="${apartment.roomType != '1BR' && apartment.roomType != 'Studio' && apartment.roomType != '1 Bedroom' && apartment.roomType != '2BR' && apartment.roomType != '2 Bedrooms' && apartment.roomType != '3BR' && apartment.roomType != '3 Bedrooms'}">
-                    This high-end apartment unit represents the premium living standards of the ABMS residence. Offering exceptional layout efficiency, modern thermal insulation, and top-tier security access (via smart lock and RFID tags), the residence provides a peaceful and modern lifestyle environment.
+                    Căn hộ cao cấp này đại diện cho tiêu chuẩn sống hiện đại của tòa nhà ABMS. Với hiệu suất bố trí mặt bằng vượt trội, khả năng cách nhiệt hiện đại và hệ thống an ninh hàng đầu (truy cập qua khóa thông minh và thẻ RFID), đây là môi trường sống lý tưởng mang lại lối sống yên bình và tiện nghi.
                 </p>
             </div>
 
@@ -106,10 +106,10 @@
             <div class="specs-description">
                 <h3>
                     <i class="fa-solid fa-list-ul"></i>
-                    General Specifications
+                    Thông số Kỹ thuật Chung
                 </h3>
                 <p>
-                    All units in the complex feature premium acoustic insulation between floors, centralized VRV air conditioning hookups, fiber-optic internet connectivity sockets, and modern fire safety sprinkler systems connected directly to the central control station.
+                    Tất cả các căn hộ trong khu phức hợp đều được trang bị hệ thống cách âm cao cấp giữa các tầng, hệ thống điều hòa trung tâm VRV, cổng kết nối internet cáp quang tốc độ cao và hệ thống đầu phun chữa cháy an toàn hiện đại kết nối trực tiếp với trung tâm điều khiển.
                 </p>
             </div>
         </div>
@@ -120,7 +120,7 @@
             <div class="side-card">
                 <h3 class="side-card-title">
                     <i class="fa-solid fa-people-roof"></i>
-                    Active Occupants
+                    Thành viên Hộ gia đình
                 </h3>
                 
                 <div class="occupants-list" th:if="${apartment.status == 1 && !#lists.isEmpty(apartment.currentResidents)}">
@@ -129,7 +129,7 @@
                             <i class="fa-solid fa-circle-user" style="color: var(--primary-color);"></i>
                             <span th:text="${res.fullName}">Nguyen Van A</span>
                             <span th:class="${res.isHouseholdOwner ? 'badge-owner' : 'badge-member'}" 
-                                  th:text="${res.isHouseholdOwner ? 'Owner' : (res.relationshipToOwner != null && res.relationshipToOwner != '' ? res.relationshipToOwner : 'Member')}">Owner</span>
+                                  th:text="${res.isHouseholdOwner ? 'Chủ hộ' : (res.relationshipToOwner != null && res.relationshipToOwner != '' ? res.relationshipToOwner : 'Thành viên')}">Chủ hộ</span>
                         </div>
                         <div class="occupant-meta" th:if="${res.phoneNumber != null}">
                             <i class="fa-solid fa-phone"></i>
@@ -141,7 +141,7 @@
                         </div>
                         <div class="occupant-meta" th:if="${res.moveInDate != null}">
                             <i class="fa-solid fa-calendar-days"></i>
-                            <span>Moved in: <span th:text="${#temporals.format(res.moveInDate, 'MMM dd, yyyy')}">Jan 01, 2023</span></span>
+                            <span>Đã dọn vào: <span th:text="${#temporals.format(res.moveInDate, 'dd/MM/yyyy')}">01/01/2023</span></span>
                         </div>
                     </div>
                 </div>
@@ -149,7 +149,7 @@
                 <!-- Empty state for occupants list -->
                 <div class="occupant-empty" th:if="${apartment.status != 1 || #lists.isEmpty(apartment.currentResidents)}">
                     <i class="fa-solid fa-door-closed"></i>
-                    <p>No active residents are registered in this apartment unit.</p>
+                    <p>Không có cư dân nào đang đăng ký tại căn hộ này.</p>
                 </div>
             </div>
 
@@ -157,15 +157,15 @@
             <div class="side-card">
                 <h3 class="side-card-title">
                     <i class="fa-solid fa-star"></i>
-                    Premium Features
+                    Tiện nghi Cao cấp
                 </h3>
                 <ul class="features-list">
-                    <li><i class="fa-solid fa-circle-check"></i> Smart Keyless Lock (PIN/RFID)</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Double-glazed soundproof glass</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Fiber-optic FTTH broadband socket</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Video intercom entry phone</li>
-                    <li><i class="fa-solid fa-circle-check"></i> 100% backup emergency power</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Central smoke & heat detector</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Khóa cửa thông minh không chìa (PIN/RFID)</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Kính hai lớp cách âm tốt</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Cổng cáp quang FTTH tốc độ cao</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Hệ thống intercom gọi cửa thông minh</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Hệ thống điện dự phòng 100% công suất</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Đầu báo khói & nhiệt trung tâm an toàn</li>
                 </ul>
             </div>
         </div>

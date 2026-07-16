@@ -27,14 +27,14 @@
     
     <div class="row row-cols-1 row-cols-md-2 g-4">
         <div class="col" th:each="mem : ${memberships}">
-            <div class="card h-100 shadow-sm border-0 rounded-4" th:classappend="${mem.statusLabel == 'Active'} ? 'border-primary' : 'bg-light opacity-75'">
+            <div class="card h-100 shadow-sm border-0 rounded-4" th:classappend="${mem.statusLabel == 'Đang hoạt động'} ? 'border-primary' : 'bg-light opacity-75'">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
                             <h5 class="card-title fw-bold text-primary mb-1" th:text="${mem.utilityName}"></h5>
                             <span class="text-muted" th:text="${mem.packageName}"></span>
                         </div>
-                        <span class="badge rounded-pill px-3 py-2" th:classappend="${mem.statusLabel == 'Active'} ? 'bg-success' : 'bg-secondary'" th:text="${mem.statusLabel}"></span>
+                        <span class="badge rounded-pill px-3 py-2" th:classappend="${mem.statusLabel == 'Đang hoạt động'} ? 'bg-success' : 'bg-secondary'" th:text="${mem.statusLabel}"></span>
                     </div>
                     <hr>
                     <div class="row mb-3 text-muted">

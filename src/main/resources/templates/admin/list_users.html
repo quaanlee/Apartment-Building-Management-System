@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'users')}">
 
 <head>
-    <title>User Management - ABMS</title>
+    <title>Quản lý người dùng - ABMS</title>
 </head>
 
 <body>
@@ -13,29 +13,29 @@
 
         <!-- Top Summary Block -->
         <div class="page-header">
-            <h2>User Management</h2>
-            <p>Directory of residents and staff aligned.</p>
+            <h2>Quản lý người dùng</h2>
+            <p>Danh bạ thông tin cư dân và nhân viên hệ thống.</p>
         </div>
 
         <!-- Statistics Cards Row -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-card-title">Total Users</div>
+                <div class="stat-card-title">Tổng người dùng</div>
                 <div class="stat-card-value" th:text="${totalUsers}">0</div>
                 <i class="fa-solid fa-users stat-card-icon"></i>
             </div>
             <div class="stat-card" style="background: linear-gradient(135deg, #818CF8 0%, #6366F1 100%);">
-                <div class="stat-card-title">Total Residents</div>
+                <div class="stat-card-title">Tổng cư dân</div>
                 <div class="stat-card-value" th:text="${totalResidents}">0</div>
                 <i class="fa-solid fa-house-user stat-card-icon"></i>
             </div>
             <div class="stat-card" style="background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);">
-                <div class="stat-card-title">Total Managers</div>
+                <div class="stat-card-title">Tổng quản lý</div>
                 <div class="stat-card-value" th:text="${totalManagers}">0</div>
                 <i class="fa-solid fa-user-tie stat-card-icon"></i>
             </div>
             <div class="stat-card" style="background: linear-gradient(135deg, #C084FC 0%, #A855F7 100%);">
-                <div class="stat-card-title">Total Maintenance</div>
+                <div class="stat-card-title">Tổng NV bảo trì</div>
                 <div class="stat-card-value" th:text="${totalMaintenance}">0</div>
                 <i class="fa-solid fa-screwdriver-wrench stat-card-icon"></i>
             </div>
@@ -48,31 +48,31 @@
                 <input type="hidden" name="search" th:value="${search}">
 
                 <div class="filter-group" style="max-width: 250px;">
-                    <label for="roleId">Role</label>
+                    <label for="roleId">Vai trò</label>
                     <select name="roleId" id="roleId" class="filter-select" onchange="this.form.submit()">
-                        <option value="">All Roles</option>
-                        <option th:each="r : ${roles}" th:value="${r.roleId}" th:text="${r.roleName}"
+                        <option value="">Tất cả vai trò</option>
+                        <option th:each="r : ${roles}" th:value="${r.roleId}" th:text="${r.roleName == 'RESIDENT' ? 'CƯ DÂN' : (r.roleName == 'MANAGER' ? 'QUẢN LÝ' : (r.roleName == 'MAINTENANCE_STAFF' ? 'NV BẢO TRÌ' : r.roleName))}"
                             th:selected="${roleId == r.roleId}">Role Name</option>
                     </select>
                 </div>
 
                 <div class="filter-group" style="max-width: 250px;">
-                    <label for="status">Security Status</label>
+                    <label for="status">Trạng thái bảo mật</label>
                     <select name="status" id="status" class="filter-select" onchange="this.form.submit()">
-                        <option value="">All Statuses</option>
-                        <option value="true" th:selected="${status == true}">Active / Unlocked</option>
-                        <option value="false" th:selected="${status == false}">Locked</option>
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="true" th:selected="${status == true}">Hoạt động / Mở khóa</option>
+                        <option value="false" th:selected="${status == false}">Bị khóa</option>
                     </select>
                 </div>
 
                 <!-- Dynamic Search input synchronizes with the Header search bar or acts as alternative submit -->
                 <noscript>
-                    <button type="submit" class="btn-add-user" style="margin-left: 0;">Apply</button>
+                    <button type="submit" class="btn-add-user" style="margin-left: 0;">Áp dụng</button>
                 </noscript>
 
                 <a th:href="@{/admin/users/create}" class="btn-add-user">
                     <i class="fa-solid fa-user-plus"></i>
-                    Add New User
+                    Thêm người dùng mới
                 </a>
             </form>
         </div>
@@ -83,10 +83,10 @@
                 <table class="user-table">
                     <thead>
                         <tr>
-                            <th>User Profile</th>
-                            <th>Role</th>
-                            <th>Account Status</th>
-                            <th style="text-align: right;">Actions</th>
+                            <th>Hồ sơ người dùng</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái tài khoản</th>
+                            <th style="text-align: right;">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,43 +99,43 @@
                                         th:text="${user.fullName != null ? (#strings.substring(user.fullName, 0, 1) + (#strings.contains(user.fullName, ' ') ? #strings.substring(user.fullName, #strings.indexOf(user.fullName, ' ') + 1, #strings.indexOf(user.fullName, ' ') + 2) : '')) : 'A'}">
                                     </div>
                                     <div class="profile-info">
-                                        <span class="profile-name" th:text="${user.fullName != null ? user.fullName : 'Administrator'}">Full Name</span>
+                                        <span class="profile-name" th:text="${user.fullName != null ? user.fullName : 'Quản trị viên'}">Full Name</span>
                                         <span class="profile-username"
-                                            th:text="${user.email != null ? user.email : 'System Admin'}">@email</span>
+                                            th:text="${user.email != null ? user.email : 'Quản trị hệ thống'}">@email</span>
                                     </div>
                                 </div>
                             </td>
                             <td>
                                 <span class="role-text"
-                                    th:text="${user.roleName != null ? user.roleName : 'N/A'}">Role</span>
+                                    th:text="${user.roleName == 'RESIDENT' ? 'Cư dân' : (user.roleName == 'MANAGER' ? 'Quản lý' : (user.roleName == 'MAINTENANCE_STAFF' ? 'Nhân viên Bảo trì' : (user.roleName == 'ADMIN' ? 'Quản trị viên' : user.roleName)))}">Role</span>
                             </td>
                             <td>
                                 <span th:if="${user.accountId != null}">
-                                    <span th:if="${user.accountStatus == true}" class="status-unlocked">Unlocked</span>
+                                    <span th:if="${user.accountStatus == true}" class="status-unlocked">Đang hoạt động</span>
                                     <span th:if="${user.accountStatus == false}" class="status-locked">
-                                        Locked <span th:if="${user.lockedUntil != null}"
-                                            th:text="'until ' + ${#temporals.format(user.lockedUntil, 'yyyy-MM-dd HH:mm')}">until
-                                            date</span>
+                                        Bị khóa <span th:if="${user.lockedUntil != null}"
+                                            th:text="'đến ' + ${#temporals.format(user.lockedUntil, 'dd-MM-yyyy HH:mm')}">đến
+                                            ngày</span>
                                     </span>
                                 </span>
                                 <span th:if="${user.accountId == null}" class="status-locked"
-                                    style="color: var(--text-secondary);">No Account</span>
+                                    style="color: var(--text-secondary);">Chưa có tài khoản</span>
                             </td>
                             <td style="text-align: right;">
                                 <div class="actions-cell" style="justify-content: flex-end;">
-                                    <a th:href="@{/admin/users/edit/{id}(id=${user.accountId})}" class="action-icon-btn" title="Edit Profile">
+                                    <a th:href="@{/admin/users/edit/{id}(id=${user.accountId})}" class="action-icon-btn" title="Chỉnh sửa hồ sơ">
                                         <i class="fa-solid fa-pencil"></i>
                                     </a>
-                                    <a th:href="@{/admin/users/detail/{id}(id=${user.accountId})}" class="action-icon-btn" title="View Profile">
+                                    <a th:href="@{/admin/users/detail/{id}(id=${user.accountId})}" class="action-icon-btn" title="Xem hồ sơ">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
                                     <form th:if="${user.accountId != null}"
                                         th:action="@{/admin/users/{id}/toggle-lock(id=${user.accountId})}" method="post"
                                         style="display:inline;"
-                                        th:onclick="return confirm('Are you sure you want to lock/unlock [[${user.fullName}]]?')">
+                                        th:onclick="return confirm('Bạn có chắc chắn muốn khóa/mở khóa [[${user.fullName}]]?')">
                                         <button type="submit" class="action-icon-btn lock-btn"
                                             th:classappend="${user.accountStatus == false ? 'locked' : ''}"
-                                            th:title="${user.accountStatus == true ? 'Lock Account' : 'Unlock Account'}">
+                                            th:title="${user.accountStatus == true ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}">
                                             <i class="fa-solid"
                                                 th:classappend="${user.accountStatus == true ? 'fa-lock-open' : 'fa-lock'}"></i>
                                         </button>
@@ -145,7 +145,7 @@
                         </tr>
                         <tr th:if="${#lists.isEmpty(users)}">
                             <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 32px;">
-                                No users found.
+                                Không tìm thấy người dùng nào.
                             </td>
                         </tr>
                     </tbody>

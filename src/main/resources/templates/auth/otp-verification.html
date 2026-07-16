@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTP Verification | ABM System</title>
+    <title>Xác thực OTP | Hệ thống ABM</title>
     <!-- Style link -->
     <link rel="stylesheet" th:href="@{/css/auth/login.css}">
     <!-- Lucide Icons -->
@@ -20,10 +20,10 @@
             <div class="brand-panel" style="justify-content: space-between;">
                 <div>
                     <div class="brand-title">ABM System</div>
-                    <h1 class="brand-heading">Security Verification</h1>
+                    <h1 class="brand-heading">Xác minh bảo mật</h1>
                     <p class="brand-description" style="margin-bottom: 2rem;">
-                        Please enter the OTP code sent to your email to continue the authentication process. We are committed to
-                        protecting the safety of your resident account.
+                        Vui lòng nhập mã OTP đã được gửi đến email của bạn để tiếp tục quá trình xác thực.
+                        Chúng tôi cam kết bảo vệ sự an toàn của tài khoản cư dân của bạn.
                     </p>
                 </div>
 
@@ -31,8 +31,8 @@
                 <div class="security-card">
                     <i data-lucide="shield" class="security-card-icon"></i>
                     <div class="security-card-content">
-                        <div class="security-card-title">2-Layer Security System</div>
-                        <div class="security-card-desc">This verification code will expire in 2 minutes to ensure absolute security.</div>
+                        <div class="security-card-title">Hệ thống bảo mật 2 lớp</div>
+                        <div class="security-card-desc">Mã xác thực này sẽ hết hạn sau 2 phút để đảm bảo an toàn tuyệt đối.</div>
                     </div>
                 </div>
             </div>
@@ -40,8 +40,8 @@
             <!-- Right panel: OTP Inputs -->
             <div class="form-panel">
                 <div class="form-header">
-                    <h2 class="form-title">OTP Verification</h2>
-                    <p class="form-subtitle">Enter the 6-digit code sent to <strong th:text="${obfuscatedEmail}">le***@gmail.com</strong></p>
+                    <h2 class="form-title">Xác thực OTP</h2>
+                    <p class="form-subtitle">Nhập mã 6 chữ số đã gửi đến <strong th:text="${obfuscatedEmail}">le***@gmail.com</strong></p>
                 </div>
 
                 <form id="otpForm" th:action="@{/forgot-password/verify}" method="POST">
@@ -62,27 +62,27 @@
                     <!-- Countdown Timer -->
                     <div class="timer-container">
                         <i data-lucide="clock" class="timer-icon"></i>
-                        <span>Code expires in: <strong id="timer-display">02:00</strong></span>
+                        <span>Mã hết hạn sau: <strong id="timer-display">02:00</strong></span>
                     </div>
 
                     <!-- Error Alert -->
                     <div th:if="${error}" class="alert alert-danger">
                         <i data-lucide="alert-circle" class="alert-icon"></i>
-                        <span th:text="${error}">Invalid or expired verification code.</span>
+                        <span th:text="${error}">Mã xác thực không hợp lệ hoặc đã hết hạn.</span>
                     </div>
 
                     <!-- Submit Button -->
                     <button type="submit" id="btn-verify" class="btn-submit" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        <span>Verify</span>
+                        <span>Xác nhận</span>
                         <i data-lucide="check-circle" style="width: 1.1rem; height: 1.1rem;"></i>
                     </button>
                 </form>
 
                 <!-- Resend code container -->
                 <div class="resend-container">
-                    Didn't receive the code? 
+                    Không nhận được mã?
                     <form th:action="@{/forgot-password/resend}" method="POST" style="display: inline;">
-                        <button type="submit" id="btn-resend" class="resend-btn">Resend Code</button>
+                        <button type="submit" id="btn-resend" class="resend-btn">Gửi lại mã</button>
                     </form>
                 </div>
 
@@ -92,7 +92,7 @@
                 <div class="back-link-container">
                     <a th:href="@{/login}" class="back-link">
                         <i data-lucide="arrow-left" class="back-link-icon"></i>
-                        <span>Back to login page</span>
+                        <span>Quay lại trang đăng nhập</span>
                     </a>
                 </div>
             </div>
@@ -102,9 +102,9 @@
 
     <!-- Footer -->
     <footer class="login-footer">
-        <a th:href="@{/privacy}" class="footer-link">Privacy Policy</a>
-        <a th:href="@{/terms}" class="footer-link">Terms of Service</a>
-        <a th:href="@{/contact}" class="footer-link">Contact Us</a>
+        <a th:href="@{/privacy}" class="footer-link">Chính sách bảo mật</a>
+        <a th:href="@{/terms}" class="footer-link">Điều khoản dịch vụ</a>
+        <a th:href="@{/contact}" class="footer-link">Liên hệ</a>
     </footer>
 
     <script th:inline="javascript">

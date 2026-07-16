@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'billing')}">
 <head>
-    <title>Payment Status Monitor - ABMS</title>
+    <title>Theo dõi Trạng thái Thanh toán - ABMS</title>
 </head>
 <body>
 
@@ -9,39 +9,39 @@
     <link rel="stylesheet" th:href="@{/css/manager/bills/bills.css}">
     <div class="page-header">
         <div>
-            <h2>Payment Status Monitor</h2>
-            <p>Track collection progress, paid invoices, overdue balances, and payment references.</p>
+            <h2>Theo dõi Trạng thái Thanh toán</h2>
+            <p>Theo dõi tiến độ thu phí, hóa đơn đã thanh toán, dư nợ trễ hạn và tham chiếu thanh toán.</p>
         </div>
     </div>
 
     <nav class="billing-tabs" aria-label="Billing tabs">
-        <a th:href="@{/manager/bills}">Bills Directory</a>
-        <a th:href="@{/manager/bills/payment-status}" class="active">Payment Status Monitor</a>
+        <a th:href="@{/manager/bills}">Danh mục Hóa đơn</a>
+        <a th:href="@{/manager/bills/payment-status}" class="active">Theo dõi Trạng thái Thanh toán</a>
     </nav>
 
     <section class="stats-grid">
         <div class="metric-card total">
-            <span>Total Receivable</span>
-            <strong th:text="'$' + ${#numbers.formatDecimal(totalReceivable, 1, 2)}">$0.00</strong>
-            <small>All generated bills</small>
+            <span>Tổng Phải Thu</span>
+            <strong th:text="${#numbers.formatDecimal(totalReceivable, 1, 'POINT', 0, 'COMMA') + ' đ'}">0 đ</strong>
+            <small>Tất cả hóa đơn đã tạo</small>
             <i class="fa-solid fa-wallet"></i>
         </div>
         <div class="metric-card paid">
-            <span>Total Paid</span>
-            <strong th:text="'$' + ${#numbers.formatDecimal(totalPaid, 1, 2)}">$0.00</strong>
-            <small th:text="${paidCount} + ' bills completed'">0 bills completed</small>
+            <span>Tổng Đã Thu</span>
+            <strong th:text="${#numbers.formatDecimal(totalPaid, 1, 'POINT', 0, 'COMMA') + ' đ'}">0 đ</strong>
+            <small th:text="${paidCount} + ' hóa đơn hoàn thành'">0 hóa đơn hoàn thành</small>
             <i class="fa-solid fa-circle-check"></i>
         </div>
         <div class="metric-card unpaid">
-            <span>Pending</span>
-            <strong th:text="'$' + ${#numbers.formatDecimal(totalReceivable.subtract(totalPaid).subtract(totalOverdue), 1, 2)}">$0.00</strong>
-            <small th:text="${unpaidCount} + ' bills outstanding'">0 bills outstanding</small>
+            <span>Chờ thanh toán</span>
+            <strong th:text="${#numbers.formatDecimal(totalReceivable.subtract(totalPaid).subtract(totalOverdue), 1, 'POINT', 0, 'COMMA') + ' đ'}">0 đ</strong>
+            <small th:text="${unpaidCount} + ' hóa đơn chưa thu'">0 hóa đơn chưa thu</small>
             <i class="fa-solid fa-clock"></i>
         </div>
         <div class="metric-card overdue">
-            <span>Overdue</span>
-            <strong th:text="'$' + ${#numbers.formatDecimal(totalOverdue, 1, 2)}">$0.00</strong>
-            <small th:text="${overdueCount} + ' bills overdue'">0 bills overdue</small>
+            <span>Trễ hạn</span>
+            <strong th:text="${#numbers.formatDecimal(totalOverdue, 1, 'POINT', 0, 'COMMA') + ' đ'}">0 đ</strong>
+            <small th:text="${overdueCount} + ' hóa đơn trễ hạn'">0 hóa đơn trễ hạn</small>
             <i class="fa-solid fa-circle-exclamation"></i>
         </div>
     </section>
@@ -49,26 +49,26 @@
     <section class="billing-toolbar">
         <form th:action="@{/manager/bills/payment-status}" method="get" class="billing-filter-form payment-filter">
             <div class="billing-field">
-                <label for="search">Search Apartment / Resident</label>
-                <input id="search" type="text" name="search" th:value="${search}" placeholder="A-101, resident name">
+                <label for="search">Tìm kiếm Căn hộ / Cư dân</label>
+                <input id="search" type="text" name="search" th:value="${search}" placeholder="Ví dụ: A-101, tên cư dân...">
             </div>
 
             <div class="billing-field">
-                <label for="status">Payment Status</label>
+                <label for="status">Trạng thái Thanh toán</label>
                 <select id="status" name="status">
-                    <option value="">All Statuses</option>
-                    <option value="0" th:selected="${status == 0}">Unpaid</option>
-                    <option value="1" th:selected="${status == 1}">Paid</option>
-                    <option value="2" th:selected="${status == 2}">Overdue</option>
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="0" th:selected="${status == 0}">Chưa thanh toán</option>
+                    <option value="1" th:selected="${status == 1}">Đã thanh toán</option>
+                    <option value="2" th:selected="${status == 2}">Trễ hạn</option>
                 </select>
             </div>
 
             <div class="billing-actions">
                 <button type="submit" class="billing-btn primary">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    Search
+                    Tìm kiếm
                 </button>
-                <a th:href="@{/manager/bills/payment-status}" class="billing-btn secondary">Reset</a>
+                <a th:href="@{/manager/bills/payment-status}" class="billing-btn secondary">Đặt lại</a>
             </div>
         </form>
     </section>
@@ -78,12 +78,12 @@
             <table class="billing-table">
                 <thead>
                 <tr>
-                    <th>Apartment &amp; Resident</th>
-                    <th>Month</th>
-                    <th>Total Amount</th>
-                    <th>Paid Date</th>
-                    <th>Method &amp; Reference</th>
-                    <th>Status</th>
+                    <th>Căn hộ &amp; Cư dân</th>
+                    <th>Tháng</th>
+                    <th>Tổng Tiền</th>
+                    <th>Ngày Thanh toán</th>
+                    <th>Phương thức &amp; Mã giao dịch</th>
+                    <th>Trạng thái</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -95,29 +95,29 @@
                         </div>
                     </td>
                     <td th:text="${bill.billMonth} + '/' + ${bill.billYear}">06/2026</td>
-                    <td class="amount" th:text="'$' + ${#numbers.formatDecimal(bill.totalAmount, 1, 2)}">$0.00</td>
+                    <td class="amount" th:text="${#numbers.formatDecimal(bill.totalAmount, 1, 'POINT', 0, 'COMMA') + ' đ'}">0 đ</td>
                     <td>
-                        <span th:if="${bill.paidDate != null}" th:text="${#temporals.format(bill.paidDate, 'yyyy-MM-dd HH:mm')}">2026-06-15 14:30</span>
-                        <span th:if="${bill.paidDate == null}" class="muted-text">Not paid yet</span>
+                        <span th:if="${bill.paidDate != null}" th:text="${#temporals.format(bill.paidDate, 'dd/MM/yyyy HH:mm')}">15/06/2026 14:30</span>
+                        <span th:if="${bill.paidDate == null}" class="muted-text">Chưa thanh toán</span>
                     </td>
                     <td>
                         <div class="resident-stack" th:if="${!#lists.isEmpty(bill.payments)}" th:each="payment : ${bill.payments}">
                             <strong th:text="${payment.paymentMethod.methodName}">Cash</strong>
                             <span th:text="${payment.transactionCode}">TX-12345</span>
                         </div>
-                        <span th:if="${#lists.isEmpty(bill.payments)}" class="muted-text">No transaction</span>
+                        <span th:if="${#lists.isEmpty(bill.payments)}" class="muted-text">Không có giao dịch</span>
                     </td>
                     <td>
-                        <span th:if="${bill.status == 0}" class="status-badge status-unpaid">Unpaid</span>
-                        <span th:if="${bill.status == 1}" class="status-badge status-paid">Paid</span>
-                        <span th:if="${bill.status == 2}" class="status-badge status-overdue">Overdue</span>
+                        <span th:if="${bill.status == 0}" class="status-badge status-unpaid">Chưa thanh toán</span>
+                        <span th:if="${bill.status == 1}" class="status-badge status-paid">Đã thanh toán</span>
+                        <span th:if="${bill.status == 2}" class="status-badge status-overdue">Trễ hạn</span>
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(bills)}">
                     <td colspan="6">
                         <div class="empty-state">
                             <i class="fa-regular fa-credit-card"></i>
-                            No payment records found.
+                            Không tìm thấy bản ghi thanh toán nào.
                         </div>
                     </td>
                 </tr>

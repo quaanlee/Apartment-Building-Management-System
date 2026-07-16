@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
     th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'bookings')}"
-    th:with="pageTitle='Manager Booking - Form'">
+    th:with="pageTitle='Ban Quản lý đặt lịch - Form'">
 
 <head>
     <title>Đặt Tiện Ích</title>
@@ -16,7 +16,7 @@
         <div class="detail-header-nav"
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <div class="breadcrumb-container" style="font-size: 14px; color: var(--text-secondary);">
-                <a th:href="@{/manager/utility-bookings}" style="color: var(--primary-color); text-decoration: none;">Bookings</a>
+                <a th:href="@{/manager/utility-bookings}" style="color: var(--primary-color); text-decoration: none;">Đơn đặt</a>
                 <span style="margin: 0 8px;">/</span>
                 <a th:href="@{/manager/utility-bookings/utilities/{id}/resources(id=${utility.utilityId})}"
                     th:text="${utility.utilityName}" style="color: var(--primary-color); text-decoration: none;">Utility
@@ -25,11 +25,11 @@
                 <span th:text="${resource.resourceName}"
                     style="font-weight: 600; color: var(--text-primary);">Resource</span>
                 <span style="margin: 0 8px;">/</span>
-                <span style="font-weight: 600; color: var(--text-primary);">Booking Form</span>
+                <span style="font-weight: 600; color: var(--text-primary);">Biểu mẫu đặt lịch</span>
             </div>
             <a th:href="@{/manager/utility-bookings/utilities/{id}/resources(id=${utility.utilityId})}" class="btn-secondary"
                 style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-primary); font-weight: 500; font-size: 14px; background: white;">
-                <i class="fa-solid fa-arrow-left"></i> Back to Utility
+                <i class="fa-solid fa-arrow-left"></i> Quay lại Tiện ích
             </a>
         </div>
 
@@ -50,9 +50,9 @@
                     <!-- Header Info Card -->
                     <div class="booking-header-card">
                         <img th:src="@{${!#strings.isEmpty(resource.primaryImageUrl) ? resource.primaryImageUrl : (!#strings.isEmpty(utility.imageUrl) ? utility.imageUrl : '/images/utilities/garden.jpg')}}"
-                            alt="Header Image" class="booking-header-img">
+                             alt="Header Image" class="booking-header-img">
                         <div class="booking-header-info">
-                            <span class="badge-premium">PREMIUM</span>
+                            <span class="badge-premium">CAO CẤP</span>
                             <span class="rating-stars">
                                 <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
                                     class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
@@ -71,7 +71,7 @@
                     <!-- Step 1 -->
                     <div class="step-indicator">
                         <div class="step-number">1</div>
-                        <h4 class="step-title">Service Package</h4>
+                        <h4 class="step-title">Gói Dịch vụ</h4>
                     </div>
 
                     <div class="package-cards" style="display: flex; gap: 16px; align-items: stretch;">
@@ -83,9 +83,9 @@
                                 style="display: block; height: 100%; pointer-events: none; cursor: default; margin: 0; box-sizing: border-box; border: 1px solid var(--border-color) !important; box-shadow: none !important;">
                                 <h6 th:text="${price.unit.unitName}">Package Name</h6>
                                 <div class="price"
-                                    th:text="${#numbers.formatDecimal(price.price, 0, 'COMMA', 0, 'POINT')} + ' VND'">
+                                    th:text="${#numbers.formatDecimal(price.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">
                                     Price</div>
-                                <p>Standard usage package.</p>
+                                <p>Gói sử dụng tiêu chuẩn.</p>
                             </label>
                         </div>
                     </div>
@@ -95,27 +95,26 @@
                         style="margin-top: 32px; background: white; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
                         <div
                             style="font-size: 11px; color: #888; margin-bottom: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 4px;">
-                            <em>Debug info - selectedDate: <span th:text="${selectedDate}"></span> | Bookings found:
+                            <em>Thông tin gỡ lỗi - ngày đã chọn: <span th:text="${selectedDate}"></span> | Số lịch đặt tìm thấy:
                                 <span th:text="${bookings.size()}"></span></em>
                             <th:block th:each="b : ${bookings}">
-                                | [<span th:text="${b.startTime}"></span> to <span th:text="${b.endTime}"></span> (St:
+                                | [<span th:text="${b.startTime}"></span> đến <span th:text="${b.endTime}"></span> (Trạng thái:
                                 <span th:text="${b.status}"></span>)]
                             </th:block>
                         </div>
                         <div
                             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <span style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">Availability
-                                on <span th:text="${#temporals.format(selectedDate, 'dd/MM/yyyy')}"></span>:</span>
+                            <span style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">Tình trạng hoạt động ngày <span th:text="${#temporals.format(selectedDate, 'dd/MM/yyyy')}"></span>:</span>
                             <div style="display: flex; gap: 12px; font-size: 12px; color: var(--text-secondary);">
                                 <span style="display: flex; align-items: center; gap: 4px;"><span
                                         style="width: 12px; height: 12px; border-radius: 50%; background: #eab308;"></span>
-                                    Pending</span>
+                                    Chờ duyệt</span>
                                 <span style="display: flex; align-items: center; gap: 4px;"><span
                                         style="width: 12px; height: 12px; border-radius: 50%; background: #a855f7;"></span>
-                                    Approved</span>
+                                    Đã duyệt</span>
                                 <span style="display: flex; align-items: center; gap: 4px;"><span
                                         style="width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0;"></span>
-                                    Available</span>
+                                    Trống</span>
                             </div>
                         </div>
                         <div
@@ -149,24 +148,24 @@
                     <!-- Step 2: Resident Details -->
                     <div class="step-indicator">
                         <div class="step-number">2</div>
-                        <h4 class="step-title">Resident Details</h4>
+                        <h4 class="step-title">Thông tin Cư dân</h4>
                     </div>
                     <div class="form-field" style="margin-bottom: 32px;">
-                        <label>Resident Phone Number</label>
+                        <label>Số điện thoại Cư dân</label>
                         <input type="text" class="custom-input" name="phoneNumber" required 
-                            placeholder="Enter resident's phone number"
+                            placeholder="Nhập số điện thoại cư dân"
                             th:value="${bookingRequest.phoneNumber != null ? bookingRequest.phoneNumber : ''}">
                     </div>
 
                     <!-- Step 3 -->
                     <div class="step-indicator">
                         <div class="step-number">3</div>
-                        <h4 class="step-title">Select Date & Time</h4>
+                        <h4 class="step-title">Chọn Ngày &amp; Giờ</h4>
                     </div>
 
                     <div class="calendar-layout">
                         <div class="form-field">
-                            <label>Select Date</label>
+                            <label>Chọn Ngày</label>
                             <div style="display: flex; gap: 8px; align-items: stretch;">
                                 <input type="date" class="custom-input" name="bookingDate" required id="bookingDate"
                                     th:value="${#temporals.format(bookingRequest.bookingDate, 'yyyy-MM-dd')}"
@@ -174,17 +173,17 @@
                                     style="flex-grow: 1;">
                                 <button type="button" class="btn-primary" 
                                     onclick="var d = document.getElementById('bookingDate').value; var r = document.getElementById('resourceIdInput').value; if(d && r) { window.location.href = '/manager/utility-bookings/book/' + r + '?date=' + d; } else { alert('Vui lòng chọn ngày!'); }"
-                                    style="padding: 10px 16px; border-radius: 8px; border: none; background: var(--primary-color); color: white; cursor: pointer; white-space: nowrap; font-weight: 500;">Change Date</button>
+                                    style="padding: 10px 16px; border-radius: 8px; border: none; background: var(--primary-color); color: white; cursor: pointer; white-space: nowrap; font-weight: 500;">Đổi Ngày</button>
                             </div>
                         </div>
                         <div class="datetime-grid">
                             <div class="form-field">
-                                <label>Start Time</label>
+                                <label>Giờ bắt đầu</label>
                                 <input type="time" class="custom-input" name="startTime" required id="startTime"
                                     th:value="${bookingRequest.startTime != null ? #temporals.format(bookingRequest.startTime, 'HH:mm') : ''}">
                             </div>
                             <div class="form-field">
-                                <label>End Time</label>
+                                <label>Giờ kết thúc</label>
                                 <input type="time" class="custom-input" name="endTime" required id="endTime"
                                     th:value="${bookingRequest.endTime != null ? #temporals.format(bookingRequest.endTime, 'HH:mm') : ''}">
                             </div>
@@ -192,8 +191,7 @@
                         <div style="margin-top: 16px; text-align: right;">
                             <button type="submit" th:formaction="@{/manager/utility-bookings/calculate}" formmethod="post"
                                 class="btn-primary"
-                                style="padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; background-color: var(--primary-color); color: white; font-weight: 600;">Save
-                                All</button>
+                                style="padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; background-color: var(--primary-color); color: white; font-weight: 600;">Tính phí / Lưu</button>
                         </div>
                     </div>
                 </div>
@@ -201,15 +199,15 @@
                 <!-- RIGHT COLUMN: Summary sidebar -->
                 <div>
                     <div class="booking-summary-card">
-                        <h4>Booking Summary</h4>
+                        <h4>Thông tin Đặt lịch</h4>
 
                         <div class="summary-row">
                             <div class="summary-col">
-                                <span>Service</span>
+                                <span>Dịch vụ</span>
                                 <strong th:text="${resource.resourceName}">Tên</strong>
                             </div>
                             <div class="summary-col" style="text-align: right;">
-                                <span>Package</span>
+                                <span>Gói</span>
                                 <strong id="summaryPackageName"
                                     th:text="${calculatedPackageName != null ? calculatedPackageName : (!resource.prices.isEmpty() ? resource.prices[0].unit.unitName : 'Giờ')}">Giờ</strong>
                             </div>
@@ -217,8 +215,7 @@
 
                         <div class="summary-datetime">
                             <div><i class="fa-regular fa-calendar-days"></i> <span id="summaryDate"
-                                    th:text="${bookingRequest.bookingDate != null ? #temporals.format(bookingRequest.bookingDate, 'dd/MM/yyyy') : 'Select date'}">Select
-                                    date</span>
+                                    th:text="${bookingRequest.bookingDate != null ? #temporals.format(bookingRequest.bookingDate, 'dd/MM/yyyy') : 'Chọn ngày'}">Chọn ngày</span>
                             </div>
                             <div><i class="fa-regular fa-clock"></i> <span id="summaryTime"
                                     th:text="${bookingRequest.startTime != null && bookingRequest.endTime != null ? #temporals.format(bookingRequest.startTime, 'HH:mm') + ' - ' + #temporals.format(bookingRequest.endTime, 'HH:mm') : '--:-- - --:--'}">--:--
@@ -226,67 +223,64 @@
                         </div>
 
                         <div class="summary-item">
-                            <span class="label">Subtotal:</span>
+                            <span class="label">Tạm tính:</span>
                             <span class="value" id="summarySubtotal"
-                                th:text="${calculatedTotal != null ? #numbers.formatDecimal(calculatedTotal, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
-                                VND</span>
+                                th:text="${calculatedTotal != null ? #numbers.formatDecimal(calculatedTotal, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0 đ</span>
                         </div>
                         <div class="summary-item">
-                            <span class="label">Service Fee:</span>
-                            <span class="value">0 VND</span>
+                            <span class="label">Phí dịch vụ:</span>
+                            <span class="value">0 đ</span>
                         </div>
 
                         <hr class="summary-divider">
 
                         <div class="summary-total">
-                            <span class="label">Total:</span>
+                            <span class="label">Tổng cộng:</span>
                             <span class="value" id="summaryTotal"
                                 style="color: var(--primary-color); font-size: 18px; font-weight: bold;"
-                                th:text="${calculatedTotal != null ? #numbers.formatDecimal(calculatedTotal, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
-                                VND</span>
+                                th:text="${calculatedTotal != null ? #numbers.formatDecimal(calculatedTotal, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0 đ</span>
                         </div>
 
                         <!-- Add JS Debug Output here -->
                         <div id="js-debug-info" style="margin-top: 10px; font-size: 10px; color: red;"></div>
 
                         <div th:if="${!hasMembership}" class="payment-method-section" style="margin: 20px 0;">
-                            <h6 style="margin-bottom: 12px; font-size: 14px;">Payment Method</h6>
+                            <h6 style="margin-bottom: 12px; font-size: 14px;">Phương thức Thanh toán</h6>
                             <div style="display: flex; gap: 16px;">
                                 <label
                                     style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
                                     <input type="radio" name="paymentMethod" value="CASH"
                                         th:checked="${bookingRequest.paymentMethod == null || bookingRequest.paymentMethod == 'CASH'}">
-                                    Cash (In-person)
+                                    Tiền mặt (Trực tiếp)
                                 </label>
                                 <label
                                     style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
                                     <input type="radio" name="paymentMethod" value="ONLINE"
-                                        th:checked="${bookingRequest.paymentMethod == 'ONLINE'}"> Online (PayOS)
+                                        th:checked="${bookingRequest.paymentMethod == 'ONLINE'}"> Trực tuyến (PayOS)
                                 </label>
                             </div>
                         </div>
                         <div th:if="${hasMembership}"
                             style="margin: 20px 0; padding: 12px; background: #e0f2fe; border-radius: 8px; color: #0284c7; font-size: 14px; display: flex; align-items: center; gap: 8px;">
                             <i class="fa-solid fa-crown"></i>
-                            <span>Membership active. Booking is prepaid.</span>
+                            <span>Thẻ thành viên đang hoạt động. Đơn đặt đã được trả trước.</span>
                             <input type="hidden" th:field="*{paymentMethod}" value="CASH">
                         </div>
 
                         <button type="submit" class="btn-primary btn-confirm-booking" onclick="return confirmBooking()"
                             th:disabled="${errorMessage != null}"
-                            th:style="${errorMessage != null ? 'width: 100%; border-radius: 8px; padding: 12px; border: none; cursor: not-allowed; opacity: 0.6;' : 'width: 100%; border-radius: 8px; padding: 12px; border: none; cursor: pointer;'}">Confirm
-                            Booking</button>
+                            th:style="${errorMessage != null ? 'width: 100%; border-radius: 8px; padding: 12px; border: none; cursor: not-allowed; opacity: 0.6;' : 'width: 100%; border-radius: 8px; padding: 12px; border: none; cursor: pointer;'}">Xác nhận Đặt lịch</button>
 
                         <div class="secure-payment-note">
-                            <i class="fa-solid fa-shield-halved"></i> Secure payment via Resident Pay
+                            <i class="fa-solid fa-shield-halved"></i> Thanh toán an toàn qua Resident Pay
                         </div>
                     </div>
 
                     <div class="cancellation-policy">
                         <i class="fa-solid fa-circle-info"></i>
                         <div>
-                            <h6>Cancellation Policy</h6>
-                            <p>Free cancellation 24 hours prior. After that, the fee is 50% of the package value.</p>
+                            <h6>Chính sách Hủy lịch</h6>
+                            <p>Hủy lịch miễn phí trước 24 giờ. Sau thời gian đó, phí hủy là 50% giá trị gói.</p>
                         </div>
                     </div>
                 </div>
@@ -328,7 +322,7 @@
             const endTime = document.getElementById('endTime').value;
 
             if (!startDate || !startTime || !endTime) {
-                alert('Please select date and time.');
+                alert('Vui lòng chọn ngày và giờ.');
                 return false;
             }
 
@@ -336,19 +330,18 @@
             const end = new Date(`${startDate}T${endTime}`);
 
             if (start < new Date()) {
-                alert('Cannot book in the past.');
+                alert('Không thể đặt lịch trong quá khứ.');
                 return false;
             }
 
             if (end <= start) {
-                alert('End time must be after start time.');
+                alert('Thời gian kết thúc phải sau thời gian bắt đầu.');
                 return false;
             }
 
             // Confirm modal via native alert since no bootstrap JS
-            return confirm('Are you sure you want to book this utility? Please double check your date and time before confirming.');
+            return confirm('Bạn có chắc chắn muốn đặt tiện ích này không? Vui lòng kiểm tra kỹ ngày và giờ trước khi xác nhận.');
         }
     </script>
 </body>
-
 </html>

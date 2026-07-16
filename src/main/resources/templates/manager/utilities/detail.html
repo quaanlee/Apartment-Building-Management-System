@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'service_utility')}" lang="en">
+      th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'service_utility')}" lang="vi">
 <head>
 </head>
 <body>
@@ -10,9 +10,9 @@
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb-nav">
-        <a th:href="@{/manager/dashboard}">Dashboard</a>
+        <a th:href="@{/manager/dashboard}">Trang chủ</a>
         <i class="fa-solid fa-chevron-right"></i>
-        <a th:href="@{/manager/utilities}">Service &amp; Utility</a>
+        <a th:href="@{/manager/utilities}">Dịch vụ &amp; Tiện ích</a>
         <i class="fa-solid fa-chevron-right"></i>
         <span th:text="${utility.utilityName}">Modern Fitness Center</span>
     </nav>
@@ -23,8 +23,8 @@
             <div class="title-badge-row">
                 <h1 th:text="${utility.utilityName}">Modern Fitness Center</h1>
                 <span th:class="${utility.status} ? 'badge-status active' : 'badge-status maintenance'"
-                      th:text="${utility.status} ? 'Active' : 'Maintenance'">Active</span>
-                <span class="badge-status" th:text="${utility.typeLabel}">RESERVABLE</span>
+                      th:text="${utility.status} ? 'Hoạt động' : 'Bảo trì'">Hoạt động</span>
+                <span class="badge-status" th:text="${utility.typeLabel == 'RESERVABLE' ? 'ĐẶT TRƯỚC' : (utility.typeLabel == 'FREE' ? 'MIỄN PHÍ' : utility.typeLabel)}">ĐẶT TRƯỚC</span>
             </div>
             <p class="subtitle-text" th:text="${utility.description}">State-of-the-art gym with cardio equipment, weights, and studio space.</p>
         </div>
@@ -32,7 +32,7 @@
             <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
                class="btn-back-list">
                 <i class="fa-solid fa-arrow-left"></i>
-                Back to List
+                Quay lại Danh sách
             </a>
         </div>
     </div>
@@ -44,7 +44,7 @@
 
     <!-- Facility Overview -->
     <div class="overview-section">
-        <h3>Facility Overview</h3>
+        <h3>Tổng quan Tiện ích</h3>
         <p th:text="${utility.description}">
             State-of-the-art gym with cardio equipment, weights, and studio space.
         </p>
@@ -58,7 +58,7 @@
     <div class="operations-grid detail-operations-grid">
         <!-- Resources Card (from Database) -->
         <div class="info-card">
-            <h4>PHYSICAL RESOURCES &amp; LOCATIONS</h4>
+            <h4>TÀI NGUYÊN THỰC TẾ &amp; VỊ TRÍ</h4>
             <div class="resources-list">
                 <div class="resource-row" th:each="res : ${utility.utilityResources}">
                     <div class="resource-meta">
@@ -68,16 +68,16 @@
                     <form th:action="@{/manager/utilities/resources/toggle-status/{id}(id=${res.resourceId}, query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" style="display:inline; margin: 0;">
                         <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer; font-family: inherit;">
                             <span th:class="${res.status} ? 'badge-status active' : 'badge-status maintenance'" 
-                                  th:text="${res.status} ? 'Ready' : 'Maintenance'" 
+                                  th:text="${res.status} ? 'Sẵn sàng' : 'Bảo trì'" 
                                   style="font-size: 11px; padding: 4px 8px; transition: all 0.2s ease-in-out; display: inline-block;"
                                   onmouseover="this.style.opacity='0.8'; this.style.transform='scale(1.05)'"
                                   onmouseout="this.style.opacity='1'; this.style.transform='scale(1)'"
-                                  th:title="${res.status ? 'Click to set Maintenance' : 'Click to set Ready'}">Ready</span>
+                                  th:title="${res.status ? 'Nhấp để chuyển sang Bảo trì' : 'Nhấp để chuyển sang Sẵn sàng'}">Sẵn sàng</span>
                         </button>
                     </form>
                 </div>
                 <div th:if="${#lists.isEmpty(utility.utilityResources)}" class="utility-empty-state">
-                    No physical resources registered for this utility.
+                    Chưa đăng ký khu vực/tài nguyên thực tế nào cho tiện ích này.
                 </div>
             </div>
         </div>

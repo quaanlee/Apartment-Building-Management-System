@@ -110,64 +110,64 @@
     </style>
 
     <div class="section-header">
-        <h1 class="section-title">Checkout</h1>
-        <p class="text-muted">Review your invoice breakdown and complete your online payment simulation.</p>
+        <h1 class="section-title">Thanh toán</h1>
+        <p class="text-muted">Kiểm tra thông tin chi tiết hóa đơn và tiến hành mô phỏng thanh toán trực tuyến.</p>
     </div>
 
     <!-- Alert message if any -->
     <div th:if="${message != null}" class="alert alert-danger border-0 mb-4" role="alert">
         <i class="fa-solid fa-circle-xmark"></i>
-        <span class="ms-2" th:text="${message}">Error message</span>
+        <span class="ms-2" th:text="${message}">Đã xảy ra lỗi</span>
     </div>
 
     <div class="row">
         <!-- Left Column: Bill breakdown -->
         <div class="col-lg-7">
             <div class="custom-card">
-                <h3 class="checkout-title"><i class="fa-solid fa-file-invoice text-primary me-2"></i> Bill Summary</h3>
+                <h3 class="checkout-title"><i class="fa-solid fa-file-invoice text-primary me-2"></i> Tóm tắt hóa đơn</h3>
                 <div class="row mb-4">
                     <div class="col-sm-6 mb-3">
-                        <span class="text-muted d-block font-size-13">Billing Period</span>
+                        <span class="text-muted d-block font-size-13">Kỳ hóa đơn</span>
                         <strong style="color: #0f172a; font-size: 15px;" th:text="${#numbers.formatInteger(bill.billMonth, 2)} + '/' + ${bill.billYear}">06/2026</strong>
                     </div>
                     <div class="col-sm-6 mb-3">
-                        <span class="text-muted d-block font-size-13">Due Date</span>
-                        <strong class="text-danger" style="font-size: 15px;" th:text="${#temporals.format(bill.dueDate, 'yyyy-MM-dd HH:mm')}">2026-06-15 23:59</strong>
+                        <span class="text-muted d-block font-size-13">Hạn thanh toán</span>
+                        <strong class="text-danger" style="font-size: 15px;" th:text="${#temporals.format(bill.dueDate, 'dd/MM/yyyy HH:mm')}">2026-06-15 23:59</strong>
                     </div>
                     <div class="col-sm-6 mb-3">
-                        <span class="text-muted d-block font-size-13">Apartment</span>
+                        <span class="text-muted d-block font-size-13">Căn hộ</span>
                         <strong style="color: #0f172a;" th:text="${bill.apartment.apartmentNumber}">A-101</strong>
                     </div>
                     <div class="col-sm-6 mb-3">
-                        <span class="text-muted d-block font-size-13">Generated Date</span>
-                        <span th:text="${#temporals.format(bill.createdDate, 'yyyy-MM-dd')}">2026-06-01</span>
+                        <span class="text-muted d-block font-size-13">Ngày phát hành</span>
+                        <span th:text="${#temporals.format(bill.createdDate, 'dd/MM/yyyy')}">2026-06-01</span>
                     </div>
                 </div>
 
-                <h6 class="fw-bold mb-3" style="color: #475569; font-size: 14px;">Items Details</h6>
+                <h6 class="fw-bold mb-3" style="color: #475569; font-size: 14px;">Chi tiết các khoản phí</h6>
                 <div class="table-responsive" style="border: 1px solid #e2e8f0; border-radius: 8px;">
                     <table class="table table-borderless align-middle mb-0" style="font-size: 13px;">
                         <thead style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0;">
                             <tr>
-                                <th class="ps-3 py-2">Service</th>
-                                <th class="text-center py-2" style="width: 80px;">Qty</th>
-                                <th class="text-end pe-3 py-2" style="width: 120px;">Amount</th>
+                                <th class="ps-3 py-2">Dịch vụ</th>
+                                <th class="text-center py-2" style="width: 80px;">Số lượng</th>
+                                <th class="text-end pe-3 py-2" style="width: 140px;">Thành tiền</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:each="detail : ${bill.billDetails}" style="border-bottom: 1px solid #f1f5f9;">
                                 <td class="ps-3 py-3">
-                                    <div class="fw-semibold text-dark" th:text="${detail.serviceItem.serviceName}">Management Fee</div>
-                                    <div class="text-muted font-size-12" th:text="${detail.description}">Monthly management fee</div>
+                                    <div class="fw-semibold text-dark" th:text="${detail.serviceItem.serviceName}">Phí quản lý</div>
+                                    <div class="text-muted font-size-12" th:text="${detail.description}">Phí quản lý tòa nhà hàng tháng</div>
                                 </td>
                                 <td class="text-center py-3" th:text="${detail.quantity}">1.00</td>
-                                <td class="text-end pe-3 py-3" th:text="'$' + ${detail.amount}">$50.00</td>
+                                <td class="text-end pe-3 py-3" th:text="${#numbers.formatDecimal(detail.amount, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</td>
                             </tr>
                         </tbody>
                         <tfoot style="background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
                             <tr>
-                                <td colspan="2" class="ps-3 py-3 fw-bold text-dark text-end">Grand Total:</td>
-                                <td class="text-end pe-3 py-3 fw-bold text-primary" style="font-size: 16px;" th:text="'$' + ${bill.totalAmount}">$120.00</td>
+                                <td colspan="2" class="ps-3 py-3 fw-bold text-dark text-end">Tổng cộng:</td>
+                                <td class="text-end pe-3 py-3 fw-bold text-primary" style="font-size: 16px;" th:text="${#numbers.formatDecimal(bill.totalAmount, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -178,7 +178,7 @@
         <!-- Right Column: Simulated Checkout / Payment Method selection -->
         <div class="col-lg-5">
             <div class="custom-card">
-                <h3 class="checkout-title"><i class="fa-solid fa-credit-card text-primary me-2"></i> Payment Method</h3>
+                <h3 class="checkout-title"><i class="fa-solid fa-credit-card text-primary me-2"></i> Phương thức thanh toán</h3>
                 
                 <form th:action="@{/resident/billing/{id}/pay(id=${bill.billId})}" method="post">
                     <div class="d-flex flex-column gap-3 mb-4">
@@ -193,7 +193,7 @@
                             
                             <div>
                                 <strong class="text-dark d-block" th:text="${method.methodName}">VNPAY</strong>
-                                <span class="text-muted font-size-12" th:text="${method.isOnline ? 'Online Simulated Payment Gate' : 'Pay via support / desk'}">Gate</span>
+                                <span class="text-muted font-size-12" th:text="${method.isOnline ? 'Cổng thanh toán trực tuyến mô phỏng' : 'Thanh toán tiền mặt tại quầy'}">Gate</span>
                             </div>
                             
                             <input type="radio" name="methodId" th:value="${method.methodId}" th:checked="${iter.index == 0}" required>
@@ -202,10 +202,10 @@
 
                     <div class="row g-2">
                         <div class="col-sm-6">
-                            <a th:href="@{/resident/billing}" class="btn-cancel">Cancel</a>
+                            <a th:href="@{/resident/billing}" class="btn-cancel">Hủy bỏ</a>
                         </div>
                         <div class="col-sm-6">
-                            <button type="submit" class="btn-pay-submit">Confirm Pay</button>
+                            <button type="submit" class="btn-pay-submit">Xác nhận thanh toán</button>
                         </div>
                     </div>
                 </form>

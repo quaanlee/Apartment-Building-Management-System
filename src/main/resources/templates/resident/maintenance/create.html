@@ -1,36 +1,36 @@
-﻿<div th:replace="~{layout/resident/layout_resident :: resident-layout(~{::content}, 'maintenance-requests')}">
+<div th:replace="~{layout/resident/layout_resident :: resident-layout(~{::content}, 'maintenance-requests')}">
     <div th:fragment="content">
         <link rel="stylesheet" th:href="@{/css/manager/maintenance/maintenance.css}">
 
         <div class="back-link-row">
             <a th:href="@{/resident/maintenance}" class="back-btn">
                 <i class="fa-solid fa-arrow-left"></i>
-                <span>Back to Requests</span>
+                <span>Quay lại Danh sách</span>
             </a>
         </div>
 
         <div class="request-details-card">
             <div class="card-header">
-                <h3>Create Maintenance Request</h3>
+                <h3>Tạo Yêu cầu Bảo trì</h3>
             </div>
             <div class="card-body">
                 <form method="post" th:action="@{/resident/maintenance/create}" enctype="multipart/form-data">
                     <div class="form-group">
-                        <label class="form-label">Title</label>
-                        <input type="text" name="title" class="form-input" required maxlength="100" placeholder="e.g. Water leak in bathroom">
+                        <label class="form-label">Tiêu đề</label>
+                        <input type="text" name="title" class="form-input" required maxlength="100" placeholder="Ví dụ: Rò rỉ nước trong nhà vệ sinh">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Description</label>
-                        <textarea name="description" class="form-input" rows="4" required placeholder="Describe the issue in detail..."></textarea>
+                        <label class="form-label">Mô tả chi tiết</label>
+                        <textarea name="description" class="form-input" rows="4" required placeholder="Mô tả chi tiết sự cố gặp phải..."></textarea>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Images (optional)</label>
+                        <label class="form-label">Hình ảnh (không bắt buộc)</label>
                         <input type="file" name="images" multiple accept="image/*" onchange="previewImages(event)">
                         <div id="imagePreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
                     </div>
                     <div class="form-group" style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
-                        <a th:href="@{/resident/maintenance}" class="back-btn" style="display:inline-flex;align-items:center;">Cancel</a>
-                        <button type="submit" class="btn-primary">Submit Request</button>
+                        <a th:href="@{/resident/maintenance}" class="back-btn" style="display:inline-flex;align-items:center;">Hủy bỏ</a>
+                        <button type="submit" class="btn-primary">Gửi Yêu cầu</button>
                     </div>
                 </form>
             </div>

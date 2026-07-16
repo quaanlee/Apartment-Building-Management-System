@@ -24,10 +24,16 @@ document.addEventListener('DOMContentLoaded', function () {
             const p = existing.split('-');
             this.current  = new Date(+p[0], +p[1]-1, 1);
             this.selected = new Date(+p[0], +p[1]-1, +p[2]);
+            if (this.selected && !isNaN(this.selected.getTime())) {
+                const y = this.selected.getFullYear();
+                const d = String(this.selected.getDate()).padStart(2, '0');
+                this.displayEl.value = months[this.selected.getMonth()].slice(0,3) + ' ' + d + ', ' + y;
+            }
         } else {
             this.current  = new Date(today.getFullYear(), today.getMonth(), 1);
             this.selected = null;
         }
+        this.backupSelected = this.selected ? new Date(this.selected.getTime()) : null;
         this._init();
     }
 
@@ -41,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!isOpen) {
                 self.calEl.classList.add('open');
                 self.wrapperEl.classList.add('active');
+                self.backupSelected = self.selected ? new Date(self.selected.getTime()) : null;
                 self._render();
             }
         });
@@ -59,6 +66,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         this.cancelBtn.addEventListener('click', function (e) {
             e.stopPropagation();
+            self.selected = self.backupSelected;
+            if (self.selected) {
+                var y = self.selected.getFullYear();
+                var m = String(self.selected.getMonth() + 1).padStart(2, '0');
+                var d = String(self.selected.getDate()).padStart(2, '0');
+                self.hiddenEl.value  = y + '-' + m + '-' + d;
+                self.displayEl.value = months[self.selected.getMonth()].slice(0,3) + ' ' + d + ', ' + y;
+            } else {
+                self.hiddenEl.value  = '';
+                self.displayEl.value = '';
+            }
             self.calEl.classList.remove('open');
             self.wrapperEl.classList.remove('active');
         });
@@ -108,6 +126,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     e.stopPropagation();
                     self.selected = new Date(year, month, day);
                     self._render();
+
+                    var y = self.selected.getFullYear();
+                    var m = String(self.selected.getMonth() + 1).padStart(2, '0');
+                    var dStr = String(self.selected.getDate()).padStart(2, '0');
+                    self.hiddenEl.value  = y + '-' + m + '-' + dStr;
+                    self.displayEl.value = months[self.selected.getMonth()].slice(0,3) + ' ' + dStr + ', ' + y;
                 });
             })(d, this);
             this.daysEl.appendChild(btn);

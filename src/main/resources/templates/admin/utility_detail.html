@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'utilities')}" lang="en">
+      th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'utilities')}" lang="vi">
 <head>
 </head>
 <body>
@@ -10,9 +10,9 @@
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb-nav">
-        <a th:href="@{/admin/dashboard}">Dashboard</a>
+        <a th:href="@{/admin/dashboard}">Bảng điều khiển</a>
         <i class="fa-solid fa-chevron-right"></i>
-        <a th:href="@{/admin/utilities}">Utility Management</a>
+        <a th:href="@{/admin/utilities}">Quản lý tiện ích</a>
         <i class="fa-solid fa-chevron-right"></i>
         <span th:text="${utility.utilityName}">Modern Fitness Center</span>
     </nav>
@@ -23,7 +23,7 @@
             <div class="title-badge-row">
                 <h1 th:text="${utility.utilityName}">Modern Fitness Center</h1>
                 <span th:class="${utility.status} ? 'badge-status active' : 'badge-status maintenance'"
-                      th:text="${utility.status} ? 'Active' : 'Maintenance'">Active</span>
+                      th:text="${utility.status} ? 'Hoạt động' : 'Bảo trì'">Active</span>
             </div>
             <p class="subtitle-text" th:text="${utility.description}">State-of-the-art gym with cardio equipment, weights, and studio space.</p>
         </div>
@@ -31,12 +31,12 @@
             <a th:href="@{/admin/utilities(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
                class="btn-back-list">
                 <i class="fa-solid fa-arrow-left"></i>
-                Back to List
+                Quay lại danh sách
             </a>
             <!-- Manage Bookings button -->
             <a th:href="@{#}" class="btn-manage-bookings">
                 <i class="fa-solid fa-calendar-check"></i>
-                Manage Bookings
+                Quản lý đặt lịch
             </a>
         </div>
     </div>
@@ -49,7 +49,7 @@
 
     <!-- Facility Overview -->
     <div class="overview-section">
-        <h3>Facility Overview</h3>
+        <h3>Tổng quan tiện ích</h3>
         <p th:text="${utility.description}">
             State-of-the-art gym with cardio equipment, weights, and studio space.
         </p>
@@ -60,10 +60,10 @@
         <!-- Resources Card (from Database) -->
         <div class="info-card" style="width: 100%; box-sizing: border-box;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px;">
-                <h4 style="margin: 0; font-size: 14px; font-weight: 700; text-transform: uppercase;">PHYSICAL RESOURCES &amp; LOCATIONS</h4>
+                <h4 style="margin: 0; font-size: 14px; font-weight: 700; text-transform: uppercase;">TÀI NGUYÊN &amp; VỊ TRÍ VẬT LÝ</h4>
                 <button class="btn-primary" style="padding: 6px 12px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-md);" 
                         onclick="openAddResourceModal()">
-                    <i class="fa-solid fa-plus"></i> Add Resource
+                    <i class="fa-solid fa-plus"></i> Thêm tài nguyên
                 </button>
             </div>
             <div class="resources-list" style="display: flex; flex-direction: column; gap: 16px;">
@@ -76,24 +76,24 @@
                         <form th:action="@{/admin/utilities/resources/toggle-status/{id}(id=${res.resourceId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" style="display:inline; margin: 0;">
                             <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer; font-family: inherit;">
                                 <span th:class="${res.status} ? 'badge-status active' : 'badge-status maintenance'" 
-                                      th:text="${res.status} ? 'Ready' : 'Maintenance'" 
+                                      th:text="${res.status} ? 'Sẵn sàng' : 'Bảo trì'" 
                                       style="font-size: 11px; padding: 4px 8px; transition: all 0.2s ease-in-out; display: inline-block;"
                                       onmouseover="this.style.opacity='0.8'; this.style.transform='scale(1.05)'"
                                       onmouseout="this.style.opacity='1'; this.style.transform='scale(1)'"
-                                      th:title="${res.status ? 'Click to set Maintenance' : 'Click to set Ready'}">Ready</span>
+                                      th:title="${res.status ? 'Nhấp để chuyển sang Bảo trì' : 'Nhấp để chuyển sang Sẵn sàng'}">Sẵn sàng</span>
                             </button>
                         </form>
                         <button type="button" class="btn-primary" style="padding: 4px 8px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; border-radius: var(--radius-sm); border: none; cursor: pointer;"
                                 th:data-resource-id="${res.resourceId}"
                                 th:data-resource-name="${res.resourceName}"
                                 onclick="openPricingModal(this.getAttribute('data-resource-id'), this.getAttribute('data-resource-name'))"
-                                title="Configure Pricing">
-                            <i class="fa-solid fa-tags"></i> Price
+                                title="Thiết lập giá">
+                            <i class="fa-solid fa-tags"></i> Giá
                         </button>
                     </div>
                 </div>
                 <div th:if="${#lists.isEmpty(utility.utilityResources)}" style="padding: 20px; text-align: center; color: var(--text-secondary);">
-                    No physical resources registered for this utility.
+                    Chưa có tài nguyên vật lý nào được đăng ký cho tiện ích này.
                 </div>
             </div>
         </div>
@@ -102,43 +102,43 @@
     <div class="modal-overlay" id="resourceModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="resourceTitle">Add Resource</h3>
+                <h3 id="resourceTitle">Thêm tài nguyên</h3>
                 <button class="modal-close" onclick="closeModal('resourceModal')"><i class="fas fa-times"></i></button>
             </div>
             <form th:action="@{/admin/utilities/add-resource(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="utilityId" id="resourceUtilityId" th:value="${utility.utilityId}">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="resourceName">Resource Name</label>
-                        <input type="text" name="resourceName" id="resourceName" class="form-control" placeholder="e.g. Main Training Hall" maxlength="100" required>
+                        <label for="resourceName">Tên tài nguyên</label>
+                        <input type="text" name="resourceName" id="resourceName" class="form-control" placeholder="Ví dụ: Phòng tập Gym số 1" maxlength="100" required>
                     </div>
                     <div class="form-group">
-                        <label for="resourceDescription">Description</label>
-                        <textarea name="resourceDescription" id="resourceDescription" class="form-control" placeholder="e.g. Equipped with standard treadmills..." maxlength="255"></textarea>
+                        <label for="resourceDescription">Mô tả</label>
+                        <textarea name="resourceDescription" id="resourceDescription" class="form-control" placeholder="Ví dụ: Trang bị đầy đủ máy chạy bộ..." maxlength="255"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="resourceLocation">Location</label>
-                        <input type="text" name="resourceLocation" id="resourceLocation" class="form-control" placeholder="e.g. Floor 2, Block A" maxlength="150" required>
+                        <label for="resourceLocation">Vị trí</label>
+                        <input type="text" name="resourceLocation" id="resourceLocation" class="form-control" placeholder="Ví dụ: Tầng 2, Tòa A" maxlength="150" required>
                     </div>
                     <div class="form-group">
-                        <label for="resourcePrimaryImage">Primary Image</label>
+                        <label for="resourcePrimaryImage">Ảnh chính</label>
                         <input type="file" name="primaryImage" id="resourcePrimaryImage" class="form-control" accept="image/*" required>
                     </div>
                     <div class="form-group">
-                        <label for="resourceSecondaryImages">Secondary Images (minimum 2)</label>
+                        <label for="resourceSecondaryImages">Ảnh phụ (tối thiểu 2 ảnh)</label>
                         <input type="file" name="secondaryImages" id="resourceSecondaryImages" class="form-control" accept="image/*" multiple required>
                     </div>
                     <div class="form-group">
-                        <label for="resourceStatus">Status</label>
+                        <label for="resourceStatus">Trạng thái</label>
                         <select name="status" id="resourceStatus" class="form-control">
-                             <option value="true">Ready</option>
-                             <option value="false">Maintenance</option>
+                             <option value="true">Sẵn sàng</option>
+                             <option value="false">Bảo trì</option>
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('resourceModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Add Resource</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('resourceModal')">Hủy bỏ</button>
+                    <button type="submit" class="btn-primary">Thêm tài nguyên</button>
                 </div>
             </form>
         </div>
@@ -148,30 +148,30 @@
     <div class="modal-overlay" id="pricingModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="pricingTitle">Configure Pricing</h3>
+                <h3 id="pricingTitle">Thiết lập đơn giá</h3>
                 <button class="modal-close" onclick="closeModal('pricingModal')"><i class="fas fa-times"></i></button>
             </div>
             <form th:action="@{/admin/utilities/manage-pricing(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST">
                 <input type="hidden" name="resourceId" id="pricingResourceId">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Resource Name</label>
+                        <label>Tên tài nguyên</label>
                         <input type="text" id="pricingResourceNameDisplay" class="form-control" disabled style="background: #f1f5f9; color: #475569; font-weight: 600;">
                     </div>
                     <div class="form-group">
-                        <label for="pricingUnitId">Pricing Unit</label>
+                        <label for="pricingUnitId">Đơn vị tính</label>
                         <select name="unitId" id="pricingUnitId" class="form-control" required>
-                            <option th:each="unit : ${allUnits}" th:value="${unit.unitId}" th:text="${unit.unitName}">hour</option>
+                            <option th:each="unit : ${allUnits}" th:value="${unit.unitId}" th:text="${unit.unitName == 'hour' ? 'Giờ' : (unit.unitName == 'day' ? 'Ngày' : (unit.unitName == 'month' ? 'Tháng' : unit.unitName))}">hour</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="pricingPrice">Price ($)</label>
-                        <input type="number" name="price" id="pricingPrice" step="0.01" min="0" class="form-control" placeholder="0.00" required>
+                        <label for="pricingPrice">Giá tiền (đ)</label>
+                        <input type="number" name="price" id="pricingPrice" step="1" min="0" class="form-control" placeholder="0" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('pricingModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Pricing</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('pricingModal')">Hủy bỏ</button>
+                    <button type="submit" class="btn-primary">Lưu mức giá</button>
                 </div>
             </form>
         </div>
@@ -198,7 +198,7 @@
         }
 
         function openPricingModal(resourceId, resourceName) {
-            document.getElementById("pricingTitle").innerText = "Configure Pricing for " + resourceName;
+            document.getElementById("pricingTitle").innerText = "Thiết lập đơn giá cho " + resourceName;
             document.getElementById("pricingResourceId").value = resourceId;
             document.getElementById("pricingResourceNameDisplay").value = resourceName;
             document.getElementById("pricingPrice").value = "";

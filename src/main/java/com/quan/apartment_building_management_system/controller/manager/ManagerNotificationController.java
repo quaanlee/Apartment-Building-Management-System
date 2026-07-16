@@ -110,7 +110,7 @@ public class ManagerNotificationController {
     public String viewNotificationDetail(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         Optional<Notification> notificationOpt = notificationService.findById(id);
         if (notificationOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "Notification not found.");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy thông báo.");
             redirectAttributes.addFlashAttribute("messageType", "warning");
             return "redirect:/manager/notifications";
         }
@@ -122,7 +122,7 @@ public class ManagerNotificationController {
     public String showEditForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         Optional<Notification> notificationOpt = notificationService.findById(id);
         if (notificationOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "Notification not found.");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy thông báo.");
             redirectAttributes.addFlashAttribute("messageType", "warning");
             return "redirect:/manager/notifications";
         }
@@ -139,7 +139,7 @@ public class ManagerNotificationController {
                                    RedirectAttributes redirectAttributes) {
         Optional<Notification> notificationOpt = notificationService.findById(id);
         if (notificationOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "Notification not found.");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy thông báo.");
             redirectAttributes.addFlashAttribute("messageType", "warning");
             return "redirect:/manager/notifications";
         }
@@ -150,7 +150,7 @@ public class ManagerNotificationController {
         notification.setRelatedEntityType(relatedEntityType);
         notificationService.save(notification);
 
-        redirectAttributes.addFlashAttribute("message", "Notification updated successfully.");
+        redirectAttributes.addFlashAttribute("message", "Cập nhật thông báo thành công.");
         return "redirect:/manager/notifications/" + id + "/edit";
     }
 
@@ -158,12 +158,12 @@ public class ManagerNotificationController {
     public String deleteNotification(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         Optional<Notification> notificationOpt = notificationService.findById(id);
         if (notificationOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "Notification not found.");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy thông báo.");
             redirectAttributes.addFlashAttribute("messageType", "warning");
             return "redirect:/manager/notifications";
         }
         notificationService.deleteById(id);
-        redirectAttributes.addFlashAttribute("message", "Notification deleted successfully.");
+        redirectAttributes.addFlashAttribute("message", "Xóa thông báo thành công.");
         return "redirect:/manager/notifications";
     }
 
@@ -214,7 +214,7 @@ public class ManagerNotificationController {
 
         notificationService.save(notification);
 
-        redirectAttributes.addFlashAttribute("message", "Notification created and sent successfully.");
+        redirectAttributes.addFlashAttribute("message", "Tạo và gửi thông báo thành công.");
         return "redirect:/manager/notifications";
     }
 }

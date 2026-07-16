@@ -317,7 +317,7 @@ public class ManagerBillController {
         }
 
         if (creator == null) {
-            redirectAttributes.addFlashAttribute("message", "No manager or admin account found to sign the bill.");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy tài khoản quản lý hoặc admin để ký hóa đơn.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/manager/bills/generate";
         }
@@ -347,7 +347,7 @@ public class ManagerBillController {
         }
 
         if (preCalculatedTotal.compareTo(BigDecimal.ZERO) <= 0) {
-            model.addAttribute("message", "Cannot generate a bill with a total amount of $0.00 or less.");
+            model.addAttribute("message", "Không thể tạo hóa đơn có tổng số tiền bằng 0 hoặc nhỏ hơn.");
             model.addAttribute("messageType", "error");
             
             List<Apartment> apartments = apartmentService.findAll().stream()
@@ -450,7 +450,7 @@ public class ManagerBillController {
             }
         }
 
-        redirectAttributes.addFlashAttribute("message", "Bill generated successfully for Apartment " + apartment.getApartmentNumber() + " ($" + totalAmount + ")");
+        redirectAttributes.addFlashAttribute("message", "Tạo hóa đơn thành công cho Căn hộ " + apartment.getApartmentNumber() + " (" + totalAmount.toPlainString() + " đ)");
         redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/manager/bills";
     }
@@ -487,7 +487,7 @@ public class ManagerBillController {
                     paymentService.deleteById(p.getPaymentId());
                 }
 
-                redirectAttributes.addFlashAttribute("message", "Bill status reverted to UNPAID for Apartment " + bill.getApartment().getApartmentNumber());
+                redirectAttributes.addFlashAttribute("message", "Hóa đơn căn hộ " + bill.getApartment().getApartmentNumber() + " đã được chuyển về trạng thái CHƯ A THANH TOÁN");
                 redirectAttributes.addFlashAttribute("messageType", "info");
             } else {
                 // Mark as Paid
@@ -513,7 +513,7 @@ public class ManagerBillController {
                     paymentService.save(payment);
                 }
 
-                redirectAttributes.addFlashAttribute("message", "Bill marked as PAID for Apartment " + bill.getApartment().getApartmentNumber());
+                redirectAttributes.addFlashAttribute("message", "Hóa đơn căn hộ " + bill.getApartment().getApartmentNumber() + " đã được đánh dấu là ĐÃ THANH TOÁN");
                 redirectAttributes.addFlashAttribute("messageType", "success");
             }
         }

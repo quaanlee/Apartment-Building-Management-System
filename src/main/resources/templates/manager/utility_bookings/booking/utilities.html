@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" 
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
       th:replace="~{layout/manager/layout_manager :: manager-layout(~{::#main-content}, 'bookings')}"
-      th:with="pageTitle='Manager Booking - Utilities'">
+      th:with="pageTitle='Đặt lịch Tiện ích'">
 <head>
     <title>Tiện Ích Khu Dân Cư</title>
 </head>
@@ -11,12 +11,12 @@
     
     <div class="utility-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
         <div>
-            <h1 class="page-header-title">Create Booking</h1>
-            <p class="page-header-subtitle">Select a utility to create a booking on behalf of a resident.</p>
+            <h1 class="page-header-title">Tạo Lượt đặt</h1>
+            <p class="page-header-subtitle">Chọn một tiện ích để tạo lượt đặt lịch thay mặt cho cư dân.</p>
         </div>
         <div style="display: flex; gap: 12px; margin-top: 10px;">
             <a th:href="@{/manager/utility-bookings}" class="btn-secondary" style="border-radius: 8px; text-decoration: none;">
-                <i class="fa-solid fa-arrow-left" style="margin-right: 6px;"></i> Back to Bookings
+                <i class="fa-solid fa-arrow-left" style="margin-right: 6px;"></i> Quay lại Đơn đặt
             </a>
         </div>
     </div>
@@ -29,13 +29,13 @@
             <div class="utility-card-body">
                 <div class="utility-card-header">
                     <h3 class="utility-card-title" th:text="${utility.utilityName}">Tên Tiện Ích</h3>
-                    <span class="utility-price-badge" th:text="${utility.type} ? 'Booking' : 'Free Use'">Booking</span>
+                    <span class="utility-price-badge" th:text="${utility.type} ? 'Đặt lịch' : 'Miễn phí'">Đặt lịch</span>
                 </div>
                 <p class="utility-card-desc" th:text="${utility.description}">Elevated aquatic serenity with...</p>
                 
                 <div class="utility-card-footer">
                     <a th:href="@{/manager/utility-bookings/utilities/{id}/resources(id=${utility.utilityId})}" class="btn-primary btn-book-now">
-                        Book Now <i class="fas fa-calendar-alt" style="margin-left: 8px;"></i>
+                        Đặt lịch ngay <i class="fas fa-calendar-alt" style="margin-left: 8px;"></i>
                     </a>
                 </div>
             </div>

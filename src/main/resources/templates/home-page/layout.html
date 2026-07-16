@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Layout Fragments</title>
@@ -17,19 +17,19 @@
             <nav>
                 <ul class="nav-menu">
                     <li>
-                        <a th:href="@{/features}" class="nav-link" th:classappend="${activeTab == 'features'} ? 'active' : ''">Features</a>
+                        <a th:href="@{/features}" class="nav-link" th:classappend="${activeTab == 'features'} ? 'active' : ''">Tính năng</a>
                     </li>
                     <li>
-                        <a th:href="@{/about}" class="nav-link" th:classappend="${activeTab == 'about'} ? 'active' : ''">About Us</a>
+                        <a th:href="@{/about}" class="nav-link" th:classappend="${activeTab == 'about'} ? 'active' : ''">Về chúng tôi</a>
                     </li>
                     <li>
-                        <a th:href="@{/contact}" class="nav-link" th:classappend="${activeTab == 'contact'} ? 'active' : ''">Contact</a>
+                        <a th:href="@{/contact}" class="nav-link" th:classappend="${activeTab == 'contact'} ? 'active' : ''">Liên hệ</a>
                     </li>
                 </ul>
             </nav>
             
             <div class="header-actions">
-                <a th:href="@{/login}" class="btn-login">Login</a>
+                <a th:href="@{/login}" class="btn-login">Đăng nhập</a>
             </div>
         </div>
     </header>
@@ -39,21 +39,21 @@
         <div class="footer-container">
             <div class="footer-brand">
                 <div class="footer-logo">ABM System</div>
-                <div class="footer-copy">© 2024 Elevate Living. All rights reserved.</div>
+                <div class="footer-copy">© 2024 Elevate Living. Bảo lưu mọi quyền.</div>
             </div>
             
             <div class="footer-nav">
-                <a th:href="@{/privacy}" class="footer-link">Privacy Policy</a>
-                <a th:href="@{/terms}" class="footer-link">Terms of Service</a>
-                <a th:href="@{/help}" class="footer-link">Help Center</a>
-                <a th:href="@{/support}" class="footer-link">Support</a>
+                <a th:href="@{/privacy}" class="footer-link">Chính sách bảo mật</a>
+                <a th:href="@{/terms}" class="footer-link">Điều khoản dịch vụ</a>
+                <a th:href="@{/help}" class="footer-link">Trung tâm trợ giúp</a>
+                <a th:href="@{/support}" class="footer-link">Hỗ trợ</a>
             </div>
             
             <div class="footer-actions">
-                <button class="footer-icon-btn" aria-label="Language">
+                <button class="footer-icon-btn" aria-label="Ngôn ngữ">
                     <i data-lucide="globe"></i>
                 </button>
-                <button class="footer-icon-btn" aria-label="Share">
+                <button class="footer-icon-btn" aria-label="Chia sẻ">
                     <i data-lucide="share-2"></i>
                 </button>
             </div>

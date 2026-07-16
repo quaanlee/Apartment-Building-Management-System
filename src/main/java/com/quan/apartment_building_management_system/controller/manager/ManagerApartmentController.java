@@ -103,9 +103,9 @@ public class ManagerApartmentController {
 
         try {
             apartmentManagerService.updateApartmentStatus(id, status);
-            redirectAttributes.addFlashAttribute("successMessage", "Status updated successfully!");
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật trạng thái thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Thất bại: " + e.getMessage());
         }
 
         return "redirect:/manager/apartments/" + id;
@@ -150,7 +150,7 @@ public class ManagerApartmentController {
             RedirectAttributes redirectAttributes) {
 
         if (request.getProfileId() == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed: Please select a resident.");
+            redirectAttributes.addFlashAttribute("errorMessage", "Thất bại: Vui lòng chọn cư dân.");
             return "redirect:/manager/apartments/" + id + "/assign-resident";
         }
         if (request.getMoveInDate() == null) {
@@ -164,9 +164,9 @@ public class ManagerApartmentController {
                     request.getMoveInDate(),
                     request.getIsHouseholdOwner()
             );
-            redirectAttributes.addFlashAttribute("successMessage", "Resident assigned successfully!");
+            redirectAttributes.addFlashAttribute("successMessage", "Gán cư dân thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Thất bại: " + e.getMessage());
         }
 
         return "redirect:/manager/apartments/" + id;
@@ -181,9 +181,9 @@ public class ManagerApartmentController {
 
         try {
             apartmentManagerService.moveOutResident(profileId, LocalDate.now());
-            redirectAttributes.addFlashAttribute("successMessage", "Resident moved out successfully!");
+            redirectAttributes.addFlashAttribute("successMessage", "Cư dân đã dọn ra thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Thất bại: " + e.getMessage());
         }
 
         return "redirect:/manager/apartments/" + apartmentId;

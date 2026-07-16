@@ -8,85 +8,85 @@
 <main class="tasks-page">
     <div class="page-header">
         <div>
-            <h2>Perform and Report on Task</h2>
-            <p>View request details, review history, and submit your repair report.</p>
+            <h2>Thực hiện &amp; Báo cáo nhiệm vụ</h2>
+            <p>Xem chi tiết yêu cầu, xem lại lịch sử và gửi báo cáo sửa chữa của bạn.</p>
         </div>
     </div>
 
     <div th:if="${message}" class="alert" th:classappend="${messageType == 'error'} ? ' alert-danger' : ' alert-success'" th:text="${message}">
-        Alert message
+        Thông báo
     </div>
 
     <div class="detail-layout">
         <section class="detail-card">
-            <h3>Task Information</h3>
+            <h3>Thông tin nhiệm vụ</h3>
             <div class="info-group">
-                <div class="info-label">Title</div>
-                <div class="info-value" th:text="${task.maintenanceRequest.title}">Fix pipe</div>
+                <div class="info-label">Tiêu đề</div>
+                <div class="info-value" th:text="${task.maintenanceRequest.title}">Sửa đường ống nước</div>
             </div>
             <div class="info-group">
-                <div class="info-label">Description</div>
-                <div class="info-value" th:text="${task.maintenanceRequest.description}">Water is leaking from the sink pipe...</div>
+                <div class="info-label">Mô tả</div>
+                <div class="info-value" th:text="${task.maintenanceRequest.description}">Mô tả chi tiết lỗi</div>
             </div>
             <div style="display: flex; gap: 40px; margin-top: 24px;">
                 <div class="info-group">
-                    <div class="info-label">Location</div>
+                    <div class="info-label">Vị trí</div>
                     <div class="info-value" th:text="${task.maintenanceRequest.apartment.apartmentNumber}">Apt 101</div>
                 </div>
                 <div class="info-group">
-                    <div class="info-label">Resident Name</div>
+                    <div class="info-label">Tên cư dân</div>
                     <div class="info-value" th:text="${task.maintenanceRequest.profile.fullName}">John Doe</div>
                 </div>
                 <div class="info-group">
-                    <div class="info-label">Assigned On</div>
-                    <div class="info-value" th:text="${#temporals.format(task.assignedDate, 'dd MMM yyyy, HH:mm')}">12 Oct 2026</div>
+                    <div class="info-label">Ngày giao</div>
+                    <div class="info-value" th:text="${#temporals.format(task.assignedDate, 'dd/MM/yyyy, HH:mm')}">12 Oct 2026</div>
                 </div>
             </div>
 
             <div th:if="${task.status != 3}">
-                <h3 style="margin-top: 40px;">Submit Detailed Repair Report</h3>
+                <h3 style="margin-top: 40px;">Gửi báo cáo sửa chữa chi tiết</h3>
                 <form class="report-form" th:action="@{'/maintenance_staff/tasks/' + ${task.taskId} + '/report'}" th:object="${reportDto}" method="post" enctype="multipart/form-data">
                     <input type="hidden" th:field="*{taskId}"/>
                     
                     <div class="form-group">
-                        <label for="reportContent">Report Content *</label>
-                        <textarea th:field="*{reportContent}" id="reportContent" class="form-control" rows="4" placeholder="Describe the actions taken, materials used, etc." required></textarea>
-                        <span th:if="${#fields.hasErrors('reportContent')}" th:errors="*{reportContent}" class="form-error">Error</span>
+                        <label for="reportContent">Nội dung báo cáo *</label>
+                        <textarea th:field="*{reportContent}" id="reportContent" class="form-control" rows="4" placeholder="Mô tả các hành động đã thực hiện, vật tư đã sử dụng, v.v." required></textarea>
+                        <span th:if="${#fields.hasErrors('reportContent')}" th:errors="*{reportContent}" class="form-error">Lỗi</span>
                     </div>
 
                     <div class="form-group">
-                        <label for="reportImages">Upload Images (Optional)</label>
+                        <label for="reportImages">Tải lên hình ảnh (Tùy chọn)</label>
                         <input type="file" name="reportImages" id="reportImages" class="form-control" accept="image/*" multiple style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 14px; background: var(--bg-card); width: 100%;">
-                        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Choose one or more images demonstrating the progress/results of the repair work.</p>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Chọn một hoặc nhiều hình ảnh minh họa tiến độ/kết quả sửa chữa.</p>
                     </div>
 
                     <div class="form-group">
-                        <label for="progressPercent">Task Progress (%) *</label>
+                        <label for="progressPercent">Tiến độ công việc (%) *</label>
                         <input type="range" th:field="*{progressPercent}" id="progressPercent" min="0" max="100" th:data-min="${minProgress}" oninput="handleSliderInput(this)">
                         <div class="progress-display" id="progVal" th:text="*{progressPercent} + '%'">0%</div>
-                        <span th:if="${#fields.hasErrors('progressPercent')}" th:errors="*{progressPercent}" class="form-error">Error</span>
-                        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Set to 100% to mark this task as completed.</p>
+                        <span th:if="${#fields.hasErrors('progressPercent')}" th:errors="*{progressPercent}" class="form-error">Lỗi</span>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Đặt mức 100% để đánh dấu công việc này đã hoàn thành.</p>
                     </div>
 
                     <button type="submit" class="task-btn primary" style="align-self: flex-start; margin-top: 8px;">
                         <i class="fa-solid fa-paper-plane"></i>
-                        Submit Report &amp; Update Progress
+                        Gửi báo cáo &amp; Cập nhật tiến độ
                     </button>
                 </form>
             </div>
         </section>
 
         <aside class="detail-card">
-            <h3>Report History</h3>
+            <h3>Lịch sử báo cáo</h3>
             <div th:if="${reports.empty}" style="color: var(--text-secondary); font-size: 14px; font-style: italic;">
-                No reports submitted yet.
+                Chưa có báo cáo nào được gửi.
             </div>
             <div class="timeline" th:unless="${reports.empty}">
                 <div class="timeline-item" th:each="report : ${reports}">
-                    <div class="timeline-date" th:text="${#temporals.format(report.createdAt, 'dd MMM yyyy, HH:mm')}">12 Oct 2026 15:00</div>
+                    <div class="timeline-date" th:text="${#temporals.format(report.createdAt, 'dd/MM/yyyy, HH:mm')}">12 Oct 2026 15:00</div>
                     <div class="timeline-content">
                         <div th:text="${report.reportContent}">Fixed the valve.</div>
-                        <span class="timeline-progress" th:text="'Progress: ' + ${report.progressPercent} + '%'">Progress: 50%</span>
+                        <span class="timeline-progress" th:text="'Tiến độ: ' + ${report.progressPercent} + '%'">Progress: 50%</span>
                         <div th:if="${report.images != null and !report.images.empty}" class="report-images" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
                             <a th:each="img : ${report.images}" th:href="${img.imageUrl}" target="_blank" style="display: inline-block;">
                                 <img th:src="${img.imageUrl}" style="width: 70px; height: 70px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-color); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" th:alt="${img.caption}">
@@ -98,7 +98,7 @@
             
             <div th:if="${task.status == 3}" style="margin-top: 32px; padding: 16px; background: #D1FAE5; border-radius: var(--radius-md); text-align: center; color: #059669; font-weight: 600;">
                 <i class="fa-solid fa-check-circle" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>
-                Task Completed
+                Công việc đã hoàn thành
             </div>
         </aside>
     </div>

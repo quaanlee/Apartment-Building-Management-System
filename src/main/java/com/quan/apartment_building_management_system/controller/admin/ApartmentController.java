@@ -50,7 +50,7 @@ public class ApartmentController {
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("apartment", new Apartment());
-        model.addAttribute("pageTitle", "Add New Unit");
+        model.addAttribute("pageTitle", "Thêm căn hộ mới");
         model.addAttribute("actionUrl", "/admin/apartments/save");
         return "admin/apartment-form";
     }
@@ -68,7 +68,7 @@ public class ApartmentController {
                                  RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("pageTitle", "Add New Unit");
+            model.addAttribute("pageTitle", "Thêm căn hộ mới");
             model.addAttribute("actionUrl", "/admin/apartments/save");
             return "admin/apartment-form";
         }
@@ -76,8 +76,8 @@ public class ApartmentController {
         Optional<Apartment> existing = apartmentService.findByApartmentNumber(apartment.getApartmentNumber());
 
         if (existing.isPresent()) {
-            bindingResult.rejectValue("apartmentNumber", "duplicate", "Apartment number already exists!");
-            model.addAttribute("pageTitle", "Add New Unit");
+            bindingResult.rejectValue("apartmentNumber", "duplicate", "Số căn hộ đã tồn tại trong hệ thống!");
+            model.addAttribute("pageTitle", "Thêm căn hộ mới");
             model.addAttribute("actionUrl", "/admin/apartments/save");
             return "admin/apartment-form";
         }
@@ -90,9 +90,9 @@ public class ApartmentController {
         try {
             apartmentService.saveApartmentImages(savedApartment, mainImage, subImage1, subImage2, deleteMainImage, deleteSubImage1, deleteSubImage2);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Error uploading images: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi tải ảnh lên: " + e.getMessage());
         }
-        redirectAttributes.addFlashAttribute("successMessage", "Apartment added successfully!");
+        redirectAttributes.addFlashAttribute("successMessage", "Thêm căn hộ thành công!");
 
         return "redirect:/admin/apartments";
     }
@@ -105,12 +105,12 @@ public class ApartmentController {
         Optional<Apartment> apartment = apartmentService.findById(id);
 
         if (apartment.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Apartment not found!");
+            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy căn hộ!");
             return "redirect:/admin/apartments";
         }
 
         model.addAttribute("apartment", apartment.get());
-        model.addAttribute("pageTitle", "Edit Unit");
+        model.addAttribute("pageTitle", "Chỉnh sửa căn hộ");
         model.addAttribute("actionUrl", "/admin/apartments/update/" + id);
 
         return "admin/apartment-form";
@@ -132,12 +132,12 @@ public class ApartmentController {
         Optional<Apartment> currentApartment = apartmentService.findById(id);
 
         if (currentApartment.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Apartment not found!");
+            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy căn hộ!");
             return "redirect:/admin/apartments";
         }
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("pageTitle", "Edit Unit");
+            model.addAttribute("pageTitle", "Chỉnh sửa căn hộ");
             model.addAttribute("actionUrl", "/admin/apartments/update/" + id);
             return "admin/apartment-form";
         }
@@ -145,8 +145,8 @@ public class ApartmentController {
         Optional<Apartment> duplicate = apartmentService.findByApartmentNumber(apartment.getApartmentNumber());
 
         if (duplicate.isPresent() && !duplicate.get().getApartmentId().equals(id)) {
-            bindingResult.rejectValue("apartmentNumber", "duplicate", "Apartment number already exists!");
-            model.addAttribute("pageTitle", "Edit Unit");
+            bindingResult.rejectValue("apartmentNumber", "duplicate", "Số căn hộ đã tồn tại trong hệ thống!");
+            model.addAttribute("pageTitle", "Chỉnh sửa căn hộ");
             model.addAttribute("actionUrl", "/admin/apartments/update/" + id);
             return "admin/apartment-form";
         }
@@ -163,9 +163,9 @@ public class ApartmentController {
         try {
             apartmentService.saveApartmentImages(updateApartment, mainImage, subImage1, subImage2, deleteMainImage, deleteSubImage1, deleteSubImage2);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Error uploading images: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi tải ảnh lên: " + e.getMessage());
         }
-        redirectAttributes.addFlashAttribute("successMessage", "Apartment updated successfully!");
+        redirectAttributes.addFlashAttribute("successMessage", "Cập nhật căn hộ thành công!");
 
         return "redirect:/admin/apartments";
     }
@@ -178,7 +178,7 @@ public class ApartmentController {
         Optional<Apartment> apartment = apartmentService.findById(id);
 
         if (apartment.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Apartment not found!");
+            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy căn hộ!");
             return "redirect:/admin/apartments";
         }
 
@@ -198,12 +198,12 @@ public class ApartmentController {
         Optional<Apartment> apartment = apartmentService.findById(id);
 
         if (apartment.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Apartment not found!");
+            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy căn hộ!");
             return "redirect:/admin/apartments";
         }
 
         apartmentService.deleteById(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Apartment deleted successfully!");
+        redirectAttributes.addFlashAttribute("successMessage", "Xóa căn hộ thành công!");
 
         return "redirect:/admin/apartments";
     }

@@ -18,45 +18,45 @@
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <h1>ABMS Admin</h1>
-                <p>Management Portal</p>
+                <p>Cổng Quản Trị</p>
             </div>
             
             <ul class="sidebar-menu">
                 <li class="sidebar-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
                     <a th:href="@{/admin/dashboard}">
                         <i class="fas fa-th-large"></i>
-                        <span>Dashboard</span>
+                        <span>Trang chủ</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'users' ? 'active' : ''}">
                     <a th:href="@{/admin/users}">
                         <i class="fa-solid fa-users-gear"></i>
-                        <span>User Management</span>
+                        <span>Quản lý người dùng</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item" th:classappend="${activeTab == 'building' ? 'active' : ''}">
                     <a th:href="@{/admin/apartments}">
                         <i class="fa-solid fa-building"></i>
-                        <span>Building Management</span>
+                        <span>Quản lý căn hộ</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'services' ? 'active' : ''}">
                     <a th:href="@{/admin/services}">
                         <i class="fa-solid fa-cubes"></i>
-                        <span>Service Catalog</span>
+                        <span>Danh mục dịch vụ</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'utilities' ? 'active' : ''}">
                     <a th:href="@{/admin/utilities}">
                         <i class="fa-solid fa-screwdriver-wrench"></i>
-                        <span>Utilities</span>
+                        <span>Tiện ích</span>
                     </a>
                 </li>
                 <li class="sidebar-item" th:classappend="${activeTab == 'logs' ? 'active' : ''}">
                     <a th:href="@{/admin/logs}">
                         <i class="fa-solid fa-clock-rotate-left"></i>
-                        <span>System Logs</span>
+                        <span>Nhật ký hệ thống</span>
                     </a>
                 </li>
             </ul>
@@ -64,7 +64,7 @@
             <div class="sidebar-footer">
                 <a th:href="@{/logout}" class="logout-btn">
                     <i class="fa-solid fa-right-from-bracket"></i>
-                    <span>Logout</span>
+                    <span>Đăng xuất</span>
                 </a>
             </div>
         </aside>
@@ -77,18 +77,18 @@
                 <!-- Search Bar -->
                 <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" class="search-input" placeholder="Search by text...">
+                    <input type="text" class="search-input" placeholder="Tìm kiếm...">
                 </div>
                 
                 <!-- Action Controls -->
                 <div class="header-actions">
-                    <button class="icon-btn" title="Settings">
+                    <button class="icon-btn" title="Cài đặt">
                         <i class="fa-solid fa-gear"></i>
                     </button>
                     
                     <div class="user-profile-trigger">
                         <div class="user-avatar-placeholder">A</div>
-                        <span class="user-role">Administrator</span>
+                        <span class="user-role">Quản trị viên</span>
                     </div>
                 </div>
             </header>

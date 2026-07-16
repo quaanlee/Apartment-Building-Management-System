@@ -9,14 +9,14 @@
     <link rel="stylesheet" th:href="@{/css/resident/billing.css}">
 
     <div class="page-header">
-        <h2 class="page-title">Billing Directory</h2>
-        <p class="page-subtitle" th:text="${apartment != null ? 'Apartment: ' + apartment.apartmentNumber + ' | Floor: ' + apartment.floor + ' | Area: ' + apartment.area + ' m²' : 'Manage and pay your apartment service bills'}">Manage and pay your apartment service bills</p>
+        <h2 class="page-title">Danh sách Hóa đơn</h2>
+        <p class="page-subtitle" th:text="${apartment != null ? 'Căn hộ: ' + apartment.apartmentNumber + ' | Tầng: ' + apartment.floor + ' | Diện tích: ' + apartment.area + ' m²' : 'Quản lý và thanh toán các hóa đơn dịch vụ căn hộ của bạn'}">Quản lý và thanh toán các hóa đơn dịch vụ căn hộ của bạn</p>
     </div>
 
     <!-- Error Alert -->
     <div th:if="${error}" class="alert alert-danger" style="background-color: #FDE8E8; color: #9B1C1C; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
         <i class="fa-solid fa-circle-exclamation"></i>
-        <span th:text="${error}">An error occurred</span>
+        <span th:text="${error}">Đã xảy ra lỗi</span>
     </div>
 
     <!-- Summary Cards -->
@@ -24,21 +24,21 @@
         <div class="summary-card orange">
             <div class="summary-icon"><i class="fa-solid fa-clock"></i></div>
             <div class="summary-body">
-                <span class="summary-label">Total Unpaid</span>
+                <span class="summary-label">Tổng chưa thanh toán</span>
                 <span class="summary-value" th:text="${#numbers.formatDecimal(totalUnpaid, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</span>
             </div>
         </div>
         <div class="summary-card green">
             <div class="summary-icon"><i class="fa-solid fa-circle-check"></i></div>
             <div class="summary-body">
-                <span class="summary-label">Total Paid</span>
+                <span class="summary-label">Tổng đã thanh toán</span>
                 <span class="summary-value" th:text="${#numbers.formatDecimal(totalPaid, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</span>
             </div>
         </div>
         <div class="summary-card blue">
             <div class="summary-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <div class="summary-body">
-                <span class="summary-label">Total Overdue</span>
+                <span class="summary-label">Tổng quá hạn</span>
                 <span class="summary-value" th:text="${#numbers.formatDecimal(totalOverdue, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</span>
             </div>
         </div>
@@ -47,18 +47,18 @@
     <!-- Filter Bar -->
     <div class="filter-bar" th:if="${apartment != null}" style="display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
         <div class="status-filters" style="display: flex; gap: 8px;">
-            <a th:href="@{/resident/billing(status='', period=${period})}" th:classappend="${activeStatus == null ? 'active' : ''}">All</a>
-            <a th:href="@{/resident/billing(status=0, period=${period})}" th:classappend="${activeStatus == 0 ? 'active' : ''}">Unpaid</a>
-            <a th:href="@{/resident/billing(status=1, period=${period})}" th:classappend="${activeStatus == 1 ? 'active' : ''}">Paid</a>
-            <a th:href="@{/resident/billing(status=2, period=${period})}" th:classappend="${activeStatus == 2 ? 'active' : ''}">Overdue</a>
+            <a th:href="@{/resident/billing(status='', period=${period})}" th:classappend="${activeStatus == null ? 'active' : ''}">Tất cả</a>
+            <a th:href="@{/resident/billing(status=0, period=${period})}" th:classappend="${activeStatus == 0 ? 'active' : ''}">Chưa thanh toán</a>
+            <a th:href="@{/resident/billing(status=1, period=${period})}" th:classappend="${activeStatus == 1 ? 'active' : ''}">Đã thanh toán</a>
+            <a th:href="@{/resident/billing(status=2, period=${period})}" th:classappend="${activeStatus == 2 ? 'active' : ''}">Quá hạn</a>
         </div>
         
         <form th:action="@{/resident/billing}" method="get" class="search-form" style="display: flex; gap: 8px; align-items: center;">
             <input type="hidden" name="status" th:value="${activeStatus}">
-            <label for="period" style="font-size: 14px; font-weight: 500; color: #4B5563;">Period:</label>
+            <label for="period" style="font-size: 14px; font-weight: 500; color: #4B5563;">Kỳ hóa đơn:</label>
             <input type="month" id="period" name="period" th:value="${period}" style="padding: 6px 12px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 14px; color: #374151; outline: none; transition: border-color 0.2s;" onchange="this.form.submit()">
             <a th:if="${period != null && !period.isEmpty()}" th:href="@{/resident/billing(status=${activeStatus})}" class="btn btn-secondary btn-sm" style="padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; height: 34px; line-height: 1;">
-                <i class="fa-solid fa-xmark"></i> Clear
+                <i class="fa-solid fa-xmark"></i> Xóa lọc
             </a>
         </form>
     </div>
@@ -68,36 +68,36 @@
         <table class="billing-table">
             <thead>
                 <tr>
-                    <th>Billing Period</th>
-                    <th>Total Amount</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                    <th class="right">Actions</th>
+                    <th>Kỳ hóa đơn</th>
+                    <th>Tổng số tiền</th>
+                    <th>Hạn thanh toán</th>
+                    <th>Trạng thái</th>
+                    <th class="right">Hành động</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:if="${#lists.isEmpty(bills)}">
                     <td colspan="5" class="no-data">
                         <i class="fa-solid fa-file-invoice"></i>
-                        <span>No bills found.</span>
+                        <span>Không tìm thấy hóa đơn nào.</span>
                     </td>
                 </tr>
                 <tr th:each="b : ${bills}">
-                    <td th:text="${'Month ' + b.billMonth + '/' + b.billYear}">Month 06/2026</td>
+                    <td th:text="${'Tháng ' + b.billMonth + '/' + b.billYear}">Tháng 06/2026</td>
                     <td class="amount" th:text="${#numbers.formatDecimal(b.totalAmount, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</td>
                     <td th:text="${b.dueDate != null ? #temporals.format(b.dueDate, 'dd/MM/yyyy') : 'N/A'}">N/A</td>
                     <td>
                         <span class="status-badge"
                               th:classappend="${b.status == 1 ? 'paid' : (b.status == 2 ? 'overdue' : 'unpaid')}"
-                              th:text="${b.status == 1 ? 'Paid' : (b.status == 2 ? 'Overdue' : 'Unpaid')}">Unpaid</span>
+                              th:text="${b.status == 1 ? 'Đã thanh toán' : (b.status == 2 ? 'Quá hạn' : 'Chưa thanh toán')}">Chưa thanh toán</span>
                     </td>
                     <td class="right">
                         <div class="billing-actions">
-                            <a th:href="@{/resident/billing/detail/{id}(id=${b.billId})}" class="btn btn-secondary btn-sm" title="View details">
-                                <i class="fa-solid fa-eye"></i> Detail
+                            <a th:href="@{/resident/billing/detail/{id}(id=${b.billId})}" class="btn btn-secondary btn-sm" title="Xem chi tiết">
+                                <i class="fa-solid fa-eye"></i> Chi tiết
                             </a>
-                            <a th:if="${b.status == 0 || b.status == 2}" th:href="@{/payment/bill/{id}(id=${b.billId})}" class="btn btn-success btn-sm" title="Pay with PayOS">
-                                <i class="fa-solid fa-credit-card"></i> Pay Now
+                            <a th:if="${b.status == 0 || b.status == 2}" th:href="@{/payment/bill/{id}(id=${b.billId})}" class="btn btn-success btn-sm" title="Thanh toán qua PayOS">
+                                <i class="fa-solid fa-credit-card"></i> Thanh toán
                             </a>
                         </div>
                     </td>
@@ -113,10 +113,10 @@
             <a th:href="@{/resident/billing(page=${currentPage - 1}, status=${activeStatus}, period=${period})}"
                th:if="${currentPage > 0}"
                class="btn btn-secondary btn-sm" style="padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
-                <i class="fa-solid fa-chevron-left"></i> Prev
+                <i class="fa-solid fa-chevron-left"></i> Trước
             </a>
             <span th:if="${currentPage == 0}" class="btn btn-secondary btn-sm disabled" style="padding: 6px 12px; border-radius: 6px; opacity: 0.5; cursor: not-allowed; pointer-events: none; display: inline-flex; align-items: center; justify-content: center;">
-                <i class="fa-solid fa-chevron-left"></i> Prev
+                <i class="fa-solid fa-chevron-left"></i> Trước
             </span>
 
             <!-- Page Numbers -->
@@ -131,10 +131,10 @@
             <a th:href="@{/resident/billing(page=${currentPage + 1}, status=${activeStatus}, period=${period})}"
                th:if="${currentPage < totalPages - 1}"
                class="btn btn-secondary btn-sm" style="padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
-                Next <i class="fa-solid fa-chevron-right"></i>
+                Sau <i class="fa-solid fa-chevron-right"></i>
             </a>
             <span th:if="${currentPage == totalPages - 1}" class="btn btn-secondary btn-sm disabled" style="padding: 6px 12px; border-radius: 6px; opacity: 0.5; cursor: not-allowed; pointer-events: none; display: inline-flex; align-items: center; justify-content: center;">
-                Next <i class="fa-solid fa-chevron-right"></i>
+                Sau <i class="fa-solid fa-chevron-right"></i>
             </span>
         </div>
     </div>

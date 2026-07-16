@@ -46,27 +46,27 @@ public class AuthController {
             RedirectAttributes redirectAttributes) {
 
         if (email == null || email.trim().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Email cannot be empty.");
+            redirectAttributes.addFlashAttribute("error", "Email không được để trống.");
             return "redirect:/login";
         }
 
         Optional<Account> accountOpt = accountService.findByUsername(email);
 
         if (accountOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Invalid email or password. Please try again.");
+            redirectAttributes.addFlashAttribute("error", "Email hoặc mật khẩu không đúng. Vui lòng thử lại.");
             return "redirect:/login";
         }
 
         Account account = accountOpt.get();
 
         if (account.getStatus() == null || !account.getStatus()) {
-            redirectAttributes.addFlashAttribute("error", "Your account has been deactivated. Please contact support.");
+            redirectAttributes.addFlashAttribute("error", "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ bộ phận hỗ trợ.");
             return "redirect:/login";
         }
 
         // Plaintext comparison for password authentication
         if (!account.getPassword().equals(password)) {
-            redirectAttributes.addFlashAttribute("error", "Invalid email or password. Please try again.");
+            redirectAttributes.addFlashAttribute("error", "Email hoặc mật khẩu không đúng. Vui lòng thử lại.");
             return "redirect:/login";
         }
 
@@ -106,13 +106,13 @@ public class AuthController {
             RedirectAttributes redirectAttributes) {
 
         if (email == null || !email.matches(EMAIL_REGEX)) {
-            redirectAttributes.addFlashAttribute("error", "Invalid email format. Please enter a valid email address.");
+            redirectAttributes.addFlashAttribute("error", "Định dạng email không hợp lệ. Vui lòng nhập địa chỉ email đúng.");
             return "redirect:/forgot-password";
         }
 
         Optional<Account> accountOpt = accountService.findByUsername(email);
         if (accountOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Email address not found. Please try again.");
+            redirectAttributes.addFlashAttribute("error", "Không tìm thấy địa chỉ email này. Vui lòng thử lại.");
             return "redirect:/forgot-password";
         }
 
@@ -174,12 +174,12 @@ public class AuthController {
         }
 
         if (LocalDateTime.now().isAfter(expiry)) {
-            redirectAttributes.addFlashAttribute("error", "Verification code has expired. Please request a new one.");
+            redirectAttributes.addFlashAttribute("error", "Mã xác thực đã hết hạn. Vui lòng yêu cầu mã mới.");
             return "redirect:/forgot-password/verify";
         }
 
         if (!sessionOtp.equals(otp)) {
-            redirectAttributes.addFlashAttribute("error", "Invalid verification code. Please try again.");
+            redirectAttributes.addFlashAttribute("error", "Mã xác thực không đúng. Vui lòng thử lại.");
             return "redirect:/forgot-password/verify";
         }
 
@@ -210,7 +210,7 @@ public class AuthController {
         // Send Email via Notification Service
         notificationService.sendOtpEmail(email, otp);
 
-        redirectAttributes.addFlashAttribute("error", "A new code has been sent to your email.");
+        redirectAttributes.addFlashAttribute("error", "Mã mới đã được gửi đến email của bạn.");
         return "redirect:/forgot-password/verify";
     }
 
@@ -241,7 +241,7 @@ public class AuthController {
         }
 
         if (!password.equals(confirmPassword)) {
-            redirectAttributes.addFlashAttribute("error", "Passwords do not match. Please try again.");
+            redirectAttributes.addFlashAttribute("error", "Mật khẩu xác nhận không khớp. Vui lòng thử lại.");
             return "redirect:/forgot-password/reset";
         }
 
@@ -249,13 +249,13 @@ public class AuthController {
         // numbers
         if (password.length() < 8 || !password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
             redirectAttributes.addFlashAttribute("error",
-                    "Password must be at least 8 characters long and contain uppercase, lowercase letters, and numbers.");
+                    "Mật khẩu phải có ít nhất 8 ký tự và bao gồm chữ hoa, chữ thường và chữ số.");
             return "redirect:/forgot-password/reset";
         }
 
         Optional<Account> accountOpt = accountService.findByUsername(email);
         if (accountOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Account not found.");
+            redirectAttributes.addFlashAttribute("error", "Không tìm thấy tài khoản.");
             return "redirect:/forgot-password";
         }
 
@@ -269,7 +269,7 @@ public class AuthController {
         session.removeAttribute("otpExpiry");
         session.removeAttribute("otpVerified");
 
-        redirectAttributes.addFlashAttribute("success", "Password has been changed successfully!");
+        redirectAttributes.addFlashAttribute("success", "Đổi mật khẩu thành công!");
         return "redirect:/login";
     }
 

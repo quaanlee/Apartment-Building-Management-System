@@ -39,14 +39,14 @@ public class ManagerVehicleController {
     public String approveVehicle(@PathVariable Integer id, Principal principal, RedirectAttributes redirectAttributes) {
         String username = (principal != null) ? principal.getName() : "system";
         vehicleService.approveVehicle(id, username);
-        redirectAttributes.addFlashAttribute("message", "Vehicle registration approved successfully.");
+        redirectAttributes.addFlashAttribute("message", "Phê duyệt đăng ký phương tiện thành công.");
         return "redirect:/manager/vehicles";
     }
 
     @PostMapping("/{id}/reject")
     public String rejectVehicle(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         vehicleService.rejectVehicle(id);
-        redirectAttributes.addFlashAttribute("message", "Vehicle registration rejected.");
+        redirectAttributes.addFlashAttribute("message", "Đã từ chối yêu cầu đăng ký phương tiện.");
         redirectAttributes.addFlashAttribute("messageType", "warning");
         return "redirect:/manager/vehicles";
     }
@@ -54,7 +54,7 @@ public class ManagerVehicleController {
     @PostMapping("/{id}/revoke")
     public String revokeVehicle(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         vehicleService.revokeVehicle(id);
-        redirectAttributes.addFlashAttribute("message", "Vehicle registration revoked successfully.");
+        redirectAttributes.addFlashAttribute("message", "Đã thu hồi đăng ký phương tiện thành công.");
         redirectAttributes.addFlashAttribute("messageType", "warning");
         return "redirect:/manager/vehicles";
     }

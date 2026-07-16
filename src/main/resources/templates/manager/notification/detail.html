@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
       th:replace="~{layout/manager/layout_manager :: manager-layout(~{::#main-content}, 'notifications')}"
-      th:with="pageTitle='Notification Detail'">
+      th:with="pageTitle='Chi tiết Thông báo'">
 <head>
-    <title>Notification Detail</title>
+    <title>Chi tiết Thông báo</title>
 </head>
 <body>
 <div id="main-content">
@@ -42,7 +42,7 @@
             color: #111827;
             margin-bottom: 24px;
         }
-
+ 
         /* Detail Cards Layout */
         .grid-container {
             display: grid;
@@ -86,7 +86,7 @@
             font-size: 20px;
             color: #582BE8;
         }
-
+ 
         /* Left Card - Content */
         .content-title {
             font-size: 22px;
@@ -101,7 +101,7 @@
             line-height: 1.6;
             white-space: pre-line;
         }
-
+ 
         /* Right Card - Details */
         .detail-item {
             margin-bottom: 20px;
@@ -150,7 +150,7 @@
             background-color: #EEECFC;
             color: #582BE8;
         }
-
+ 
         /* Faded Megaphone Icon background */
         .background-icon {
             position: absolute;
@@ -165,7 +165,7 @@
     </style>
 
     <a th:href="@{/manager/notifications}" class="back-link">
-        <i class="fa-solid fa-arrow-left"></i> Back to Notifications
+        <i class="fa-solid fa-arrow-left"></i> Quay lại Danh sách
     </a>
 
     <h1 class="page-title" th:text="${notification.title}">Annual Fire Safety Inspection</h1>
@@ -174,7 +174,7 @@
         <!-- Message Content Card (Left) -->
         <div class="detail-card">
             <div class="card-header-area">
-                <h2 class="card-section-title">Message Content</h2>
+                <h2 class="card-section-title">Nội dung Thông báo</h2>
                 <div class="card-header-icon">
                     <!-- envelope icon with checkmark lookalike -->
                     <i class="fa-solid fa-envelope-circle-check"></i>
@@ -189,37 +189,37 @@
         <!-- Details Card (Right) -->
         <div class="detail-card">
             <div class="card-header-area">
-                <h2 class="card-section-title">Details</h2>
+                <h2 class="card-section-title">Thông tin Chi tiết</h2>
             </div>
             
             <div class="detail-item">
-                <span class="detail-label">Notification Type</span>
+                <span class="detail-label">Loại Thông báo</span>
                 <div class="detail-value">
                     <i class="fa-solid fa-bullhorn"></i>
-                    <span th:text="${notification.notificationType == 1 ? 'Broadcast' : (notification.notificationType == 2 ? 'Alert' : 'General')}">Broadcast</span>
+                    <span th:text="${notification.notificationType == 1 ? 'Bản tin chung' : (notification.notificationType == 2 ? 'Cảnh báo' : 'Khác')}">Bản tin chung</span>
                 </div>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Status</span>
+                <span class="detail-label">Trạng thái</span>
                 <div class="detail-value">
-                    <span class="status-badge status-badge-sent">Sent</span>
+                    <span class="status-badge status-badge-sent">Đã gửi</span>
                 </div>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Created At</span>
+                <span class="detail-label">Thời gian tạo</span>
                 <div class="detail-value">
                     <i class="fa-regular fa-calendar"></i>
-                    <span th:text="${#temporals.format(notification.createdAt, 'MMM dd, yyyy hh:mm a')}">Oct 12, 2023 09:00 AM</span>
+                    <span th:text="${#temporals.format(notification.createdAt, 'dd/MM/yyyy HH:mm')}">Oct 12, 2023 09:00 AM</span>
                 </div>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Recipient Group</span>
+                <span class="detail-label">Nhóm Người nhận</span>
                 <div class="detail-value">
                     <i class="fa-solid fa-users"></i>
-                    <span th:text="${notification.relatedEntityType != null ? notification.relatedEntityType : 'All Residents'}">All Residents</span>
+                    <span th:text="${notification.relatedEntityType != null ? (notification.relatedEntityType == 'All Residents' ? 'Tất cả Cư dân' : (notification.relatedEntityType == 'Building A' ? 'Tòa nhà A' : (notification.relatedEntityType == 'Vehicle Owners' ? 'Chủ xe' : notification.relatedEntityType))) : 'Tất cả Cư dân'}">All Residents</span>
                 </div>
             </div>
         </div>

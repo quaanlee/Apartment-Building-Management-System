@@ -38,13 +38,13 @@ public class UtilityBookingHistoryDTO {
     public void setStatus(Byte status) { this.status = status; }
     
     public String getStatusLabel() {
-        if (status == null) return "Unknown";
+        if (status == null) return "Không rõ";
         return switch (status) {
-            case 0 -> "Pending";
-            case 1 -> "Approved";
-            case 2 -> "Rejected";
-            case 3 -> "Cancelled";
-            default -> "Unknown";
+            case 0 -> "Chờ duyệt";
+            case 1 -> "Đã duyệt";
+            case 2 -> "Từ chối";
+            case 3 -> "Đã hủy";
+            default -> "Không rõ";
         };
     }
 
@@ -52,7 +52,7 @@ public class UtilityBookingHistoryDTO {
     public void setPaymentStatus(Boolean paymentStatus) { this.paymentStatus = paymentStatus; }
     
     public String getPaymentStatusLabel() {
-        return Boolean.TRUE.equals(paymentStatus) ? "Paid" : "Unpaid";
+        return Boolean.TRUE.equals(paymentStatus) ? "Đã thanh toán" : "Chưa thanh toán";
     }
 
     public LocalDateTime getCreatedAt() { return createdAt; }

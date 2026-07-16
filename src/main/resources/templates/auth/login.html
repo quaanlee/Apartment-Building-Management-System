@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In | ABM System</title>
+    <title>Đăng nhập | Hệ thống ABM</title>
     <!-- Style link -->
     <link rel="stylesheet" th:href="@{/css/auth/login.css}">
     <!-- Lucide Icons -->
@@ -22,10 +22,10 @@
                 <a th:href="@{/}" class="brand-title"
                     style="text-decoration: none; color: inherit; display: inline-block;">ABM System</a>
                 <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
-                    <h1 class="brand-heading">Elevating Every Living Experience.</h1>
+                    <h1 class="brand-heading">Nâng tầm trải nghiệm sống.</h1>
                     <p class="brand-description">
-                        Access your property management tools with ease. Security and simplicity, redefined for modern
-                        residents.
+                        Truy cập công cụ quản lý bất động sản của bạn dễ dàng. Bảo mật và tiện lợi,
+                        được thiết kế lại cho cư dân hiện đại.
                     </p>
                 </div>
             </div>
@@ -34,12 +34,12 @@
             <div class="form-panel">
                 <a th:href="@{/}" class="back-home-link">
                     <i data-lucide="arrow-left"></i>
-                    <span>Back to Homepage</span>
+                    <span>Quay lại trang chủ</span>
                 </a>
 
                 <div class="form-header">
-                    <h2 class="form-title">Sign In</h2>
-                    <p class="form-subtitle">Enter your credentials to access your portal</p>
+                    <h2 class="form-title">Đăng nhập</h2>
+                    <p class="form-subtitle">Nhập thông tin đăng nhập để truy cập cổng của bạn</p>
                 </div>
 
                 <form th:action="@{/login}" method="POST">
@@ -50,47 +50,47 @@
                         <div class="input-container">
                             <i data-lucide="mail" class="input-icon"></i>
                             <input type="email" id="email" name="email" class="form-input"
-                                placeholder="Enter your email" required autocomplete="email">
+                                placeholder="Nhập email của bạn" required autocomplete="email">
                         </div>
                     </div>
 
                     <!-- Password Field -->
                     <div class="form-group" style="margin-bottom: 0.75rem;">
-                        <label for="password" class="form-label">Password</label>
+                        <label for="password" class="form-label">Mật khẩu</label>
                         <div class="input-container">
                             <i data-lucide="lock" class="input-icon"></i>
                             <input type="password" id="password" name="password" class="form-input"
                                 placeholder="••••••••••••" required autocomplete="current-password">
                             <button type="button" id="password-toggle" class="password-toggle"
-                                aria-label="Toggle password visibility">
+                                aria-label="Hiện/ẩn mật khẩu">
                                 <i data-lucide="eye" id="toggle-icon"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Forgot Password Link -->
-                    <a th:href="@{/forgot-password}" class="forgot-password">Forgot password?</a>
+                    <a th:href="@{/forgot-password}" class="forgot-password">Quên mật khẩu?</a>
 
                     <!-- Error Alert -->
                     <div th:if="${error}" class="alert alert-danger">
                         <i data-lucide="alert-circle" class="alert-icon"></i>
-                        <span th:text="${error}">Invalid email or password. Please try again.</span>
+                        <span th:text="${error}">Email hoặc mật khẩu không đúng. Vui lòng thử lại.</span>
                     </div>
 
                     <!-- Success Alert -->
                     <div th:if="${success}" class="alert alert-success">
                         <i data-lucide="check-circle" class="alert-icon"></i>
-                        <span th:text="${success}">Password changed successfully.</span>
+                        <span th:text="${success}">Đổi mật khẩu thành công.</span>
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="btn-submit">Sign In Now</button>
+                    <button type="submit" class="btn-submit">Đăng nhập ngay</button>
                 </form>
 
                 <div class="divider"></div>
 
                 <div class="support-link">
-                    Need help? <a th:href="@{/support}">Contact Support</a>
+                    Cần hỗ trợ? <a th:href="@{/support}">Liên hệ hỗ trợ</a>
                 </div>
             </div>
 
@@ -99,9 +99,9 @@
 
     <!-- Footer -->
     <footer class="login-footer">
-        <a th:href="@{/privacy}" class="footer-link">Privacy Policy</a>
-        <a th:href="@{/terms}" class="footer-link">Terms of Service</a>
-        <a th:href="@{/contact}" class="footer-link">Contact Us</a>
+        <a th:href="@{/privacy}" class="footer-link">Chính sách bảo mật</a>
+        <a th:href="@{/terms}" class="footer-link">Điều khoản dịch vụ</a>
+        <a th:href="@{/contact}" class="footer-link">Liên hệ</a>
     </footer>
 
     <!-- Lucide Initialization & Password Toggle Logic -->

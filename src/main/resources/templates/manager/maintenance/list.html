@@ -8,8 +8,8 @@
         <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="page-title-row">
             <div class="page-title-left">
-                <h2 class="page-title">Maintenance Requests</h2>
-                <p class="page-subtitle">Coordinate repair requests, assign technical staff, and monitor completion progress.</p>
+                <h2 class="page-title">Yêu cầu Bảo trì</h2>
+                <p class="page-subtitle">Điều phối các yêu cầu sửa chữa, phân công nhân viên kỹ thuật và giám sát tiến độ hoàn thành.</p>
             </div>
         </div>
 
@@ -17,7 +17,7 @@
         <div id="toastMsg" class="toast-msg" th:if="${message != null}"
              th:classappend="${messageType == 'success' ? ' toast-success' : ' toast-error'}">
             <i th:class="${messageType == 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation'}"></i>
-            <span th:text="${message}">Action completed successfully!</span>
+            <span th:text="${message}">Thao tác hoàn thành thành công!</span>
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════ -->
@@ -29,7 +29,7 @@
                     <i class="fa-solid fa-circle-exclamation"></i>
                 </div>
                 <div class="stat-info">
-                    <span class="stat-label">Pending Requests</span>
+                    <span class="stat-label">Yêu cầu Chờ xử lý</span>
                     <span class="stat-value" th:text="${pendingRequests}">0</span>
                 </div>
             </div>
@@ -38,7 +38,7 @@
                     <i class="fa-solid fa-screwdriver-wrench"></i>
                 </div>
                 <div class="stat-info">
-                    <span class="stat-label">Active Tasks</span>
+                    <span class="stat-label">Công việc Đang làm</span>
                     <span class="stat-value" th:text="${activeRequests}">0</span>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
                 <div class="stat-info">
-                    <span class="stat-label">Completed Tasks</span>
+                    <span class="stat-label">Công việc Hoàn thành</span>
                     <span class="stat-value" th:text="${completedRequests}">0</span>
                 </div>
             </div>
@@ -61,23 +61,23 @@
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="text" id="searchInput" class="search-input" th:value="${keyword}"
-                       placeholder="Search by Title, Resident Name, or Apartment...">
+                       placeholder="Tìm theo Tiêu đề, Tên cư dân, hoặc Số căn hộ...">
             </div>
 
             <!-- Filter by Date -->
             <div class="date-filter-wrapper" style="display: flex; gap: 8px; align-items: center; margin-left: auto;">
-                <input type="date" id="fromDate" class="form-input" th:value="${fromDate}" style="width: auto; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; transition: border-color 0.2s;" title="From Date">
+                <input type="date" id="fromDate" class="form-input" th:value="${fromDate}" style="width: auto; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; transition: border-color 0.2s;" title="Từ ngày">
                 <span style="color: #718096; font-weight: 500;">-</span>
-                <input type="date" id="toDate" class="form-input" th:value="${toDate}" style="width: auto; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; transition: border-color 0.2s;" title="To Date">
+                <input type="date" id="toDate" class="form-input" th:value="${toDate}" style="width: auto; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 14px; outline: none; transition: border-color 0.2s;" title="Đến ngày">
             </div>
 
             <!-- Filter by status -->
             <div class="status-filter-wrapper">
                 <select id="statusFilter" class="status-select">
-                    <option value="" th:selected="${statusFilter == null}">All Statuses</option>
-                    <option value="0" th:selected="${statusFilter == 0}">Pending</option>
-                    <option value="1" th:selected="${statusFilter == 1}">Assigned</option>
-                    <option value="2" th:selected="${statusFilter == 2}">Completed</option>
+                    <option value="" th:selected="${statusFilter == null}">Tất cả trạng thái</option>
+                    <option value="0" th:selected="${statusFilter == 0}">Chờ xử lý</option>
+                    <option value="1" th:selected="${statusFilter == 1}">Đã phân công</option>
+                    <option value="2" th:selected="${statusFilter == 2}">Hoàn thành</option>
                 </select>
                 <i class="fa-solid fa-filter select-chevron"></i>
             </div>
@@ -90,47 +90,47 @@
             <table class="data-table" th:if="${!#lists.isEmpty(requests)}">
                 <thead>
                     <tr>
-                        <th>Request Title</th>
-                        <th>Apartment</th>
-                        <th>Resident Name</th>
-                        <th>Report Date</th>
-                        <th>Assign Status</th>
-                        <th>Work Status</th>
-                        <th>Actions</th>
+                        <th>Tiêu đề Yêu cầu</th>
+                        <th>Căn hộ</th>
+                        <th>Tên Cư dân</th>
+                        <th>Ngày báo cáo</th>
+                        <th>Trạng thái Phân công</th>
+                        <th>Trạng thái Công việc</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="req : ${requests}">
                         <td th:text="${req.title}" style="font-weight: 600;">Leaking Water Pipe</td>
-                        <td th:text="${req.apartment != null ? req.apartment.apartmentNumber : 'Unassigned'}">Apt A-101</td>
+                        <td th:text="${req.apartment != null ? req.apartment.apartmentNumber : 'Chưa gán'}">Apt A-101</td>
                         <td th:text="${req.profile != null ? req.profile.fullName : 'N/A'}">Nguyen Van A</td>
                         <td th:text="${#temporals.format(req.requestDate, 'dd/MM/yyyy HH:mm')}">29/06/2026 14:20</td>
                         <td>
                             <!-- Status Badges -->
-                            <span th:if="${req.status == 0}" class="status-badge pending">PENDING</span>
-                            <span th:if="${req.status == 1}" class="status-badge assigned">ASSIGNED</span>
-                            <span th:if="${req.status == 2}" class="status-badge completed">COMPLETED</span>
+                            <span th:if="${req.status == 0}" class="status-badge pending">CHỜ XỬ LÝ</span>
+                            <span th:if="${req.status == 1}" class="status-badge assigned">ĐÃ PHÂN CÔNG</span>
+                            <span th:if="${req.status == 2}" class="status-badge completed">HOÀN THÀNH</span>
                         </td>
                         <td>
                             <!-- Work Status: Completed vs Incomplete -->
-                            <span th:if="${req.status == 2 or (req.maintenanceTask != null and req.maintenanceTask.status == 0)}" class="status-badge completed">COMPLETED</span>
-                            <span th:if="${req.status != 2 and (req.maintenanceTask == null or req.maintenanceTask.status != 0)}" class="status-badge pending">INCOMPLETE</span>
+                            <span th:if="${req.status == 2 or (req.maintenanceTask != null and req.maintenanceTask.status == 0)}" class="status-badge completed">HOÀN THÀNH</span>
+                            <span th:if="${req.status != 2 and (req.maintenanceTask == null or req.maintenanceTask.status != 0)}" class="status-badge pending">CHƯA HOÀN THÀNH</span>
                         </td>
                         <td>
                             <!-- Actions Buttons -->
                             <a th:if="${req.status == 0}" th:href="@{/manager/maintenance/{id}/assign(id=${req.requestId})}" class="action-btn assign-link" style="text-decoration: none;">
                                 <i class="fa-solid fa-user-plus"></i>
-                                <span>Assign Staff</span>
+                                <span>Phân công</span>
                             </a>
                             <button th:if="${req.status == 1 or req.status == 2}" class="action-btn view-btn" type="button"
                                     th:onclick="'openViewProgressModal(' + ${req.requestId} + ')'" style="margin-right: 5px;">
                                 <i class="fa-solid fa-eye"></i>
-                                <span>View Progress</span>
+                                <span>Xem tiến độ</span>
                             </button>
                             <form th:if="${req.status == 1}" th:action="@{/manager/maintenance/{id}/unassign(id=${req.requestId})}" method="post" style="display: inline-block; margin: 0;">
                                 <button type="submit" class="action-btn unassign-btn" onclick="openUnassignModal(event, this.form)">
                                     <i class="fa-solid fa-user-minus"></i>
-                                    <span>Unassign</span>
+                                    <span>Hủy phân công</span>
                                 </button>
                             </form>
 
@@ -142,11 +142,10 @@
             <!-- Empty State -->
             <div class="no-results-card" th:if="${#lists.isEmpty(requests)}">
                 <i class="fa-solid fa-clipboard-question"></i>
-                <h3>No requests found</h3>
-                <p>No maintenance requests match your filter options.</p>
+                <h3>Không tìm thấy yêu cầu nào</h3>
+                <p>Không có yêu cầu bảo trì nào khớp với bộ lọc của bạn.</p>
             </div>
 
-            <!-- Pagination Controls -->
             <!-- Pagination Controls -->
             <div class="pagination-block" th:if="${totalPages > 1}">
                 <div class="pagination-buttons" style="display: flex; gap: 8px;">
@@ -177,7 +176,7 @@
         <div class="modal-overlay" id="viewProgressModal" role="dialog" aria-modal="true" aria-labelledby="progressModalTitle">
             <div class="modal-box" style="max-width: 600px;">
                 <div class="modal-header">
-                    <h3 class="modal-title" id="progressModalTitle">Task Progress Details</h3>
+                    <h3 class="modal-title" id="progressModalTitle">Chi tiết Tiến độ Công việc</h3>
                     <button class="modal-close-btn" id="closeProgressModalBtn" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -185,23 +184,23 @@
                 <div class="modal-body">
                     <!-- Incident summary -->
                     <div class="detail-row">
-                        <span class="detail-label">Title</span>
+                        <span class="detail-label">Tiêu đề</span>
                         <span class="detail-value" id="detailTitle">Title here</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Resident</span>
+                        <span class="detail-label">Cư dân</span>
                         <span class="detail-value" id="detailResident">Resident Name</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Apartment</span>
+                        <span class="detail-label">Căn hộ</span>
                         <span class="detail-value" id="detailApartment">Apt A-101</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Reported On</span>
+                        <span class="detail-label">Ngày báo cáo</span>
                         <span class="detail-value" id="detailDate">29/06/2026</span>
                     </div>
                     <div class="detail-row" style="flex-direction: column; margin-bottom: 16px;">
-                        <span class="detail-label" style="margin-bottom: 6px;">Description</span>
+                        <span class="detail-label" style="margin-bottom: 6px;">Mô tả</span>
                         <span class="detail-value" id="detailDescription" style="padding: 10px; background: #f8fafc; border-radius: 6px; display: block; border: 1px solid #edf2f7;">Detailed issue goes here.</span>
                     </div>
 
@@ -210,23 +209,23 @@
 
                     <!-- Task Assignment Section -->
                     <div id="taskDetailsSection" style="margin-top: 20px; border-top: 1px solid #edf2f7; padding-top: 16px;">
-                        <h4 class="progress-header">Work Assignment</h4>
+                        <h4 class="progress-header">Phân công Công việc</h4>
                         <div class="detail-row">
-                            <span class="detail-label">Assigned Staff</span>
+                            <span class="detail-label">Nhân viên đảm nhận</span>
                             <span class="detail-value" id="detailStaff" style="font-weight: 600;">Technician Name</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Deadline</span>
+                            <span class="detail-label">Hạn chót</span>
                             <span class="detail-value" id="detailDeadline">Deadline Date</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Task Status</span>
+                            <span class="detail-label">Trạng thái Nhiệm vụ</span>
                             <span class="detail-value">
-                                <span class="status-badge assigned" id="detailTaskStatus">ASSIGNED</span>
+                                <span class="status-badge assigned" id="detailTaskStatus">ĐÃ PHÂN CÔNG</span>
                             </span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Work Status</span>
+                            <span class="detail-label">Trạng thái Công việc</span>
                             <span class="detail-value">
                                 <span class="status-badge" id="detailWorkStatus" style="background: #e2e8f0; color: #4a5568;">AVAILABLE</span>
                             </span>
@@ -234,7 +233,7 @@
 
                         <!-- Progress report list -->
                         <div class="progress-timeline">
-                            <h4 class="progress-header">Activity Progress Reports</h4>
+                            <h4 class="progress-header">Báo cáo Tiến độ Công việc</h4>
                             <div class="timeline-list" id="timelineList">
                                 <!-- Appended dynamically -->
                             </div>
@@ -242,7 +241,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="modal-cancel-btn" id="closeProgressModalFooterBtn">Close</button>
+                    <button type="button" class="modal-cancel-btn" id="closeProgressModalFooterBtn">Đóng</button>
                 </div>
             </div>
         </div>
@@ -251,7 +250,7 @@
         <div class="modal-overlay" id="unassignConfirmModal" role="dialog" aria-modal="true" aria-labelledby="unassignModalTitle">
             <div class="modal-box" style="max-width: 440px;">
                 <div class="modal-header">
-                    <h3 class="modal-title" id="unassignModalTitle">Confirm Unassignment</h3>
+                    <h3 class="modal-title" id="unassignModalTitle">Xác nhận Hủy phân công</h3>
                     <button class="modal-close-btn" type="button" onclick="closeUnassignModal()" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -261,12 +260,12 @@
                         <i class="fa-solid fa-triangle-exclamation"></i>
                     </div>
                     <p style="font-size: 15px; color: #4a5568; line-height: 1.6; margin: 0;">
-                        Are you sure you want to unassign this task? The request status will return to Pending.
+                        Bạn có chắc chắn muốn hủy phân công công việc này không? Trạng thái yêu cầu sẽ trở lại thành Chờ xử lý.
                     </p>
                 </div>
                 <div class="modal-footer" style="background-color: #f8fafc; display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px;">
-                    <button class="modal-cancel-btn" type="button" onclick="closeUnassignModal()">Cancel</button>
-                    <button class="modal-submit-btn" type="button" id="confirmUnassignSubmitBtn" style="background-color: #e53e3e; color: white;">Unassign</button>
+                    <button class="modal-cancel-btn" type="button" onclick="closeUnassignModal()">Hủy</button>
+                    <button class="modal-submit-btn" type="button" id="confirmUnassignSubmitBtn" style="background-color: #e53e3e; color: white;">Hủy phân công</button>
                 </div>
             </div>
         </div>
@@ -321,7 +320,7 @@
                 function validateDates(fd, td) {
                     if (fd !== "" && td !== "") {
                         if (new Date(fd) > new Date(td)) {
-                            showToast("From Date must be less than or equal to To Date.", "error");
+                            showToast("Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.", "error");
                             return false;
                         }
                     }
@@ -412,25 +411,25 @@
                                 const badge = document.getElementById("detailTaskStatus");
                                 badge.className = "status-badge";
                                 if (data.task.status === 1) {
-                                    badge.textContent = "ASSIGNED";
+                                    badge.textContent = "ĐÃ PHÂN CÔNG";
                                     badge.classList.add("assigned");
                                 } else if (data.task.status === 2) {
-                                    badge.textContent = "IN PROGRESS";
+                                    badge.textContent = "ĐANG THỰC HIỆN";
                                     badge.classList.add("assigned"); // keep blue
                                 } else if (data.task.status === 3) {
-                                    badge.textContent = "COMPLETED";
+                                    badge.textContent = "HOÀN THÀNH";
                                     badge.classList.add("completed");
                                 }
 
                                 const workBadge = document.getElementById("detailWorkStatus");
                                 workBadge.className = "status-badge";
                                 if (data.task.workStatus === 'busy') {
-                                    workBadge.textContent = "BUSY";
+                                    workBadge.textContent = "ĐANG BẬN";
                                     workBadge.style.background = "#fff5f5";
                                     workBadge.style.color = "#e53e3e";
                                     workBadge.style.border = "1px solid #fed7d7";
                                 } else {
-                                    workBadge.textContent = "AVAILABLE";
+                                    workBadge.textContent = "SẴN SÀNG";
                                     workBadge.style.background = "#f0fff4";
                                     workBadge.style.color = "#38a169";
                                     workBadge.style.border = "1px solid #c6f6d5";
@@ -458,7 +457,7 @@
 
                                         item.innerHTML = `
                                             <div class="timeline-content">
-                                                <strong>Progress: ${report.progressPercent}%</strong><br>
+                                                <strong>Tiến độ: ${report.progressPercent}%</strong><br>
                                                 <span>${report.reportContent}</span>
                                                 ${imagesHtml}
                                             </div>
@@ -467,7 +466,7 @@
                                         timeline.appendChild(item);
                                     });
                                 } else {
-                                    timeline.innerHTML = '<p style="color: #a0aec0; font-size: 13px; margin: 0;">No progress reports submitted yet by technician.</p>';
+                                    timeline.innerHTML = '<p style="color: #a0aec0; font-size: 13px; margin: 0;">Chưa có báo cáo tiến độ nào từ nhân viên kỹ thuật.</p>';
                                 }
 
                                 taskSection.style.display = 'block';

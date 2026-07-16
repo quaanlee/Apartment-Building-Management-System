@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
       th:replace="~{layout/manager/layout_manager :: manager-layout(~{::#main-content}, 'notifications')}"
-      th:with="pageTitle='New Notification'">
+      th:with="pageTitle='Thông báo Mới'">
 <head>
-    <title>New Notification</title>
+    <title>Thông báo Mới</title>
 </head>
 <body>
 <div id="main-content">
@@ -41,7 +41,7 @@
             color: #111827;
             margin-bottom: 24px;
         }
-
+ 
         .form-card {
             background: white;
             border: 1px solid #e5e7eb;
@@ -50,14 +50,14 @@
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
             max-width: 800px;
         }
-
+ 
         .form-label {
             font-size: 13px;
             font-weight: 600;
             color: #374151;
             margin-bottom: 8px;
         }
-
+ 
         .form-control, .form-select {
             border: 1px solid #d1d5db;
             border-radius: 8px;
@@ -66,12 +66,12 @@
             color: #111827;
             font-family: 'Inter', sans-serif;
         }
-
+ 
         .form-control:focus, .form-select:focus {
             border-color: #582BE8;
             box-shadow: 0 0 0 3px rgba(88, 43, 232, 0.15);
         }
-
+ 
         .btn-save {
             background-color: #582BE8;
             color: white;
@@ -82,12 +82,12 @@
             font-weight: 600;
             transition: all 0.2s;
         }
-
+ 
         .btn-save:hover {
             background-color: #4a22c9;
             box-shadow: 0 4px 12px rgba(88, 43, 232, 0.15);
         }
-
+ 
         .btn-cancel {
             background-color: white;
             border: 1px solid #d1d5db;
@@ -102,7 +102,7 @@
             align-items: center;
             justify-content: center;
         }
-
+ 
         .btn-cancel:hover {
             background-color: #f9fafb;
             color: #111827;
@@ -110,46 +110,46 @@
     </style>
 
     <a th:href="@{/manager/notifications}" class="back-link">
-        <i class="fa-solid fa-arrow-left"></i> Back to Notifications
+        <i class="fa-solid fa-arrow-left"></i> Quay lại Danh sách
     </a>
 
-    <h1 class="page-title">Create New Notification</h1>
+    <h1 class="page-title">Tạo Thông báo Mới</h1>
 
     <div class="form-card">
         <form th:action="@{/manager/notifications/new}" method="post">
             <div class="mb-4">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" name="title" placeholder="Enter notification title" required>
+                <label for="title" class="form-label">Tiêu đề</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Nhập tiêu đề thông báo" required>
             </div>
 
             <div class="mb-4">
-                <label for="content" class="form-label">Message Content</label>
-                <textarea class="form-control" id="content" name="content" rows="6" placeholder="Type notification content here..." required></textarea>
+                <label for="content" class="form-label">Nội dung Thông báo</label>
+                <textarea class="form-control" id="content" name="content" rows="6" placeholder="Nhập nội dung thông báo tại đây..." required></textarea>
             </div>
 
             <div class="row mb-4">
                 <div class="col-md-6 mb-3 mb-md-0">
-                    <label for="notificationType" class="form-label">Notification Type</label>
+                    <label for="notificationType" class="form-label">Loại Thông báo</label>
                     <select class="form-select" id="notificationType" name="notificationType" required>
-                        <option value="1">Broadcast</option>
-                        <option value="2">Alert</option>
-                        <option value="3">Billing</option>
-                        <option value="4">General</option>
+                        <option value="1">Bản tin chung</option>
+                        <option value="2">Cảnh báo</option>
+                        <option value="3">Thanh toán</option>
+                        <option value="4">Khác</option>
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <label for="relatedEntityType" class="form-label">Recipient Group</label>
+                    <label for="relatedEntityType" class="form-label">Nhóm Người nhận</label>
                     <select class="form-select" id="relatedEntityType" name="relatedEntityType" required>
-                        <option value="All Residents">All Residents</option>
-                        <option value="Building A">Building A</option>
-                        <option value="Vehicle Owners">Vehicle Owners</option>
+                        <option value="All Residents">Tất cả Cư dân</option>
+                        <option value="Building A">Tòa nhà A</option>
+                        <option value="Vehicle Owners">Chủ xe</option>
                     </select>
                 </div>
             </div>
 
             <div class="d-flex gap-3">
-                <button type="submit" class="btn-save">Create and Send</button>
-                <a th:href="@{/manager/notifications}" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-save">Tạo và Gửi</button>
+                <a th:href="@{/manager/notifications}" class="btn-cancel">Hủy</a>
             </div>
         </form>
     </div>

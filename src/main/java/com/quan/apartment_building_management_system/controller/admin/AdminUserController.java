@@ -93,9 +93,9 @@ public class AdminUserController {
             boolean newStatus = !account.getStatus();
             account.setStatus(newStatus);
             accountService.save(account);
-            String statusMsg = newStatus ? "unlocked" : "locked";
+            String statusMsg = newStatus ? "mở khóa" : "khóa";
             redirectAttributes.addFlashAttribute("message",
-                    "Account for " + account.getUsername() + " has been successfully " + statusMsg + "!");
+                    "Tài khoản " + account.getUsername() + " đã được " + statusMsg + " thành công!");
             redirectAttributes.addFlashAttribute("messageType", "info");
         }
         return "redirect:/admin/users";
@@ -128,27 +128,27 @@ public class AdminUserController {
     public String createUser(@Valid @ModelAttribute("userDto") UserDTO userDto, BindingResult bindingResult,
             Model model, RedirectAttributes redirectAttributes) {
         if (accountService.existsByUsername(userDto.getEmail())) {
-            bindingResult.rejectValue("email", "error.userDto", "Email (Username) already exists in the system!");
+            bindingResult.rejectValue("email", "error.userDto", "Email (Tên đăng nhập) đã tồn tại trong hệ thống!");
         }
 
-        // Validate CitizenID for RESIDENT
+        // Xác thực CCCD cho RESIDENT
         if ("RESIDENT".equalsIgnoreCase(userDto.getRoleName())) {
             if (userDto.getCitizenId() == null || userDto.getCitizenId().isBlank()) {
-                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID is required for Resident!");
+                bindingResult.rejectValue("citizenId", "error.userDto", "CCCD là bắt buộc đối với Cư dân!");
             } else if (!userDto.getCitizenId().matches("^[0-9]{12}$")) {
-                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID must be exactly 12 digits!");
+                bindingResult.rejectValue("citizenId", "error.userDto", "CCCD phải gồm đúng 12 chữ số!");
             } else {
                 Optional<Profile> existingProfile = profileService.findByCitizenId(userDto.getCitizenId());
                 if (existingProfile.isPresent()) {
-                    bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID already exists!");
+                    bindingResult.rejectValue("citizenId", "error.userDto", "CCCD đã tồn tại trong hệ thống!");
                 }
             }
         }
 
-        // Validate Move-In vs Move-Out dates
+        // Xác thực ngày vào/ra
         if (userDto.getMoveInDate() != null && userDto.getMoveOutDate() != null) {
             if (userDto.getMoveInDate().isAfter(userDto.getMoveOutDate())) {
-                bindingResult.rejectValue("moveOutDate", "error.userDto", "Move-out date must be after move-in date!");
+                bindingResult.rejectValue("moveOutDate", "error.userDto", "Ngày chuyển ra phải sau ngày chuyển vào!");
             }
         }
 
@@ -158,7 +158,7 @@ public class AdminUserController {
         }
 
         profileService.saveUserDTO(userDto);
-        redirectAttributes.addFlashAttribute("message", "User " + userDto.getFullName() + " created successfully!");
+        redirectAttributes.addFlashAttribute("message", "Người dùng " + userDto.getFullName() + " đã được tạo thành công!");
         redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/admin/users";
     }
@@ -178,24 +178,24 @@ public class AdminUserController {
     @PostMapping("/admin/users/edit/{id}")
     public String updateUser(@PathVariable("id") Integer id, @Valid @ModelAttribute("userDto") UserDTO userDto,
             BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
-        // Validate CitizenID for RESIDENT
+        // Xác thực CCCD cho RESIDENT
         if ("RESIDENT".equalsIgnoreCase(userDto.getRoleName())) {
             if (userDto.getCitizenId() == null || userDto.getCitizenId().isBlank()) {
-                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID is required for Resident!");
+                bindingResult.rejectValue("citizenId", "error.userDto", "CCCD là bắt buộc đối với Cư dân!");
             } else if (!userDto.getCitizenId().matches("^[0-9]{12}$")) {
-                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID must be exactly 12 digits!");
+                bindingResult.rejectValue("citizenId", "error.userDto", "CCCD phải gồm đúng 12 chữ số!");
             } else {
                 Optional<Profile> existingProfile = profileService.findByCitizenId(userDto.getCitizenId());
                 if (existingProfile.isPresent() && existingProfile.get().getAccount() != null && !existingProfile.get().getAccount().getAccountId().equals(id)) {
-                    bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID already exists!");
+                    bindingResult.rejectValue("citizenId", "error.userDto", "CCCD đã tồn tại trong hệ thống!");
                 }
             }
         }
 
-        // Validate Move-In vs Move-Out dates
+        // Xác thực ngày vào/ra
         if (userDto.getMoveInDate() != null && userDto.getMoveOutDate() != null) {
             if (userDto.getMoveInDate().isAfter(userDto.getMoveOutDate())) {
-                bindingResult.rejectValue("moveOutDate", "error.userDto", "Move-out date must be after move-in date!");
+                bindingResult.rejectValue("moveOutDate", "error.userDto", "Ngày chuyển ra phải sau ngày chuyển vào!");
             }
         }
 
@@ -206,7 +206,7 @@ public class AdminUserController {
             return "admin/form_user";
         }
         profileService.saveUserDTO(userDto);
-        redirectAttributes.addFlashAttribute("message", "User " + userDto.getFullName() + " updated successfully!");
+        redirectAttributes.addFlashAttribute("message", "Người dùng " + userDto.getFullName() + " đã được cập nhật thành công!");
         redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/admin/users";
     }

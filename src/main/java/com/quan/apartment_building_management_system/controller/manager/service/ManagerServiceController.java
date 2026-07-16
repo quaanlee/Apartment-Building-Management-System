@@ -161,7 +161,7 @@ public class ManagerServiceController {
                                      RedirectAttributes redirectAttributes) {
         Utility utility = utilityService.findById(id).orElse(null);
         if (utility == null) {
-            redirectAttributes.addFlashAttribute("message", "Utility not found.");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy tiện ích.");
             return "redirect:/manager/utilities";
         }
 
@@ -187,7 +187,7 @@ public class ManagerServiceController {
                                       RedirectAttributes redirectAttributes) {
         UtilityResource resource = utilityResourceService.findById(id).orElse(null);
         if (resource == null) {
-            redirectAttributes.addFlashAttribute("message", "Resource not found.");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy tài nguyên.");
             return "redirect:/manager/utilities";
         }
         UtilityDTO.Resource resourceDTO = dtoHandler.toUtilityResourceDTO(resource);
@@ -217,7 +217,7 @@ public class ManagerServiceController {
             if (r.getUtility() != null) {
                 utilityIdHolder[0] = r.getUtility().getUtilityId();
             }
-            redirectAttributes.addFlashAttribute("message", "Resource status updated successfully!");
+            redirectAttributes.addFlashAttribute("message", "Cập nhật trạng thái tài nguyên thành công!");
         });
         redirectAttributes.addAttribute("query", query);
         redirectAttributes.addAttribute("status", status);

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'building')}">
 <head>
-    <title>Unit Details</title>
+    <title>Chi tiết căn hộ</title>
 </head>
 <body>
 
@@ -12,10 +12,10 @@
 
     <div class="detail-header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <div class="detail-title" style="font-size: 24px; font-weight: 700; color: var(--text-primary);">
-            Unit Details: <span th:text="${apartment.apartmentNumber}">A-405</span>
+            Chi tiết căn hộ: <span th:text="${apartment.apartmentNumber}">A-405</span>
         </div>
         <a th:href="@{/admin/apartments}" class="cancel-btn" style="display: inline-flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-arrow-left"></i> Back to List
+            <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
         </a>
     </div>
 
@@ -54,26 +54,26 @@
             <!-- Specs Grid (4 columns) -->
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
                 <div class="info-box" style="margin: 0; padding: 16px;">
-                    <span class="label">ROOM TYPE</span>
-                    <span class="value" th:text="${apartment.roomType}" style="font-size: 18px; margin-top: 6px; display: block;">3 Bedrooms</span>
+                    <span class="label">LOẠI PHÒNG</span>
+                    <span class="value" th:text="${apartment.roomType == 'Studio' ? 'Phòng Studio' : (apartment.roomType == '1 Bedroom' ? '1 Phòng ngủ' : (apartment.roomType == '2 Bedrooms' ? '2 Phòng ngủ' : (apartment.roomType == '3 Bedrooms' ? '3 Phòng ngủ' : (apartment.roomType == 'Penthouse' ? 'Penthouse' : apartment.roomType))))}" style="font-size: 18px; margin-top: 6px; display: block;">3 Bedrooms</span>
                 </div>
 
                 <div class="info-box" style="margin: 0; padding: 16px;">
-                    <span class="label">AREA</span>
+                    <span class="label">DIỆN TÍCH</span>
                     <span class="value" th:text="${apartment.area + ' m²'}" style="font-size: 18px; margin-top: 6px; display: block;">78.00 m²</span>
                 </div>
 
                 <div class="info-box" style="margin: 0; padding: 16px;">
-                    <span class="label">MAX OCCUPANCY</span>
-                    <span class="value" th:text="${apartment.maxOccupancy + ' Persons'}" style="font-size: 18px; margin-top: 6px; display: block;">6 Persons</span>
+                    <span class="label">SỐ NGƯỜI TỐI ĐA</span>
+                    <span class="value" th:text="${apartment.maxOccupancy + ' Người'}" style="font-size: 18px; margin-top: 6px; display: block;">6 Người</span>
                 </div>
 
                 <div class="info-box" style="margin: 0; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
-                    <span class="label">STATUS</span>
+                    <span class="label">TRẠNG THÁI</span>
                     <div style="margin-top: 6px;">
-                        <span th:if="${apartment.status == 0}" class="badge vacant" style="font-size: 13px; padding: 6px 16px; display: inline-block;">Vacant</span>
-                        <span th:if="${apartment.status == 1}" class="badge occupied" style="font-size: 13px; padding: 6px 16px; display: inline-block;">Occupied</span>
-                        <span th:if="${apartment.status == 2}" class="badge maintenance" style="font-size: 13px; padding: 6px 16px; display: inline-block;">Maintenance</span>
+                        <span th:if="${apartment.status == 0}" class="badge vacant" style="font-size: 13px; padding: 6px 16px; display: inline-block;">Còn trống</span>
+                        <span th:if="${apartment.status == 1}" class="badge occupied" style="font-size: 13px; padding: 6px 16px; display: inline-block;">Đang ở</span>
+                        <span th:if="${apartment.status == 2}" class="badge maintenance" style="font-size: 13px; padding: 6px 16px; display: inline-block;">Đang bảo trì</span>
                     </div>
                 </div>
             </div>
@@ -81,23 +81,23 @@
             <!-- Actions Row -->
             <div style="padding-bottom: 24px; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; justify-content: flex-start; margin-bottom: 32px;">
                 <a th:href="@{/admin/apartments/edit/{id}(id=${apartment.apartmentId})}" class="cancel-btn" style="text-align: center; border: 1px solid var(--border-color); display: inline-flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-pen"></i> Edit Unit
+                    <i class="fa-solid fa-pen"></i> Chỉnh sửa căn hộ
                 </a>
             </div>
 
             <!-- Residents Section -->
             <div style="margin-top: 32px;">
                 <h2 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-users" style="color: var(--primary-color);"></i> Current Residents
+                    <i class="fa-solid fa-users" style="color: var(--primary-color);"></i> Cư dân hiện tại
                 </h2>
 
                 <table class="detail-table">
                     <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Phone</th>
+                        <th>Họ và tên</th>
+                        <th>Số điện thoại</th>
                         <th>Email</th>
-                        <th>Action</th>
+                        <th>Thao tác</th>
                     </tr>
                     </thead>
 
@@ -107,14 +107,14 @@
                         <td th:text="${ra.profile.phoneNumber}">0123456789</td>
                         <td th:text="${ra.profile.email}">john@example.com</td>
                         <td class="actions">
-                            <a th:href="@{/admin/users/detail/{id}(id=${ra.profile.profileId})}" title="View Resident Detail">
+                            <a th:href="@{/admin/users/detail/{id}(id=${ra.profile.profileId})}" title="Xem chi tiết cư dân">
                                 <i class="fa-solid fa-eye"></i>
                             </a>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(residentApartments)}">
                         <td colspan="4" style="text-align: center; padding: 24px; color: var(--text-secondary);">
-                            No residents assigned to this apartment yet.
+                            Chưa có cư dân nào được gán cho căn hộ này.
                         </td>
                     </tr>
                     </tbody>

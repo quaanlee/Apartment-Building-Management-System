@@ -3,7 +3,7 @@
       th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'users')}">
 <head>
     <meta charset="UTF-8">
-    <title>User Details</title>
+    <title>Chi tiết người dùng</title>
 </head>
 <body>
 
@@ -14,10 +14,10 @@
     <div class="detail-header-actions">
         <div class="detail-title">
             <i class="fa-solid fa-user-gear" style="margin-right: 8px; color: var(--primary-color);"></i>
-            User Profile Details
+            Chi tiết hồ sơ người dùng
         </div>
         <a th:href="@{/admin/users}" class="btn-secondary">
-            <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>Back to List
+            <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i>Quay lại danh sách
         </a>
     </div>
 
@@ -35,11 +35,11 @@
                 <div class="profile-sub-meta">
                     <span style="margin-right: 16px;">
                         <i class="fa-solid fa-at" style="margin-right: 4px;"></i>
-                        <span th:text="${user.email != null ? user.email : 'no_email'}">@email</span>
+                        <span th:text="${user.email != null ? user.email : 'chua_co_email'}">@email</span>
                     </span>
                     <span>
                         <i class="fa-solid fa-calendar-day" style="margin-right: 4px;"></i>
-                        Registered: <span th:text="${user.accountCreatedAt != null ? #temporals.format(user.accountCreatedAt, 'yyyy-MM-dd HH:mm') : 'N/A'}">2026-06-25</span>
+                        Ngày đăng ký: <span th:text="${user.accountCreatedAt != null ? #temporals.format(user.accountCreatedAt, 'dd-MM-yyyy HH:mm') : 'N/A'}">2026-06-25</span>
                     </span>
                 </div>
                 
@@ -47,7 +47,7 @@
                     <!-- Role badge -->
                     <span class="badge-role" 
                           th:classappend="${user.roleName != null ? #strings.toLowerCase(user.roleName) : 'resident'}"
-                          th:text="${user.roleName != null ? user.roleName : 'RESIDENT'}">
+                          th:text="${user.roleName == 'RESIDENT' ? 'CƯ DÂN' : (user.roleName == 'MANAGER' ? 'QUẢN LÝ' : (user.roleName == 'MAINTENANCE_STAFF' ? 'NV BẢO TRÌ' : (user.roleName == 'ADMIN' ? 'ADMIN' : user.roleName)))}">
                         RESIDENT
                     </span>
                     
@@ -55,11 +55,11 @@
                     <span th:if="${user.accountId != null}" 
                           class="badge-status" 
                           th:classappend="${user.accountStatus == true ? 'active' : 'locked'}"
-                          th:text="${user.accountStatus == true ? 'Active' : 'Locked'}">
+                          th:text="${user.accountStatus == true ? 'Hoạt động' : 'Bị khóa'}">
                         Active
                     </span>
                     <span th:if="${user.accountId == null}" class="badge-status locked" style="background-color: #E5E7EB; color: #4B5563;">
-                        No Account
+                        Chưa có tài khoản
                     </span>
                 </div>
             </div>
@@ -71,32 +71,32 @@
             <!-- SECTION 1: PERSONAL INFORMATION -->
             <div class="detail-section">
                 <div class="section-title">
-                    <i class="fa-solid fa-address-card"></i>Personal Demographics
+                    <i class="fa-solid fa-address-card"></i>Thông tin cá nhân
                 </div>
                 
                 <div class="info-grid">
                     <div class="info-item">
-                        <span class="info-label">Full Name</span>
+                        <span class="info-label">Họ và tên</span>
                         <span class="info-value" th:text="${user.fullName}">John Doe</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Gender</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(user.gender) ? 'N/A' : user.gender}" th:classappend="${#strings.isEmpty(user.gender) ? 'empty' : ''}">Male</span>
+                        <span class="info-label">Giới tính</span>
+                        <span class="info-value" th:text="${user.gender == 'Male' ? 'Nam' : (user.gender == 'Female' ? 'Nữ' : (#strings.isEmpty(user.gender) ? 'N/A' : user.gender))}" th:classappend="${#strings.isEmpty(user.gender) ? 'empty' : ''}">Nam</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Date of Birth</span>
-                        <span class="info-value" th:text="${user.dateOfBirth != null ? #temporals.format(user.dateOfBirth, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${user.dateOfBirth == null ? 'empty' : ''}">1990-01-01</span>
+                        <span class="info-label">Ngày sinh</span>
+                        <span class="info-value" th:text="${user.dateOfBirth != null ? #temporals.format(user.dateOfBirth, 'dd-MM-yyyy') : 'N/A'}" th:classappend="${user.dateOfBirth == null ? 'empty' : ''}">1990-01-01</span>
                     </div>
                     <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
-                        <span class="info-label">Place of Birth</span>
+                        <span class="info-label">Nơi sinh</span>
                         <span class="info-value" th:text="${#strings.isEmpty(user.placeOfBirth) ? 'N/A' : user.placeOfBirth}" th:classappend="${#strings.isEmpty(user.placeOfBirth) ? 'empty' : ''}">Danang</span>
                     </div>
                     <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
-                        <span class="info-label">Nationality</span>
+                        <span class="info-label">Quốc tịch</span>
                         <span class="info-value" th:text="${#strings.isEmpty(user.nationality) ? 'N/A' : user.nationality}">Vietnam</span>
                     </div>
                     <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
-                        <span class="info-label">Ethnicity</span>
+                        <span class="info-label">Dân tộc</span>
                         <span class="info-value" th:text="${#strings.isEmpty(user.ethnicity) ? 'N/A' : user.ethnicity}">Kinh</span>
                     </div>
                 </div>
@@ -105,27 +105,27 @@
             <!-- SECTION 2: CONTACT & COMMUNICATIONS -->
             <div class="detail-section">
                 <div class="section-title">
-                    <i class="fa-solid fa-square-phone"></i>Contact & Communication Info
+                    <i class="fa-solid fa-square-phone"></i>Thông tin liên lạc
                 </div>
                 
                 <div class="info-grid">
                     <div class="info-item">
-                        <span class="info-label">Phone Number</span>
+                        <span class="info-label">Số điện thoại</span>
                         <span class="info-value" th:text="${#strings.isEmpty(user.phoneNumber) ? 'N/A' : user.phoneNumber}" th:classappend="${#strings.isEmpty(user.phoneNumber) ? 'empty' : ''}">0912345678</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Email Address</span>
+                        <span class="info-label">Địa chỉ Email</span>
                         <span class="info-value" th:text="${#strings.isEmpty(user.email) ? 'N/A' : user.email}" th:classappend="${#strings.isEmpty(user.email) ? 'empty' : ''}">user@example.com</span>
                     </div>
                     <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
                         <!-- Spacer element -->
                     </div>
                     <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
-                        <span class="info-label">Emergency Contact Name</span>
+                        <span class="info-label">Tên liên hệ khẩn cấp</span>
                         <span class="info-value" th:text="${#strings.isEmpty(user.emergencyContactName) ? 'N/A' : user.emergencyContactName}" th:classappend="${#strings.isEmpty(user.emergencyContactName) ? 'empty' : ''}">Jane Doe</span>
                     </div>
                     <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
-                        <span class="info-label">Emergency Contact Phone</span>
+                        <span class="info-label">SĐT liên hệ khẩn cấp</span>
                         <span class="info-value" th:text="${#strings.isEmpty(user.emergencyContactPhone) ? 'N/A' : user.emergencyContactPhone}" th:classappend="${#strings.isEmpty(user.emergencyContactPhone) ? 'empty' : ''}">0987654321</span>
                     </div>
                 </div>
@@ -134,21 +134,21 @@
             <!-- SECTION 3: LEGAL IDENTIFICATION -->
             <div class="detail-section" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
                 <div class="section-title">
-                    <i class="fa-solid fa-passport"></i>Identification Details
+                    <i class="fa-solid fa-passport"></i>Giấy tờ tùy thân
                 </div>
                 
                 <div class="info-grid">
                     <div class="info-item">
-                        <span class="info-label">Citizen ID (CCCD/CMND)</span>
+                        <span class="info-label">Số CCCD/CMND</span>
                         <span class="info-value" th:text="${#strings.isEmpty(user.citizenId) ? 'N/A' : user.citizenId}" th:classappend="${#strings.isEmpty(user.citizenId) ? 'empty' : ''}">123456789012</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Issue Date</span>
-                        <span class="info-value" th:text="${user.citizenIdIssueDate != null ? #temporals.format(user.citizenIdIssueDate, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${user.citizenIdIssueDate == null ? 'empty' : ''}">2020-01-01</span>
+                        <span class="info-label">Ngày cấp</span>
+                        <span class="info-value" th:text="${user.citizenIdIssueDate != null ? #temporals.format(user.citizenIdIssueDate, 'dd-MM-yyyy') : 'N/A'}" th:classappend="${user.citizenIdIssueDate == null ? 'empty' : ''}">2020-01-01</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Issue Place</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(user.citizenIdIssuePlace) ? 'N/A' : user.citizenIdIssuePlace}" th:classappend="${#strings.isEmpty(user.citizenIdIssuePlace) ? 'empty' : ''}">Ministry of Public Security</span>
+                        <span class="info-label">Nơi cấp</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.citizenIdIssuePlace) ? 'N/A' : user.citizenIdIssuePlace}" th:classappend="${#strings.isEmpty(user.citizenIdIssuePlace) ? 'empty' : ''}">Cục Cảnh sát ĐKQL cư trú và DLQG về dân cư</span>
                     </div>
                 </div>
             </div>
@@ -158,39 +158,39 @@
             <!-- Resident Specific Info -->
             <div class="detail-section" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
                 <div class="section-title">
-                    <i class="fa-solid fa-house-chimney-user"></i>Resident Specific Status
+                    <i class="fa-solid fa-house-chimney-user"></i>Trạng thái cư trú
                 </div>
                 
                 <div class="info-grid" style="margin-bottom: 24px;">
                     <div class="info-item">
-                        <span class="info-label">Resident Status</span>
+                        <span class="info-label">Trạng thái cư dân</span>
                         <span class="info-value">
-                            <span th:if="${user.residentStatus == 1}">Active / Live-in</span>
-                            <span th:if="${user.residentStatus == 2}">Moved out</span>
-                            <span th:if="${user.residentStatus == 3}">Temporary</span>
+                            <span th:if="${user.residentStatus == 1}">Thường trú / Đang ở</span>
+                            <span th:if="${user.residentStatus == 2}">Đã dọn đi</span>
+                            <span th:if="${user.residentStatus == 3}">Tạm trú</span>
                         </span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Relationship to Owner</span>
+                        <span class="info-label">Quan hệ với chủ hộ</span>
                         <span class="info-value" th:text="${#strings.isEmpty(user.relationshipToOwner) ? 'N/A' : user.relationshipToOwner}">N/A</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Household Owner Status</span>
-                        <span class="info-value" th:text="${user.isHouseholdOwner == true ? 'Yes' : 'No'}">Yes</span>
+                        <span class="info-label">Vai trò chủ hộ</span>
+                        <span class="info-value" th:text="${user.isHouseholdOwner == true ? 'Là chủ hộ' : 'Thành viên'}">Là chủ hộ</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Move-In Date</span>
-                        <span class="info-value" th:text="${user.moveInDate != null ? #temporals.format(user.moveInDate, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${user.moveInDate == null ? 'empty' : ''}">N/A</span>
+                        <span class="info-label">Ngày dọn vào</span>
+                        <span class="info-value" th:text="${user.moveInDate != null ? #temporals.format(user.moveInDate, 'dd-MM-yyyy') : 'N/A'}" th:classappend="${user.moveInDate == null ? 'empty' : ''}">N/A</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Move-Out Date</span>
-                        <span class="info-value" th:text="${user.moveOutDate != null ? #temporals.format(user.moveOutDate, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${user.moveOutDate == null ? 'empty' : ''}">N/A</span>
+                        <span class="info-label">Ngày dọn đi</span>
+                        <span class="info-value" th:text="${user.moveOutDate != null ? #temporals.format(user.moveOutDate, 'dd-MM-yyyy') : 'N/A'}" th:classappend="${user.moveOutDate == null ? 'empty' : ''}">N/A</span>
                     </div>
                 </div>
 
                 <!-- Apartment assignment info card -->
                 <div class="section-title" style="margin-top: 16px;">
-                    <i class="fa-solid fa-door-open"></i>Assigned Apartment Info
+                    <i class="fa-solid fa-door-open"></i>Thông tin căn hộ đã gán
                 </div>
                 
                 <div class="apartment-detail-card" th:if="${account != null && account.profile != null && account.profile.apartment != null}">
@@ -199,39 +199,39 @@
                     </div>
                     <div class="apartment-meta-info">
                         <div class="info-item">
-                            <span class="info-label">Apartment Number</span>
+                            <span class="info-label">Số căn hộ</span>
                             <span class="info-value" th:text="${account.profile.apartment.apartmentNumber}" style="font-weight: 700;">A-101</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Floor</span>
+                            <span class="info-label">Tầng</span>
                             <span class="info-value" th:text="${account.profile.apartment.floor}">1</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Area (Size)</span>
+                            <span class="info-label">Diện tích</span>
                             <span class="info-value" th:text="${account.profile.apartment.area + ' m²'}">75.0 m²</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Room Type</span>
-                            <span class="info-value" th:text="${account.profile.apartment.roomType}">2 Bedrooms</span>
+                            <span class="info-label">Loại phòng</span>
+                            <span class="info-value" th:text="${account.profile.apartment.roomType == 'Studio' ? 'Phòng Studio' : (account.profile.apartment.roomType == '1 Bedroom' ? '1 Phòng ngủ' : (account.profile.apartment.roomType == '2 Bedrooms' ? '2 Phòng ngủ' : (account.profile.apartment.roomType == '3 Bedrooms' ? '3 Phòng ngủ' : (account.profile.apartment.roomType == 'Penthouse' ? 'Penthouse' : account.profile.apartment.roomType))))}">2 Bedrooms</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="no-apartment-box" th:if="${account == null || account.profile == null || account.profile.apartment == null}">
                     <i class="fa-solid fa-circle-info" style="font-size: 18px;"></i>
-                    <span>This resident is not currently assigned to any apartment.</span>
+                    <span>Cư dân này hiện chưa được gán cho căn hộ nào.</span>
                 </div>
             </div>
 
             <!-- Manager / Maintenance Staff Specific Info -->
             <div class="detail-section" th:if="${#strings.equalsIgnoreCase(user.roleName, 'MANAGER') || #strings.equalsIgnoreCase(user.roleName, 'MAINTENANCE_STAFF')}">
                 <div class="section-title">
-                    <i class="fa-solid fa-briefcase"></i>Employment & Occupation Info
+                    <i class="fa-solid fa-briefcase"></i>Thông tin nghề nghiệp & công việc
                 </div>
                 
                 <div class="info-grid">
                     <div class="info-item">
-                        <span class="info-label">Occupation / Title / Specialty</span>
+                        <span class="info-label">Nghề nghiệp / Chức vụ / Chuyên môn</span>
                         <span class="info-value" th:text="${#strings.isEmpty(user.occupation) ? 'N/A' : user.occupation}" th:classappend="${#strings.isEmpty(user.occupation) ? 'empty' : ''}">Building Supervisor</span>
                     </div>
                 </div>
@@ -242,7 +242,7 @@
     
     <div class="no-profile-found" th:if="${user == null}" style="text-align: center; padding: 48px; color: var(--text-secondary);">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 48px; color: #F59E0B; margin-bottom: 16px;"></i>
-        <p>No user profile details found for the requested ID.</p>
+        <p>Không tìm thấy thông tin chi tiết người dùng theo ID yêu cầu.</p>
     </div>
 </main>
 

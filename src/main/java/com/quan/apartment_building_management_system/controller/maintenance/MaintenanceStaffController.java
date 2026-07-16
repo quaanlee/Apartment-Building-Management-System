@@ -104,7 +104,7 @@ public class MaintenanceStaffController {
         model.addAttribute("recentTasks", recentTasks);
         model.addAttribute("recentReports", recentReports);
 
-        model.addAttribute("pageTitle", "Maintenance Dashboard");
+        model.addAttribute("pageTitle", "Bảng điều khiển");
         return "maintenance_staff/dashboard";
     }
 
@@ -130,7 +130,7 @@ public class MaintenanceStaffController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", taskPage.getTotalPages());
         model.addAttribute("totalItems", taskPage.getTotalElements());
-        model.addAttribute("pageTitle", "Assigned Tasks");
+        model.addAttribute("pageTitle", "Nhiệm vụ được giao");
         return "maintenance_staff/tasks";
     }
 
@@ -150,7 +150,7 @@ public class MaintenanceStaffController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", taskPage.getTotalPages());
         model.addAttribute("totalItems", taskPage.getTotalElements());
-        model.addAttribute("pageTitle", "Task History");
+        model.addAttribute("pageTitle", "Lịch sử nhiệm vụ");
         return "maintenance_staff/history";
     }
 
@@ -161,7 +161,7 @@ public class MaintenanceStaffController {
         Optional<MaintenanceTask> taskOpt = maintenanceTaskService.findById(id);
 
         if (taskOpt.isEmpty() || !taskOpt.get().getStaff().getAccountId().equals(staffId)) {
-            return "redirect:/maintenance_staff/tasks?error=Task not found or unauthorized";
+            return "redirect:/maintenance_staff/tasks?error=Không tìm thấy công việc hoặc không có quyền truy cập";
         }
 
         MaintenanceTask task = taskOpt.get();
@@ -180,7 +180,7 @@ public class MaintenanceStaffController {
             model.addAttribute("reportDto", dto);
         }
 
-        model.addAttribute("pageTitle", "Task Detail");
+        model.addAttribute("pageTitle", "Chi tiết nhiệm vụ");
         return "maintenance_staff/task_detail";
     }
 
@@ -197,7 +197,7 @@ public class MaintenanceStaffController {
         Optional<MaintenanceTask> taskOpt = maintenanceTaskService.findById(id);
 
         if (taskOpt.isEmpty() || !taskOpt.get().getStaff().getAccountId().equals(staffId)) {
-            redirectAttributes.addFlashAttribute("message", "Task not found or unauthorized");
+            redirectAttributes.addFlashAttribute("message", "Không tìm thấy công việc hoặc không có quyền truy cập");
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/maintenance_staff/tasks";
         }
@@ -205,7 +205,7 @@ public class MaintenanceStaffController {
         MaintenanceTask task = taskOpt.get();
 
         if (task.getStatus() == 3) {
-            redirectAttributes.addFlashAttribute("message", "Task is already completed.");
+            redirectAttributes.addFlashAttribute("message", "Công việc đã hoàn thành trước đó.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/maintenance_staff/tasks/" + id;
         }
@@ -215,7 +215,7 @@ public class MaintenanceStaffController {
         Byte currentProgress = reports.isEmpty() ? (byte) 0 : reports.get(reports.size() - 1).getProgressPercent();
         if (reportDto.getProgressPercent() != null && reportDto.getProgressPercent() < currentProgress) {
             bindingResult.rejectValue("progressPercent", "error.progressPercent",
-                    "Progress percent cannot be less than current progress (" + currentProgress + "%).");
+                    "Tiến độ công việc không thể nhỏ hơn tiến độ hiện tại (" + currentProgress + "%).");
         }
 
         if (bindingResult.hasErrors()) {
@@ -261,7 +261,7 @@ public class MaintenanceStaffController {
         
         maintenanceTaskService.save(task);
 
-        redirectAttributes.addFlashAttribute("message", "Report submitted successfully!");
+        redirectAttributes.addFlashAttribute("message", "Báo cáo đã được gửi thành công!");
         redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/maintenance_staff/tasks/" + id;
     }
@@ -284,7 +284,7 @@ public class MaintenanceStaffController {
                 for (com.quan.apartment_building_management_system.entity.AccountNotification an : existingNotifs) {
                     if ("MaintenanceTask".equals(an.getNotification().getRelatedEntityType()) 
                             && an.getNotification().getContent().contains("'" + task.getMaintenanceRequest().getTitle() + "'")
-                            && "Task Overdue Warning".equals(an.getNotification().getTitle())) {
+                            && "Cảnh báo công việc trễ hạn".equals(an.getNotification().getTitle())) {
                         alreadyNotified = true;
                         break;
                     }
@@ -293,7 +293,7 @@ public class MaintenanceStaffController {
                 if (!alreadyNotified) {
                     // Create Overdue Notification
                     com.quan.apartment_building_management_system.entity.Notification notification = new com.quan.apartment_building_management_system.entity.Notification();
-                    notification.setTitle("Task Overdue Warning");
+                    notification.setTitle("Cảnh báo công việc trễ hạn");
                     notification.setContent("Cảnh báo: Hạn chót hoàn thành công việc '" + task.getMaintenanceRequest().getTitle() + "' đã quá hạn!");
                     notification.setNotificationType((byte) 1); // System alert
                     notification.setCreatedBy(task.getAssignedBy());
@@ -391,7 +391,7 @@ public class MaintenanceStaffController {
                 for (com.quan.apartment_building_management_system.entity.AccountNotification an : existingNotifs) {
                     if ("MaintenanceTask".equals(an.getNotification().getRelatedEntityType()) 
                             && an.getNotification().getContent().contains("'" + task.getMaintenanceRequest().getTitle() + "'")
-                            && "Task Overdue Warning".equals(an.getNotification().getTitle())) {
+                            && "Cảnh báo công việc trễ hạn".equals(an.getNotification().getTitle())) {
                         alreadyNotified = true;
                         break;
                     }
@@ -399,7 +399,7 @@ public class MaintenanceStaffController {
 
                 if (!alreadyNotified) {
                     com.quan.apartment_building_management_system.entity.Notification notification = new com.quan.apartment_building_management_system.entity.Notification();
-                    notification.setTitle("Task Overdue Warning");
+                    notification.setTitle("Cảnh báo công việc trễ hạn");
                     notification.setContent("Cảnh báo: Hạn chót hoàn thành công việc '" + task.getMaintenanceRequest().getTitle() + "' đã quá hạn!");
                     notification.setNotificationType((byte) 1);
                     notification.setCreatedBy(task.getAssignedBy());

@@ -8,14 +8,14 @@
         <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="page-title-row">
             <div class="page-title-left">
-                <h2 class="page-title">Service Catalog &amp; Pricing</h2>
-                <p class="page-subtitle">Manage utility types, service rates, and regional pricing policies.</p>
+                <h2 class="page-title">Danh mục &amp; Đơn giá dịch vụ</h2>
+                <p class="page-subtitle">Quản lý loại tiện ích, mức giá dịch vụ và chính sách đơn giá khu dân cư.</p>
             </div>
             <div class="page-title-right">
                 <!-- Opens the Add New Service modal -->
                 <button class="add-service-btn" id="openModalBtn">
                     <i class="fa-solid fa-plus"></i>
-                    <span>Add New Service</span>
+                    <span>Thêm dịch vụ mới</span>
                 </button>
             </div>
         </div>
@@ -24,8 +24,8 @@
         <div id="toastMsg" class="toast-msg" th:if="${param.success != null or param.error != null}"
              th:classappend="${param.success != null ? ' toast-success' : ' toast-error'}">
             <i th:class="${param.success != null ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation'}"></i>
-            <span th:if="${param.success != null}">Service created successfully!</span>
-            <span th:if="${param.error != null}">Error: Unit not found. Please try again.</span>
+            <span th:if="${param.success != null}">Tạo dịch vụ thành công!</span>
+            <span th:if="${param.error != null}">Lỗi: Không tìm thấy đơn vị tính. Vui lòng thử lại.</span>
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════ -->
@@ -34,13 +34,13 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-info">
-                    <span class="stat-label">TOTAL SERVICES</span>
+                    <span class="stat-label">TỔNG DỊCH VỤ</span>
                     <span class="stat-value" th:text="${totalServices}">15</span>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-info">
-                    <span class="stat-label">ACTIVE SERVICES</span>
+                    <span class="stat-label">DỊCH VỤ HOẠT ĐỘNG</span>
                     <span class="stat-value" th:text="${activeServices}">12</span>
                 </div>
             </div>
@@ -72,10 +72,10 @@
 
                     <div class="service-meta-right">
                         <span th:class="${service.status ? 'status-badge active' : 'status-badge locked'}"
-                              th:text="${service.status ? 'ACTIVE' : 'LOCKED'}">ACTIVE</span>
+                              th:text="${service.status ? 'HOẠT ĐỘNG' : 'BỊ KHÓA'}">HOẠT ĐỘNG</span>
                         <span class="service-type-label"
                               th:classappend="'label-' + ${#strings.toLowerCase(service.serviceType)}"
-                              th:text="${#strings.toUpperCase(service.serviceType)}">ELECTRICITY</span>
+                              th:text="${service.serviceType == 'electricity' ? 'ĐIỆN' : (service.serviceType == 'water' ? 'NƯỚC' : (service.serviceType == 'cleaning' ? 'VỆ SINH' : (service.serviceType == 'parking' ? 'GỬI XE' : (service.serviceType == 'management' ? 'QUẢN LÝ' : (service.serviceType == 'internet' ? 'INTERNET' : #strings.toUpperCase(service.serviceType))))))}">ĐIỆN</span>
                     </div>
                 </div>
 
@@ -85,12 +85,12 @@
                 <!-- Pricing details -->
                 <div class="pricing-details">
                     <div class="pricing-row">
-                        <span class="detail-label">Unit Price</span>
-                        <span class="detail-value" th:text="'$' + ${#numbers.formatDecimal(service.unitPrice, 1, 2)}">$0.18</span>
+                        <span class="detail-label">Đơn giá</span>
+                        <span class="detail-value" th:text="${#numbers.formatDecimal(service.unitPrice, 1, 'POINT', 0, 'COMMA') + ' đ'}">180 đ</span>
                     </div>
                     <div class="pricing-row">
-                        <span class="detail-label">Unit Name</span>
-                        <span class="detail-value" th:text="${service.unitName}">kWh</span>
+                        <span class="detail-label">Đơn vị tính</span>
+                        <span class="detail-value" th:text="${service.unitName == 'kWh' ? 'kWh' : (service.unitName == 'm3' ? 'm³' : (service.unitName == 'month' ? 'Tháng' : (service.unitName == 'day' ? 'Ngày' : service.unitName)))}">kWh</span>
                     </div>
                 </div>
 
@@ -103,7 +103,7 @@
                             th:data-unit-id="${service.unitId}"
                             th:data-description="${service.description}">
                         <i class="fa-solid fa-pen"></i>
-                        <span>Edit Service</span>
+                        <span>Sửa dịch vụ</span>
                     </button>
                     <button class="lock-btn" type="button"
                             th:class="${service.status ? 'lock-btn action-lock' : 'lock-btn action-unlock'}"
@@ -111,7 +111,7 @@
                             th:data-service-name="${service.serviceName}"
                             th:data-is-locked="${!service.status}">
                         <i th:class="${service.status ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open'}"></i>
-                        <span th:text="${service.status ? 'Lock' : 'Unlock'}">Lock</span>
+                        <span th:text="${service.status ? 'Khóa' : 'Mở khóa'}">Khóa</span>
                     </button>
                 </div>
             </div>
@@ -120,8 +120,8 @@
         <!-- Empty state -->
         <div class="no-results-card" th:if="${#lists.isEmpty(services)}">
             <i class="fa-solid fa-box-open"></i>
-            <h3>No services found</h3>
-            <p>Try adjusting your search keyword or status filter.</p>
+            <h3>Không tìm thấy dịch vụ nào</h3>
+            <p>Hãy thử điều chỉnh từ khóa tìm kiếm hoặc bộ lọc trạng thái.</p>
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════ -->
@@ -132,7 +132,7 @@
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h3 class="modal-title" id="modalTitle">Add New Service</h3>
+                    <h3 class="modal-title" id="modalTitle">Thêm dịch vụ mới</h3>
                     <button class="modal-close-btn" id="closeModalBtn" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -144,40 +144,40 @@
 
                         <!-- Service Name -->
                         <div class="form-group">
-                            <label class="form-label" for="serviceName">Service Name</label>
+                            <label class="form-label" for="serviceName">Tên dịch vụ</label>
                             <input type="text" id="serviceName" name="serviceName"
-                                   class="form-input" placeholder="e.g. Solar Grid Feed"
+                                   class="form-input" placeholder="Ví dụ: Cấp điện năng lượng mặt trời"
                                    required maxlength="100">
                             <span class="field-error" id="serviceNameError"></span>
                         </div>
 
                         <!-- Service Type -->
                         <div class="form-group">
-                            <label class="form-label" for="serviceType">Service Type</label>
+                            <label class="form-label" for="serviceType">Loại dịch vụ</label>
                             <input type="text" id="serviceType" name="serviceType"
-                                   class="form-input" placeholder="e.g. Renewable Energy"
+                                   class="form-input" placeholder="Ví dụ: Năng lượng tái tạo"
                                    required maxlength="50">
                             <span class="field-error" id="serviceTypeError"></span>
                         </div>
 
                         <!-- Unit Price -->
                         <div class="form-group">
-                            <label class="form-label" for="unitPrice">Unit Price ($)</label>
+                            <label class="form-label" for="unitPrice">Đơn giá (đ)</label>
                             <input type="number" id="unitPrice" name="unitPrice"
-                                   class="form-input" placeholder="0.00"
-                                   min="0" step="0.01" value="0.00" required>
+                                   class="form-input" placeholder="0"
+                                   min="0" step="1" value="0" required>
                             <span class="field-error" id="unitPriceError"></span>
                         </div>
 
                         <!-- Unit dropdown (populated from model) -->
                         <div class="form-group">
-                            <label class="form-label" for="unitId">Unit</label>
+                            <label class="form-label" for="unitId">Đơn vị tính</label>
                             <div class="select-wrapper">
                                 <select id="unitId" name="unitId" class="form-select" required>
-                                    <option value="" disabled selected>Select a unit...</option>
+                                    <option value="" disabled selected>Chọn đơn vị tính...</option>
                                     <option th:each="unit : ${units}"
                                             th:value="${unit.unitId}"
-                                            th:text="${unit.unitName}">kWh</option>
+                                            th:text="${unit.unitName == 'kWh' ? 'kWh' : (unit.unitName == 'm3' ? 'm³' : (unit.unitName == 'month' ? 'Tháng' : (unit.unitName == 'day' ? 'Ngày' : unit.unitName)))}">kWh</option>
                                 </select>
                                 <i class="fa-solid fa-chevron-down select-chevron"></i>
                             </div>
@@ -186,10 +186,10 @@
 
                         <!-- Description (optional) -->
                         <div class="form-group">
-                            <label class="form-label" for="description">Description</label>
+                            <label class="form-label" for="description">Mô tả</label>
                             <textarea id="description" name="description"
                                       class="form-textarea"
-                                      placeholder="Describe the service coverage and terms..."
+                                      placeholder="Mô tả chi tiết phạm vi và điều khoản dịch vụ..."
                                       rows="4" maxlength="500"></textarea>
                         </div>
 
@@ -197,10 +197,10 @@
 
                     <!-- Modal Footer -->
                     <div class="modal-footer">
-                        <button type="button" class="modal-cancel-btn" id="cancelModalBtn">Cancel</button>
+                        <button type="button" class="modal-cancel-btn" id="cancelModalBtn">Hủy bỏ</button>
                         <button type="submit" class="modal-submit-btn" id="createServiceBtn">
                             <i class="fa-solid fa-check"></i>
-                            Create Service
+                            Tạo dịch vụ
                         </button>
                     </div>
                 </form>
@@ -215,7 +215,7 @@
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h3 class="modal-title" id="editModalTitle">Edit Service Details</h3>
+                    <h3 class="modal-title" id="editModalTitle">Chỉnh sửa chi tiết dịch vụ</h3>
                     <button class="modal-close-btn" id="closeEditModalBtn" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -231,8 +231,8 @@
                                 <i class="fa-solid fa-circle-info"></i>
                             </div>
                             <div class="edit-notice-text">
-                                <strong>IMPORTANT NOTICE</strong>
-                                <span>Any modifications to the unit price or structure will be applied only to future billing cycles starting from the next calendar month. Existing invoices remain unaffected.</span>
+                                <strong>THÔNG BÁO QUAN TRỌNG</strong>
+                                <span>Mọi thay đổi đối với đơn giá hoặc cấu trúc sẽ chỉ được áp dụng cho các chu kỳ thanh toán trong tương lai bắt đầu từ tháng tiếp theo. Các hóa đơn hiện tại không bị ảnh hưởng.</span>
                             </div>
                         </div>
 
@@ -241,7 +241,7 @@
 
                         <!-- Service Name -->
                         <div class="form-group">
-                            <label class="form-label" for="editServiceName">Service Name</label>
+                            <label class="form-label" for="editServiceName">Tên dịch vụ</label>
                             <input type="text" id="editServiceName" name="serviceName"
                                    class="form-input" required maxlength="100">
                             <span class="field-error" id="editServiceNameError"></span>
@@ -250,23 +250,23 @@
                         <!-- Unit Price + Unit Type — 2 column row -->
                         <div class="form-row-2col">
                             <div class="form-group">
-                                <label class="form-label" for="editUnitPrice">Unit Price</label>
+                                <label class="form-label" for="editUnitPrice">Đơn giá</label>
                                 <div class="input-prefix-wrapper">
-                                    <span class="input-prefix">$</span>
                                     <input type="number" id="editUnitPrice" name="unitPrice"
-                                           class="form-input has-prefix" min="0" step="0.01" required>
+                                           class="form-input has-prefix" min="0" step="1" required style="padding-left: 12px;">
+                                    <span class="input-prefix" style="right: 12px; left: auto;">đ</span>
                                 </div>
                                 <span class="field-error" id="editUnitPriceError"></span>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label" for="editUnitId">Unit Type</label>
+                                <label class="form-label" for="editUnitId">Đơn vị tính</label>
                                 <div class="select-wrapper">
                                     <select id="editUnitId" name="unitId" class="form-select" required>
-                                        <option value="" disabled selected>Select...</option>
+                                        <option value="" disabled selected>Chọn...</option>
                                         <option th:each="unit : ${units}"
                                                 th:value="${unit.unitId}"
-                                                th:text="${unit.unitName}">Month</option>
+                                                th:text="${unit.unitName == 'kWh' ? 'kWh' : (unit.unitName == 'm3' ? 'm³' : (unit.unitName == 'month' ? 'Tháng' : (unit.unitName == 'day' ? 'Ngày' : unit.unitName)))}">Month</option>
                                     </select>
                                     <i class="fa-solid fa-chevron-down select-chevron"></i>
                                 </div>
@@ -277,10 +277,10 @@
 
                         <!-- Description -->
                         <div class="form-group">
-                            <label class="form-label" for="editDescription">Description</label>
+                            <label class="form-label" for="editDescription">Mô tả</label>
                             <textarea id="editDescription" name="description"
                                       class="form-textarea"
-                                      placeholder="Describe the service coverage and terms..."
+                                      placeholder="Mô tả chi tiết phạm vi và điều khoản dịch vụ..."
                                       rows="4" maxlength="500"></textarea>
                         </div>
 
@@ -288,10 +288,10 @@
 
                     <!-- Modal Footer -->
                     <div class="modal-footer">
-                        <button type="button" class="modal-cancel-btn" id="cancelEditModalBtn">Cancel</button>
+                        <button type="button" class="modal-cancel-btn" id="cancelEditModalBtn">Hủy bỏ</button>
                         <button type="submit" class="modal-submit-btn">
                             <i class="fa-solid fa-floppy-disk"></i>
-                            Save Changes
+                            Lưu thay đổi
                         </button>
                     </div>
                 </form>
@@ -309,7 +309,7 @@
                     <div class="lock-icon-box">
                         <i class="fa-solid fa-lock"></i>
                     </div>
-                    <h3 class="modal-title" id="lockModalTitle">Lock Service</h3>
+                    <h3 class="modal-title" id="lockModalTitle">Khóa dịch vụ</h3>
                     <button class="modal-close-btn" id="closeLockModalBtn" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -319,16 +319,16 @@
                 <div class="modal-body lock-modal-body">
                     <div class="lock-info-box">
                         <i class="fa-solid fa-circle-info"></i>
-                        <p>Locking this service will prevent new billings from being generated. Current active subscriptions will remain unaffected until the next billing cycle.</p>
+                        <p>Khóa dịch vụ này sẽ ngăn các khoản phí hóa đơn mới được phát sinh. Các chu kỳ đăng ký hoạt động hiện tại vẫn được giữ nguyên cho đến kỳ hóa đơn tiếp theo.</p>
                     </div>
                 </div>
 
                 <!-- Modal Footer -->
                 <div class="modal-footer">
-                    <button type="button" class="modal-cancel-btn" id="cancelLockModalBtn">Cancel</button>
+                    <button type="button" class="modal-cancel-btn" id="cancelLockModalBtn">Hủy bỏ</button>
                     <button type="button" class="modal-submit-btn lock-confirm-btn" id="confirmLockBtn">
                         <i class="fa-solid fa-lock"></i>
-                        Lock Service
+                        Khóa dịch vụ
                     </button>
                 </div>
 
@@ -348,7 +348,7 @@
                     <div class="unlock-icon-box">
                         <i class="fa-solid fa-lock-open"></i>
                     </div>
-                    <h3 class="modal-title" id="unlockModalTitle">Unlock Service</h3>
+                    <h3 class="modal-title" id="unlockModalTitle">Mở khóa dịch vụ</h3>
                     <button class="modal-close-btn" id="closeUnlockModalBtn" aria-label="Close">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -358,16 +358,16 @@
                 <div class="modal-body unlock-modal-body">
                     <div class="unlock-info-box">
                         <i class="fa-solid fa-circle-info"></i>
-                        <p>Unlocking this service will allow new billings to be generated starting from the current cycle. Please ensure the pricing is up to date.</p>
+                        <p>Mở khóa dịch vụ này sẽ cho phép các hóa đơn mới được phát sinh bắt đầu từ chu kỳ hiện tại. Vui lòng đảm bảo rằng đơn giá dịch vụ đã được cập nhật chính xác.</p>
                     </div>
                 </div>
 
                 <!-- Modal Footer -->
                 <div class="modal-footer">
-                    <button type="button" class="modal-cancel-btn" id="cancelUnlockModalBtn">Cancel</button>
+                    <button type="button" class="modal-cancel-btn" id="cancelUnlockModalBtn">Hủy bỏ</button>
                     <button type="button" class="modal-submit-btn unlock-confirm-btn" id="confirmUnlockBtn">
                         <i class="fa-solid fa-lock-open"></i>
-                        Unlock Service
+                        Mở khóa dịch vụ
                     </button>
                 </div>
 
@@ -390,7 +390,7 @@
 
                 if (searchInput) {
                     searchInput.value       = keywordFromModel || "";
-                    searchInput.placeholder = "Search services or rates...";
+                    searchInput.placeholder = "Tìm kiếm dịch vụ hoặc đơn giá...";
                     searchInput.addEventListener("keypress", function (e) {
                         if (e.key === "Enter") triggerFilter();
                     });
@@ -408,9 +408,9 @@
                     selectWrapper.innerHTML = `
                     <div class="status-select-container">
                         <select id="statusFilterSelect" class="status-select">
-                            <option value="" ${isAll ? "selected" : ""}>All Status</option>
-                            <option value="true" ${isActive ? "selected" : ""}>Active</option>
-                            <option value="false" ${isLocked ? "selected" : ""}>Locked</option>
+                            <option value="" ${isAll ? "selected" : ""}>Tất cả trạng thái</option>
+                            <option value="true" ${isActive ? "selected" : ""}>Hoạt động</option>
+                            <option value="false" ${isLocked ? "selected" : ""}>Bị khóa</option>
                         </select>
                         <i class="fa-solid fa-filter select-icon"></i>
                     </div>`;
@@ -485,10 +485,10 @@
                         const price = parseFloat(document.getElementById("unitPrice").value);
                         const unit  = document.getElementById("unitId").value;
 
-                        if (!name)  { showError("serviceName", "serviceNameError", "Service name is required."); valid = false; }
-                        if (!type)  { showError("serviceType", "serviceTypeError", "Service type is required."); valid = false; }
-                        if (isNaN(price) || price < 0) { showError("unitPrice", "unitPriceError", "Price must be ≥ 0."); valid = false; }
-                        if (!unit)  { showError("unitId", "unitIdError", "Please select a unit."); valid = false; }
+                        if (!name)  { showError("serviceName", "serviceNameError", "Tên dịch vụ là bắt buộc."); valid = false; }
+                        if (!type)  { showError("serviceType", "serviceTypeError", "Loại dịch vụ là bắt buộc."); valid = false; }
+                        if (isNaN(price) || price < 0) { showError("unitPrice", "unitPriceError", "Đơn giá phải ≥ 0."); valid = false; }
+                        if (!unit)  { showError("unitId", "unitIdError", "Vui lòng chọn đơn vị tính."); valid = false; }
 
                         if (!valid) e.preventDefault();
                     });
@@ -525,7 +525,7 @@
                 function populateEditForm(service) {
                     document.getElementById("editServiceId").value    = service.serviceId   || "";
                     document.getElementById("editServiceName").value  = service.serviceName || "";
-                    document.getElementById("editUnitPrice").value    = service.unitPrice   || "0.00";
+                    document.getElementById("editUnitPrice").value    = service.unitPrice   || "0";
                     document.getElementById("editUnitId").value       = service.unitId      || "";
                     document.getElementById("editDescription").value  = service.description || "";
                 }
@@ -573,9 +573,9 @@
                         const price = parseFloat(document.getElementById("editUnitPrice").value);
                         const unit  = document.getElementById("editUnitId").value;
 
-                        if (!name)  { showEditError("editServiceName", "editServiceNameError", "Service name is required."); valid = false; }
-                        if (isNaN(price) || price < 0) { showEditError("editUnitPrice", "editUnitPriceError", "Price must be ≥ 0."); valid = false; }
-                        if (!unit)  { showEditError("editUnitId", "editUnitIdError", "Please select a unit."); valid = false; }
+                        if (!name)  { showEditError("editServiceName", "editServiceNameError", "Tên dịch vụ là bắt buộc."); valid = false; }
+                        if (isNaN(price) || price < 0) { showEditError("editUnitPrice", "editUnitPriceError", "Đơn giá phải ≥ 0."); valid = false; }
+                        if (!unit)  { showEditError("editUnitId", "editUnitIdError", "Vui lòng chọn đơn vị tính."); valid = false; }
 
                         if (!valid) e.preventDefault();
                     });

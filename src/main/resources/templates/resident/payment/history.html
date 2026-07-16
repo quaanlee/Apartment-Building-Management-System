@@ -74,25 +74,25 @@
     </style>
 
     <div class="section-header">
-        <h1 class="section-title">Payment History</h1>
-        <p class="section-desc">View your previous bills' completed payments, transaction codes, and receipt details.</p>
+        <h1 class="section-title">Lịch sử thanh toán</h1>
+        <p class="section-desc">Xem các giao dịch thanh toán hóa đơn đã hoàn thành, mã giao dịch và thông tin biên lai của bạn.</p>
     </div>
 
     <!-- Payments Table Card -->
     <div class="custom-card">
         <h2 class="card-title">
-            <i class="fa-solid fa-clock-rotate-left"></i> Completed Transactions
+            <i class="fa-solid fa-clock-rotate-left"></i> Giao dịch đã hoàn thành
         </h2>
         <div class="table-responsive">
             <table class="table table-custom align-middle">
                 <thead>
                     <tr>
-                        <th>Transaction Code</th>
-                        <th>Billing Month</th>
-                        <th>Payment Date</th>
-                        <th>Payment Method</th>
-                        <th>Amount Paid</th>
-                        <th>Status</th>
+                        <th>Mã giao dịch</th>
+                        <th>Kỳ hóa đơn</th>
+                        <th>Ngày thanh toán</th>
+                        <th>Phương thức thanh toán</th>
+                        <th>Số tiền đã trả</th>
+                        <th>Trạng thái</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,18 +103,18 @@
                         <td>
                             <strong th:text="${#numbers.formatInteger(payment.bill.billMonth, 2)} + '/' + ${payment.bill.billYear}">06/2026</strong>
                         </td>
-                        <td th:text="${#temporals.format(payment.paymentDate, 'yyyy-MM-dd HH:mm')}">2026-06-12 14:35</td>
+                        <td th:text="${#temporals.format(payment.paymentDate, 'dd/MM/yyyy HH:mm')}">2026-06-12 14:35</td>
                         <td th:text="${payment.paymentMethod.methodName}">VNPAY</td>
                         <td>
-                            <strong class="text-success" th:text="'$' + ${payment.amount}">$120.00</strong>
+                            <strong class="text-success" th:text="${#numbers.formatDecimal(payment.amount, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</strong>
                         </td>
                         <td>
-                            <span class="badge-status badge-success">Success</span>
+                            <span class="badge-status badge-success">Thành công</span>
                         </td>
                     </tr>
                     <tr th:if="${payments == null || payments.isEmpty()}">
                         <td colspan="6" class="text-center py-4 text-muted">
-                            No payment transaction history found.
+                            Không tìm thấy lịch sử giao dịch thanh toán nào.
                         </td>
                     </tr>
                 </tbody>

@@ -123,7 +123,7 @@ public class ManagerMaintenanceController {
             String errorMessage = bindingResult.getFieldErrors().stream()
                     .map(error -> error.getDefaultMessage())
                     .collect(Collectors.joining(", "));
-            redirectAttributes.addFlashAttribute("message", "Validation error: " + errorMessage);
+            redirectAttributes.addFlashAttribute("message", "Lỗi xác thực: " + errorMessage);
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/manager/maintenance";
         }
@@ -154,10 +154,10 @@ public class ManagerMaintenanceController {
             }
 
             maintenanceTaskService.assignTask(assignDTO.getRequestId(), assignDTO.getStaffId(), deadline, manager);
-            redirectAttributes.addFlashAttribute("message", "Task assigned successfully!");
+            redirectAttributes.addFlashAttribute("message", "Phân công công việc thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("message", "Error: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("message", "Lỗi: " + e.getMessage());
             redirectAttributes.addFlashAttribute("messageType", "error");
         }
 
@@ -273,10 +273,10 @@ public class ManagerMaintenanceController {
             }
 
             maintenanceTaskService.assignTask(requestId, staffId, null, manager);
-            redirectAttributes.addFlashAttribute("message", "Task assigned successfully!");
+            redirectAttributes.addFlashAttribute("message", "Phân công công việc thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("message", "Error: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("message", "Lỗi: " + e.getMessage());
             redirectAttributes.addFlashAttribute("messageType", "error");
         }
         return "redirect:/manager/maintenance";
@@ -308,14 +308,14 @@ public class ManagerMaintenanceController {
         }
         MaintenanceRequest request = requestOpt.get();
         if (request.getStatus() != 0) {
-            redirectAttributes.addFlashAttribute("message", "Cannot edit: request is not in Pending status");
+            redirectAttributes.addFlashAttribute("message", "Không thể chỉnh sửa: yêu cầu không ở trạng thái Chờ xử lý");
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/manager/maintenance";
         }
         request.setTitle(title);
         request.setDescription(description);
         maintenanceRequestService.save(request);
-        redirectAttributes.addFlashAttribute("message", "Request updated successfully");
+        redirectAttributes.addFlashAttribute("message", "Cập nhật yêu cầu thành công");
         redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/manager/maintenance";
     }
@@ -324,10 +324,10 @@ public class ManagerMaintenanceController {
     public String unassignTask(@PathVariable("requestId") Integer requestId, RedirectAttributes redirectAttributes) {
         try {
             maintenanceTaskService.unassignTask(requestId);
-            redirectAttributes.addFlashAttribute("message", "Task unassigned successfully!");
+            redirectAttributes.addFlashAttribute("message", "Hủy phân công công việc thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("message", "Error unassigning task: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("message", "Lỗi khi hủy phân công: " + e.getMessage());
             redirectAttributes.addFlashAttribute("messageType", "error");
         }
         return "redirect:/manager/maintenance";
