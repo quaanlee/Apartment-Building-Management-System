@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/maintenance/layout_maintenance :: maintenance-layout(~{::main}, 'profile')}">
+<head>
+    <title>Hồ sơ cá nhân - ABMS</title>
+</head>
+<body>
+
+<main class="profile-page-container">
+    <!-- Load custom profile styles -->
+    <link rel="stylesheet" th:href="@{/css/maintenance/profile.css}">
+
+    <!-- Page Header -->
+    <div class="profile-header-bar">
+        <h2 class="profile-page-title"><i class="fa-solid fa-id-card"></i> Hồ sơ của bạn</h2>
+        <p class="profile-page-subtitle">Quản lý thông tin tài khoản và thông tin cá nhân của bạn.</p>
+    </div>
+
+    <!-- Main Flex Row -->
+    <div class="profile-grid">
+        
+        <!-- Left Side Column: Avatar & Account Info Card -->
+        <div class="profile-card profile-sidebar-card">
+            <div class="avatar-upload-section">
+                <div class="avatar-preview-container">
+                    <!-- If user has avatar URL -->
+                    <img th:if="${userDto.avatarUrl != null && !userDto.avatarUrl.isEmpty()}" 
+                         th:src="${userDto.avatarUrl}" 
+                         id="avatarPreviewImg" 
+                         alt="Avatar" 
+                         class="profile-large-avatar">
+                    <!-- If user does not have avatar URL -->
+                    <div th:unless="${userDto.avatarUrl != null && !userDto.avatarUrl.isEmpty()}" 
+                         id="avatarPlaceholder" 
+                         class="profile-large-avatar-placeholder" 
+                         th:text="${#strings.substring(userDto.fullName, 0, 1)}">NV</div>
+                </div>
+                
+                <label for="avatarFileInput" class="avatar-upload-btn">
+                    <i class="fa-solid fa-camera"></i> Đổi ảnh đại diện
+                </label>
+                <!-- Linked to profileUpdateForm using HTML5 'form' attribute -->
+                <input type="file" id="avatarFileInput" name="avatarFile" form="profileUpdateForm" accept="image/*" style="display: none;">
+                <p class="upload-hint">Chấp nhận JPG, PNG kích thước tối đa 2MB.</p>
+            </div>
+
+            <div class="account-meta-section">
+                <div class="meta-item">
+                    <span class="meta-label"><i class="fa-solid fa-envelope"></i> Tên đăng nhập (Email)</span>
+                    <span class="meta-value" th:text="${userDto.email}">email@abms.com</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label"><i class="fa-solid fa-user-shield"></i> Vai trò quyền</span>
+                    <span class="meta-value role-badge">Nhân viên bảo trì</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label"><i class="fa-solid fa-circle-check"></i> Trạng thái</span>
+                    <span class="meta-value status-badge active">Hoạt động</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side Column: Tab Panels Card -->
+        <div class="profile-card profile-details-card">
+            <!-- Tabs Menu -->
+            <div class="profile-tabs-header">
+                <button type="button" class="profile-tab-btn active" data-tab="personal">
+                    <i class="fa-solid fa-user-pen"></i> Thông tin cá nhân
+                </button>
+                <button type="button" class="profile-tab-btn" data-tab="password">
+                    <i class="fa-solid fa-key"></i> Đổi mật khẩu
+                </button>
+            </div>
+
+            <!-- Tab Content Container -->
+            <div class="profile-tabs-content">
+                
+                <!-- Panel 1: Personal Details Form -->
+                <div id="personal-tab" class="profile-tab-panel active">
+                    <form th:action="@{/maintenance_staff/profile/update}" method="post" enctype="multipart/form-data" th:object="${userDto}" id="profileUpdateForm">
+                        <!-- Hidden inputs for validation requirements -->
+                        <input type="hidden" th:field="*{accountId}">
+                        <input type="hidden" th:field="*{employeeProfileId}">
+                        <input type="hidden" th:field="*{email}">
+                        <input type="hidden" th:field="*{avatarUrl}">
+
+                        <h3 class="panel-section-title">Chi tiết thông tin cá nhân</h3>
+                        <div class="profile-form-grid">
+                            <div class="profile-form-group">
+                                <label for="fullName">Họ và tên <span class="required-star">*</span></label>
+                                <input type="text" id="fullName" th:field="*{fullName}" class="profile-form-control" th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'" placeholder="Nhập họ tên đầy đủ">
+                                <span class="profile-error-text" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></span>
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label for="phoneNumber">Số điện thoại <span class="required-star">*</span></label>
+                                <input type="text" id="phoneNumber" th:field="*{phoneNumber}" class="profile-form-control" th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'" placeholder="Số điện thoại liên hệ">
+                                <span class="profile-error-text" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label for="dateOfBirth">Ngày sinh</label>
+                                <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}" class="profile-form-control" th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid'">
+                                <span class="profile-error-text" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></span>
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label for="gender">Giới tính</label>
+                                <select id="gender" th:field="*{gender}" class="profile-form-control">
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                </select>
+                            </div>
+
+                            <div class="profile-form-group full-width">
+                                <label for="address">Địa chỉ thường trú</label>
+                                <input type="text" id="address" th:field="*{address}" class="profile-form-control" th:classappend="${#fields.hasErrors('address')} ? 'is-invalid'" placeholder="Số nhà, đường, quận/huyện, thành phố...">
+                                <span class="profile-error-text" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+                            </div>
+                        </div>
+
+                        <div class="profile-form-actions">
+                            <button type="submit" class="profile-btn-primary">
+                                <i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Panel 2: Change Password Form -->
+                <div id="password-tab" class="profile-tab-panel">
+                    <form th:action="@{/maintenance_staff/profile/change-password}" method="post">
+                        <h3 class="panel-section-title">Thay đổi mật khẩu đăng nhập</h3>
+                        
+                        <div class="password-form-container">
+                            <div class="profile-form-group full-width">
+                                <label for="currentPassword">Mật khẩu hiện tại <span class="required-star">*</span></label>
+                                <div class="password-input-wrapper">
+                                    <input type="password" id="currentPassword" name="currentPassword" class="profile-form-control" required placeholder="Nhập mật khẩu đang dùng">
+                                    <button type="button" class="toggle-password-visibility" tabindex="-1"><i class="fa-regular fa-eye"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="profile-form-group full-width">
+                                <label for="newPassword">Mật khẩu mới <span class="required-star">*</span></label>
+                                <div class="password-input-wrapper">
+                                    <input type="password" id="newPassword" name="newPassword" class="profile-form-control" required placeholder="Tối thiểu 8 ký tự, có chữ hoa, thường & số">
+                                    <button type="button" class="toggle-password-visibility" tabindex="-1"><i class="fa-regular fa-eye"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="profile-form-group full-width">
+                                <label for="confirmPassword">Xác nhận mật khẩu mới <span class="required-star">*</span></label>
+                                <div class="password-input-wrapper">
+                                    <input type="password" id="confirmPassword" name="confirmPassword" class="profile-form-control" required placeholder="Nhập lại mật khẩu mới">
+                                    <button type="button" class="toggle-password-visibility" tabindex="-1"><i class="fa-regular fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-form-actions">
+                            <button type="submit" class="profile-btn-primary" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);">
+                                <i class="fa-solid fa-shield-halved"></i> Cập nhật mật khẩu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts for Tab Switching, Image Preview, and Show/Hide Password -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Tab switching logic
+            const tabBtns = document.querySelectorAll(".profile-tab-btn");
+            const panels = document.querySelectorAll(".profile-tab-panel");
+            
+            // Check active tab via URL search query
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeTabParam = urlParams.get('tab');
+            
+            if (activeTabParam === 'password') {
+                switchTab('password');
+            }
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const targetTab = this.getAttribute("data-tab");
+                    switchTab(targetTab);
+                });
+            });
+            
+            function switchTab(tabName) {
+                tabBtns.forEach(b => b.classList.remove("active"));
+                panels.forEach(p => p.classList.remove("active"));
+                
+                const activeBtn = document.querySelector(`.profile-tab-btn[data-tab="${tabName}"]`);
+                const activePanel = document.getElementById(`${tabName}-tab`);
+                
+                if (activeBtn) activeBtn.classList.add("active");
+                if (activePanel) activePanel.classList.add("active");
+            }
+
+            // Image file selection & instant client preview
+            const avatarInput = document.getElementById("avatarFileInput");
+            const avatarImg = document.getElementById("avatarPreviewImg");
+            const placeholderImg = document.getElementById("avatarPlaceholder");
+            
+            if (avatarInput) {
+                avatarInput.addEventListener("change", function() {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            if (avatarImg) {
+                                avatarImg.src = e.target.result;
+                            } else {
+                                const parent = placeholderImg.parentElement;
+                                const newImg = document.createElement("img");
+                                newImg.id = "avatarPreviewImg";
+                                newImg.src = e.target.result;
+                                newImg.alt = "Avatar";
+                                newImg.className = "profile-large-avatar";
+                                placeholderImg.style.display = "none";
+                                parent.appendChild(newImg);
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // Show/Hide Password Toggle
+            const toggleBtns = document.querySelectorAll(".toggle-password-visibility");
+            toggleBtns.forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const input = this.previousElementSibling;
+                    const icon = this.querySelector("i");
+                    if (input.type === "password") {
+                        input.type = "text";
+                        icon.classList.remove("fa-eye");
+                        icon.classList.add("fa-eye-slash");
+                    } else {
+                        input.type = "password";
+                        icon.classList.remove("fa-eye-slash");
+                        icon.classList.add("fa-eye");
+                    }
+                });
+            });
+        });
+    </script>
+</main>
+
+</body>
+</html>

@@ -33,6 +33,9 @@ public class AccountServiceImpl implements AccountService {
             if (account.getProfile() != null) {
                 account.getProfile().getFullName(); // Eagerly initialize proxy
             }
+            if (account.getEmployeeProfile() != null) {
+                account.getEmployeeProfile().getFullName(); // Eagerly initialize proxy
+            }
         }
         return accounts;
     }
@@ -48,6 +51,9 @@ public class AccountServiceImpl implements AccountService {
             if (account.getProfile() != null) {
                 account.getProfile().getFullName(); // Eagerly initialize proxy
             }
+            if (account.getEmployeeProfile() != null) {
+                account.getEmployeeProfile().getFullName(); // Eagerly initialize proxy
+            }
         }
         return accountOpt;
     }
@@ -62,6 +68,9 @@ public class AccountServiceImpl implements AccountService {
             }
             if (account.getProfile() != null) {
                 account.getProfile().getFullName(); // Eagerly initialize proxy
+            }
+            if (account.getEmployeeProfile() != null) {
+                account.getEmployeeProfile().getFullName(); // Eagerly initialize proxy
             }
         }
         return accountOpt;

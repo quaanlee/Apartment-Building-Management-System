@@ -83,13 +83,26 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Transactional
     public UserDTO saveUserDTO(UserDTO userDto) {
-        // Find role
-        Optional<Role> roleOpt = roleRepository.findByRoleName(userDto.getRoleName().toUpperCase());
+        // Find role robustly (handles space/underscore formats case-insensitively)
+        String lookupName = userDto.getRoleName();
+        Optional<Role> roleOpt = roleRepository.findByRoleName(lookupName);
+        if (!roleOpt.isPresent()) {
+            roleOpt = roleRepository.findByRoleName(lookupName.toUpperCase());
+        }
+        if (!roleOpt.isPresent() && lookupName.contains("_")) {
+            roleOpt = roleRepository.findByRoleName(lookupName.replace("_", " "));
+        }
+        if (!roleOpt.isPresent() && lookupName.contains(" ")) {
+            roleOpt = roleRepository.findByRoleName(lookupName.replace(" ", "_"));
+        }
+        
         if (!roleOpt.isPresent()) {
             throw new IllegalArgumentException("Role not found: " + userDto.getRoleName());
         }
 
-        boolean isEmployee = "MANAGER".equalsIgnoreCase(userDto.getRoleName()) || "MAINTENANCE_STAFF".equalsIgnoreCase(userDto.getRoleName());
+        boolean isEmployee = "MANAGER".equalsIgnoreCase(userDto.getRoleName()) 
+                || "MAINTENANCE_STAFF".equalsIgnoreCase(userDto.getRoleName())
+                || "MAINTENANCE STAFF".equalsIgnoreCase(userDto.getRoleName());
 
         Account account;
         Profile profile = null;
@@ -135,6 +148,7 @@ public class ProfileServiceImpl implements ProfileService {
             employeeProfile.setPhoneNumber(userDto.getPhoneNumber());
             employeeProfile.setEmail(userDto.getEmail());
             employeeProfile.setAvatarUrl(userDto.getAvatarUrl());
+            employeeProfile.setAddress(userDto.getAddress());
             employeeProfile.setStatus(userDto.getAccountStatus() != null ? userDto.getAccountStatus() : true);
             employeeProfile = employeeProfileRepository.save(employeeProfile);
             return new UserDTO(employeeProfile);

@@ -69,6 +69,9 @@ public class UserDTO {
 
     private String avatarUrl;
 
+    @Size(max = 255, message = "Address must not exceed 255 characters")
+    private String address;
+
     @Size(max = 100, message = "Emergency Contact Name must not exceed 100 characters")
     private String emergencyContactName;
 
@@ -148,6 +151,7 @@ public class UserDTO {
             this.phoneNumber = employeeProfile.getPhoneNumber();
             this.email = employeeProfile.getEmail();
             this.avatarUrl = employeeProfile.getAvatarUrl();
+            this.address = employeeProfile.getAddress();
 
             if (employeeProfile.getAccount() != null) {
                 this.accountId = employeeProfile.getAccount().getAccountId();
@@ -179,6 +183,7 @@ public class UserDTO {
                 this.phoneNumber = ep.getPhoneNumber();
                 this.email = ep.getEmail();
                 this.avatarUrl = ep.getAvatarUrl();
+                this.address = ep.getAddress();
             } else if (account.getProfile() != null) {
                 Profile p = account.getProfile();
                 this.profileId = p.getProfileId();
@@ -450,5 +455,13 @@ public class UserDTO {
 
     public void setApartmentNumber(String apartmentNumber) {
         this.apartmentNumber = apartmentNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

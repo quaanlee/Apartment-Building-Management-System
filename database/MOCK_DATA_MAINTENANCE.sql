@@ -83,16 +83,13 @@ BEGIN
 END
 GO
 
--- 4. Profiles
-IF EXISTS (SELECT 1 FROM Profile WHERE ProfileID = 1)
-    UPDATE Profile SET AccountID = 2, ApartmentID = NULL, FullName = N'Nguyen Van Ly (Manager)', Gender = N'Nam', PhoneNumber = '0912345678', Email = 'lynv@abms.com', CitizenID = '123456789001', IsHouseholdOwner = 1, ResidentStatus = 1 WHERE ProfileID = 1;
-ELSE
+-- Unlink old staff records from Profile table if they exist to avoid Account mapping confusion
+IF EXISTS (SELECT 1 FROM Profile WHERE ProfileID IN (1, 3, 4))
 BEGIN
-    SET IDENTITY_INSERT Profile ON;
-    INSERT INTO Profile (ProfileID, AccountID, ApartmentID, FullName, Gender, PhoneNumber, Email, CitizenID, IsHouseholdOwner, ResidentStatus) VALUES (1, 2, NULL, N'Nguyen Van Ly (Manager)', N'Nam', '0912345678', 'lynv@abms.com', '123456789001', 1, 1);
-    SET IDENTITY_INSERT Profile OFF;
+    UPDATE Profile SET AccountID = NULL WHERE ProfileID IN (1, 3, 4);
 END
 
+-- 4. Resident Profiles
 IF EXISTS (SELECT 1 FROM Profile WHERE ProfileID = 2)
     UPDATE Profile SET AccountID = 3, ApartmentID = 1, FullName = N'Tran Duc Nam (Resident)', Gender = N'Nam', PhoneNumber = '0987654321', Email = 'namtd@gmail.com', CitizenID = '123456789002', IsHouseholdOwner = 1, ResidentStatus = 1 WHERE ProfileID = 2;
 ELSE
@@ -101,24 +98,23 @@ BEGIN
     INSERT INTO Profile (ProfileID, AccountID, ApartmentID, FullName, Gender, PhoneNumber, Email, CitizenID, IsHouseholdOwner, ResidentStatus) VALUES (2, 3, 1, N'Tran Duc Nam (Resident)', N'Nam', '0987654321', 'namtd@gmail.com', '123456789002', 1, 1);
     SET IDENTITY_INSERT Profile OFF;
 END
+GO
 
-IF EXISTS (SELECT 1 FROM Profile WHERE ProfileID = 3)
-    UPDATE Profile SET AccountID = 4, ApartmentID = NULL, FullName = N'Le Van Sua (Thợ ống nước)', Gender = N'Nam', PhoneNumber = '0922222222', Email = 'sualv@abms.com', CitizenID = '123456789003', IsHouseholdOwner = 0, ResidentStatus = 1 WHERE ProfileID = 3;
+-- 4.1 Employee Profiles
+IF EXISTS (SELECT 1 FROM EmployeeProfile WHERE AccountID = 2)
+    UPDATE EmployeeProfile SET FullName = N'Nguyen Van Ly (Manager)', Gender = 1, PhoneNumber = '0912345678', Email = 'manager1@gmail.com', Address = N'Phòng BQL, Tầng 1', Status = 1 WHERE AccountID = 2;
 ELSE
-BEGIN
-    SET IDENTITY_INSERT Profile ON;
-    INSERT INTO Profile (ProfileID, AccountID, ApartmentID, FullName, Gender, PhoneNumber, Email, CitizenID, IsHouseholdOwner, ResidentStatus) VALUES (3, 4, NULL, N'Le Van Sua (Thợ ống nước)', N'Nam', '0922222222', 'sualv@abms.com', '123456789003', 0, 1);
-    SET IDENTITY_INSERT Profile OFF;
-END
+    INSERT INTO EmployeeProfile (AccountID, FullName, Gender, PhoneNumber, Email, Address, Status) VALUES (2, N'Nguyen Van Ly (Manager)', 1, '0912345678', 'manager1@gmail.com', N'Phòng BQL, Tầng 1', 1);
 
-IF EXISTS (SELECT 1 FROM Profile WHERE ProfileID = 4)
-    UPDATE Profile SET AccountID = 5, ApartmentID = NULL, FullName = N'Pham Minh Dien (Thợ sửa điện)', Gender = N'Nam', PhoneNumber = '0933333333', Email = 'dienpm@abms.com', CitizenID = '123456789004', IsHouseholdOwner = 0, ResidentStatus = 1 WHERE ProfileID = 4;
+IF EXISTS (SELECT 1 FROM EmployeeProfile WHERE AccountID = 4)
+    UPDATE EmployeeProfile SET FullName = N'Le Van Sua (Thợ ống nước)', Gender = 1, PhoneNumber = '0922222222', Email = 'worker1@gmail.com', Address = N'Phòng kỹ thuật, Tầng hầm B1', Status = 1 WHERE AccountID = 4;
 ELSE
-BEGIN
-    SET IDENTITY_INSERT Profile ON;
-    INSERT INTO Profile (ProfileID, AccountID, ApartmentID, FullName, Gender, PhoneNumber, Email, CitizenID, IsHouseholdOwner, ResidentStatus) VALUES (4, 5, NULL, N'Pham Minh Dien (Thợ sửa điện)', N'Nam', '0933333333', 'dienpm@abms.com', '123456789004', 0, 1);
-    SET IDENTITY_INSERT Profile OFF;
-END
+    INSERT INTO EmployeeProfile (AccountID, FullName, Gender, PhoneNumber, Email, Address, Status) VALUES (4, N'Le Van Sua (Thợ ống nước)', 1, '0922222222', 'worker1@gmail.com', N'Phòng kỹ thuật, Tầng hầm B1', 1);
+
+IF EXISTS (SELECT 1 FROM EmployeeProfile WHERE AccountID = 5)
+    UPDATE EmployeeProfile SET FullName = N'Pham Minh Dien (Thợ sửa điện)', Gender = 1, PhoneNumber = '0933333333', Email = 'worker2@gmail.com', Address = N'Phòng kỹ thuật, Tầng hầm B1', Status = 1 WHERE AccountID = 5;
+ELSE
+    INSERT INTO EmployeeProfile (AccountID, FullName, Gender, PhoneNumber, Email, Address, Status) VALUES (5, N'Pham Minh Dien (Thợ sửa điện)', 1, '0933333333', 'worker2@gmail.com', N'Phòng kỹ thuật, Tầng hầm B1', 1);
 GO
 
 -- 5. Maintenance Requests
@@ -205,10 +201,10 @@ GO
 SET IDENTITY_INSERT Notification ON;
 
 IF EXISTS (SELECT 1 FROM Notification WHERE NotificationID = 1)
-    UPDATE Notification SET Title = N'Công việc mới được phân công', Content = N'Bạn được phân công xử lý sự cố: Ổ cắm điện phòng khách bị cháy chập.', CreatedBy = 2, CreatedAt = DATEADD(hour, -1, GETDATE()), RelatedEntityType = 'MaintenanceTask', RelatedEntityId = 1 WHERE NotificationID = 1;
+    UPDATE Notification SET Title = N'Công việc mới được phân công', Content = N'Bạn được phân công xử lý sự cố: Ổ cắm điện phòng khách bị cháy chập.', CreatedBy = 2, CreatedAt = DATEADD(hour, -1, GETDATE()), RelatedEntityType = 'MaintenanceTask', ReceiverID = 4 WHERE NotificationID = 1;
 ELSE
-    INSERT INTO Notification (NotificationID, Title, Content, NotificationType, CreatedBy, CreatedAt, RelatedEntityType, RelatedEntityId)
-    VALUES (1, N'Công việc mới được phân công', N'Bạn được phân công xử lý sự cố: Ổ cắm điện phòng khách bị cháy chập.', 3, 2, DATEADD(hour, -1, GETDATE()), 'MaintenanceTask', 1);
+    INSERT INTO Notification (NotificationID, Title, Content, NotificationType, CreatedBy, CreatedAt, RelatedEntityType, ReceiverID)
+    VALUES (1, N'Công việc mới được phân công', N'Bạn được phân công xử lý sự cố: Ổ cắm điện phòng khách bị cháy chập.', 3, 2, DATEADD(hour, -1, GETDATE()), 'MaintenanceTask', 4);
 
 SET IDENTITY_INSERT Notification OFF;
 GO

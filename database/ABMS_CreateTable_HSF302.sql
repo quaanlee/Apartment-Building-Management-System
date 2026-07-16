@@ -140,6 +140,7 @@ CREATE TABLE Service (
     ServiceType NVARCHAR(50)    NULL,                    -- Điện, Nước, Gửi xe, Vệ sinh,...
     UnitPrice   DECIMAL(18,2)   NOT NULL         DEFAULT 0,
     UnitID      INT             NOT NULL,
+    Description NVARCHAR(500)   NULL,
     Status      BIT             NOT NULL         DEFAULT 1,
 
     CONSTRAINT FK_Service_Unit FOREIGN KEY (UnitID) REFERENCES Unit(UnitID)
@@ -396,6 +397,7 @@ CREATE TABLE SystemLog (
     EntityType  NVARCHAR(50)    NULL,                       -- Account, Bill, Booking,...
     EntityID    INT             NULL,
     IPAddress   VARCHAR(45)     NULL,                       -- Hỗ trợ IPv6
+    Details     NVARCHAR(MAX)   NULL,
     CreatedAt   DATETIME        NOT NULL         DEFAULT GETDATE(),
 
     CONSTRAINT FK_SystemLog_Account FOREIGN KEY (AccountID) REFERENCES Account(AccountID)

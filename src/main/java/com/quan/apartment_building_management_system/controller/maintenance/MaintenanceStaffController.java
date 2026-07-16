@@ -8,6 +8,10 @@ import com.quan.apartment_building_management_system.service.maintenance.Mainten
 import com.quan.apartment_building_management_system.service.maintenance.MaintenanceTaskService;
 import com.quan.apartment_building_management_system.service.utility.CloudinaryUploadService;
 import com.quan.apartment_building_management_system.service.maintenance.MaintenanceReportImageService;
+import com.quan.apartment_building_management_system.service.user.AccountService;
+import com.quan.apartment_building_management_system.service.user.ProfileService;
+import com.quan.apartment_building_management_system.dto.user.UserDTO;
+import com.quan.apartment_building_management_system.entity.Account;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -37,19 +41,25 @@ public class MaintenanceStaffController {
     private final com.quan.apartment_building_management_system.service.system.NotificationService notificationService;
     private final CloudinaryUploadService cloudinaryUploadService;
     private final MaintenanceReportImageService maintenanceReportImageService;
+    private final AccountService accountService;
+    private final ProfileService profileService;
 
     public MaintenanceStaffController(MaintenanceTaskService maintenanceTaskService,
                                       MaintenanceReportService maintenanceReportService,
                                       com.quan.apartment_building_management_system.service.user.AccountNotificationService accountNotificationService,
                                       com.quan.apartment_building_management_system.service.system.NotificationService notificationService,
                                       CloudinaryUploadService cloudinaryUploadService,
-                                      MaintenanceReportImageService maintenanceReportImageService) {
+                                      MaintenanceReportImageService maintenanceReportImageService,
+                                      AccountService accountService,
+                                      ProfileService profileService) {
         this.maintenanceTaskService = maintenanceTaskService;
         this.maintenanceReportService = maintenanceReportService;
         this.accountNotificationService = accountNotificationService;
         this.notificationService = notificationService;
         this.cloudinaryUploadService = cloudinaryUploadService;
         this.maintenanceReportImageService = maintenanceReportImageService;
+        this.accountService = accountService;
+        this.profileService = profileService;
     }
 
     // Utility to simulate logged-in maintenance staff. 
@@ -283,7 +293,7 @@ public class MaintenanceStaffController {
                 boolean alreadyNotified = false;
                 for (com.quan.apartment_building_management_system.entity.AccountNotification an : existingNotifs) {
                     if ("MaintenanceTask".equals(an.getNotification().getRelatedEntityType()) 
-                            && an.getNotification().getContent().contains("'" + task.getMaintenanceRequest().getTitle() + "'")
+                            && an.getNotification().getContent().contains(task.getMaintenanceRequest().getTitle())
                             && "Cảnh báo công việc trễ hạn".equals(an.getNotification().getTitle())) {
                         alreadyNotified = true;
                         break;
@@ -331,7 +341,7 @@ public class MaintenanceStaffController {
             Integer taskId = null;
             if ("MaintenanceTask".equals(an.getNotification().getRelatedEntityType())) {
                 for (com.quan.apartment_building_management_system.entity.MaintenanceTask task : tasks) {
-                    if (an.getNotification().getContent().contains("'" + task.getMaintenanceRequest().getTitle() + "'")) {
+                    if (an.getNotification().getContent().contains(task.getMaintenanceRequest().getTitle())) {
                         taskId = task.getTaskId();
                         break;
                     }
@@ -390,7 +400,7 @@ public class MaintenanceStaffController {
                 boolean alreadyNotified = false;
                 for (com.quan.apartment_building_management_system.entity.AccountNotification an : existingNotifs) {
                     if ("MaintenanceTask".equals(an.getNotification().getRelatedEntityType()) 
-                            && an.getNotification().getContent().contains("'" + task.getMaintenanceRequest().getTitle() + "'")
+                            && an.getNotification().getContent().contains(task.getMaintenanceRequest().getTitle())
                             && "Cảnh báo công việc trễ hạn".equals(an.getNotification().getTitle())) {
                         alreadyNotified = true;
                         break;
@@ -442,7 +452,7 @@ public class MaintenanceStaffController {
                 if ("MaintenanceTask".equals(an.getNotification().getRelatedEntityType())) {
                     List<com.quan.apartment_building_management_system.entity.MaintenanceTask> tasks = maintenanceTaskService.findByStaffId(staffId);
                     for (com.quan.apartment_building_management_system.entity.MaintenanceTask task : tasks) {
-                        if (an.getNotification().getContent().contains("'" + task.getMaintenanceRequest().getTitle() + "'")) {
+                        if (an.getNotification().getContent().contains(task.getMaintenanceRequest().getTitle())) {
                             return "redirect:/maintenance_staff/tasks/" + task.getTaskId();
                         }
                     }
@@ -463,5 +473,132 @@ public class MaintenanceStaffController {
             accountNotificationService.save(an);
         }
         return "redirect:/maintenance_staff/notifications";
+    }
+
+    // 11. View Profile Page
+    @GetMapping("/profile")
+    public String viewProfile(@RequestParam(value = "tab", defaultValue = "personal") String tab,
+                              HttpSession session, Model model) {
+        Integer staffId = getLoggedInStaffId(session);
+        Optional<Account> accountOpt = accountService.findById(staffId);
+        if (accountOpt.isEmpty()) {
+            return "redirect:/login";
+        }
+        Account account = accountOpt.get();
+        UserDTO userDto = new UserDTO(account);
+        model.addAttribute("userDto", userDto);
+        model.addAttribute("activeTab", "profile");
+        model.addAttribute("activeProfileTab", tab);
+        model.addAttribute("pageTitle", "Hồ sơ cá nhân");
+        return "maintenance_staff/profile";
+    }
+
+    // 12. Update Profile Details
+    @PostMapping("/profile/update")
+    public String updateProfile(@Valid @ModelAttribute("userDto") UserDTO userDto,
+                                BindingResult bindingResult,
+                                @RequestParam(value = "avatarFile", required = false) MultipartFile avatarFile,
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes,
+                                Model model) {
+        Integer staffId = getLoggedInStaffId(session);
+        Optional<Account> accountOpt = accountService.findById(staffId);
+        if (accountOpt.isEmpty()) {
+            return "redirect:/login";
+        }
+        Account account = accountOpt.get();
+
+        // Bind secure fields manually to prevent tampering
+        userDto.setAccountId(account.getAccountId());
+        userDto.setEmployeeProfileId(account.getEmployeeProfile() != null ? account.getEmployeeProfile().getEmployeeProfileId() : null);
+        userDto.setRoleName("MAINTENANCE_STAFF");
+        userDto.setPassword(account.getPassword());
+
+        boolean hasRealErrors = false;
+        if (bindingResult.hasErrors()) {
+            for (org.springframework.validation.FieldError error : bindingResult.getFieldErrors()) {
+                if (!"password".equals(error.getField()) && !"roleName".equals(error.getField())) {
+                    hasRealErrors = true;
+                }
+            }
+        }
+
+        if (hasRealErrors) {
+            model.addAttribute("pageTitle", "Hồ sơ cá nhân");
+            model.addAttribute("activeTab", "profile");
+            model.addAttribute("activeProfileTab", "personal");
+            return "maintenance_staff/profile";
+        }
+
+        // Handle avatar upload to Cloudinary
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            try {
+                String url = cloudinaryUploadService.uploadImage(avatarFile, "abms/avatars");
+                if (url != null) {
+                    userDto.setAvatarUrl(url);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                redirectAttributes.addFlashAttribute("message", "Lỗi tải ảnh lên: " + e.getMessage());
+                redirectAttributes.addFlashAttribute("messageType", "error");
+                return "redirect:/maintenance_staff/profile";
+            }
+        } else {
+            if (account.getEmployeeProfile() != null) {
+                userDto.setAvatarUrl(account.getEmployeeProfile().getAvatarUrl());
+            }
+        }
+
+        profileService.saveUserDTO(userDto);
+
+        // Refresh session
+        Optional<Account> updatedAccountOpt = accountService.findById(staffId);
+        updatedAccountOpt.ifPresent(updatedAccount -> session.setAttribute("currentUser", updatedAccount));
+
+        redirectAttributes.addFlashAttribute("message", "Cập nhật thông tin cá nhân thành công!");
+        redirectAttributes.addFlashAttribute("messageType", "success");
+        return "redirect:/maintenance_staff/profile";
+    }
+
+    // 13. Change Password
+    @PostMapping("/profile/change-password")
+    public String changePassword(@RequestParam("currentPassword") String currentPassword,
+                                 @RequestParam("newPassword") String newPassword,
+                                 @RequestParam("confirmPassword") String confirmPassword,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        Integer staffId = getLoggedInStaffId(session);
+        Optional<Account> accountOpt = accountService.findById(staffId);
+        if (accountOpt.isEmpty()) {
+            return "redirect:/login";
+        }
+        Account account = accountOpt.get();
+
+        if (!account.getPassword().equals(currentPassword)) {
+            redirectAttributes.addFlashAttribute("message", "Mật khẩu hiện tại không đúng!");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/maintenance_staff/profile?tab=password";
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("message", "Mật khẩu mới và xác nhận mật khẩu không khớp!");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/maintenance_staff/profile?tab=password";
+        }
+
+        if (newPassword.length() < 8 || !newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+            redirectAttributes.addFlashAttribute("message", "Mật khẩu mới phải có ít nhất 8 ký tự và bao gồm chữ hoa, chữ thường và chữ số.");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+            return "redirect:/maintenance_staff/profile?tab=password";
+        }
+
+        account.setPassword(newPassword);
+        accountService.save(account);
+
+        session.setAttribute("currentUser", account);
+
+        redirectAttributes.addFlashAttribute("message", "Đổi mật khẩu thành công!");
+        redirectAttributes.addFlashAttribute("messageType", "success");
+        return "redirect:/maintenance_staff/profile";
     }
 }

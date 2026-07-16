@@ -9,7 +9,7 @@
     <!-- Welcome Header -->
     <div class="page-header">
         <div>
-            <h2 th:text="'Chào mừng trở lại, ' + (${session.currentUser != null && session.currentUser.profile != null} ? ${session.currentUser.profile.fullName} : 'Đối tác bảo trì') + '!'">Chào mừng trở lại!</h2>
+            <h2 th:text="'Chào mừng trở lại, ' + (${session.currentUser != null && session.currentUser.employeeProfile != null} ? ${session.currentUser.employeeProfile.fullName} : 'Đối tác bảo trì') + '!'">Chào mừng trở lại!</h2>
             <p>Đây là tổng quan về khối lượng công việc bảo trì hiện tại và tiến độ của bạn.</p>
         </div>
         <div class="current-date">
