@@ -25,4 +25,5 @@ public interface ProfileService {
     Page<UserDTO> findFiltered(String search, Integer roleId, Boolean status, Pageable pageable);
     List<Profile> findActiveMaintenanceStaffs();
     UserDTO saveUserDTO(UserDTO userDto);
+    Optional<Profile> findByPhoneNumber(String phoneNumber);
 }

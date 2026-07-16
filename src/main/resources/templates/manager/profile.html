@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/maintenance/layout_maintenance :: maintenance-layout(~{::main}, 'profile')}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/manager/layout_manager :: manager-layout(~{::main}, 'profile')}">
 <head>
-    <title>Hồ sơ cá nhân - ABMS</title>
+    <title>Hồ sơ cá nhân - ABMS Quản Lý</title>
 </head>
 <body>
 
@@ -22,23 +22,20 @@
         <div class="profile-card profile-sidebar-card">
             <div class="avatar-upload-section">
                 <div class="avatar-preview-container">
-                    <!-- If user has avatar URL -->
                     <img th:if="${userDto.avatarUrl != null && !userDto.avatarUrl.isEmpty()}" 
                          th:src="${userDto.avatarUrl}" 
                          id="avatarPreviewImg" 
                          alt="Avatar" 
                          class="profile-large-avatar">
-                    <!-- If user does not have avatar URL -->
                     <div th:unless="${userDto.avatarUrl != null && !userDto.avatarUrl.isEmpty()}" 
                          id="avatarPlaceholder" 
                          class="profile-large-avatar-placeholder" 
-                         th:text="${#strings.substring(userDto.fullName, 0, 1)}">NV</div>
+                         th:text="${#strings.substring(userDto.fullName, 0, 1)}">QL</div>
                 </div>
                 
                 <label for="avatarFileInput" class="avatar-upload-btn">
                     <i class="fa-solid fa-camera"></i> Đổi ảnh đại diện
                 </label>
-                <!-- Linked to profileUpdateForm using HTML5 'form' attribute -->
                 <input type="file" id="avatarFileInput" name="avatarFile" form="profileUpdateForm" accept="image/*" style="display: none;">
                 <p class="upload-hint">Chấp nhận JPG, PNG kích thước tối đa 2MB.</p>
             </div>
@@ -50,7 +47,7 @@
                 </div>
                 <div class="meta-item">
                     <span class="meta-label"><i class="fa-solid fa-user-shield"></i> Vai trò quyền</span>
-                    <span class="meta-value role-badge">Nhân viên bảo trì</span>
+                    <span class="meta-value role-badge">Quản lý</span>
                 </div>
                 <div class="meta-item">
                     <span class="meta-label"><i class="fa-solid fa-circle-check"></i> Trạng thái</span>
@@ -76,8 +73,7 @@
                 
                 <!-- Panel 1: Personal Details Form -->
                 <div id="personal-tab" class="profile-tab-panel active">
-                    <form th:action="@{/maintenance_staff/profile/update}" method="post" enctype="multipart/form-data" th:object="${userDto}" id="profileUpdateForm">
-                        <!-- Hidden inputs for validation requirements -->
+                    <form th:action="@{/profile/update}" method="post" enctype="multipart/form-data" th:object="${userDto}" id="profileUpdateForm">
                         <input type="hidden" th:field="*{accountId}">
                         <input type="hidden" th:field="*{employeeProfileId}">
                         <input type="hidden" th:field="*{email}">
@@ -112,7 +108,7 @@
                             </div>
 
                             <div class="profile-form-group full-width">
-                                <label for="address">Địa chỉ thường trú</label>
+                                <label for="address">Địa chỉ liên hệ</label>
                                 <input type="text" id="address" th:field="*{address}" class="profile-form-control" th:classappend="${#fields.hasErrors('address')} ? 'is-invalid'" placeholder="Số nhà, đường, quận/huyện, thành phố...">
                                 <span class="profile-error-text" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
                             </div>
@@ -128,7 +124,7 @@
 
                 <!-- Panel 2: Change Password Form -->
                 <div id="password-tab" class="profile-tab-panel">
-                    <form th:action="@{/maintenance_staff/profile/change-password}" method="post">
+                    <form th:action="@{/profile/change-password}" method="post">
                         <h3 class="panel-section-title">Thay đổi mật khẩu đăng nhập</h3>
                         
                         <div class="password-form-container">

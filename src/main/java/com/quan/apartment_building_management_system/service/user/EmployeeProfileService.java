@@ -8,6 +8,8 @@ import java.util.Optional;
 public interface EmployeeProfileService {
     List<EmployeeProfile> findAll();
     Optional<EmployeeProfile> findById(Integer id);
+    Optional<EmployeeProfile> findByAccountId(Integer accountId);
     EmployeeProfile save(EmployeeProfile employeeProfile);
     void deleteById(Integer id);
+    Optional<EmployeeProfile> findByPhoneNumber(String phoneNumber);
 }

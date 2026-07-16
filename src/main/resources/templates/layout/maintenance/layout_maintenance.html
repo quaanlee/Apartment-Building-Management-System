@@ -74,11 +74,11 @@
                     
                     <a th:href="@{/maintenance_staff/profile}" class="user-profile-trigger" id="userProfileTrigger" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
                         <img th:if="${session.currentUser != null && session.currentUser.employeeProfile != null && session.currentUser.employeeProfile.avatarUrl != null}"
-                             th:src="${session.currentUser.employeeProfile.avatarUrl}" 
-                             alt="Avatar" 
+                             th:src="${session.currentUser.employeeProfile.avatarUrl}"
+                             alt="Avatar"
                              style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #e2e8f0;">
                         <div th:unless="${session.currentUser != null && session.currentUser.employeeProfile != null && session.currentUser.employeeProfile.avatarUrl != null}"
-                             class="user-avatar-placeholder" 
+                             class="user-avatar-placeholder"
                              th:text="${session.currentUser != null && session.currentUser.employeeProfile != null ? #strings.substring(session.currentUser.employeeProfile.fullName, 0, 1) : 'NV'}">NV</div>
                         <span class="user-role" th:text="${session.currentUser != null && session.currentUser.employeeProfile != null ? session.currentUser.employeeProfile.fullName : 'Nhân viên bảo trì'}">Nhân viên bảo trì</span>
                     </a>

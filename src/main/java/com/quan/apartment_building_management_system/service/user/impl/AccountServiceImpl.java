@@ -104,4 +104,23 @@ public class AccountServiceImpl implements AccountService {
                 .map(UserDTO::new)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional
+    public boolean changePassword(Integer accountId, String oldPassword, String newPassword) {
+        Optional<Account> opt = accountRepository.findById(accountId);
+        if (opt.isEmpty())
+            return false;
+        Account account = opt.get();
+        if (!account.getPassword().equals(oldPassword))
+            return false;
+
+        // Execute an explicit UPDATE statement to guarantee the database is modified
+        // immediately
+        accountRepository.updatePassword(accountId, newPassword);
+
+        // Update the persistence context as well
+        account.setPassword(newPassword);
+        return true;
+    }
 }

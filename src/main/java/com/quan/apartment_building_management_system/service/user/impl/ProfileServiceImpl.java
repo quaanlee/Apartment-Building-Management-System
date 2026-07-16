@@ -61,7 +61,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Transactional
     public Profile save(Profile profile) {
-        return profileRepository.save(profile);
+        return profileRepository.saveAndFlush(profile);
     }
 
     @Override
@@ -95,12 +95,12 @@ public class ProfileServiceImpl implements ProfileService {
         if (!roleOpt.isPresent() && lookupName.contains(" ")) {
             roleOpt = roleRepository.findByRoleName(lookupName.replace(" ", "_"));
         }
-        
+
         if (!roleOpt.isPresent()) {
             throw new IllegalArgumentException("Role not found: " + userDto.getRoleName());
         }
 
-        boolean isEmployee = "MANAGER".equalsIgnoreCase(userDto.getRoleName()) 
+        boolean isEmployee = "MANAGER".equalsIgnoreCase(userDto.getRoleName())
                 || "MAINTENANCE_STAFF".equalsIgnoreCase(userDto.getRoleName())
                 || "MAINTENANCE STAFF".equalsIgnoreCase(userDto.getRoleName());
 
@@ -111,9 +111,11 @@ public class ProfileServiceImpl implements ProfileService {
         if (isEmployee) {
             if (userDto.getEmployeeProfileId() != null) {
                 employeeProfile = employeeProfileRepository.findById(userDto.getEmployeeProfileId())
-                        .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("EmployeeProfile not found with ID: " + userDto.getEmployeeProfileId()));
+                        .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
+                                "EmployeeProfile not found with ID: " + userDto.getEmployeeProfileId()));
                 account = employeeProfile.getAccount();
-                if (account == null) account = new Account();
+                if (account == null)
+                    account = new Account();
             } else {
                 employeeProfile = new EmployeeProfile();
                 account = new Account();
@@ -121,9 +123,11 @@ public class ProfileServiceImpl implements ProfileService {
         } else {
             if (userDto.getProfileId() != null) {
                 profile = profileRepository.findById(userDto.getProfileId())
-                        .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Profile not found with ID: " + userDto.getProfileId()));
+                        .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
+                                "Profile not found with ID: " + userDto.getProfileId()));
                 account = profile.getAccount();
-                if (account == null) account = new Account();
+                if (account == null)
+                    account = new Account();
             } else {
                 profile = new Profile();
                 account = new Account();
@@ -179,5 +183,10 @@ public class ProfileServiceImpl implements ProfileService {
             profile = profileRepository.save(profile);
             return new UserDTO(profile);
         }
+    }
+
+    @Override
+    public Optional<Profile> findByPhoneNumber(String phoneNumber) {
+        return profileRepository.findByPhoneNumber(phoneNumber);
     }
 }

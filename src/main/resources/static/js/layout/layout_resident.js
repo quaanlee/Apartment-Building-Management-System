@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (messageEl) {
         const message = messageEl.getAttribute('data-message');
         const type = messageEl.getAttribute('data-type') || 'success';
-        if (message) {
+        if (message && message.trim() !== "") {
             showToast(message, type);
         }
     }

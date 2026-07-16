@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/maintenance/layout_maintenance :: maintenance-layout(~{::main}, 'profile')}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/resident/layout_resident :: resident-layout(~{::main}, 'profile')}">
 <head>
-    <title>Hồ sơ cá nhân - ABMS</title>
+    <title>Hồ sơ cá nhân - ABMS Cư Dân</title>
 </head>
 <body>
 
@@ -22,24 +22,20 @@
         <div class="profile-card profile-sidebar-card">
             <div class="avatar-upload-section">
                 <div class="avatar-preview-container">
-                    <!-- If user has avatar URL -->
                     <img th:if="${userDto.avatarUrl != null && !userDto.avatarUrl.isEmpty()}" 
                          th:src="${userDto.avatarUrl}" 
                          id="avatarPreviewImg" 
                          alt="Avatar" 
                          class="profile-large-avatar">
-                    <!-- If user does not have avatar URL -->
                     <div th:unless="${userDto.avatarUrl != null && !userDto.avatarUrl.isEmpty()}" 
                          id="avatarPlaceholder" 
                          class="profile-large-avatar-placeholder" 
-                         th:text="${#strings.substring(userDto.fullName, 0, 1)}">NV</div>
+                         th:text="${#strings.substring(userDto.fullName, 0, 1)}">CD</div>
                 </div>
                 
                 <label for="avatarFileInput" class="avatar-upload-btn">
                     <i class="fa-solid fa-camera"></i> Đổi ảnh đại diện
                 </label>
-                <!-- Linked to profileUpdateForm using HTML5 'form' attribute -->
-                <input type="file" id="avatarFileInput" name="avatarFile" form="profileUpdateForm" accept="image/*" style="display: none;">
                 <p class="upload-hint">Chấp nhận JPG, PNG kích thước tối đa 2MB.</p>
             </div>
 
@@ -50,7 +46,7 @@
                 </div>
                 <div class="meta-item">
                     <span class="meta-label"><i class="fa-solid fa-user-shield"></i> Vai trò quyền</span>
-                    <span class="meta-value role-badge">Nhân viên bảo trì</span>
+                    <span class="meta-value role-badge">Cư dân</span>
                 </div>
                 <div class="meta-item">
                     <span class="meta-label"><i class="fa-solid fa-circle-check"></i> Trạng thái</span>
@@ -76,14 +72,17 @@
                 
                 <!-- Panel 1: Personal Details Form -->
                 <div id="personal-tab" class="profile-tab-panel active">
-                    <form th:action="@{/maintenance_staff/profile/update}" method="post" enctype="multipart/form-data" th:object="${userDto}" id="profileUpdateForm">
-                        <!-- Hidden inputs for validation requirements -->
+                    <form th:action="@{/profile/update}" method="post" enctype="multipart/form-data" th:object="${userDto}" id="profileUpdateForm">
                         <input type="hidden" th:field="*{accountId}">
-                        <input type="hidden" th:field="*{employeeProfileId}">
+                        <input type="hidden" th:field="*{profileId}">
                         <input type="hidden" th:field="*{email}">
                         <input type="hidden" th:field="*{avatarUrl}">
+                        
+                        <!-- Avatar file input moved inside the form for reliable multipart submission -->
+                        <input type="file" id="avatarFileInput" name="avatarFile" accept="image/*" style="display: none;">
 
-                        <h3 class="panel-section-title">Chi tiết thông tin cá nhân</h3>
+                        <h3 class="panel-section-title">Chi tiết thông tin cá nhân (Cư dân)</h3>
+                        
                         <div class="profile-form-grid">
                             <div class="profile-form-group">
                                 <label for="fullName">Họ và tên <span class="required-star">*</span></label>
@@ -108,13 +107,80 @@
                                 <select id="gender" th:field="*{gender}" class="profile-form-control">
                                     <option value="Nam">Nam</option>
                                     <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
                                 </select>
+                            </div>
+                            
+                            <div class="profile-form-group">
+                                <label for="citizenId">Số CCCD / CMND</label>
+                                <input type="text" id="citizenId" th:field="*{citizenId}" class="profile-form-control" th:classappend="${#fields.hasErrors('citizenId')} ? 'is-invalid'" placeholder="Số CCCD (12 số)">
+                                <span class="profile-error-text" th:if="${#fields.hasErrors('citizenId')}" th:errors="*{citizenId}"></span>
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label for="citizenIdIssueDate">Ngày cấp CCCD</label>
+                                <input type="date" id="citizenIdIssueDate" th:field="*{citizenIdIssueDate}" class="profile-form-control" th:classappend="${#fields.hasErrors('citizenIdIssueDate')} ? 'is-invalid'">
+                                <span class="profile-error-text" th:if="${#fields.hasErrors('citizenIdIssueDate')}" th:errors="*{citizenIdIssueDate}"></span>
                             </div>
 
                             <div class="profile-form-group full-width">
-                                <label for="address">Địa chỉ thường trú</label>
-                                <input type="text" id="address" th:field="*{address}" class="profile-form-control" th:classappend="${#fields.hasErrors('address')} ? 'is-invalid'" placeholder="Số nhà, đường, quận/huyện, thành phố...">
-                                <span class="profile-error-text" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+                                <label for="citizenIdIssuePlace">Nơi cấp CCCD</label>
+                                <input type="text" id="citizenIdIssuePlace" th:field="*{citizenIdIssuePlace}" class="profile-form-control" th:classappend="${#fields.hasErrors('citizenIdIssuePlace')} ? 'is-invalid'" placeholder="Nơi cấp">
+                                <span class="profile-error-text" th:if="${#fields.hasErrors('citizenIdIssuePlace')}" th:errors="*{citizenIdIssuePlace}"></span>
+                            </div>
+
+                            <div class="profile-form-group full-width">
+                                <label for="placeOfBirth">Nơi sinh / Quê quán</label>
+                                <input type="text" id="placeOfBirth" th:field="*{placeOfBirth}" class="profile-form-control" th:classappend="${#fields.hasErrors('placeOfBirth')} ? 'is-invalid'" placeholder="Xã/Phường, Quận/Huyện, Tỉnh/Thành phố...">
+                                <span class="profile-error-text" th:if="${#fields.hasErrors('placeOfBirth')}" th:errors="*{placeOfBirth}"></span>
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label for="nationality">Quốc tịch</label>
+                                <input type="text" id="nationality" th:field="*{nationality}" class="profile-form-control" placeholder="Ví dụ: Việt Nam">
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label for="ethnicity">Dân tộc</label>
+                                <input type="text" id="ethnicity" th:field="*{ethnicity}" class="profile-form-control" placeholder="Ví dụ: Kinh">
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label for="occupation">Nghề nghiệp</label>
+                                <input type="text" id="occupation" th:field="*{occupation}" class="profile-form-control" placeholder="Nghề nghiệp hiện tại">
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label for="relationshipToOwner">Quan hệ với chủ hộ</label>
+                                <input type="text" id="relationshipToOwner" th:field="*{relationshipToOwner}" class="profile-form-control" placeholder="Ví dụ: Vợ/Chồng, Con...">
+                            </div>
+
+                            <div class="profile-form-group full-width">
+                                <h4 class="panel-section-subtitle" style="margin-top: 15px; margin-bottom: 5px; color: var(--text-main); font-size: 0.95rem;">Liên hệ khẩn cấp</h4>
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label for="emergencyContactName">Tên người liên hệ</label>
+                                <input type="text" id="emergencyContactName" th:field="*{emergencyContactName}" class="profile-form-control" placeholder="Họ tên người thân">
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label for="emergencyContactPhone">SĐT người liên hệ</label>
+                                <input type="text" id="emergencyContactPhone" th:field="*{emergencyContactPhone}" class="profile-form-control" placeholder="Số điện thoại">
+                            </div>
+
+                            <div class="profile-form-group full-width">
+                                <h4 class="panel-section-subtitle" style="margin-top: 15px; margin-bottom: 5px; color: var(--text-main); font-size: 0.95rem;">Thông tin lưu trú (Chỉ xem)</h4>
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label>Căn hộ</label>
+                                <input type="text" th:value="${userDto.apartmentNumber}" class="profile-form-control" disabled>
+                            </div>
+
+                            <div class="profile-form-group">
+                                <label>Ngày chuyển vào</label>
+                                <input type="date" th:value="${userDto.moveInDate}" class="profile-form-control" disabled>
                             </div>
                         </div>
 
@@ -128,7 +194,7 @@
 
                 <!-- Panel 2: Change Password Form -->
                 <div id="password-tab" class="profile-tab-panel">
-                    <form th:action="@{/maintenance_staff/profile/change-password}" method="post">
+                    <form th:action="@{/profile/change-password}" method="post">
                         <h3 class="panel-section-title">Thay đổi mật khẩu đăng nhập</h3>
                         
                         <div class="password-form-container">

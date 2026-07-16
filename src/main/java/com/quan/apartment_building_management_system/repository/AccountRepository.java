@@ -27,4 +27,8 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     @org.springframework.data.jpa.repository.Query("SELECT a FROM Account a JOIN FETCH a.role r LEFT JOIN FETCH a.employeeProfile ep WHERE r.roleName = 'MAINTENANCE_STAFF' AND a.status = true")
     java.util.List<Account> findActiveMaintenanceStaffs();
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("UPDATE Account a SET a.password = :newPassword WHERE a.accountId = :accountId")
+    void updatePassword(@org.springframework.data.repository.query.Param("accountId") Integer accountId, @org.springframework.data.repository.query.Param("newPassword") String newPassword);
 }

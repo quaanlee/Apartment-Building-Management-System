@@ -1,8 +1,8 @@
 /* Premium styles for Maintenance Staff Profile Page */
 
 :root {
-    --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    --primary-color: #2563eb;
+    --primary-gradient: linear-gradient(135deg, #6b40e8 0%, #451ec9 100%);
+    --primary-color: #582be8;
     --text-main: #1e293b;
     --text-muted: #64748b;
     --border-color: #e2e8f0;
@@ -111,8 +111,8 @@
 .profile-large-avatar-placeholder {
     font-size: 48px;
     font-weight: 700;
-    color: #3b82f6;
-    background: #dbeafe;
+    color: #582be8;
+    background: #f0edfe;
     width: 100%;
     height: 100%;
     display: flex;
@@ -180,8 +180,8 @@
 
 .role-badge {
     display: inline-block;
-    background: #eff6ff;
-    color: #1e40af;
+    background: #f0edfe;
+    color: #582be8;
     padding: 4px 10px;
     border-radius: 6px;
     font-size: 12px;
@@ -313,7 +313,7 @@
 .profile-form-control:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(88, 43, 232, 0.1);
 }
 
 .profile-form-control::placeholder {
@@ -346,7 +346,7 @@
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 4px 12px rgba(88, 43, 232, 0.2);
     transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
@@ -355,7 +355,7 @@
 
 .profile-btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 6px 16px rgba(88, 43, 232, 0.3);
 }
 
 .profile-btn-primary:active {

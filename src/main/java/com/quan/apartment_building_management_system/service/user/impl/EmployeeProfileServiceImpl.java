@@ -30,6 +30,11 @@ public class EmployeeProfileServiceImpl implements EmployeeProfileService {
     }
 
     @Override
+    public Optional<EmployeeProfile> findByAccountId(Integer accountId) {
+        return employeeProfileRepository.findByAccountAccountId(accountId);
+    }
+
+    @Override
     public EmployeeProfile save(EmployeeProfile employeeProfile) {
         return employeeProfileRepository.save(employeeProfile);
     }
@@ -37,5 +42,10 @@ public class EmployeeProfileServiceImpl implements EmployeeProfileService {
     @Override
     public void deleteById(Integer id) {
         employeeProfileRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<EmployeeProfile> findByPhoneNumber(String phoneNumber) {
+        return employeeProfileRepository.findByPhoneNumber(phoneNumber);
     }
 }
