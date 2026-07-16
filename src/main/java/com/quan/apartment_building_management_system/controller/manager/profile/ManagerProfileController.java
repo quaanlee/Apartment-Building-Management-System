@@ -3,6 +3,7 @@ package com.quan.apartment_building_management_system.controller.manager.profile
 import com.quan.apartment_building_management_system.dto.user.UserDTO;
 import com.quan.apartment_building_management_system.entity.Profile;
 import com.quan.apartment_building_management_system.entity.Role;
+import com.quan.apartment_building_management_system.service.user.AccountService;
 import com.quan.apartment_building_management_system.service.user.ProfileService;
 import com.quan.apartment_building_management_system.service.user.RoleService;
 import com.quan.apartment_building_management_system.repository.VehicleRepository;
@@ -29,6 +30,7 @@ public class ManagerProfileController {
 
     private final ProfileService profileService;
     private final RoleService roleService;
+    private final AccountService accountService;
     private final ProfileRepository profileRepository;
     private final VehicleRepository vehicleRepository;
     private final BillRepository billRepository;
@@ -38,6 +40,7 @@ public class ManagerProfileController {
 
     public ManagerProfileController(ProfileService profileService, 
                                RoleService roleService,
+                               AccountService accountService,
                                ProfileRepository profileRepository,
                                VehicleRepository vehicleRepository,
                                BillRepository billRepository,
@@ -46,6 +49,7 @@ public class ManagerProfileController {
                                MaintenanceTaskRepository maintenanceTaskRepository) {
         this.profileService = profileService;
         this.roleService = roleService;
+        this.accountService = accountService;
         this.profileRepository = profileRepository;
         this.vehicleRepository = vehicleRepository;
         this.billRepository = billRepository;
@@ -71,14 +75,14 @@ public class ManagerProfileController {
         }
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserDTO> userPage = profileService.findFiltered(search, roleId, null, pageable);
+        Page<UserDTO> userPage = accountService.findFilteredAccounts(search, roleId, null, pageable);
 
-        List<Profile> allProfiles = profileService.findAll();
-        long totalResidents = allProfiles.stream()
-                .filter(p -> p.getAccount() != null && "RESIDENT".equalsIgnoreCase(p.getAccount().getRole().getRoleName().replace(" ", "_")))
+        List<com.quan.apartment_building_management_system.entity.Account> allAccounts = accountService.findAll();
+        long totalResidents = allAccounts.stream()
+                .filter(a -> a.getRole() != null && "RESIDENT".equalsIgnoreCase(a.getRole().getRoleName().replace(" ", "_")))
                 .count();
-        long totalMaintenance = allProfiles.stream()
-                .filter(p -> p.getAccount() != null && "MAINTENANCE_STAFF".equalsIgnoreCase(p.getAccount().getRole().getRoleName().replace(" ", "_")))
+        long totalMaintenance = allAccounts.stream()
+                .filter(a -> a.getRole() != null && "MAINTENANCE_STAFF".equalsIgnoreCase(a.getRole().getRoleName().replace(" ", "_")))
                 .count();
 
         model.addAttribute("profiles", userPage.getContent());
@@ -98,49 +102,60 @@ public class ManagerProfileController {
 
     @GetMapping("/manager/profiles/{id}")
     public String viewDetail(@PathVariable("id") Integer id, Model model) {
-        Optional<Profile> profileOpt = profileService.findById(id);
-        if (profileOpt.isEmpty()) {
+        Optional<com.quan.apartment_building_management_system.entity.Account> accountOpt = accountService.findById(id);
+        if (accountOpt.isEmpty()) {
             return "redirect:/manager/profiles";
         }
         
-        Profile profile = profileOpt.get();
-        model.addAttribute("profile", profile);
+        com.quan.apartment_building_management_system.entity.Account account = accountOpt.get();
+        UserDTO user = new UserDTO(account);
+        
+        model.addAttribute("user", user);
+        model.addAttribute("account", account);
         model.addAttribute("activeTab", "profiles");
         model.addAttribute("pageTitle", "Profile Details");
         
         // Determine role and load operational data dynamically
         boolean isResident = false;
-        if (profile.getAccount() != null && profile.getAccount().getRole() != null) {
-            isResident = "RESIDENT".equalsIgnoreCase(profile.getAccount().getRole().getRoleName());
+        if (account.getRole() != null) {
+            isResident = "RESIDENT".equalsIgnoreCase(account.getRole().getRoleName());
         }
         
         model.addAttribute("isResident", isResident);
         
         if (isResident) {
-            // Load vehicles
-            model.addAttribute("vehicles", vehicleRepository.findByProfileProfileId(id));
-            
-            // Load utility bookings
-            model.addAttribute("bookings", utilityBookingRepository.findByProfileProfileId(id));
-            
-            // Load bills and household members (if assigned to an apartment)
-            if (profile.getApartment() != null) {
-                model.addAttribute("bills", billRepository.findByApartmentApartmentId(profile.getApartment().getApartmentId()));
-                model.addAttribute("householdMembers", profileRepository.findByApartmentApartmentId(profile.getApartment().getApartmentId()));
+            Integer profileId = user.getProfileId();
+            if (profileId != null) {
+                // Load vehicles
+                model.addAttribute("vehicles", vehicleRepository.findByProfileProfileId(profileId));
+                
+                // Load utility bookings
+                model.addAttribute("bookings", utilityBookingRepository.findByProfileProfileId(profileId));
+                
+                // Load maintenance requests
+                model.addAttribute("requests", maintenanceRequestRepository.findByProfileProfileId(profileId));
+                
+                // Load bills and household members (if assigned to an apartment)
+                Optional<Profile> pOpt = profileService.findById(profileId);
+                if (pOpt.isPresent() && pOpt.get().getApartment() != null) {
+                    Integer aptId = pOpt.get().getApartment().getApartmentId();
+                    model.addAttribute("bills", billRepository.findByApartmentApartmentId(aptId));
+                    model.addAttribute("householdMembers", profileRepository.findByApartmentApartmentId(aptId));
+                    model.addAttribute("apartment", pOpt.get().getApartment());
+                } else {
+                    model.addAttribute("bills", Collections.emptyList());
+                    model.addAttribute("householdMembers", Collections.emptyList());
+                }
             } else {
+                model.addAttribute("vehicles", Collections.emptyList());
+                model.addAttribute("bookings", Collections.emptyList());
+                model.addAttribute("requests", Collections.emptyList());
                 model.addAttribute("bills", Collections.emptyList());
                 model.addAttribute("householdMembers", Collections.emptyList());
             }
-            
-            // Load maintenance requests
-            model.addAttribute("requests", maintenanceRequestRepository.findByProfileProfileId(id));
         } else {
             // For Maintenance Staff, load tasks assigned to their account
-            if (profile.getAccount() != null) {
-                model.addAttribute("tasks", maintenanceTaskRepository.findByStaffAccountId(profile.getAccount().getAccountId()));
-            } else {
-                model.addAttribute("tasks", Collections.emptyList());
-            }
+            model.addAttribute("tasks", maintenanceTaskRepository.findByStaffAccountId(id));
         }
         
         return "manager/profiles/detail";

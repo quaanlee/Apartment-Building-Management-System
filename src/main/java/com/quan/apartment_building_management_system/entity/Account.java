@@ -50,6 +50,9 @@ public class Account {
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     private Profile profile;
 
+    @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
+    private EmployeeProfile employeeProfile;
+
     @OneToMany(mappedBy = "account")
     private List<AccountNotification> accountNotifications = new ArrayList<>();
 
@@ -134,5 +137,13 @@ public class Account {
 
     public void setAccountNotifications(List<AccountNotification> accountNotifications) {
         this.accountNotifications = accountNotifications;
+    }
+
+    public EmployeeProfile getEmployeeProfile() {
+        return employeeProfile;
+    }
+
+    public void setEmployeeProfile(EmployeeProfile employeeProfile) {
+        this.employeeProfile = employeeProfile;
     }
 }

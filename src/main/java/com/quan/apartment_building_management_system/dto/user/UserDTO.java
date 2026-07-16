@@ -1,5 +1,7 @@
 package com.quan.apartment_building_management_system.dto.user;
 
+import com.quan.apartment_building_management_system.entity.Account;
+import com.quan.apartment_building_management_system.entity.EmployeeProfile;
 import com.quan.apartment_building_management_system.entity.Profile;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,13 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class UserDTO {
-    // Account fields
     private Integer accountId;
-
-    @NotBlank(message = "Username is required and can not only space")
-    @Size(min = 5, max = 50, message = "Username must be between 5 and 50 characters")
-    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Username can only contain letters, numbers, and underscores")
-    private String username;
 
     @NotBlank(message = "Password is required and can not only space")
     @Size(min = 6, message = "Password must be at least 6 characters")
@@ -33,6 +29,7 @@ public class UserDTO {
 
     // Profile fields
     private Integer profileId;
+    private Integer employeeProfileId;
 
     @NotBlank(message = "Full Name is required and can not only space")
     @Size(max = 100, message = "Full Name must not exceed 100 characters")
@@ -47,8 +44,7 @@ public class UserDTO {
     @Size(max = 100, message = "Place of Birth must not exceed 100 characters")
     private String placeOfBirth;
 
-    @NotBlank(message = "Citizen ID is required and can not only space")
-    @Pattern(regexp = "^[0-9]{12}$", message = "Citizen ID must be exactly 12 digits")
+    @Pattern(regexp = "^$|^[0-9]{12}$", message = "Citizen ID must be exactly 12 digits")
     private String citizenId;
 
     @Past(message = "Citizen ID Issue Date must be in the past")
@@ -133,13 +129,84 @@ public class UserDTO {
 
             if (profile.getAccount() != null) {
                 this.accountId = profile.getAccount().getAccountId();
-                this.username = profile.getAccount().getUsername();
                 this.password = profile.getAccount().getPassword();
                 this.roleName = profile.getAccount().getRole() != null ? profile.getAccount().getRole().getRoleName()
                         : null;
                 this.accountStatus = profile.getAccount().getStatus();
                 this.accountCreatedAt = profile.getAccount().getCreatedAt();
                 this.lockedUntil = profile.getAccount().getLockedUntil();
+            }
+        }
+    }
+
+    public UserDTO(EmployeeProfile employeeProfile) {
+        if (employeeProfile != null) {
+            this.employeeProfileId = employeeProfile.getEmployeeProfileId();
+            this.fullName = employeeProfile.getFullName();
+            this.gender = employeeProfile.getGender() != null ? (employeeProfile.getGender() ? "Nam" : "Nữ") : null;
+            this.dateOfBirth = employeeProfile.getDateOfBirth();
+            this.phoneNumber = employeeProfile.getPhoneNumber();
+            this.email = employeeProfile.getEmail();
+            this.avatarUrl = employeeProfile.getAvatarUrl();
+
+            if (employeeProfile.getAccount() != null) {
+                this.accountId = employeeProfile.getAccount().getAccountId();
+                this.password = employeeProfile.getAccount().getPassword();
+                this.roleName = employeeProfile.getAccount().getRole() != null ? employeeProfile.getAccount().getRole().getRoleName() : null;
+                this.accountStatus = employeeProfile.getAccount().getStatus();
+                this.accountCreatedAt = employeeProfile.getAccount().getCreatedAt();
+                this.lockedUntil = employeeProfile.getAccount().getLockedUntil();
+            }
+        }
+    }
+
+    public UserDTO(Account account) {
+        if (account != null) {
+            this.accountId = account.getAccountId();
+            this.password = account.getPassword();
+            this.email = account.getUsername();
+            this.roleName = account.getRole() != null ? account.getRole().getRoleName() : null;
+            this.accountStatus = account.getStatus();
+            this.accountCreatedAt = account.getCreatedAt();
+            this.lockedUntil = account.getLockedUntil();
+
+            if (account.getEmployeeProfile() != null) {
+                EmployeeProfile ep = account.getEmployeeProfile();
+                this.employeeProfileId = ep.getEmployeeProfileId();
+                this.fullName = ep.getFullName();
+                this.gender = ep.getGender() != null ? (ep.getGender() ? "Nam" : "Nữ") : null;
+                this.dateOfBirth = ep.getDateOfBirth();
+                this.phoneNumber = ep.getPhoneNumber();
+                this.email = ep.getEmail();
+                this.avatarUrl = ep.getAvatarUrl();
+            } else if (account.getProfile() != null) {
+                Profile p = account.getProfile();
+                this.profileId = p.getProfileId();
+                this.fullName = p.getFullName();
+                this.gender = p.getGender();
+                this.dateOfBirth = p.getDateOfBirth();
+                this.placeOfBirth = p.getPlaceOfBirth();
+                this.citizenId = p.getCitizenId();
+                this.citizenIdIssueDate = p.getCitizenIdIssueDate();
+                this.citizenIdIssuePlace = p.getCitizenIdIssuePlace();
+                this.nationality = p.getNationality();
+                this.ethnicity = p.getEthnicity();
+                this.phoneNumber = p.getPhoneNumber();
+                this.email = p.getEmail();
+                this.avatarUrl = p.getAvatarUrl();
+                this.emergencyContactName = p.getEmergencyContactName();
+                this.emergencyContactPhone = p.getEmergencyContactPhone();
+                this.relationshipToOwner = p.getRelationshipToOwner();
+                this.moveInDate = p.getMoveInDate();
+                this.moveOutDate = p.getMoveOutDate();
+                this.isHouseholdOwner = p.getIsHouseholdOwner();
+                this.residentStatus = p.getResidentStatus();
+                this.occupation = p.getOccupation();
+
+                if (p.getApartment() != null) {
+                    this.apartmentId = p.getApartment().getApartmentId();
+                    this.apartmentNumber = p.getApartment().getApartmentNumber();
+                }
             }
         }
     }
@@ -151,14 +218,6 @@ public class UserDTO {
 
     public void setAccountId(Integer accountId) {
         this.accountId = accountId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {
@@ -207,6 +266,14 @@ public class UserDTO {
 
     public void setProfileId(Integer profileId) {
         this.profileId = profileId;
+    }
+
+    public Integer getEmployeeProfileId() {
+        return employeeProfileId;
+    }
+
+    public void setEmployeeProfileId(Integer employeeProfileId) {
+        this.employeeProfileId = employeeProfileId;
     }
 
     public String getFullName() {

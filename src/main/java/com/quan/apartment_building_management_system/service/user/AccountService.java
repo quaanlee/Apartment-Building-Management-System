@@ -4,6 +4,9 @@ import com.quan.apartment_building_management_system.entity.Account;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import com.quan.apartment_building_management_system.dto.user.UserDTO;
 
 public interface AccountService {
 
@@ -18,4 +21,8 @@ public interface AccountService {
     Account save(Account account);
 
     void deleteById(Integer id);
+
+    Page<UserDTO> findFilteredAccounts(String search, Integer roleId, Boolean status, Pageable pageable);
+
+    List<UserDTO> findActiveMaintenanceStaffs();
 }

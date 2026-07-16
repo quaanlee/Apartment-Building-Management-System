@@ -45,10 +45,11 @@
                 <!-- RESIDENT FORM -->
                 <div id="resident-tab" class="tab-panel active">
                     <form
-                        th:action="${userDto.profileId == null ? '/admin/users/create' : '/admin/users/edit/' + userDto.profileId}"
+                        th:action="${userDto.accountId == null ? '/admin/users/create' : '/admin/users/edit/' + userDto.accountId}"
                         method="post" th:object="${userDto}">
                         <input type="hidden" name="roleName" value="RESIDENT">
                         <input type="hidden" th:field="*{profileId}">
+                        <input type="hidden" th:field="*{employeeProfileId}">
                         <input type="hidden" th:field="*{accountId}">
 
                         <div class="form-title"
@@ -58,14 +59,54 @@
 
                         <!-- Form Fields Grid -->
                         <div class="form-grid">
+
+
                             <div class="form-group">
-                                <label for="res-username">Username<span class="required-star"
-                                        th:if="${userDto.profileId == null}">*</span></label>
-                                <input type="text" id="res-username" th:field="*{username}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'"
-                                    placeholder="e.g. resident101" th:readonly="${userDto.profileId != null}">
-                                <span class="error-text" th:if="${#fields.hasErrors('username')}"
-                                    th:errors="*{username}"></span>
+                                <label for="res-fullname">Full Name<span class="required-star">*</span></label>
+                                <input type="text" id="res-fullname" th:field="*{fullName}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'"
+                                    placeholder="e.g. Tahani Al-Jamil">
+                                <span class="error-text" th:if="${#fields.hasErrors('fullName')}"
+                                    th:errors="*{fullName}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="res-gender">Gender<span class="required-star">*</span></label>
+                                <select id="res-gender" th:field="*{gender}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid'">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <span class="error-text" th:if="${#fields.hasErrors('gender')}"
+                                    th:errors="*{gender}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="res-dob">Date of Birth</label>
+                                <input type="date" id="res-dob" th:field="*{dateOfBirth}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid'">
+                                <span class="error-text" th:if="${#fields.hasErrors('dateOfBirth')}"
+                                    th:errors="*{dateOfBirth}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="res-phone">Phone Number<span class="required-star">*</span></label>
+                                <input type="text" id="res-phone" th:field="*{phoneNumber}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'"
+                                    placeholder="e.g. 0912345678">
+                                <span class="error-text" th:if="${#fields.hasErrors('phoneNumber')}"
+                                    th:errors="*{phoneNumber}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="res-email">Email<span class="required-star">*</span></label>
+                                <input type="text" id="res-email" th:field="*{email}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                                    placeholder="e.g. tahani@example.com">
+                                <span class="error-text" th:if="${#fields.hasErrors('email')}"
+                                    th:errors="*{email}"></span>
                             </div>
 
                             <!-- Password field visible on create, hidden on edit -->
@@ -79,49 +120,6 @@
                             </div>
                             <input type="hidden" th:field="*{password}" th:if="${userDto.profileId != null}">
 
-                            <div class="form-group">
-                                <label for="res-fullname">Full Name<span class="required-star">*</span></label>
-                                <input type="text" id="res-fullname" th:field="*{fullName}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'"
-                                    placeholder="e.g. Tahani Al-Jamil">
-                                <span class="error-text" th:if="${#fields.hasErrors('fullName')}"
-                                    th:errors="*{fullName}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="res-email">Email<span class="required-star">*</span></label>
-                                <input type="text" id="res-email" th:field="*{email}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
-                                    placeholder="e.g. tahani@example.com">
-                                <span class="error-text" th:if="${#fields.hasErrors('email')}"
-                                    th:errors="*{email}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="res-phone">Phone Number<span class="required-star">*</span></label>
-                                <input type="text" id="res-phone" th:field="*{phoneNumber}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'"
-                                    placeholder="e.g. 0912345678">
-                                <span class="error-text" th:if="${#fields.hasErrors('phoneNumber')}"
-                                    th:errors="*{phoneNumber}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="res-gender">Gender<span class="required-star">*</span></label>
-                                <select id="res-gender" th:field="*{gender}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid'">
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                                <span class="error-text" th:if="${#fields.hasErrors('gender')}"
-                                    th:errors="*{gender}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="res-dob">Date of Birth</label>
-                                <input type="date" id="res-dob" th:field="*{dateOfBirth}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid'">
-                                <span class="error-text" th:if="${#fields.hasErrors('dateOfBirth')}"
-                                    th:errors="*{dateOfBirth}"></span>
-                            </div>
                             <div class="form-group">
                                 <label for="res-placebirth">Place of Birth</label>
                                 <input type="text" id="res-placebirth" th:field="*{placeOfBirth}" class="form-control"
@@ -139,6 +137,7 @@
                                 <span class="error-text" th:if="${#fields.hasErrors('citizenId')}"
                                     th:errors="*{citizenId}"></span>
                             </div>
+
                             <div class="form-group">
                                 <label for="res-citizen-date">Issue Date</label>
                                 <input type="date" id="res-citizen-date" th:field="*{citizenIdIssueDate}"
@@ -147,6 +146,7 @@
                                 <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssueDate')}"
                                     th:errors="*{citizenIdIssueDate}"></span>
                             </div>
+
                             <div class="form-group">
                                 <label for="res-citizen-place">Issue Place</label>
                                 <input type="text" id="res-citizen-place" th:field="*{citizenIdIssuePlace}"
@@ -244,10 +244,11 @@
                 <!-- MANAGER FORM -->
                 <div id="manager-tab" class="tab-panel">
                     <form
-                        th:action="${userDto.profileId == null ? '/admin/users/create' : '/admin/users/edit/' + userDto.profileId}"
+                        th:action="${userDto.accountId == null ? '/admin/users/create' : '/admin/users/edit/' + userDto.accountId}"
                         method="post" th:object="${userDto}">
                         <input type="hidden" name="roleName" value="MANAGER">
                         <input type="hidden" th:field="*{profileId}">
+                        <input type="hidden" th:field="*{employeeProfileId}">
                         <input type="hidden" th:field="*{accountId}">
 
                         <div class="form-title"
@@ -256,14 +257,54 @@
                         </div>
 
                         <div class="form-grid">
+
+
                             <div class="form-group">
-                                <label for="man-username">Username<span class="required-star"
-                                        th:if="${userDto.profileId == null}">*</span></label>
-                                <input type="text" id="man-username" th:field="*{username}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'"
-                                    placeholder="e.g. manager01" th:readonly="${userDto.profileId != null}">
-                                <span class="error-text" th:if="${#fields.hasErrors('username')}"
-                                    th:errors="*{username}"></span>
+                                <label for="man-fullname">Full Name<span class="required-star">*</span></label>
+                                <input type="text" id="man-fullname" th:field="*{fullName}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'"
+                                    placeholder="e.g. Eleanor Shellstrop">
+                                <span class="error-text" th:if="${#fields.hasErrors('fullName')}"
+                                    th:errors="*{fullName}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="man-gender">Gender<span class="required-star">*</span></label>
+                                <select id="man-gender" th:field="*{gender}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid'">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <span class="error-text" th:if="${#fields.hasErrors('gender')}"
+                                    th:errors="*{gender}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="man-dob">Date of Birth</label>
+                                <input type="date" id="man-dob" th:field="*{dateOfBirth}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid'">
+                                <span class="error-text" th:if="${#fields.hasErrors('dateOfBirth')}"
+                                    th:errors="*{dateOfBirth}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="man-phone">Phone Number<span class="required-star">*</span></label>
+                                <input type="text" id="man-phone" th:field="*{phoneNumber}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'"
+                                    placeholder="e.g. 0912345678">
+                                <span class="error-text" th:if="${#fields.hasErrors('phoneNumber')}"
+                                    th:errors="*{phoneNumber}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="man-email">Email<span class="required-star">*</span></label>
+                                <input type="text" id="man-email" th:field="*{email}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                                    placeholder="e.g. eleanor@example.com">
+                                <span class="error-text" th:if="${#fields.hasErrors('email')}"
+                                    th:errors="*{email}"></span>
                             </div>
 
                             <!-- Password field visible on create, hidden on edit -->
@@ -277,124 +318,6 @@
                             </div>
                             <input type="hidden" th:field="*{password}" th:if="${userDto.profileId != null}">
 
-                            <div class="form-group">
-                                <label for="man-fullname">Full Name<span class="required-star">*</span></label>
-                                <input type="text" id="man-fullname" th:field="*{fullName}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'"
-                                    placeholder="e.g. Eleanor Shellstrop">
-                                <span class="error-text" th:if="${#fields.hasErrors('fullName')}"
-                                    th:errors="*{fullName}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="man-email">Email<span class="required-star">*</span></label>
-                                <input type="text" id="man-email" th:field="*{email}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
-                                    placeholder="e.g. eleanor@example.com">
-                                <span class="error-text" th:if="${#fields.hasErrors('email')}"
-                                    th:errors="*{email}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="man-phone">Phone Number<span class="required-star">*</span></label>
-                                <input type="text" id="man-phone" th:field="*{phoneNumber}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'"
-                                    placeholder="e.g. 0912345678">
-                                <span class="error-text" th:if="${#fields.hasErrors('phoneNumber')}"
-                                    th:errors="*{phoneNumber}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="man-gender">Gender<span class="required-star">*</span></label>
-                                <select id="man-gender" th:field="*{gender}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid'">
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                                <span class="error-text" th:if="${#fields.hasErrors('gender')}"
-                                    th:errors="*{gender}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="man-dob">Date of Birth</label>
-                                <input type="date" id="man-dob" th:field="*{dateOfBirth}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid'">
-                                <span class="error-text" th:if="${#fields.hasErrors('dateOfBirth')}"
-                                    th:errors="*{dateOfBirth}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="man-placebirth">Place of Birth</label>
-                                <input type="text" id="man-placebirth" th:field="*{placeOfBirth}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('placeOfBirth')} ? 'is-invalid'"
-                                    placeholder="e.g. Saigon">
-                                <span class="error-text" th:if="${#fields.hasErrors('placeOfBirth')}"
-                                    th:errors="*{placeOfBirth}"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="man-citizen">Citizen ID (CCCD)<span class="required-star">*</span></label>
-                                <input type="text" id="man-citizen" th:field="*{citizenId}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('citizenId')} ? 'is-invalid'"
-                                    placeholder="12-digit number">
-                                <span class="error-text" th:if="${#fields.hasErrors('citizenId')}"
-                                    th:errors="*{citizenId}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="man-citizen-date">Issue Date</label>
-                                <input type="date" id="man-citizen-date" th:field="*{citizenIdIssueDate}"
-                                    class="form-control"
-                                    th:classappend="${#fields.hasErrors('citizenIdIssueDate')} ? 'is-invalid'">
-                                <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssueDate')}"
-                                    th:errors="*{citizenIdIssueDate}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="man-citizen-place">Issue Place</label>
-                                <input type="text" id="man-citizen-place" th:field="*{citizenIdIssuePlace}"
-                                    class="form-control"
-                                    th:classappend="${#fields.hasErrors('citizenIdIssuePlace')} ? 'is-invalid'"
-                                    placeholder="e.g. Cục QLHC về TTXH">
-                                <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssuePlace')}"
-                                    th:errors="*{citizenIdIssuePlace}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="man-nationality">Nationality</label>
-                                <input type="text" id="man-nationality" th:field="*{nationality}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('nationality')} ? 'is-invalid'">
-                                <span class="error-text" th:if="${#fields.hasErrors('nationality')}"
-                                    th:errors="*{nationality}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="man-ethnicity">Ethnicity</label>
-                                <input type="text" id="man-ethnicity" th:field="*{ethnicity}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('ethnicity')} ? 'is-invalid'">
-                                <span class="error-text" th:if="${#fields.hasErrors('ethnicity')}"
-                                    th:errors="*{ethnicity}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="man-occupation">Occupation / Title</label>
-                                <input type="text" id="man-occupation" th:field="*{occupation}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('occupation')} ? 'is-invalid'"
-                                    placeholder="e.g. Building Supervisor">
-                                <span class="error-text" th:if="${#fields.hasErrors('occupation')}"
-                                    th:errors="*{occupation}"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="man-emergency-name">Emergency Contact Name</label>
-                                <input type="text" id="man-emergency-name" th:field="*{emergencyContactName}"
-                                    class="form-control"
-                                    th:classappend="${#fields.hasErrors('emergencyContactName')} ? 'is-invalid'"
-                                    placeholder="e.g. Family member name">
-                                <span class="error-text" th:if="${#fields.hasErrors('emergencyContactName')}"
-                                    th:errors="*{emergencyContactName}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="man-emergency-phone">Emergency Contact Phone</label>
-                                <input type="text" id="man-emergency-phone" th:field="*{emergencyContactPhone}"
-                                    class="form-control"
-                                    th:classappend="${#fields.hasErrors('emergencyContactPhone')} ? 'is-invalid'"
-                                    placeholder="e.g. Phone number">
-                                <span class="error-text" th:if="${#fields.hasErrors('emergencyContactPhone')}"
-                                    th:errors="*{emergencyContactPhone}"></span>
-                            </div>
                         </div>
 
                         <div class="form-actions">
@@ -409,10 +332,11 @@
                 <!-- MAINTENANCE STAFF FORM -->
                 <div id="staff-tab" class="tab-panel">
                     <form
-                        th:action="${userDto.profileId == null ? '/admin/users/create' : '/admin/users/edit/' + userDto.profileId}"
+                        th:action="${userDto.accountId == null ? '/admin/users/create' : '/admin/users/edit/' + userDto.accountId}"
                         method="post" th:object="${userDto}">
                         <input type="hidden" name="roleName" value="MAINTENANCE_STAFF">
                         <input type="hidden" th:field="*{profileId}">
+                        <input type="hidden" th:field="*{employeeProfileId}">
                         <input type="hidden" th:field="*{accountId}">
 
                         <div class="form-title"
@@ -421,14 +345,54 @@
                         </div>
 
                         <div class="form-grid">
+
+
                             <div class="form-group">
-                                <label for="st-username">Username<span class="required-star"
-                                        th:if="${userDto.profileId == null}">*</span></label>
-                                <input type="text" id="st-username" th:field="*{username}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'"
-                                    placeholder="e.g. staff01" th:readonly="${userDto.profileId != null}">
-                                <span class="error-text" th:if="${#fields.hasErrors('username')}"
-                                    th:errors="*{username}"></span>
+                                <label for="st-fullname">Full Name<span class="required-star">*</span></label>
+                                <input type="text" id="st-fullname" th:field="*{fullName}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'"
+                                    placeholder="e.g. John Doe">
+                                <span class="error-text" th:if="${#fields.hasErrors('fullName')}"
+                                    th:errors="*{fullName}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="st-gender">Gender<span class="required-star">*</span></label>
+                                <select id="st-gender" th:field="*{gender}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid'">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <span class="error-text" th:if="${#fields.hasErrors('gender')}"
+                                    th:errors="*{gender}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="st-dob">Date of Birth</label>
+                                <input type="date" id="st-dob" th:field="*{dateOfBirth}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid'">
+                                <span class="error-text" th:if="${#fields.hasErrors('dateOfBirth')}"
+                                    th:errors="*{dateOfBirth}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="st-phone">Phone Number<span class="required-star">*</span></label>
+                                <input type="text" id="st-phone" th:field="*{phoneNumber}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'"
+                                    placeholder="e.g. 0912345678">
+                                <span class="error-text" th:if="${#fields.hasErrors('phoneNumber')}"
+                                    th:errors="*{phoneNumber}"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="st-email">Email<span class="required-star">*</span></label>
+                                <input type="text" id="st-email" th:field="*{email}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                                    placeholder="e.g. staff@example.com">
+                                <span class="error-text" th:if="${#fields.hasErrors('email')}"
+                                    th:errors="*{email}"></span>
                             </div>
 
                             <!-- Password field visible on create, hidden on edit -->
@@ -442,124 +406,6 @@
                             </div>
                             <input type="hidden" th:field="*{password}" th:if="${userDto.profileId != null}">
 
-                            <div class="form-group">
-                                <label for="st-fullname">Full Name<span class="required-star">*</span></label>
-                                <input type="text" id="st-fullname" th:field="*{fullName}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'"
-                                    placeholder="e.g. John Doe">
-                                <span class="error-text" th:if="${#fields.hasErrors('fullName')}"
-                                    th:errors="*{fullName}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="st-email">Email<span class="required-star">*</span></label>
-                                <input type="text" id="st-email" th:field="*{email}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
-                                    placeholder="e.g. staff@example.com">
-                                <span class="error-text" th:if="${#fields.hasErrors('email')}"
-                                    th:errors="*{email}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="st-phone">Phone Number<span class="required-star">*</span></label>
-                                <input type="text" id="st-phone" th:field="*{phoneNumber}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'"
-                                    placeholder="e.g. 0912345678">
-                                <span class="error-text" th:if="${#fields.hasErrors('phoneNumber')}"
-                                    th:errors="*{phoneNumber}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="st-gender">Gender<span class="required-star">*</span></label>
-                                <select id="st-gender" th:field="*{gender}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid'">
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                                <span class="error-text" th:if="${#fields.hasErrors('gender')}"
-                                    th:errors="*{gender}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="st-dob">Date of Birth</label>
-                                <input type="date" id="st-dob" th:field="*{dateOfBirth}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid'">
-                                <span class="error-text" th:if="${#fields.hasErrors('dateOfBirth')}"
-                                    th:errors="*{dateOfBirth}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="st-placebirth">Place of Birth</label>
-                                <input type="text" id="st-placebirth" th:field="*{placeOfBirth}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('placeOfBirth')} ? 'is-invalid'"
-                                    placeholder="e.g. Danang">
-                                <span class="error-text" th:if="${#fields.hasErrors('placeOfBirth')}"
-                                    th:errors="*{placeOfBirth}"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="st-citizen">Citizen ID (CCCD)<span class="required-star">*</span></label>
-                                <input type="text" id="st-citizen" th:field="*{citizenId}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('citizenId')} ? 'is-invalid'"
-                                    placeholder="12-digit number">
-                                <span class="error-text" th:if="${#fields.hasErrors('citizenId')}"
-                                    th:errors="*{citizenId}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="st-citizen-date">Issue Date</label>
-                                <input type="date" id="st-citizen-date" th:field="*{citizenIdIssueDate}"
-                                    class="form-control"
-                                    th:classappend="${#fields.hasErrors('citizenIdIssueDate')} ? 'is-invalid'">
-                                <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssueDate')}"
-                                    th:errors="*{citizenIdIssueDate}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="st-citizen-place">Issue Place</label>
-                                <input type="text" id="st-citizen-place" th:field="*{citizenIdIssuePlace}"
-                                    class="form-control"
-                                    th:classappend="${#fields.hasErrors('citizenIdIssuePlace')} ? 'is-invalid'"
-                                    placeholder="e.g. Cục QLHC về TTXH">
-                                <span class="error-text" th:if="${#fields.hasErrors('citizenIdIssuePlace')}"
-                                    th:errors="*{citizenIdIssuePlace}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="st-nationality">Nationality</label>
-                                <input type="text" id="st-nationality" th:field="*{nationality}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('nationality')} ? 'is-invalid'">
-                                <span class="error-text" th:if="${#fields.hasErrors('nationality')}"
-                                    th:errors="*{nationality}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="st-ethnicity">Ethnicity</label>
-                                <input type="text" id="st-ethnicity" th:field="*{ethnicity}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('ethnicity')} ? 'is-invalid'">
-                                <span class="error-text" th:if="${#fields.hasErrors('ethnicity')}"
-                                    th:errors="*{ethnicity}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="st-occupation">Specialty / Occupation</label>
-                                <input type="text" id="st-occupation" th:field="*{occupation}" class="form-control"
-                                    th:classappend="${#fields.hasErrors('occupation')} ? 'is-invalid'"
-                                    placeholder="e.g. Plumber, Electrician">
-                                <span class="error-text" th:if="${#fields.hasErrors('occupation')}"
-                                    th:errors="*{occupation}"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="st-emergency-name">Emergency Contact Name</label>
-                                <input type="text" id="st-emergency-name" th:field="*{emergencyContactName}"
-                                    class="form-control"
-                                    th:classappend="${#fields.hasErrors('emergencyContactName')} ? 'is-invalid'"
-                                    placeholder="e.g. Family member name">
-                                <span class="error-text" th:if="${#fields.hasErrors('emergencyContactName')}"
-                                    th:errors="*{emergencyContactName}"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="st-emergency-phone">Emergency Contact Phone</label>
-                                <input type="text" id="st-emergency-phone" th:field="*{emergencyContactPhone}"
-                                    class="form-control"
-                                    th:classappend="${#fields.hasErrors('emergencyContactPhone')} ? 'is-invalid'"
-                                    placeholder="e.g. Phone number">
-                                <span class="error-text" th:if="${#fields.hasErrors('emergencyContactPhone')}"
-                                    th:errors="*{emergencyContactPhone}"></span>
-                            </div>
                         </div>
 
                         <div class="form-actions">

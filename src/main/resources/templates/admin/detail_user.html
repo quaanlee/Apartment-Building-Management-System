@@ -21,44 +21,44 @@
         </a>
     </div>
 
-    <div class="detail-container" th:if="${profile != null}">
+    <div class="detail-container" th:if="${user != null}">
         <!-- Header overview card -->
         <div class="profile-overview-card">
             <div class="profile-large-avatar" 
-                 th:text="${#strings.isEmpty(profile.fullName) ? 'U' : #strings.substring(profile.fullName, 0, 1)}">
+                 th:text="${#strings.isEmpty(user.fullName) ? 'U' : #strings.substring(user.fullName, 0, 1)}">
                 U
             </div>
             
             <div class="profile-main-meta">
-                <h2 th:text="${profile.fullName}">User Full Name</h2>
+                <h2 th:text="${user.fullName}">User Full Name</h2>
                 
                 <div class="profile-sub-meta">
                     <span style="margin-right: 16px;">
                         <i class="fa-solid fa-at" style="margin-right: 4px;"></i>
-                        <span th:text="${profile.account != null ? profile.account.username : 'no_account'}">@username</span>
+                        <span th:text="${user.email != null ? user.email : 'no_email'}">@email</span>
                     </span>
                     <span>
                         <i class="fa-solid fa-calendar-day" style="margin-right: 4px;"></i>
-                        Registered: <span th:text="${#temporals.format(profile.createdAt, 'yyyy-MM-dd HH:mm')}">2026-06-25</span>
+                        Registered: <span th:text="${user.accountCreatedAt != null ? #temporals.format(user.accountCreatedAt, 'yyyy-MM-dd HH:mm') : 'N/A'}">2026-06-25</span>
                     </span>
                 </div>
                 
                 <div class="badges-row">
                     <!-- Role badge -->
                     <span class="badge-role" 
-                          th:classappend="${profile.account != null && profile.account.role != null ? #strings.toLowerCase(profile.account.role.roleName) : 'resident'}"
-                          th:text="${profile.account != null && profile.account.role != null ? profile.account.role.roleName : 'RESIDENT'}">
+                          th:classappend="${user.roleName != null ? #strings.toLowerCase(user.roleName) : 'resident'}"
+                          th:text="${user.roleName != null ? user.roleName : 'RESIDENT'}">
                         RESIDENT
                     </span>
                     
                     <!-- Account status badge -->
-                    <span th:if="${profile.account != null}" 
+                    <span th:if="${user.accountId != null}" 
                           class="badge-status" 
-                          th:classappend="${profile.account.status == true ? 'active' : 'locked'}"
-                          th:text="${profile.account.status == true ? 'Active' : 'Locked'}">
+                          th:classappend="${user.accountStatus == true ? 'active' : 'locked'}"
+                          th:text="${user.accountStatus == true ? 'Active' : 'Locked'}">
                         Active
                     </span>
-                    <span th:if="${profile.account == null}" class="badge-status locked" style="background-color: #E5E7EB; color: #4B5563;">
+                    <span th:if="${user.accountId == null}" class="badge-status locked" style="background-color: #E5E7EB; color: #4B5563;">
                         No Account
                     </span>
                 </div>
@@ -77,27 +77,27 @@
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">Full Name</span>
-                        <span class="info-value" th:text="${profile.fullName}">John Doe</span>
+                        <span class="info-value" th:text="${user.fullName}">John Doe</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Gender</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.gender) ? 'N/A' : profile.gender}" th:classappend="${#strings.isEmpty(profile.gender) ? 'empty' : ''}">Male</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.gender) ? 'N/A' : user.gender}" th:classappend="${#strings.isEmpty(user.gender) ? 'empty' : ''}">Male</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Date of Birth</span>
-                        <span class="info-value" th:text="${profile.dateOfBirth != null ? #temporals.format(profile.dateOfBirth, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${profile.dateOfBirth == null ? 'empty' : ''}">1990-01-01</span>
+                        <span class="info-value" th:text="${user.dateOfBirth != null ? #temporals.format(user.dateOfBirth, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${user.dateOfBirth == null ? 'empty' : ''}">1990-01-01</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
                         <span class="info-label">Place of Birth</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.placeOfBirth) ? 'N/A' : profile.placeOfBirth}" th:classappend="${#strings.isEmpty(profile.placeOfBirth) ? 'empty' : ''}">Danang</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.placeOfBirth) ? 'N/A' : user.placeOfBirth}" th:classappend="${#strings.isEmpty(user.placeOfBirth) ? 'empty' : ''}">Danang</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
                         <span class="info-label">Nationality</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.nationality) ? 'N/A' : profile.nationality}">Vietnam</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.nationality) ? 'N/A' : user.nationality}">Vietnam</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
                         <span class="info-label">Ethnicity</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.ethnicity) ? 'N/A' : profile.ethnicity}">Kinh</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.ethnicity) ? 'N/A' : user.ethnicity}">Kinh</span>
                     </div>
                 </div>
             </div>
@@ -111,28 +111,28 @@
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">Phone Number</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.phoneNumber) ? 'N/A' : profile.phoneNumber}" th:classappend="${#strings.isEmpty(profile.phoneNumber) ? 'empty' : ''}">0912345678</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.phoneNumber) ? 'N/A' : user.phoneNumber}" th:classappend="${#strings.isEmpty(user.phoneNumber) ? 'empty' : ''}">0912345678</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Email Address</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.email) ? 'N/A' : profile.email}" th:classappend="${#strings.isEmpty(profile.email) ? 'empty' : ''}">user@example.com</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.email) ? 'N/A' : user.email}" th:classappend="${#strings.isEmpty(user.email) ? 'empty' : ''}">user@example.com</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
                         <!-- Spacer element -->
                     </div>
-                    <div class="info-item">
+                    <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
                         <span class="info-label">Emergency Contact Name</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.emergencyContactName) ? 'N/A' : profile.emergencyContactName}" th:classappend="${#strings.isEmpty(profile.emergencyContactName) ? 'empty' : ''}">Jane Doe</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.emergencyContactName) ? 'N/A' : user.emergencyContactName}" th:classappend="${#strings.isEmpty(user.emergencyContactName) ? 'empty' : ''}">Jane Doe</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
                         <span class="info-label">Emergency Contact Phone</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.emergencyContactPhone) ? 'N/A' : profile.emergencyContactPhone}" th:classappend="${#strings.isEmpty(profile.emergencyContactPhone) ? 'empty' : ''}">0987654321</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.emergencyContactPhone) ? 'N/A' : user.emergencyContactPhone}" th:classappend="${#strings.isEmpty(user.emergencyContactPhone) ? 'empty' : ''}">0987654321</span>
                     </div>
                 </div>
             </div>
 
             <!-- SECTION 3: LEGAL IDENTIFICATION -->
-            <div class="detail-section">
+            <div class="detail-section" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
                 <div class="section-title">
                     <i class="fa-solid fa-passport"></i>Identification Details
                 </div>
@@ -140,15 +140,15 @@
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">Citizen ID (CCCD/CMND)</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.citizenId) ? 'N/A' : profile.citizenId}" th:classappend="${#strings.isEmpty(profile.citizenId) ? 'empty' : ''}">123456789012</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.citizenId) ? 'N/A' : user.citizenId}" th:classappend="${#strings.isEmpty(user.citizenId) ? 'empty' : ''}">123456789012</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Issue Date</span>
-                        <span class="info-value" th:text="${profile.citizenIdIssueDate != null ? #temporals.format(profile.citizenIdIssueDate, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${profile.citizenIdIssueDate == null ? 'empty' : ''}">2020-01-01</span>
+                        <span class="info-value" th:text="${user.citizenIdIssueDate != null ? #temporals.format(user.citizenIdIssueDate, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${user.citizenIdIssueDate == null ? 'empty' : ''}">2020-01-01</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Issue Place</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.citizenIdIssuePlace) ? 'N/A' : profile.citizenIdIssuePlace}" th:classappend="${#strings.isEmpty(profile.citizenIdIssuePlace) ? 'empty' : ''}">Ministry of Public Security</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.citizenIdIssuePlace) ? 'N/A' : user.citizenIdIssuePlace}" th:classappend="${#strings.isEmpty(user.citizenIdIssuePlace) ? 'empty' : ''}">Ministry of Public Security</span>
                     </div>
                 </div>
             </div>
@@ -156,7 +156,7 @@
             <!-- SECTION 4: ROLE SPECIFIC INFORMATION -->
             
             <!-- Resident Specific Info -->
-            <div class="detail-section" th:if="${profile.account == null || profile.account.role == null || profile.account.role.roleName == 'RESIDENT'}">
+            <div class="detail-section" th:if="${user.roleName == null || #strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
                 <div class="section-title">
                     <i class="fa-solid fa-house-chimney-user"></i>Resident Specific Status
                 </div>
@@ -165,26 +165,26 @@
                     <div class="info-item">
                         <span class="info-label">Resident Status</span>
                         <span class="info-value">
-                            <span th:if="${profile.residentStatus == 1}">Active / Live-in</span>
-                            <span th:if="${profile.residentStatus == 2}">Moved out</span>
-                            <span th:if="${profile.residentStatus == 3}">Temporary</span>
+                            <span th:if="${user.residentStatus == 1}">Active / Live-in</span>
+                            <span th:if="${user.residentStatus == 2}">Moved out</span>
+                            <span th:if="${user.residentStatus == 3}">Temporary</span>
                         </span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Relationship to Owner</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.relationshipToOwner) ? 'N/A' : profile.relationshipToOwner}">N/A</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.relationshipToOwner) ? 'N/A' : user.relationshipToOwner}">N/A</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Household Owner Status</span>
-                        <span class="info-value" th:text="${profile.isHouseholdOwner == true ? 'Yes' : 'No'}">Yes</span>
+                        <span class="info-value" th:text="${user.isHouseholdOwner == true ? 'Yes' : 'No'}">Yes</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Move-In Date</span>
-                        <span class="info-value" th:text="${profile.moveInDate != null ? #temporals.format(profile.moveInDate, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${profile.moveInDate == null ? 'empty' : ''}">N/A</span>
+                        <span class="info-value" th:text="${user.moveInDate != null ? #temporals.format(user.moveInDate, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${user.moveInDate == null ? 'empty' : ''}">N/A</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Move-Out Date</span>
-                        <span class="info-value" th:text="${profile.moveOutDate != null ? #temporals.format(profile.moveOutDate, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${profile.moveOutDate == null ? 'empty' : ''}">N/A</span>
+                        <span class="info-value" th:text="${user.moveOutDate != null ? #temporals.format(user.moveOutDate, 'yyyy-MM-dd') : 'N/A'}" th:classappend="${user.moveOutDate == null ? 'empty' : ''}">N/A</span>
                     </div>
                 </div>
 
@@ -193,38 +193,38 @@
                     <i class="fa-solid fa-door-open"></i>Assigned Apartment Info
                 </div>
                 
-                <div class="apartment-detail-card" th:if="${profile.apartment != null}">
+                <div class="apartment-detail-card" th:if="${account != null && account.profile != null && account.profile.apartment != null}">
                     <div class="apartment-icon-box">
                         <i class="fa-solid fa-building-user"></i>
                     </div>
                     <div class="apartment-meta-info">
                         <div class="info-item">
                             <span class="info-label">Apartment Number</span>
-                            <span class="info-value" th:text="${profile.apartment.apartmentNumber}" style="font-weight: 700;">A-101</span>
+                            <span class="info-value" th:text="${account.profile.apartment.apartmentNumber}" style="font-weight: 700;">A-101</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Floor</span>
-                            <span class="info-value" th:text="${profile.apartment.floor}">1</span>
+                            <span class="info-value" th:text="${account.profile.apartment.floor}">1</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Area (Size)</span>
-                            <span class="info-value" th:text="${profile.apartment.area + ' m²'}">75.0 m²</span>
+                            <span class="info-value" th:text="${account.profile.apartment.area + ' m²'}">75.0 m²</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Room Type</span>
-                            <span class="info-value" th:text="${profile.apartment.roomType}">2 Bedrooms</span>
+                            <span class="info-value" th:text="${account.profile.apartment.roomType}">2 Bedrooms</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="no-apartment-box" th:if="${profile.apartment == null}">
+                <div class="no-apartment-box" th:if="${account == null || account.profile == null || account.profile.apartment == null}">
                     <i class="fa-solid fa-circle-info" style="font-size: 18px;"></i>
                     <span>This resident is not currently assigned to any apartment.</span>
                 </div>
             </div>
 
             <!-- Manager / Maintenance Staff Specific Info -->
-            <div class="detail-section" th:if="${profile.account != null && profile.account.role != null && (profile.account.role.roleName == 'MANAGER' || profile.account.role.roleName == 'MAINTENANCE_STAFF')}">
+            <div class="detail-section" th:if="${#strings.equalsIgnoreCase(user.roleName, 'MANAGER') || #strings.equalsIgnoreCase(user.roleName, 'MAINTENANCE_STAFF')}">
                 <div class="section-title">
                     <i class="fa-solid fa-briefcase"></i>Employment & Occupation Info
                 </div>
@@ -232,7 +232,7 @@
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">Occupation / Title / Specialty</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.occupation) ? 'N/A' : profile.occupation}" th:classappend="${#strings.isEmpty(profile.occupation) ? 'empty' : ''}">Building Supervisor</span>
+                        <span class="info-value" th:text="${#strings.isEmpty(user.occupation) ? 'N/A' : user.occupation}" th:classappend="${#strings.isEmpty(user.occupation) ? 'empty' : ''}">Building Supervisor</span>
                     </div>
                 </div>
             </div>
@@ -240,7 +240,7 @@
         </div>
     </div>
     
-    <div class="no-profile-found" th:if="${profile == null}" style="text-align: center; padding: 48px; color: var(--text-secondary);">
+    <div class="no-profile-found" th:if="${user == null}" style="text-align: center; padding: 48px; color: var(--text-secondary);">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 48px; color: #F59E0B; margin-bottom: 16px;"></i>
         <p>No user profile details found for the requested ID.</p>
     </div>

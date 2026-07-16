@@ -80,7 +80,6 @@ public class AuthController {
         return "redirect:/login";
     }
 
-
     @GetMapping("/maintainer/dashboard")
     public String maintainerDashboard(HttpSession session) {
         Account currentUser = (Account) session.getAttribute("currentUser");
@@ -289,8 +288,8 @@ public class AuthController {
     private String getRedirectUrlForRole(Account account) {
         String roleName = account.getRole().getRoleName().toUpperCase().replace(" ", "_");
         return switch (roleName) {
-            case "ADMIN" -> "redirect:/admin/users";
-            case "MANAGER" -> "redirect:/manager/utility-bookings";
+            case "ADMIN" -> "redirect:/admin/dashboard";
+            case "MANAGER" -> "redirect:/manager/dashboard";
             case "RESIDENT" -> "redirect:/resident/dashboard";
             case "MAINTENANCE_STAFF" -> "redirect:/maintenance_staff/dashboard";
             default -> "redirect:/login";

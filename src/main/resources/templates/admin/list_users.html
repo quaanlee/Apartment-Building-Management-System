@@ -96,12 +96,12 @@
                                     <img th:if="${user.avatarUrl != null}" th:src="${user.avatarUrl}"
                                         class="profile-avatar" alt="Avatar">
                                     <div th:if="${user.avatarUrl == null}" class="profile-avatar"
-                                        th:text="${#strings.substring(user.fullName, 0, 1) + (#strings.contains(user.fullName, ' ') ? #strings.substring(user.fullName, #strings.indexOf(user.fullName, ' ') + 1, #strings.indexOf(user.fullName, ' ') + 2) : '')}">
+                                        th:text="${user.fullName != null ? (#strings.substring(user.fullName, 0, 1) + (#strings.contains(user.fullName, ' ') ? #strings.substring(user.fullName, #strings.indexOf(user.fullName, ' ') + 1, #strings.indexOf(user.fullName, ' ') + 2) : '')) : 'A'}">
                                     </div>
                                     <div class="profile-info">
-                                        <span class="profile-name" th:text="${user.fullName}">Full Name</span>
+                                        <span class="profile-name" th:text="${user.fullName != null ? user.fullName : 'Administrator'}">Full Name</span>
                                         <span class="profile-username"
-                                            th:text="${user.username != null ? user.username : 'no_account'}">@username</span>
+                                            th:text="${user.email != null ? user.email : 'System Admin'}">@email</span>
                                     </div>
                                 </div>
                             </td>
@@ -123,12 +123,10 @@
                             </td>
                             <td style="text-align: right;">
                                 <div class="actions-cell" style="justify-content: flex-end;">
-                                    <a th:href="@{/admin/users/edit/{id}(id=${user.profileId})}" class="action-icon-btn"
-                                        title="Edit Profile">
+                                    <a th:href="@{/admin/users/edit/{id}(id=${user.accountId})}" class="action-icon-btn" title="Edit Profile">
                                         <i class="fa-solid fa-pencil"></i>
                                     </a>
-                                    <a th:href="@{/admin/users/detail/{id}(id=${user.profileId})}"
-                                        class="action-icon-btn" title="View Profile">
+                                    <a th:href="@{/admin/users/detail/{id}(id=${user.accountId})}" class="action-icon-btn" title="View Profile">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
                                     <form th:if="${user.accountId != null}"

@@ -3,6 +3,7 @@ package com.quan.apartment_building_management_system.controller.admin;
 import com.quan.apartment_building_management_system.dto.user.UserDTO;
 import com.quan.apartment_building_management_system.entity.Account;
 import com.quan.apartment_building_management_system.entity.Profile;
+import com.quan.apartment_building_management_system.entity.EmployeeProfile;
 import com.quan.apartment_building_management_system.entity.Role;
 import com.quan.apartment_building_management_system.service.user.AccountService;
 import com.quan.apartment_building_management_system.service.user.ProfileService;
@@ -47,22 +48,19 @@ public class AdminUserController {
             Model model) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserDTO> userPage = profileService.findFiltered(search, roleId, status, pageable);
+        Page<UserDTO> userPage = accountService.findFilteredAccounts(search, roleId, status, pageable);
 
         // Fetch counts for cards
-        List<Profile> allProfiles = profileService.findAll();
-        long totalUsers = allProfiles.stream().filter(p -> p.getAccount() != null).count();
-        long totalResidents = allProfiles.stream()
-                .filter(p -> p.getAccount() != null
-                        && "RESIDENT".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
+        List<Account> allAccounts = accountService.findAll();
+        long totalUsers = allAccounts.size();
+        long totalResidents = allAccounts.stream()
+                .filter(a -> a.getRole() != null && "RESIDENT".equalsIgnoreCase(a.getRole().getRoleName()))
                 .count();
-        long totalManagers = allProfiles.stream()
-                .filter(p -> p.getAccount() != null
-                        && "MANAGER".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
+        long totalManagers = allAccounts.stream()
+                .filter(a -> a.getRole() != null && "MANAGER".equalsIgnoreCase(a.getRole().getRoleName()))
                 .count();
-        long totalMaintenance = allProfiles.stream()
-                .filter(p -> p.getAccount() != null && "MAINTENANCE_STAFF"
-                        .equalsIgnoreCase(p.getAccount().getRole().getRoleName().replace(" ", "_")))
+        long totalMaintenance = allAccounts.stream()
+                .filter(a -> a.getRole() != null && "MAINTENANCE_STAFF".equalsIgnoreCase(a.getRole().getRoleName().replace(" ", "_")))
                 .count();
 
         // Get list of all roles for filter dropdown
@@ -105,11 +103,16 @@ public class AdminUserController {
 
     @GetMapping("/admin/users/detail/{id}")
     public String showUserDetail(@PathVariable("id") Integer id, Model model) {
-        Optional<Profile> profileOpt = profileService.findById(id);
-        if (profileOpt.isEmpty()) {
+        Optional<Account> accountOpt = accountService.findById(id);
+        if (accountOpt.isEmpty()) {
             return "redirect:/admin/users";
         }
-        model.addAttribute("profile", profileOpt.get());
+        
+        Account account = accountOpt.get();
+        UserDTO user = new UserDTO(account);
+        
+        model.addAttribute("user", user);
+        model.addAttribute("account", account);
         model.addAttribute("activeTab", "users");
         return "admin/detail_user";
     }
@@ -124,15 +127,21 @@ public class AdminUserController {
     @PostMapping("/admin/users/create")
     public String createUser(@Valid @ModelAttribute("userDto") UserDTO userDto, BindingResult bindingResult,
             Model model, RedirectAttributes redirectAttributes) {
-        if (accountService.existsByUsername(userDto.getUsername())) {
-            bindingResult.rejectValue("username", "error.userDto", "Username already exists!");
+        if (accountService.existsByUsername(userDto.getEmail())) {
+            bindingResult.rejectValue("email", "error.userDto", "Email (Username) already exists in the system!");
         }
 
-        // Validate duplicate CitizenID
-        if (userDto.getCitizenId() != null && !userDto.getCitizenId().isBlank()) {
-            Optional<Profile> existingProfile = profileService.findByCitizenId(userDto.getCitizenId());
-            if (existingProfile.isPresent()) {
-                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID already exists!");
+        // Validate CitizenID for RESIDENT
+        if ("RESIDENT".equalsIgnoreCase(userDto.getRoleName())) {
+            if (userDto.getCitizenId() == null || userDto.getCitizenId().isBlank()) {
+                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID is required for Resident!");
+            } else if (!userDto.getCitizenId().matches("^[0-9]{12}$")) {
+                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID must be exactly 12 digits!");
+            } else {
+                Optional<Profile> existingProfile = profileService.findByCitizenId(userDto.getCitizenId());
+                if (existingProfile.isPresent()) {
+                    bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID already exists!");
+                }
             }
         }
 
@@ -156,11 +165,11 @@ public class AdminUserController {
 
     @GetMapping("/admin/users/edit/{id}")
     public String showEditForm(@PathVariable("id") Integer id, Model model) {
-        Optional<Profile> profileOpt = profileService.findById(id);
-        if (profileOpt.isEmpty()) {
+        Optional<Account> accountOpt = accountService.findById(id);
+        if (accountOpt.isEmpty()) {
             return "redirect:/admin/users";
         }
-        UserDTO userDto = new UserDTO(profileOpt.get());
+        UserDTO userDto = new UserDTO(accountOpt.get());
         model.addAttribute("userDto", userDto);
         model.addAttribute("activeTab", "users");
         return "admin/form_user";
@@ -169,11 +178,17 @@ public class AdminUserController {
     @PostMapping("/admin/users/edit/{id}")
     public String updateUser(@PathVariable("id") Integer id, @Valid @ModelAttribute("userDto") UserDTO userDto,
             BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
-        // Validate duplicate CitizenID (excluding the profile currently being edited)
-        if (userDto.getCitizenId() != null && !userDto.getCitizenId().isBlank()) {
-            Optional<Profile> existingProfile = profileService.findByCitizenId(userDto.getCitizenId());
-            if (existingProfile.isPresent() && !existingProfile.get().getProfileId().equals(id)) {
-                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID already exists!");
+        // Validate CitizenID for RESIDENT
+        if ("RESIDENT".equalsIgnoreCase(userDto.getRoleName())) {
+            if (userDto.getCitizenId() == null || userDto.getCitizenId().isBlank()) {
+                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID is required for Resident!");
+            } else if (!userDto.getCitizenId().matches("^[0-9]{12}$")) {
+                bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID must be exactly 12 digits!");
+            } else {
+                Optional<Profile> existingProfile = profileService.findByCitizenId(userDto.getCitizenId());
+                if (existingProfile.isPresent() && existingProfile.get().getAccount() != null && !existingProfile.get().getAccount().getAccountId().equals(id)) {
+                    bindingResult.rejectValue("citizenId", "error.userDto", "Citizen ID already exists!");
+                }
             }
         }
 

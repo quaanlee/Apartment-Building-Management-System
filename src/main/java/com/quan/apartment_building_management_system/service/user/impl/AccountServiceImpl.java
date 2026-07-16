@@ -6,8 +6,12 @@ import com.quan.apartment_building_management_system.service.user.AccountService
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import com.quan.apartment_building_management_system.dto.user.UserDTO;
 
 @Service
 @Transactional(readOnly = true)
@@ -78,5 +82,17 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public void deleteById(Integer id) {
         accountRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<UserDTO> findFilteredAccounts(String search, Integer roleId, Boolean status, Pageable pageable) {
+        return accountRepository.findFilteredAccounts(search, roleId, status, pageable).map(UserDTO::new);
+    }
+
+    @Override
+    public List<UserDTO> findActiveMaintenanceStaffs() {
+        return accountRepository.findActiveMaintenanceStaffs().stream()
+                .map(UserDTO::new)
+                .collect(Collectors.toList());
     }
 }

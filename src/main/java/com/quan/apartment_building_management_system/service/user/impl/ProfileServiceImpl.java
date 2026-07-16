@@ -4,6 +4,8 @@ import com.quan.apartment_building_management_system.dto.user.UserDTO;
 import com.quan.apartment_building_management_system.entity.Account;
 import com.quan.apartment_building_management_system.entity.Profile;
 import com.quan.apartment_building_management_system.entity.Role;
+import com.quan.apartment_building_management_system.entity.EmployeeProfile;
+import com.quan.apartment_building_management_system.repository.EmployeeProfileRepository;
 import com.quan.apartment_building_management_system.repository.AccountRepository;
 import com.quan.apartment_building_management_system.repository.ProfileRepository;
 import com.quan.apartment_building_management_system.repository.RoleRepository;
@@ -24,13 +26,16 @@ public class ProfileServiceImpl implements ProfileService {
     private final ProfileRepository profileRepository;
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
+    private final EmployeeProfileRepository employeeProfileRepository;
 
     public ProfileServiceImpl(ProfileRepository profileRepository,
             AccountRepository accountRepository,
-            RoleRepository roleRepository) {
+            RoleRepository roleRepository,
+            EmployeeProfileRepository employeeProfileRepository) {
         this.profileRepository = profileRepository;
         this.accountRepository = accountRepository;
         this.roleRepository = roleRepository;
+        this.employeeProfileRepository = employeeProfileRepository;
     }
 
     @Override
@@ -84,70 +89,81 @@ public class ProfileServiceImpl implements ProfileService {
             throw new IllegalArgumentException("Role not found: " + userDto.getRoleName());
         }
 
-        Account account;
-        Profile profile;
+        boolean isEmployee = "MANAGER".equalsIgnoreCase(userDto.getRoleName()) || "MAINTENANCE_STAFF".equalsIgnoreCase(userDto.getRoleName());
 
-        if (userDto.getProfileId() != null) {
-            // Edit / Update Mode
-            profile = profileRepository.findById(userDto.getProfileId())
-                    .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
-                            "Profile not found with ID: " + userDto.getProfileId()));
-            account = profile.getAccount();
-            if (account == null) {
+        Account account;
+        Profile profile = null;
+        EmployeeProfile employeeProfile = null;
+
+        if (isEmployee) {
+            if (userDto.getEmployeeProfileId() != null) {
+                employeeProfile = employeeProfileRepository.findById(userDto.getEmployeeProfileId())
+                        .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("EmployeeProfile not found with ID: " + userDto.getEmployeeProfileId()));
+                account = employeeProfile.getAccount();
+                if (account == null) account = new Account();
+            } else {
+                employeeProfile = new EmployeeProfile();
                 account = new Account();
             }
         } else {
-            // Create Mode
-            profile = new Profile();
-            account = new Account();
+            if (userDto.getProfileId() != null) {
+                profile = profileRepository.findById(userDto.getProfileId())
+                        .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Profile not found with ID: " + userDto.getProfileId()));
+                account = profile.getAccount();
+                if (account == null) account = new Account();
+            } else {
+                profile = new Profile();
+                account = new Account();
+            }
         }
 
         // Save/Update Account
         // Keep username and role unchangeable in edit mode
-        if (userDto.getProfileId() == null) {
-            account.setUsername(userDto.getUsername());
+        if (userDto.getProfileId() == null && userDto.getEmployeeProfileId() == null) {
+            account.setUsername(userDto.getEmail());
             account.setRole(roleOpt.get());
         }
         account.setPassword(userDto.getPassword());
         account.setStatus(userDto.getAccountStatus() != null ? userDto.getAccountStatus() : true);
         account = accountRepository.save(account);
 
-        // Save/Update Profile
-        profile.setAccount(account);
-        profile.setFullName(userDto.getFullName());
-        profile.setGender(userDto.getGender());
-        profile.setDateOfBirth(userDto.getDateOfBirth());
-        profile.setPlaceOfBirth(userDto.getPlaceOfBirth());
-        profile.setCitizenId(userDto.getCitizenId());
-        profile.setCitizenIdIssueDate(userDto.getCitizenIdIssueDate());
-        profile.setCitizenIdIssuePlace(userDto.getCitizenIdIssuePlace());
-        profile.setNationality(userDto.getNationality() != null ? userDto.getNationality() : "Vietnam");
-        profile.setEthnicity(userDto.getEthnicity() != null ? userDto.getEthnicity() : "Kinh");
-        profile.setPhoneNumber(userDto.getPhoneNumber());
-        profile.setEmail(userDto.getEmail());
-        profile.setAvatarUrl(userDto.getAvatarUrl());
-        profile.setEmergencyContactName(userDto.getEmergencyContactName());
-        profile.setEmergencyContactPhone(userDto.getEmergencyContactPhone());
+        if (isEmployee) {
+            employeeProfile.setAccount(account);
+            employeeProfile.setFullName(userDto.getFullName());
+            employeeProfile.setGender(userDto.getGender() != null && "Nam".equalsIgnoreCase(userDto.getGender()));
+            employeeProfile.setDateOfBirth(userDto.getDateOfBirth());
+            employeeProfile.setPhoneNumber(userDto.getPhoneNumber());
+            employeeProfile.setEmail(userDto.getEmail());
+            employeeProfile.setAvatarUrl(userDto.getAvatarUrl());
+            employeeProfile.setStatus(userDto.getAccountStatus() != null ? userDto.getAccountStatus() : true);
+            employeeProfile = employeeProfileRepository.save(employeeProfile);
+            return new UserDTO(employeeProfile);
+        } else {
+            profile.setAccount(account);
+            profile.setFullName(userDto.getFullName());
+            profile.setGender(userDto.getGender());
+            profile.setDateOfBirth(userDto.getDateOfBirth());
+            profile.setPlaceOfBirth(userDto.getPlaceOfBirth());
+            profile.setCitizenId(userDto.getCitizenId());
+            profile.setCitizenIdIssueDate(userDto.getCitizenIdIssueDate());
+            profile.setCitizenIdIssuePlace(userDto.getCitizenIdIssuePlace());
+            profile.setNationality(userDto.getNationality() != null ? userDto.getNationality() : "Vietnam");
+            profile.setEthnicity(userDto.getEthnicity() != null ? userDto.getEthnicity() : "Kinh");
+            profile.setPhoneNumber(userDto.getPhoneNumber());
+            profile.setEmail(userDto.getEmail());
+            profile.setAvatarUrl(userDto.getAvatarUrl());
+            profile.setEmergencyContactName(userDto.getEmergencyContactName());
+            profile.setEmergencyContactPhone(userDto.getEmergencyContactPhone());
 
-        // Handle role-specific attributes
-        if ("RESIDENT".equalsIgnoreCase(userDto.getRoleName())) {
             profile.setRelationshipToOwner(userDto.getRelationshipToOwner());
             profile.setIsHouseholdOwner(userDto.getIsHouseholdOwner() != null && userDto.getIsHouseholdOwner());
             profile.setResidentStatus(userDto.getResidentStatus() != null ? userDto.getResidentStatus() : 1);
             profile.setMoveInDate(userDto.getMoveInDate());
             profile.setMoveOutDate(userDto.getMoveOutDate());
             profile.setOccupation(null); // Clear occupation just in case
-        } else if ("MANAGER".equalsIgnoreCase(userDto.getRoleName())
-                || "MAINTENANCE_STAFF".equalsIgnoreCase(userDto.getRoleName())) {
-            profile.setOccupation(userDto.getOccupation());
-            profile.setIsHouseholdOwner(false);
-            profile.setResidentStatus((byte) 1);
-            profile.setMoveInDate(null);
-            profile.setMoveOutDate(null);
+
+            profile = profileRepository.save(profile);
+            return new UserDTO(profile);
         }
-
-        profile = profileRepository.save(profile);
-
-        return new UserDTO(profile);
     }
 }
