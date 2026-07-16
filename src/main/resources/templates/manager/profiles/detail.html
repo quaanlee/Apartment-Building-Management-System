@@ -77,7 +77,9 @@
                         </div>
                     </div>
 
-                    <h4 class="section-title">Thông tin cá nhân & nguồn gốc</h4>
+                    <h4 class="section-title">
+                        Thông tin cá nhân<span th:if="${isResident}"> & nguồn gốc</span>
+                    </h4>
                     <div class="info-grid" style="margin-bottom: 28px;">
                         <div class="info-item">
                             <span class="info-label">Giới tính</span>
@@ -87,49 +89,55 @@
                             <span class="info-label">Ngày sinh</span>
                             <span class="info-value" th:text="${user.dateOfBirth != null ? #temporals.format(user.dateOfBirth, 'dd/MM/yyyy') : 'N/A'}">N/A</span>
                         </div>
-                        <div class="info-item" th:if="${#strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
+                        <div class="info-item" th:if="${isResident}">
                             <span class="info-label">Nơi sinh</span>
                             <span class="info-value" th:text="${user.placeOfBirth != null && user.placeOfBirth != '' ? user.placeOfBirth : 'N/A'}">N/A</span>
                         </div>
-                        <div class="info-item" th:if="${#strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
+                        <div class="info-item" th:if="${isResident}">
                             <span class="info-label">Quốc tịch</span>
                             <span class="info-value" th:text="${user.nationality != null && user.nationality != '' ? user.nationality : 'N/A'}">N/A</span>
                         </div>
-                        <div class="info-item" th:if="${#strings.equalsIgnoreCase(user.roleName, 'RESIDENT')}">
+                        <div class="info-item" th:if="${isResident}">
                             <span class="info-label">Dân tộc</span>
                             <span class="info-value" th:text="${user.ethnicity != null && user.ethnicity != '' ? user.ethnicity : 'N/A'}">N/A</span>
                         </div>
-                    </div>
-
-                    <h4 class="section-title">Căn cước công dân</h4>
-                    <div class="info-grid" style="margin-bottom: 28px;">
-                        <div class="info-item">
-                            <span class="info-label">Số CCCD/CMND</span>
-                            <span class="info-value" th:text="${user.citizenId != null && user.citizenId != '' ? user.citizenId : 'N/A'}">N/A</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Ngày cấp</span>
-                            <span class="info-value" th:text="${user.citizenIdIssueDate != null ? #temporals.format(user.citizenIdIssueDate, 'dd/MM/yyyy') : 'N/A'}">N/A</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Nơi cấp</span>
-                            <span class="info-value" th:text="${user.citizenIdIssuePlace != null && user.citizenIdIssuePlace != '' ? user.citizenIdIssuePlace : 'N/A'}">N/A</span>
+                        <div class="info-item" th:if="${!isResident}">
+                            <span class="info-label">Địa chỉ</span>
+                            <span class="info-value" th:text="${user.address != null && user.address != '' ? user.address : 'N/A'}">N/A</span>
                         </div>
                     </div>
 
-                    <h4 class="section-title">Liên hệ khẩn cấp</h4>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Tên người liên hệ</span>
-                            <span class="info-value" th:text="${user.emergencyContactName != null && user.emergencyContactName != '' ? user.emergencyContactName : 'N/A'}">N/A</span>
+                    <div th:if="${isResident}">
+                        <h4 class="section-title">Căn cước công dân</h4>
+                        <div class="info-grid" style="margin-bottom: 28px;">
+                            <div class="info-item">
+                                <span class="info-label">Số CCCD/CMND</span>
+                                <span class="info-value" th:text="${user.citizenId != null && user.citizenId != '' ? user.citizenId : 'N/A'}">N/A</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Ngày cấp</span>
+                                <span class="info-value" th:text="${user.citizenIdIssueDate != null ? #temporals.format(user.citizenIdIssueDate, 'dd/MM/yyyy') : 'N/A'}">N/A</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Nơi cấp</span>
+                                <span class="info-value" th:text="${user.citizenIdIssuePlace != null && user.citizenIdIssuePlace != '' ? user.citizenIdIssuePlace : 'N/A'}">N/A</span>
+                            </div>
                         </div>
-                        <div class="info-item">
-                            <span class="info-label">Số điện thoại liên hệ</span>
-                            <span class="info-value" th:text="${user.emergencyContactPhone != null && user.emergencyContactPhone != '' ? user.emergencyContactPhone : 'N/A'}">N/A</span>
-                        </div>
-                        <div class="info-item" th:if="${isResident}">
-                            <span class="info-label">Quan hệ với chủ hộ</span>
-                            <span class="info-value" th:text="${user.relationshipToOwner != null && user.relationshipToOwner != '' ? user.relationshipToOwner : 'N/A'}">N/A</span>
+
+                        <h4 class="section-title">Liên hệ khẩn cấp</h4>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Tên người liên hệ</span>
+                                <span class="info-value" th:text="${user.emergencyContactName != null && user.emergencyContactName != '' ? user.emergencyContactName : 'N/A'}">N/A</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Số điện thoại liên hệ</span>
+                                <span class="info-value" th:text="${user.emergencyContactPhone != null && user.emergencyContactPhone != '' ? user.emergencyContactPhone : 'N/A'}">N/A</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Quan hệ với chủ hộ</span>
+                                <span class="info-value" th:text="${user.relationshipToOwner != null && user.relationshipToOwner != '' ? user.relationshipToOwner : 'N/A'}">N/A</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -350,7 +358,7 @@
                         <div class="info-grid" style="margin-bottom: 24px;">
                             <div class="info-item">
                                 <span class="info-label">Chuyên môn</span>
-                                <span class="info-value" th:text="${profile.occupation != null && profile.occupation != '' ? profile.occupation : 'N/A'}">N/A</span>
+                                <span class="info-value" th:text="${user.occupation != null && user.occupation != '' ? user.occupation : 'N/A'}">N/A</span>
                             </div>
                         </div>
 
