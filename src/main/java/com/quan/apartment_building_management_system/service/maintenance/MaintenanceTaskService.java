@@ -27,11 +27,14 @@ public interface MaintenanceTaskService {
 
     MaintenanceTask save(MaintenanceTask maintenanceTask);
 
-    void assignTask(Integer requestId, Integer staffId, java.time.LocalDateTime deadline, Integer managerId);
+    void assignTask(Integer requestId, Integer staffId, java.time.LocalDateTime deadline, com.quan.apartment_building_management_system.entity.Account manager);
 
     String getStaffWorkStatus(Integer staffId);
 
     List<com.quan.apartment_building_management_system.dto.maintenance.StaffWorkStatusDTO> getActiveMaintenanceStaffWithWorkStatus();
 
     void deleteById(Integer id);
+
+    void unassignTask(Integer requestId);
 }
+

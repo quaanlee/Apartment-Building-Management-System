@@ -1,4 +1,4 @@
-﻿<div th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'maintenance')}">
+<div th:replace="~{layout/manager/layout_manager :: manager-layout(~{::content}, 'maintenance')}">
     <div th:fragment="content">
         <!-- Load custom page styling -->
         <link rel="stylesheet" th:href="@{/css/manager/maintenance/maintenance.css}">
@@ -123,10 +123,17 @@
                                 <span>Assign Staff</span>
                             </a>
                             <button th:if="${req.status == 1 or req.status == 2}" class="action-btn view-btn" type="button"
-                                    th:onclick="'openViewProgressModal(' + ${req.requestId} + ')'">
+                                    th:onclick="'openViewProgressModal(' + ${req.requestId} + ')'" style="margin-right: 5px;">
                                 <i class="fa-solid fa-eye"></i>
                                 <span>View Progress</span>
                             </button>
+                            <form th:if="${req.status == 1}" th:action="@{/manager/maintenance/{id}/unassign(id=${req.requestId})}" method="post" style="display: inline-block; margin: 0;">
+                                <button type="submit" class="action-btn unassign-btn" onclick="openUnassignModal(event, this.form)">
+                                    <i class="fa-solid fa-user-minus"></i>
+                                    <span>Unassign</span>
+                                </button>
+                            </form>
+
                         </td>
                     </tr>
                 </tbody>
@@ -236,6 +243,30 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="modal-cancel-btn" id="closeProgressModalFooterBtn">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Unassign Confirmation Modal -->
+        <div class="modal-overlay" id="unassignConfirmModal" role="dialog" aria-modal="true" aria-labelledby="unassignModalTitle">
+            <div class="modal-box" style="max-width: 440px;">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="unassignModalTitle">Confirm Unassignment</h3>
+                    <button class="modal-close-btn" type="button" onclick="closeUnassignModal()" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="modal-body" style="text-align: center; padding: 32px 24px;">
+                    <div style="font-size: 48px; color: #e53e3e; margin-bottom: 16px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <p style="font-size: 15px; color: #4a5568; line-height: 1.6; margin: 0;">
+                        Are you sure you want to unassign this task? The request status will return to Pending.
+                    </p>
+                </div>
+                <div class="modal-footer" style="background-color: #f8fafc; display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px;">
+                    <button class="modal-cancel-btn" type="button" onclick="closeUnassignModal()">Cancel</button>
+                    <button class="modal-submit-btn" type="button" id="confirmUnassignSubmitBtn" style="background-color: #e53e3e; color: white;">Unassign</button>
                 </div>
             </div>
         </div>
@@ -468,6 +499,45 @@
                 document.addEventListener("keydown", function (e) {
                     if (e.key === "Escape") {
                         closeProgressModal();
+                    }
+                });
+
+                /* Custom Unassign Modal Logic */
+                const unassignConfirmModal = document.getElementById("unassignConfirmModal");
+                const confirmUnassignSubmitBtn = document.getElementById("confirmUnassignSubmitBtn");
+                let unassignFormToSubmit = null;
+
+                window.openUnassignModal = function(event, form) {
+                    event.preventDefault();
+                    unassignFormToSubmit = form;
+                    unassignConfirmModal.classList.add("is-open");
+                    document.body.classList.add("modal-open");
+                };
+
+                window.closeUnassignModal = function() {
+                    unassignConfirmModal.classList.remove("is-open");
+                    document.body.classList.remove("modal-open");
+                    unassignFormToSubmit = null;
+                };
+
+                if (confirmUnassignSubmitBtn) {
+                    confirmUnassignSubmitBtn.addEventListener("click", function() {
+                        if (unassignFormToSubmit) {
+                            unassignFormToSubmit.submit();
+                        }
+                    });
+                }
+
+                // Also close on click outside and escape
+                window.addEventListener("click", function(e) {
+                    if (e.target === unassignConfirmModal) {
+                        closeUnassignModal();
+                    }
+                });
+
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Escape") {
+                        closeUnassignModal();
                     }
                 });
 

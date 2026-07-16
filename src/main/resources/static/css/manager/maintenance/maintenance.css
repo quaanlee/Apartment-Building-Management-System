@@ -657,12 +657,12 @@
 }
 
 .action-btn.assign-action-btn {
-    background-color: #38a169;
+    background-color: #4c51bf;
     color: #ffffff;
 }
 
 .action-btn.assign-action-btn:hover {
-    background-color: #2f855a;
+    background-color: #3b3f9a;
 }
 
 .action-btn.view-profile-btn {
@@ -681,6 +681,18 @@
 
 .assign-link:hover {
     background-color: #3b3f9a;
+}
+
+.unassign-btn {
+    background-color: #fee2e2;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+}
+
+.unassign-btn:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
 }
 
 /* Custom Pagination Styles */

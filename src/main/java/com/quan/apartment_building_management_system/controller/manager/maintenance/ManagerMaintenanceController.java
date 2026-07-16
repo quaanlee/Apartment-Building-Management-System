@@ -44,13 +44,16 @@ public class ManagerMaintenanceController {
     private final MaintenanceRequestService maintenanceRequestService;
     private final MaintenanceTaskService maintenanceTaskService;
     private final ProfileService profileService;
+    private final com.quan.apartment_building_management_system.service.user.AccountService accountService;
 
     public ManagerMaintenanceController(MaintenanceRequestService maintenanceRequestService,
                                         MaintenanceTaskService maintenanceTaskService,
-                                        ProfileService profileService) {
+                                        ProfileService profileService,
+                                        com.quan.apartment_building_management_system.service.user.AccountService accountService) {
         this.maintenanceRequestService = maintenanceRequestService;
         this.maintenanceTaskService = maintenanceTaskService;
         this.profileService = profileService;
+        this.accountService = accountService;
     }
 
     @GetMapping
@@ -113,6 +116,7 @@ public class ManagerMaintenanceController {
     public String assignStaff(
             @Valid @ModelAttribute MaintenanceTaskAssignDTO assignDTO,
             BindingResult bindingResult,
+            jakarta.servlet.http.HttpSession session,
             RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
@@ -130,13 +134,26 @@ public class ManagerMaintenanceController {
                 deadline = LocalDateTime.parse(assignDTO.getDeadline(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             }
 
-            // Fetch any manager to act as the assigner (since no Security context is configured yet)
-            Optional<Profile> managerOpt = profileService.findAll().stream()
-                    .filter(p -> p.getAccount() != null && "MANAGER".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
-                    .findFirst();
-            Integer managerAccountId = managerOpt.map(p -> p.getAccount().getAccountId()).orElse(1); // fallback to ID 1
+            // Fetch Manager account from session, fallback to database
+            com.quan.apartment_building_management_system.entity.Account manager = null;
+            if (session != null) {
+                manager = (com.quan.apartment_building_management_system.entity.Account) session.getAttribute("currentUser");
+            }
+            if (manager == null) {
+                manager = accountService.findByUsername("manager@gmail.com")
+                    .or(() -> accountService.findByUsername("admin@gmail.com"))
+                    .orElseGet(() -> {
+                        Optional<Profile> managerOpt = profileService.findAll().stream()
+                                .filter(p -> p.getAccount() != null && "MANAGER".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
+                                .findFirst();
+                        return managerOpt.map(Profile::getAccount).orElse(null);
+                    });
+            }
+            if (manager == null) {
+                throw new IllegalArgumentException("No default manager/admin account found.");
+            }
 
-            maintenanceTaskService.assignTask(assignDTO.getRequestId(), assignDTO.getStaffId(), deadline, managerAccountId);
+            maintenanceTaskService.assignTask(assignDTO.getRequestId(), assignDTO.getStaffId(), deadline, manager);
             redirectAttributes.addFlashAttribute("message", "Task assigned successfully!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         } catch (Exception e) {
@@ -233,15 +250,29 @@ public class ManagerMaintenanceController {
     public String assignStaffToRequest(
             @PathVariable("requestId") Integer requestId,
             @PathVariable("staffId") Integer staffId,
+            jakarta.servlet.http.HttpSession session,
             RedirectAttributes redirectAttributes) {
         try {
-            // Fetch any manager to act as the assigner (since no Security context is configured yet)
-            Optional<Profile> managerOpt = profileService.findAll().stream()
-                    .filter(p -> p.getAccount() != null && "MANAGER".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
-                    .findFirst();
-            Integer managerAccountId = managerOpt.map(p -> p.getAccount().getAccountId()).orElse(1); // fallback to ID 1
+            // Fetch Manager account from session, fallback to database
+            com.quan.apartment_building_management_system.entity.Account manager = null;
+            if (session != null) {
+                manager = (com.quan.apartment_building_management_system.entity.Account) session.getAttribute("currentUser");
+            }
+            if (manager == null) {
+                manager = accountService.findByUsername("manager@gmail.com")
+                    .or(() -> accountService.findByUsername("admin@gmail.com"))
+                    .orElseGet(() -> {
+                        Optional<Profile> managerOpt = profileService.findAll().stream()
+                                .filter(p -> p.getAccount() != null && "MANAGER".equalsIgnoreCase(p.getAccount().getRole().getRoleName()))
+                                .findFirst();
+                        return managerOpt.map(Profile::getAccount).orElse(null);
+                    });
+            }
+            if (manager == null) {
+                throw new IllegalArgumentException("No default manager/admin account found.");
+            }
 
-            maintenanceTaskService.assignTask(requestId, staffId, null, managerAccountId);
+            maintenanceTaskService.assignTask(requestId, staffId, null, manager);
             redirectAttributes.addFlashAttribute("message", "Task assigned successfully!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         } catch (Exception e) {
@@ -288,4 +319,18 @@ public class ManagerMaintenanceController {
         redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/manager/maintenance";
     }
+
+    @PostMapping("/{requestId}/unassign")
+    public String unassignTask(@PathVariable("requestId") Integer requestId, RedirectAttributes redirectAttributes) {
+        try {
+            maintenanceTaskService.unassignTask(requestId);
+            redirectAttributes.addFlashAttribute("message", "Task unassigned successfully!");
+            redirectAttributes.addFlashAttribute("messageType", "success");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "Error unassigning task: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("messageType", "error");
+        }
+        return "redirect:/manager/maintenance";
+    }
 }
+

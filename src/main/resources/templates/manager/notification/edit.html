@@ -275,7 +275,7 @@
                 <i class="fa-regular fa-pen-to-square"></i>
             </button>
             <!-- Delete Button (hidden in edit mode) -->
-            <button type="submit" th:formaction="@{/manager/notifications/{id}/delete(id=${notification.notificationId})}" id="btnDeleteNotification" class="action-btn-custom delete-btn-custom" title="Delete" onclick="return confirm('Are you sure you want to delete this notification?');">
+            <button type="button" id="btnDeleteNotification" class="action-btn-custom delete-btn-custom" title="Delete" onclick="openDeleteModal()">
                 <i class="fa-regular fa-trash-can"></i>
             </button>
         </div>
@@ -435,5 +435,40 @@
     });
 </script>
 </div>
+    <!-- Confirm Delete Modal -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+            <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
+                <div class="modal-header" style="border-bottom: 1px solid #edf2f7; padding: 16px 24px;">
+                    <h5 class="modal-title fw-bold" id="confirmDeleteModalLabel" style="color: #1a202c; font-size: 16px; margin: 0;">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center" style="padding: 32px 24px;">
+                    <div style="font-size: 48px; color: #dc3545; margin-bottom: 16px;">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </div>
+                    <p style="font-size: 14px; color: #4a5568; line-height: 1.6; margin: 0;">
+                        Are you sure you want to delete this notification?
+                    </p>
+                </div>
+                <div class="modal-footer" style="background-color: #f8fafc; border-top: 1px solid #edf2f7; display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 6px; color: #4a5568; border: 1px solid #cbd5e0; background: #edf2f7;">Cancel</button>
+                    <form th:action="@{/manager/notifications/{id}/delete(id=${notification.notificationId})}" method="post" style="margin: 0;">
+                        <button type="submit" class="btn btn-danger" style="font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 6px; background-color: #dc3545; border: none; color: white;">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        window.openDeleteModal = function() {
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            confirmModal.show();
+        };
+    </script>
 </body>
 </html>

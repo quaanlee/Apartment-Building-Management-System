@@ -82,8 +82,8 @@
                         <tr th:each="staff : ${staffs}">
                             <td>
                                 <div class="staff-name-cell">
-                                    <div class="staff-avatar-circle" th:text="${#strings.substring(staff.profile.fullName, 0, 1)}">W</div>
-                                    <span th:text="${staff.profile.fullName}">Worker A</span>
+                                    <div class="staff-avatar-circle" th:text="${staff.profile.fullName != null and !staff.profile.fullName.isEmpty() ? #strings.substring(staff.profile.fullName, 0, 1) : 'S'}">W</div>
+                                    <span th:text="${staff.profile.fullName != null ? staff.profile.fullName : 'Unknown'}">Worker A</span>
                                 </div>
                             </td>
                             <td>
@@ -97,9 +97,9 @@
                                     <form th:action="@{/manager/maintenance/{reqId}/assign/{staffId}(reqId=${request.requestId}, staffId=${staff.profile.profileId})}" 
                                           method="post" 
                                           th:data-staff-name="${staff.profile.fullName}"
-                                          onsubmit="return confirm('Are you sure you want to assign ' + this.getAttribute('data-staff-name') + ' to this request?');" 
+                                          onsubmit="openAssignModal(event, this);" 
                                           style="margin: 0;">
-                                        <button type="submit" class="action-btn" th:disabled="${staff.workStatus == 'busy'}" th:style="${staff.workStatus == 'busy'} ? 'background-color: #cbd5e0; color: #718096; padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: not-allowed; display: inline-flex; align-items: center; gap: 6px;' : 'background-color: #38a169; color: #ffffff; padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;'">
+                                        <button type="submit" class="action-btn" th:disabled="${staff.workStatus == 'busy'}" th:style="${staff.workStatus == 'busy' ? 'background-color: #cbd5e0; color: #718096; padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: not-allowed; display: inline-flex; align-items: center; gap: 6px;' : 'background-color: #4c51bf; color: #ffffff; padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;'}">
                                             <i class="fa-solid fa-check-double"></i>
                                             <span>Assign</span>
                                         </button>
@@ -121,6 +121,69 @@
                 </table>
             </div>
         </div>
+
+        <!-- Custom Assign Confirmation Modal -->
+        <div class="modal-overlay" id="assignConfirmModal" role="dialog" aria-modal="true" aria-labelledby="assignModalTitle">
+            <div class="modal-box" style="max-width: 440px;">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="assignModalTitle">Confirm Assignment</h3>
+                    <button class="modal-close-btn" type="button" onclick="closeAssignModal()" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="modal-body" style="text-align: center; padding: 32px 24px;">
+                    <div style="font-size: 48px; color: #4c51bf; margin-bottom: 16px;">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </div>
+                    <p id="assignModalText" style="font-size: 15px; color: #4a5568; line-height: 1.6; margin: 0;"></p>
+                </div>
+                <div class="modal-footer" style="background-color: #f8fafc; display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px;">
+                    <button class="modal-cancel-btn" type="button" onclick="closeAssignModal()">Cancel</button>
+                    <button class="modal-submit-btn" type="button" id="confirmAssignSubmitBtn" style="background-color: #4c51bf; color: white;">Assign</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let assignFormToSubmit = null;
+
+            window.openAssignModal = function(event, form) {
+                event.preventDefault();
+                assignFormToSubmit = form;
+                const staffName = form.getAttribute('data-staff-name');
+                document.getElementById('assignModalText').textContent = 'Are you sure you want to assign ' + staffName + ' to this request?';
+                const modal = document.getElementById('assignConfirmModal');
+                modal.classList.add('is-open');
+                document.body.classList.add('modal-open');
+            };
+
+            window.closeAssignModal = function() {
+                const modal = document.getElementById('assignConfirmModal');
+                modal.classList.remove('is-open');
+                document.body.classList.remove('modal-open');
+                assignFormToSubmit = null;
+            };
+
+            document.getElementById('confirmAssignSubmitBtn').addEventListener('click', function() {
+                if (assignFormToSubmit) {
+                    assignFormToSubmit.submit();
+                }
+            });
+
+            // Close on click outside and escape
+            window.addEventListener('click', function(e) {
+                const modal = document.getElementById('assignConfirmModal');
+                if (e.target === modal) {
+                    closeAssignModal();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeAssignModal();
+                }
+            });
+        </script>
 
     </div>
 </div>
