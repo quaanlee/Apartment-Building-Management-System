@@ -95,4 +95,15 @@ public class AccountServiceImpl implements AccountService {
                 .map(UserDTO::new)
                 .collect(Collectors.toList());
     }
-}
+
+    @Override
+    @Transactional
+    public boolean changePassword(Integer accountId, String oldPassword, String newPassword) {
+        Optional<Account> opt = accountRepository.findById(accountId);
+        if (opt.isEmpty()) return false;
+        Account account = opt.get();
+        if (!account.getPassword().equals(oldPassword)) return false;
+        account.setPassword(newPassword);
+        accountRepository.save(account);
+        return true;
+    }}

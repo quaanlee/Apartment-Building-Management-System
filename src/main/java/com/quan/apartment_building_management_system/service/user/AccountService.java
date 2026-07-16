@@ -25,4 +25,7 @@ public interface AccountService {
     Page<UserDTO> findFilteredAccounts(String search, Integer roleId, Boolean status, Pageable pageable);
 
     List<UserDTO> findActiveMaintenanceStaffs();
+
+    @org.springframework.transaction.annotation.Transactional
+    boolean changePassword(Integer accountId, String oldPassword, String newPassword);
 }

@@ -30,6 +30,11 @@ public class EmployeeProfileServiceImpl implements EmployeeProfileService {
     }
 
     @Override
+    public Optional<EmployeeProfile> findByAccountId(Integer accountId) {
+        return employeeProfileRepository.findByAccountAccountId(accountId);
+    }
+
+    @Override
     public EmployeeProfile save(EmployeeProfile employeeProfile) {
         return employeeProfileRepository.save(employeeProfile);
     }
