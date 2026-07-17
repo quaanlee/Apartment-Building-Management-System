@@ -14,9 +14,11 @@ import java.util.Optional;
 public class BillServiceImpl implements BillService {
 
     private final BillRepository billRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public BillServiceImpl(BillRepository billRepository) {
+    public BillServiceImpl(BillRepository billRepository, com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.billRepository = billRepository;
+        this.systemLogService = systemLogService;
     }
 
     @Override

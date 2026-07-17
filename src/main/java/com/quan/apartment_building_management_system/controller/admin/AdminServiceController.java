@@ -32,10 +32,12 @@ public class AdminServiceController {
 
     private final ServiceItemService serviceItemService;
     private final UnitService unitService;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public AdminServiceController(ServiceItemService serviceItemService, UnitService unitService) {
+    public AdminServiceController(ServiceItemService serviceItemService, UnitService unitService, com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.serviceItemService = serviceItemService;
         this.unitService = unitService;
+        this.systemLogService = systemLogService;
     }
 
     // ── GET: Hiển thị danh sách dịch vụ ──────────────────────────────────────
@@ -95,7 +97,10 @@ public class AdminServiceController {
         newService.setDescription(createDTO.getDescription() != null ? createDTO.getDescription().trim() : "");
         newService.setStatus(true); // mặc định ACTIVE khi tạo mới
 
-        serviceItemService.save(newService);
+        newService = serviceItemService.save(newService);
+
+        com.quan.apartment_building_management_system.dto.systemlog.ServiceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.ServiceLogDTO.fromEntity(newService);
+        systemLogService.logSystemAction("CREATE_SERVICE", "ServiceItem", newService.getServiceId(), null, newDto, "Created service " + newService.getServiceName());
 
         return "redirect:/admin/services?success=created";
     }
@@ -133,12 +138,17 @@ public class AdminServiceController {
         }
 
         ServiceItem service = serviceOpt.get();
+        com.quan.apartment_building_management_system.dto.systemlog.ServiceLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.ServiceLogDTO.fromEntity(service);
+        
         service.setServiceName(updateDTO.getServiceName().trim());
         service.setUnitPrice(updateDTO.getUnitPrice());
         service.setUnit(unitOpt.get());
         service.setDescription(updateDTO.getDescription() != null ? updateDTO.getDescription().trim() : "");
 
-        serviceItemService.save(service);
+        service = serviceItemService.save(service);
+
+        com.quan.apartment_building_management_system.dto.systemlog.ServiceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.ServiceLogDTO.fromEntity(service);
+        systemLogService.logSystemAction("UPDATE_SERVICE", "ServiceItem", service.getServiceId(), oldDto, newDto, "Updated service " + service.getServiceName());
 
         return "redirect:/admin/services?success=updated";
     }
@@ -155,6 +165,7 @@ public class AdminServiceController {
         }
 
         ServiceItem service = serviceOpt.get();
+        com.quan.apartment_building_management_system.dto.systemlog.ServiceLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.ServiceLogDTO.fromEntity(service);
 
         // If lock param is provided, use it; otherwise toggle the current status
         if (lock != null) {
@@ -163,7 +174,11 @@ public class AdminServiceController {
             service.setStatus(!service.getStatus()); // toggle current status
         }
 
-        serviceItemService.save(service);
+        service = serviceItemService.save(service);
+
+        com.quan.apartment_building_management_system.dto.systemlog.ServiceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.ServiceLogDTO.fromEntity(service);
+        String actionStr = service.getStatus() ? "Unlocked" : "Locked";
+        systemLogService.logSystemAction("UPDATE_SERVICE", "ServiceItem", service.getServiceId(), oldDto, newDto, actionStr + " service " + service.getServiceName());
 
         String action = service.getStatus() ? "unlocked" : "locked";
         return "redirect:/admin/services?success=" + action;

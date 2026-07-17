@@ -1,7 +1,7 @@
 package com.quan.apartment_building_management_system.controller.resident.apartment;
 
-import com.quan.apartment_building_management_system.dto.ApartmentDTO;
-import com.quan.apartment_building_management_system.dto.ApartmentDetailDTO;
+import com.quan.apartment_building_management_system.dto.apartment.ApartmentDTO;
+import com.quan.apartment_building_management_system.dto.apartment.ApartmentDetailDTO;
 import com.quan.apartment_building_management_system.entity.Account;
 import com.quan.apartment_building_management_system.entity.Profile;
 import com.quan.apartment_building_management_system.service.apartment.ApartmentManagerService;

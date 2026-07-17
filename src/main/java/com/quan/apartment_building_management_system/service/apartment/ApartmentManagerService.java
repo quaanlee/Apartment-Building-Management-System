@@ -1,7 +1,7 @@
 package com.quan.apartment_building_management_system.service.apartment;
 
-import com.quan.apartment_building_management_system.dto.ApartmentDTO;
-import com.quan.apartment_building_management_system.dto.ApartmentDetailDTO;
+import com.quan.apartment_building_management_system.dto.apartment.ApartmentDTO;
+import com.quan.apartment_building_management_system.dto.apartment.ApartmentDetailDTO;
 import com.quan.apartment_building_management_system.entity.Apartment;
 import com.quan.apartment_building_management_system.entity.ApartmentImage;
 import com.quan.apartment_building_management_system.entity.Profile;
@@ -28,13 +28,16 @@ public class ApartmentManagerService {
     private final ApartmentRepository apartmentRepository;
     private final ResidentApartmentRepository residentApartmentRepository;
     private final ProfileRepository profileRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
     public ApartmentManagerService(ApartmentRepository apartmentRepository,
-                                   ResidentApartmentRepository residentApartmentRepository,
-                                   ProfileRepository profileRepository) {
+            ResidentApartmentRepository residentApartmentRepository,
+            ProfileRepository profileRepository,
+            com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.apartmentRepository = apartmentRepository;
         this.residentApartmentRepository = residentApartmentRepository;
         this.profileRepository = profileRepository;
+        this.systemLogService = systemLogService;
     }
 
     // 1. View Apartment List (Legacy signature)
@@ -73,15 +76,30 @@ public class ApartmentManagerService {
             throw new IllegalArgumentException("Invalid status. Must be 0, 1, or 2");
         }
 
+        com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO
+                .fromEntity(apartment);
+
+        String oldStatus = String.valueOf(apartment.getStatus());
         apartment.setStatus(status);
         Apartment updated = apartmentRepository.save(apartment);
+
+        com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO
+                .fromEntity(updated);
+        systemLogService.logSystemAction(
+                "UPDATE_APARTMENT",
+                "Apartment",
+                apartmentId,
+                oldDto,
+                newDto,
+                "Updated apartment status from " + oldStatus + " to " + status);
+
         return convertToDTO(updated);
     }
 
     // 4. Assign Resident
     @Transactional
     public void assignResidentToApartment(Integer profileId, Integer apartmentId,
-                                          LocalDate moveInDate, Boolean isHouseholdOwner) {
+            LocalDate moveInDate, Boolean isHouseholdOwner) {
         Apartment apartment = apartmentRepository.findById(apartmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Apartment not found"));
 
@@ -127,6 +145,9 @@ public class ApartmentManagerService {
         }
 
         ResidentApartment residentApartment = new ResidentApartment();
+        com.quan.apartment_building_management_system.dto.systemlog.ResidentAssignmentLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.ResidentAssignmentLogDTO
+                .fromProfileBefore(profile);
+
         residentApartment.setApartment(apartment);
         residentApartment.setProfile(profile);
         residentApartment.setMoveInDate(moveInDate != null ? moveInDate : LocalDate.now());
@@ -142,6 +163,18 @@ public class ApartmentManagerService {
             apartment.setStatus((byte) 1);
             apartmentRepository.save(apartment);
         }
+
+        com.quan.apartment_building_management_system.dto.systemlog.ResidentAssignmentLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.ResidentAssignmentLogDTO
+                .fromAssign(
+                        profile, apartment, moveInDate != null ? moveInDate : LocalDate.now(), isHouseholdOwner);
+
+        systemLogService.logSystemAction(
+                "ASSIGN_RESIDENT",
+                "Apartment",
+                apartmentId,
+                oldDto,
+                newDto,
+                "Assigned resident " + profile.getFullName() + " to apartment " + apartment.getApartmentNumber());
     }
 
     // 5. Move out resident
@@ -168,6 +201,9 @@ public class ApartmentManagerService {
             apartmentId = activeRecords.get(0).getApartment().getApartmentId();
         }
 
+        com.quan.apartment_building_management_system.dto.systemlog.ResidentAssignmentLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.ResidentAssignmentLogDTO
+                .fromProfileBefore(profile);
+
         for (ResidentApartment ra : activeRecords) {
             ra.setMoveOutDate(moveOut);
             residentApartmentRepository.save(ra);
@@ -190,6 +226,18 @@ public class ApartmentManagerService {
                 apartmentRepository.save(apartment);
             }
         }
+
+        com.quan.apartment_building_management_system.dto.systemlog.ResidentAssignmentLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.ResidentAssignmentLogDTO
+                .fromProfileBefore(profile);
+
+        systemLogService.logSystemAction(
+                "MOVE_OUT_RESIDENT",
+                "Apartment",
+                apartmentId,
+                oldDto,
+                newDto,
+                "Resident " + profile.getFullName() + " moved out of apartment "
+                        + (apartmentId != null ? apartmentId : "unknown"));
     }
 
     // 6. Get available residents
@@ -197,8 +245,7 @@ public class ApartmentManagerService {
         Pageable pageable = PageRequest.of(0, 50);
         return profileRepository.findAvailableResidents(
                 search != null && !search.isEmpty() ? search : null,
-                pageable
-        );
+                pageable);
     }
 
     public Page<Profile> getAvailableResidentsPaged(String search, Integer apartmentId, Pageable pageable) {

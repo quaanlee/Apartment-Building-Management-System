@@ -16,4 +16,8 @@ public interface NotificationService {
     void deleteById(Long id);
 
     void sendOtpEmail(String toEmail, String otp);
+
+    void sendBookingSuccessEmail(String toEmail, String resourceName, String bookingDate, String amount);
+
+    void sendBookingStatusUpdateNotification(com.quan.apartment_building_management_system.entity.UtilityBooking booking, Byte status);
 }

@@ -49,6 +49,32 @@
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════ -->
+        <!-- FILTER BAR                                                  -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <div class="filter-bar-card" style="display: flex; justify-content: flex-start; background: #ffffff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 24px; border: 1px solid var(--border-color);">
+            <div class="filter-left" style="display: flex; align-items: center; gap: 16px;">
+                <span class="filter-label" style="font-weight: 500; color: var(--text-secondary);">Trạng thái:</span>
+                <div class="status-select-container" style="position: relative;">
+                    <select id="statusFilter" class="status-select" onchange="filterByStatus()" style="appearance: none; padding: 8px 36px 8px 16px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--text-primary); cursor: pointer; min-width: 140px;">
+                        <option value="all" th:selected="${statusFilter == null}">Tất cả</option>
+                        <option value="true" th:selected="${statusFilter == true}">Hoạt động</option>
+                        <option value="false" th:selected="${statusFilter == false}">Bị khóa</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-secondary); font-size: 12px;"></i>
+                </div>
+                
+                <form id="searchForm" th:action="@{/admin/services}" method="get" style="display: flex; gap: 8px; margin: 0;">
+                    <input th:if="${statusFilter != null}" type="hidden" name="status" id="hiddenStatus" th:value="${statusFilter}">
+                    <div style="position: relative; width: 250px;">
+                        <input type="text" id="searchInput" name="keyword" th:value="${keyword}" placeholder="Tìm kiếm tên, loại dịch vụ..." class="form-input search-input" style="padding-left: 36px; height: 38px; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;">
+                        <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8;"></i>
+                    </div>
+                    <button type="submit" class="btn-primary" style="height: 38px; padding: 0 16px; border-radius: 8px; font-weight: 500; border: none; cursor: pointer;">Tìm kiếm</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
         <!-- SERVICES GRID                                               -->
         <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="services-grid">
@@ -381,8 +407,24 @@
         <!-- ═══════════════════════════════════════════════════════════ -->
         <!-- JAVASCRIPT                                                  -->
         <!-- ═══════════════════════════════════════════════════════════ -->
-        <script th:inline="javascript">
-            /*<![CDATA[*/
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        function filterByStatus() {
+            const statusVal = document.getElementById("statusFilter").value;
+            const searchInput = document.getElementById("searchInput").value.trim();
+            const url = new URL(window.location.href);
+            if (statusVal === "all") {
+                url.searchParams.delete("status");
+            } else {
+                url.searchParams.set("status", statusVal);
+            }
+            if (searchInput) {
+                url.searchParams.set("keyword", searchInput);
+            } else {
+                url.searchParams.delete("keyword");
+            }
+            window.location.href = url.toString();
+        }
             document.addEventListener("DOMContentLoaded", function () {
 
                 /* ── Search & filter wiring ── */

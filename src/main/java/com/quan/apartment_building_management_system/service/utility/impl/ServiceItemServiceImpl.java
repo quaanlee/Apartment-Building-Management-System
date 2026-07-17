@@ -15,9 +15,11 @@ import java.util.stream.Collectors;
 public class ServiceItemServiceImpl implements ServiceItemService {
 
     private final ServiceItemRepository serviceItemRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public ServiceItemServiceImpl(ServiceItemRepository serviceItemRepository) {
+    public ServiceItemServiceImpl(ServiceItemRepository serviceItemRepository, com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.serviceItemRepository = serviceItemRepository;
+        this.systemLogService = systemLogService;
     }
 
     @Override
@@ -54,11 +56,22 @@ public class ServiceItemServiceImpl implements ServiceItemService {
 
     @Override
     public List<ServiceItem> searchServices(String keyword, Boolean status) {
+        String normalizedKeyword = removeAccents(keyword != null ? keyword.trim().toLowerCase() : "");
         return serviceItemRepository.findAll().stream()
-                .filter(s -> keyword == null || keyword.isEmpty() ||
-                        s.getServiceName().toLowerCase().contains(keyword.toLowerCase()) ||
-                        (s.getServiceType() != null && s.getServiceType().toLowerCase().contains(keyword.toLowerCase())))
+                .filter(s -> {
+                    if (normalizedKeyword.isEmpty()) return true;
+                    String name = s.getServiceName() != null ? removeAccents(s.getServiceName().toLowerCase()) : "";
+                    String type = s.getServiceType() != null ? removeAccents(s.getServiceType().toLowerCase()) : "";
+                    return name.contains(normalizedKeyword) || type.contains(normalizedKeyword);
+                })
                 .filter(s -> status == null || s.getStatus().equals(status))
                 .collect(Collectors.toList());
+    }
+
+    private String removeAccents(String s) {
+        if (s == null) return "";
+        String temp = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD);
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(temp).replaceAll("").replace('đ', 'd').replace('Đ', 'D');
     }
 }

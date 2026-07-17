@@ -3,6 +3,7 @@ package com.quan.apartment_building_management_system.service.user.impl;
 import com.quan.apartment_building_management_system.entity.Account;
 import com.quan.apartment_building_management_system.repository.AccountRepository;
 import com.quan.apartment_building_management_system.service.user.AccountService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,9 +19,13 @@ import com.quan.apartment_building_management_system.dto.user.UserDTO;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public AccountServiceImpl(AccountRepository accountRepository) {
+    public AccountServiceImpl(AccountRepository accountRepository, PasswordEncoder passwordEncoder, com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.accountRepository = accountRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.systemLogService = systemLogService;
     }
 
     @Override
@@ -84,7 +89,21 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public Account save(Account account) {
-        return accountRepository.save(account);
+        boolean isNew = account.getAccountId() == null;
+        com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO oldDto = null;
+        if (!isNew) {
+            oldDto = com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO.fromEntity(accountRepository.findById(account.getAccountId()).orElse(null));
+        }
+
+        Account saved = accountRepository.save(account);
+
+        com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO.fromEntity(saved);
+        String action = isNew ? "CREATE_ACCOUNT" : "UPDATE_ACCOUNT";
+        String desc = isNew ? "Created account " + saved.getUsername() : "Updated account " + saved.getUsername();
+        
+        systemLogService.logSystemAction(action, "Account", saved.getAccountId(), oldDto, newDto, desc);
+        
+        return saved;
     }
 
     @Override
@@ -112,15 +131,33 @@ public class AccountServiceImpl implements AccountService {
         if (opt.isEmpty())
             return false;
         Account account = opt.get();
-        if (!account.getPassword().equals(oldPassword))
+        if (!passwordEncoder.matches(oldPassword, account.getPassword()))
             return false;
 
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        
         // Execute an explicit UPDATE statement to guarantee the database is modified
         // immediately
-        accountRepository.updatePassword(accountId, newPassword);
+        accountRepository.updatePassword(accountId, encodedPassword);
 
         // Update the persistence context as well
-        account.setPassword(newPassword);
+        account.setPassword(encodedPassword);
+
+        systemLogService.logSystemAction("CHANGE_PASSWORD", "Account", account.getAccountId(), null, null, "Changed password for account " + account.getUsername());
+
         return true;
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String email, String newPassword) {
+        Optional<Account> accountOpt = accountRepository.findByUsername(email);
+        if (accountOpt.isPresent()) {
+            Account account = accountOpt.get();
+            account.setPassword(passwordEncoder.encode(newPassword));
+            accountRepository.save(account);
+
+            systemLogService.logSystemAction("RESET_PASSWORD", "Account", account.getAccountId(), null, null, "Reset password for account " + account.getUsername());
+        }
     }
 }

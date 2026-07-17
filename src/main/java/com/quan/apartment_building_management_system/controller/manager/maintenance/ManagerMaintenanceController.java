@@ -45,15 +45,18 @@ public class ManagerMaintenanceController {
     private final MaintenanceTaskService maintenanceTaskService;
     private final ProfileService profileService;
     private final com.quan.apartment_building_management_system.service.user.AccountService accountService;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
     public ManagerMaintenanceController(MaintenanceRequestService maintenanceRequestService,
                                         MaintenanceTaskService maintenanceTaskService,
                                         ProfileService profileService,
-                                        com.quan.apartment_building_management_system.service.user.AccountService accountService) {
+                                        com.quan.apartment_building_management_system.service.user.AccountService accountService,
+                                        com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.maintenanceRequestService = maintenanceRequestService;
         this.maintenanceTaskService = maintenanceTaskService;
         this.profileService = profileService;
         this.accountService = accountService;
+        this.systemLogService = systemLogService;
     }
 
     @GetMapping
@@ -312,9 +315,16 @@ public class ManagerMaintenanceController {
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/manager/maintenance";
         }
+        com.quan.apartment_building_management_system.dto.systemlog.MaintenanceRequestLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.MaintenanceRequestLogDTO.fromEntity(request);
+        
         request.setTitle(title);
         request.setDescription(description);
-        maintenanceRequestService.save(request);
+        
+        request = maintenanceRequestService.save(request);
+        
+        com.quan.apartment_building_management_system.dto.systemlog.MaintenanceRequestLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.MaintenanceRequestLogDTO.fromEntity(request);
+        String aptNum = request.getApartment() != null ? request.getApartment().getApartmentNumber() : "Unknown";
+        systemLogService.logSystemAction("UPDATE_MAINTENANCE_REQUEST", "MaintenanceRequest", request.getRequestId(), oldDto, newDto, "Updated maintenance request for apartment " + aptNum);
         redirectAttributes.addFlashAttribute("message", "Cập nhật yêu cầu thành công");
         redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/manager/maintenance";

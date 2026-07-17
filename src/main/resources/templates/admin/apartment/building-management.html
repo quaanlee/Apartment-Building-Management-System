@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/admin/layout_admin :: admin-layout(~{::main}, 'building')}">
+<head>
+    <title>Quản lý tòa nhà</title>
+</head>
+<body>
+
+<main>
+    <!-- Link custom stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/manager/apartment/building-management.css}">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1>Quản lý căn hộ</h1>
+            <p>Theo dõi và quản lý danh sách các căn hộ trong tòa nhà.</p>
+        </div>
+
+        <a th:href="@{/admin/apartments/add}" class="add-btn">
+            <i class="fa-solid fa-plus"></i> Thêm căn hộ
+        </a>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${successMessage}" class="alert success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert error" th:text="${errorMessage}"></div>
+
+    <!-- Filter Box -->
+    <div class="filter-box" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 24px;">
+
+        <form th:action="@{/admin/apartments}" method="get" style="display: flex; gap: 8px; margin: 0;">
+            <div style="position: relative; width: 250px;">
+                <input type="text" name="query" th:value="${query}" placeholder="Tìm kiếm tên căn hộ..." class="form-input search-input" style="padding-left: 36px; height: 38px; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;">
+                <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8;"></i>
+            </div>
+            <button type="submit" class="btn-primary" style="height: 38px; padding: 0 16px; border-radius: 8px; font-weight: 500; border: none; cursor: pointer; background-color: var(--primary-color, #6366f1); color: white;">Tìm kiếm</button>
+        </form>
+
+        <select id="statusFilter">
+            <option value="all">Tất cả trạng thái</option>
+            <option value="0">Còn trống</option>
+            <option value="1">Đang ở</option>
+            <option value="2">Đang bảo trì</option>
+        </select>
+
+        <select id="floorFilter">
+            <option value="all">Tất cả các tầng</option>
+            <option th:each="apartment : ${apartments}"
+                    th:value="${apartment.floor}"
+                    th:text="'Tầng ' + ${apartment.floor}">
+            </option>
+        </select>
+
+        <span class="dot"></span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+        <table>
+            <thead>
+            <tr>
+                <th>Tên căn hộ</th>
+                <th>Tầng</th>
+                <th>Loại phòng</th>
+                <th>Trạng thái</th>
+                <th>Số người tối đa</th>
+                <th>Thao tác</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="apartment : ${apartments}"
+                th:attr="data-status=${apartment.status}, data-floor=${apartment.floor}">
+
+                <td class="apt-name" th:text="${apartment.apartmentNumber}">A-101</td>
+                <td th:text="'Tầng ' + ${apartment.floor}">Tầng 1</td>
+                <td th:text="${apartment.roomType}">Studio</td>
+                <td>
+                    <span th:if="${apartment.status == 0}" class="badge vacant">Còn trống</span>
+                    <span th:if="${apartment.status == 1}" class="badge occupied">Đang ở</span>
+                    <span th:if="${apartment.status == 2}" class="badge maintenance">Đang bảo trì</span>
+                </td>
+                <td th:text="${apartment.maxOccupancy}">4</td>
+                <td class="actions">
+                    <a th:href="@{/admin/apartments/edit/{id}(id=${apartment.apartmentId})}" title="Chỉnh sửa">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <a th:href="@{/admin/apartments/detail/{id}(id=${apartment.apartmentId})}" title="Xem chi tiết">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <a th:href="@{/admin/apartments/delete/{id}(id=${apartment.apartmentId})}"
+                       onclick="return confirm('Bạn có chắc chắn muốn xóa căn hộ này không?')"
+                       title="Xóa">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(apartments)}">
+                <td colspan="6" class="empty">Không tìm thấy căn hộ nào.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Filter Script -->
+    <script>
+        const statusFilter = document.getElementById("statusFilter");
+        const floorFilter = document.getElementById("floorFilter");
+        function filterRows() {
+            const selectedStatus = statusFilter.value;
+            const selectedFloor = floorFilter.value;
+            const rows = document.querySelectorAll("tbody tr[data-status]");
+
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute("data-status");
+                const rowFloor = row.getAttribute("data-floor");
+
+                const matchStatus = selectedStatus === "all" || selectedStatus === rowStatus;
+                const matchFloor = selectedFloor === "all" || selectedFloor === rowFloor;
+
+                row.style.display = matchStatus && matchFloor ? "" : "none";
+            });
+        }
+
+        // Apply initial search filter if parameter exists in URL
+        // (Handled by backend so we just need to keep the input value which is done via Thymeleaf)
+
+
+        // Run initial filter
+        filterRows();
+
+        statusFilter.addEventListener("change", filterRows);
+        floorFilter.addEventListener("change", filterRows);
+    </script>
+</main>
+
+</body>
+</html>

@@ -61,6 +61,7 @@ public class PayOSService {
     private final UtilityBookingRepository utilityBookingRepository;
     private final NotificationRepository notificationRepository;
     private final AccountNotificationRepository accountNotificationRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
     @Value("${payos.return-url}")
     private String returnUrl;
@@ -79,7 +80,9 @@ public class PayOSService {
             ProfileRepository profileRepository,
             UtilityBookingRepository utilityBookingRepository,
             NotificationRepository notificationRepository,
-            AccountNotificationRepository accountNotificationRepository) {
+            AccountNotificationRepository accountNotificationRepository,
+            com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService,
+            com.quan.apartment_building_management_system.service.system.NotificationService notificationService) {
         this.payOS = payOS;
         this.billRepository = billRepository;
         this.paymentRepository = paymentRepository;
@@ -92,7 +95,11 @@ public class PayOSService {
         this.utilityBookingRepository = utilityBookingRepository;
         this.notificationRepository = notificationRepository;
         this.accountNotificationRepository = accountNotificationRepository;
+        this.systemLogService = systemLogService;
+        this.notificationService = notificationService;
     }
+
+    private final com.quan.apartment_building_management_system.service.system.NotificationService notificationService;
 
     /**
      * Creates a PayOS payment link for the given bill.
@@ -353,6 +360,17 @@ public class PayOSService {
                 booking.setPaymentStatus(true);
                 // Status remains unchanged (e.g. 0 - Pending) so manager can approve it later
                 utilityBookingRepository.save(booking);
+                
+                // Send notifications (In-app and Email)
+                Account residentAccount = booking.getProfile() != null ? booking.getProfile().getAccount() : null;
+                if (residentAccount != null) {
+                    sendBookingSuccessNotification(residentAccount, booking);
+                    if (booking.getProfile().getEmail() != null && !booking.getProfile().getEmail().isEmpty()) {
+                        String resourceName = booking.getResource() != null ? booking.getResource().getResourceName() : "Tiện ích";
+                        String amount = String.format("%,.0f", booking.getTotalPrice() != null ? booking.getTotalPrice() : 0.0);
+                        notificationService.sendBookingSuccessEmail(booking.getProfile().getEmail(), resourceName, booking.getStartTime().toString(), amount);
+                    }
+                }
             });
             return;
         }
@@ -361,6 +379,9 @@ public class PayOSService {
             if (payment.getStatus() != null && payment.getStatus() == 1) {
                 return;
             }
+
+            com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO oldDto =
+                    com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO.fromEntity(payment);
 
             payment.setStatus((byte) 1);
             payment.setPaymentDate(LocalDateTime.now());
@@ -378,6 +399,11 @@ public class PayOSService {
             }
 
             paymentRepository.save(payment);
+
+            com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO newDto =
+                    com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO.fromEntity(payment);
+            systemLogService.logSystemAction("PAYMENT_BILL", "Payment", payment.getPaymentId(), oldDto, newDto,
+                    "Bill payment completed for bill #" + (bill != null ? bill.getBillId() : "?"));
         });
     }
 
@@ -413,6 +439,40 @@ public class PayOSService {
             accountNotificationRepository.save(accountNotification);
         } catch (Exception e) {
             System.err.println("[Notification Error] Failed to create payment success notification: " + e.getMessage());
+        }
+    }
+
+    private void sendBookingSuccessNotification(Account residentAccount, com.quan.apartment_building_management_system.entity.UtilityBooking booking) {
+        try {
+            Account sender = accountRepository.findById(1).orElse(residentAccount);
+
+            Notification notification = new Notification();
+            notification.setTitle("Thanh toán đặt lịch thành công");
+
+            String resourceName = booking.getResource() != null ? booking.getResource().getResourceName() : "Tiện ích";
+            String content = String.format(
+                    "Đơn đặt lịch %s vào ngày %s đã được thanh toán thành công.",
+                    resourceName,
+                    booking.getStartTime().toString());
+            notification.setContent(content);
+            notification.setNotificationType((byte) 2); // 2: Utility Booking
+            notification.setCreatedBy(sender);
+            notification.setRelatedEntityType("UtilityBooking");
+            notification.setReceiver(residentAccount);
+            notification.setRecipient("RESIDENT");
+            notification.setCreatedAt(LocalDateTime.now());
+
+            notification = notificationRepository.save(notification);
+
+            AccountNotification accountNotification = new AccountNotification();
+            accountNotification.setNotification(notification);
+            accountNotification.setAccount(residentAccount);
+            accountNotification.setIsRead(false);
+            accountNotification.setReadAt(null);
+
+            accountNotificationRepository.save(accountNotification);
+        } catch (Exception e) {
+            System.err.println("[Notification Error] Failed to create booking success notification: " + e.getMessage());
         }
     }
 

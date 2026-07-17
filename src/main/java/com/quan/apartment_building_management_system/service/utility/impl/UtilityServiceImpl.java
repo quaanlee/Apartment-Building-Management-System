@@ -14,9 +14,11 @@ import java.util.Optional;
 public class UtilityServiceImpl implements UtilityService {
 
     private final UtilityRepository utilityRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public UtilityServiceImpl(UtilityRepository utilityRepository) {
+    public UtilityServiceImpl(UtilityRepository utilityRepository, com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.utilityRepository = utilityRepository;
+        this.systemLogService = systemLogService;
     }
 
     @Override
@@ -51,6 +53,20 @@ public class UtilityServiceImpl implements UtilityService {
         if (query == null || query.trim().isEmpty()) {
             return findAll();
         }
-        return utilityRepository.findByUtilityNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query);
+        String normalizedQuery = removeAccents(query.trim().toLowerCase());
+        return findAll().stream()
+                .filter(u -> {
+                    String name = u.getUtilityName() != null ? removeAccents(u.getUtilityName().toLowerCase()) : "";
+                    String desc = u.getDescription() != null ? removeAccents(u.getDescription().toLowerCase()) : "";
+                    return name.contains(normalizedQuery) || desc.contains(normalizedQuery);
+                })
+                .toList();
+    }
+
+    private String removeAccents(String s) {
+        if (s == null) return "";
+        String temp = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD);
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(temp).replaceAll("").replace('đ', 'd').replace('Đ', 'D');
     }
 }

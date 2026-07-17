@@ -199,7 +199,7 @@ public class ManagerServiceController {
         model.addAttribute("currentPricePage", pricePage);
         model.addAttribute("priceQuery", priceQuery);
         model.addAttribute("activeTab", "service_utility");
-        return "manager/resource_detail";
+        return "manager/utilities/resource_detail";
     }
 
     @PostMapping("/manager/utilities/resources/toggle-status/{id}")

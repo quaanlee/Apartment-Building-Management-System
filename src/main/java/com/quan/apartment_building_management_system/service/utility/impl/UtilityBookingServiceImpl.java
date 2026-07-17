@@ -35,9 +35,16 @@ public class UtilityBookingServiceImpl implements UtilityBookingService {
             DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final UtilityBookingRepository utilityBookingRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public UtilityBookingServiceImpl(UtilityBookingRepository utilityBookingRepository) {
+    private final com.quan.apartment_building_management_system.service.system.NotificationService notificationService;
+
+    public UtilityBookingServiceImpl(UtilityBookingRepository utilityBookingRepository, 
+                                     com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService,
+                                     com.quan.apartment_building_management_system.service.system.NotificationService notificationService) {
         this.utilityBookingRepository = utilityBookingRepository;
+        this.systemLogService = systemLogService;
+        this.notificationService = notificationService;
     }
 
     private static boolean autoApproveEnabled = false;
@@ -91,7 +98,21 @@ public class UtilityBookingServiceImpl implements UtilityBookingService {
     @Override
     @Transactional
     public UtilityBooking save(UtilityBooking utilityBooking) {
-        return utilityBookingRepository.save(utilityBooking);
+        boolean isNew = utilityBooking.getBookingId() == null;
+        com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO oldDto = null;
+        if (!isNew) {
+            oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO.fromEntity(utilityBookingRepository.findById(utilityBooking.getBookingId()).orElse(null));
+        }
+
+        UtilityBooking saved = utilityBookingRepository.save(utilityBooking);
+        
+        com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO.fromEntity(saved);
+        String action = isNew ? "CREATE_UTILITY_BOOKING" : "UPDATE_UTILITY_BOOKING";
+        String resourceName = saved.getResource() != null ? saved.getResource().getResourceName() : "Unknown";
+        String desc = isNew ? "Created utility booking for " + resourceName : "Updated utility booking for " + resourceName;
+        systemLogService.logSystemAction(action, "UtilityBooking", saved.getBookingId(), oldDto, newDto, desc);
+        
+        return saved;
     }
 
     @Override
@@ -135,6 +156,9 @@ public class UtilityBookingServiceImpl implements UtilityBookingService {
     public void updateStatus(Integer bookingId, Byte newStatus, Account actor) {
         UtilityBooking booking = utilityBookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking #" + bookingId + " not found"));
+        
+        com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO.fromEntity(booking);
+
         booking.setStatus(newStatus);
         if (newStatus == 1) {               // Approved
             booking.setApprovedBy(actor);
@@ -152,7 +176,15 @@ public class UtilityBookingServiceImpl implements UtilityBookingService {
             booking.setCancelledAt(null);
             booking.setCancelReason(null);
         }
-        utilityBookingRepository.save(booking);
+        UtilityBooking saved = utilityBookingRepository.save(booking);
+        
+        com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO.fromEntity(saved);
+        systemLogService.logSystemAction("UPDATE_BOOKING_STATUS", "UtilityBooking", saved.getBookingId(), oldDto, newDto, "Changed booking status to " + newStatus);
+
+        // Send notifications when booking is Approved (1) or Rejected (2)
+        if (newStatus == 1 || newStatus == 2) {
+            notificationService.sendBookingStatusUpdateNotification(saved, newStatus);
+        }
     }
 
     // ── Private helpers ──────────────────────────────────────────────────────────

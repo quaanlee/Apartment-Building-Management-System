@@ -16,10 +16,16 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     long countByStatus(Boolean status);
 
-    @org.springframework.data.jpa.repository.Query("SELECT a FROM Account a LEFT JOIN FETCH a.role LEFT JOIN FETCH a.profile p LEFT JOIN FETCH a.employeeProfile ep WHERE " +
-           "(:search IS NULL OR :search = '' OR LOWER(p.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.citizenId) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.email) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(ep.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(ep.email) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+    @org.springframework.data.jpa.repository.Query(
+            value = "SELECT a FROM Account a LEFT JOIN FETCH a.role LEFT JOIN FETCH a.profile p LEFT JOIN FETCH a.employeeProfile ep WHERE " +
+           "(:search IS NULL OR :search = '' OR STR(a.accountId) LIKE CONCAT('%', :search, '%') OR LOWER(p.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.phoneNumber) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.email) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(ep.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(ep.phoneNumber) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(ep.email) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
            "(:roleId IS NULL OR a.role.roleId = :roleId) AND " +
-           "(:status IS NULL OR a.status = :status)")
+           "(:status IS NULL OR a.status = :status)",
+            countQuery = "SELECT COUNT(a) FROM Account a LEFT JOIN a.role LEFT JOIN a.profile p LEFT JOIN a.employeeProfile ep WHERE " +
+           "(:search IS NULL OR :search = '' OR STR(a.accountId) LIKE CONCAT('%', :search, '%') OR LOWER(p.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.phoneNumber) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.email) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(ep.fullName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(ep.phoneNumber) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(ep.email) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+           "(:roleId IS NULL OR a.role.roleId = :roleId) AND " +
+           "(:status IS NULL OR a.status = :status)"
+    )
     org.springframework.data.domain.Page<Account> findFilteredAccounts(@org.springframework.data.repository.query.Param("search") String search,
                                @org.springframework.data.repository.query.Param("roleId") Integer roleId,
                                @org.springframework.data.repository.query.Param("status") Boolean status,

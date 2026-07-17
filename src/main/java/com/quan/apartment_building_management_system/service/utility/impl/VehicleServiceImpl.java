@@ -14,9 +14,11 @@ import java.util.Optional;
 public class VehicleServiceImpl implements VehicleService {
 
     private final VehicleRepository vehicleRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public VehicleServiceImpl(VehicleRepository vehicleRepository) {
+    public VehicleServiceImpl(VehicleRepository vehicleRepository, com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.vehicleRepository = vehicleRepository;
+        this.systemLogService = systemLogService;
     }
 
     @Override
@@ -42,7 +44,20 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     @Transactional
     public Vehicle save(Vehicle vehicle) {
-        return vehicleRepository.save(vehicle);
+        boolean isNew = vehicle.getVehicleId() == null;
+        com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO oldDto = null;
+        if (!isNew) {
+            oldDto = com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO.fromEntity(vehicleRepository.findById(vehicle.getVehicleId()).orElse(null));
+        }
+
+        Vehicle saved = vehicleRepository.save(vehicle);
+        
+        com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO.fromEntity(saved);
+        String action = isNew ? "CREATE_VEHICLE_REGISTRATION" : "UPDATE_VEHICLE_REGISTRATION";
+        String desc = isNew ? "Created vehicle registration for " + saved.getLicensePlate() : "Updated vehicle registration for " + saved.getLicensePlate();
+        systemLogService.logSystemAction(action, "Vehicle", saved.getVehicleId(), oldDto, newDto, desc);
+        
+        return saved;
     }
 
     @Override
@@ -70,26 +85,41 @@ public class VehicleServiceImpl implements VehicleService {
     @Transactional
     public void approveVehicle(Integer id, String approvedByUsername) {
         Vehicle vehicle = vehicleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid vehicle Id:" + id));
+        com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO.fromEntity(vehicle);
+
         vehicle.setStatus((byte) 1);
         vehicle.setApprovedAt(java.time.LocalDateTime.now());
         // For simplicity, we are not setting approvedBy Account object here without injecting AccountRepository
         // A complete implementation would fetch the Account and set it.
-        vehicleRepository.save(vehicle);
+        Vehicle saved = vehicleRepository.save(vehicle);
+        
+        com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO.fromEntity(saved);
+        systemLogService.logSystemAction("APPROVE_VEHICLE_REGISTRATION", "Vehicle", saved.getVehicleId(), oldDto, newDto, "Approved vehicle registration for " + saved.getLicensePlate());
     }
 
     @Override
     @Transactional
     public void rejectVehicle(Integer id) {
         Vehicle vehicle = vehicleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid vehicle Id:" + id));
+        com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO.fromEntity(vehicle);
+
         vehicle.setStatus((byte) 2);
-        vehicleRepository.save(vehicle);
+        Vehicle saved = vehicleRepository.save(vehicle);
+        
+        com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO.fromEntity(saved);
+        systemLogService.logSystemAction("REJECT_VEHICLE_REGISTRATION", "Vehicle", saved.getVehicleId(), oldDto, newDto, "Rejected vehicle registration for " + saved.getLicensePlate());
     }
 
     @Override
     @Transactional
     public void revokeVehicle(Integer id) {
         Vehicle vehicle = vehicleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid vehicle Id:" + id));
+        com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO.fromEntity(vehicle);
+
         vehicle.setStatus((byte) 0);
-        vehicleRepository.save(vehicle);
+        Vehicle saved = vehicleRepository.save(vehicle);
+        
+        com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.VehicleRegistrationLogDTO.fromEntity(saved);
+        systemLogService.logSystemAction("REVOKE_VEHICLE_REGISTRATION", "Vehicle", saved.getVehicleId(), oldDto, newDto, "Revoked vehicle registration for " + saved.getLicensePlate());
     }
 }

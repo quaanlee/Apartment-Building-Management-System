@@ -39,7 +39,7 @@ public interface SystemLogRepository extends JpaRepository<SystemLog, Long> {
 
     Page<SystemLog> findByAccountAccountId(Integer accountId, Pageable pageable);
 
-    @Query("SELECT sl FROM SystemLog sl " +
+    @Query(value = "SELECT sl FROM SystemLog sl " +
            "LEFT JOIN FETCH sl.account a " +
            "LEFT JOIN FETCH a.role r " +
            "LEFT JOIN FETCH a.profile p " +
@@ -52,7 +52,20 @@ public interface SystemLogRepository extends JpaRepository<SystemLog, Long> {
            "       LOWER(FUNCTION('TRANSLATE', p.fullName, 'áàảãạâấầẩẫậăắằẳẵặđéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵ', 'aaaaaaaaaaaaaaaaadeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyy')) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "       LOWER(sl.action) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "       LOWER(sl.entityType) LIKE LOWER(CONCAT('%', :search, '%'))) " +
-           "ORDER BY sl.createdAt DESC")
+           "ORDER BY sl.createdAt DESC",
+           countQuery = "SELECT COUNT(sl) FROM SystemLog sl " +
+           "LEFT JOIN sl.account a " +
+           "LEFT JOIN a.role r " +
+           "LEFT JOIN a.profile p " +
+           "WHERE (:fromDate IS NULL OR sl.createdAt >= :fromDate) " +
+           "  AND (:toDate IS NULL OR sl.createdAt <= :toDate) " +
+           "  AND (:role IS NULL OR r.roleName = :role) " +
+           "  AND (:action IS NULL OR sl.action = :action) " +
+           "  AND (:search IS NULL OR :search = '' OR " +
+           "       LOWER(a.username) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "       LOWER(FUNCTION('TRANSLATE', p.fullName, 'áàảãạâấầẩẫậăắằẳẵặđéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵ', 'aaaaaaaaaaaaaaaaadeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyy')) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "       LOWER(sl.action) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "       LOWER(sl.entityType) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<SystemLog> findFiltered(
             @Param("fromDate") LocalDateTime fromDate,
             @Param("toDate") LocalDateTime toDate,

@@ -107,10 +107,10 @@
 
             <!-- Action Controls -->
             <div class="header-actions">
-                <button class="icon-btn" title="Thông báo">
+                <a th:href="@{/resident/notifications}" class="icon-btn" title="Thông báo">
                     <i class="fa-solid fa-bell"></i>
-                    <span class="badge"></span>
-                </button>
+                    <span class="badge" th:if="${unreadNotificationCount != null && unreadNotificationCount > 0}"></span>
+                </a>
 
                 <a th:href="@{/resident/profile}" class="user-profile-trigger" id="userProfileTrigger" style="text-decoration: none;">
                     <div class="user-avatar-placeholder">C</div>

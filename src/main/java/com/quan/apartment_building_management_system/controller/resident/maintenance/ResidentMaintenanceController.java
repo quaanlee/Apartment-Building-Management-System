@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.quan.apartment_building_management_system.entity.*;
 import com.quan.apartment_building_management_system.repository.*;
+import com.quan.apartment_building_management_system.service.system.SystemLogService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,14 +29,16 @@ public class ResidentMaintenanceController {
     private final ProfileRepository profileRepo;
     private final ResidentApartmentRepository residentApartmentRepo;
     private final Cloudinary cloudinary;
+    private final SystemLogService systemLogService;
 
     public ResidentMaintenanceController(MaintenanceRequestRepository requestRepo,
-                                          MaintenanceRequestImageRepository requestImageRepo,
-                                          MaintenanceTaskRepository taskRepo,
-                                          MaintenanceReportRepository reportRepo,
-                                          ProfileRepository profileRepo,
-                                          ResidentApartmentRepository residentApartmentRepo,
-                                          Cloudinary cloudinary) {
+            MaintenanceRequestImageRepository requestImageRepo,
+            MaintenanceTaskRepository taskRepo,
+            MaintenanceReportRepository reportRepo,
+            ProfileRepository profileRepo,
+            ResidentApartmentRepository residentApartmentRepo,
+            Cloudinary cloudinary,
+            SystemLogService systemLogService) {
         this.requestRepo = requestRepo;
         this.requestImageRepo = requestImageRepo;
         this.taskRepo = taskRepo;
@@ -43,11 +46,13 @@ public class ResidentMaintenanceController {
         this.profileRepo = profileRepo;
         this.residentApartmentRepo = residentApartmentRepo;
         this.cloudinary = cloudinary;
+        this.systemLogService = systemLogService;
     }
 
     private Profile getProfile(HttpSession session) {
         Account currentUser = (Account) session.getAttribute("currentUser");
-        if (currentUser == null) return null;
+        if (currentUser == null)
+            return null;
         return profileRepo.findByAccountAccountId(currentUser.getAccountId()).orElse(null);
     }
 
@@ -59,7 +64,8 @@ public class ResidentMaintenanceController {
             HttpSession session, Model model) {
 
         Profile profile = getProfile(session);
-        if (profile == null) return "redirect:/login";
+        if (profile == null)
+            return "redirect:/login";
 
         List<MaintenanceRequest> all = requestRepo.findByProfileProfileId(profile.getProfileId());
 
@@ -69,9 +75,11 @@ public class ResidentMaintenanceController {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime fromDate = (fromDateStr != null && !fromDateStr.isBlank())
-                ? LocalDate.parse(fromDateStr, dtf).atStartOfDay() : null;
+                ? LocalDate.parse(fromDateStr, dtf).atStartOfDay()
+                : null;
         LocalDateTime toDate = (toDateStr != null && !toDateStr.isBlank())
-                ? LocalDate.parse(toDateStr, dtf).atTime(23, 59, 59) : null;
+                ? LocalDate.parse(toDateStr, dtf).atTime(23, 59, 59)
+                : null;
 
         if (fromDate != null) {
             all = all.stream().filter(r -> !r.getRequestDate().isBefore(fromDate)).toList();
@@ -92,7 +100,10 @@ public class ResidentMaintenanceController {
             var taskOpt = taskRepo.findByMaintenanceRequestRequestId(req.getRequestId());
             if (taskOpt.isPresent()) {
                 MaintenanceTask task = taskOpt.get();
-                item.put("staffName", task.getStaff() != null && task.getStaff().getProfile() != null ? task.getStaff().getProfile().getFullName() : "-");
+                item.put("staffName",
+                        task.getStaff() != null && task.getStaff().getProfile() != null
+                                ? task.getStaff().getProfile().getFullName()
+                                : "-");
                 var reports = reportRepo.findByMaintenanceTaskTaskId(task.getTaskId());
                 if (!reports.isEmpty()) {
                     MaintenanceReport last = reports.get(reports.size() - 1);
@@ -121,7 +132,8 @@ public class ResidentMaintenanceController {
     @GetMapping("/create")
     public String showCreateForm(HttpSession session, Model model) {
         Profile profile = getProfile(session);
-        if (profile == null) return "redirect:/login";
+        if (profile == null)
+            return "redirect:/login";
         model.addAttribute("pageTitle", "Create Maintenance Request");
         return "resident/maintenance/create";
     }
@@ -136,7 +148,8 @@ public class ResidentMaintenanceController {
             RedirectAttributes redirect) {
 
         Profile profile = getProfile(session);
-        if (profile == null) return "redirect:/login";
+        if (profile == null)
+            return "redirect:/login";
 
         Apartment apartment = profile.getApartment();
         if (apartment == null) {
@@ -165,9 +178,8 @@ public class ResidentMaintenanceController {
                 if (!image.isEmpty()) {
                     try {
                         var uploadResult = cloudinary.uploader().upload(
-                            image.getBytes(),
-                            ObjectUtils.asMap("folder", "maintenance/resident")
-                        );
+                                image.getBytes(),
+                                ObjectUtils.asMap("folder", "maintenance/resident"));
                         String url = uploadResult.get("secure_url").toString();
                         MaintenanceRequestImage img = new MaintenanceRequestImage();
                         img.setRequest(req);
@@ -180,6 +192,12 @@ public class ResidentMaintenanceController {
             }
         }
 
+        com.quan.apartment_building_management_system.dto.systemlog.MaintenanceRequestLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.MaintenanceRequestLogDTO
+                .fromEntity(req);
+        systemLogService.logSystemAction("CREATE_MAINTENANCE_REQUEST", "MaintenanceRequest", req.getRequestId(),
+                new com.quan.apartment_building_management_system.dto.systemlog.MaintenanceRequestLogDTO(), newDto,
+                "Resident created maintenance request: " + req.getTitle());
+
         redirect.addFlashAttribute("message", "Yêu cầu bảo trì đã được tạo thành công.");
         redirect.addFlashAttribute("messageType", "success");
         return "redirect:/resident/maintenance";
@@ -188,7 +206,8 @@ public class ResidentMaintenanceController {
     @GetMapping("/{id}/detail")
     public String viewDetail(@PathVariable Integer id, HttpSession session, Model model) {
         Profile profile = getProfile(session);
-        if (profile == null) return "redirect:/login";
+        if (profile == null)
+            return "redirect:/login";
 
         MaintenanceRequest req = requestRepo.findById(id).orElse(null);
         if (req == null || !req.getProfile().getProfileId().equals(profile.getProfileId())) {
@@ -203,7 +222,10 @@ public class ResidentMaintenanceController {
         var taskOpt = taskRepo.findByMaintenanceRequestRequestId(req.getRequestId());
         if (taskOpt.isPresent()) {
             MaintenanceTask task = taskOpt.get();
-            model.addAttribute("taskStaffName", task.getStaff() != null && task.getStaff().getProfile() != null ? task.getStaff().getProfile().getFullName() : "-");
+            model.addAttribute("taskStaffName",
+                    task.getStaff() != null && task.getStaff().getProfile() != null
+                            ? task.getStaff().getProfile().getFullName()
+                            : "-");
             model.addAttribute("taskDeadline", task.getDeadline());
             var reports = reportRepo.findByMaintenanceTaskTaskId(task.getTaskId());
             if (!reports.isEmpty()) {
@@ -230,7 +252,8 @@ public class ResidentMaintenanceController {
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Integer id, HttpSession session, Model model) {
         Profile profile = getProfile(session);
-        if (profile == null) return "redirect:/login";
+        if (profile == null)
+            return "redirect:/login";
 
         MaintenanceRequest req = requestRepo.findById(id).orElse(null);
         if (req == null || !req.getProfile().getProfileId().equals(profile.getProfileId())) {
@@ -248,12 +271,13 @@ public class ResidentMaintenanceController {
     @PostMapping("/{id}/edit")
     @Transactional
     public String updateRequest(@PathVariable Integer id,
-                                 @RequestParam("description") String description,
-                                 @RequestParam(value = "images", required = false) List<MultipartFile> images,
-                                 HttpSession session,
-                                 RedirectAttributes redirect) {
+            @RequestParam("description") String description,
+            @RequestParam(value = "images", required = false) List<MultipartFile> images,
+            HttpSession session,
+            RedirectAttributes redirect) {
         Profile profile = getProfile(session);
-        if (profile == null) return "redirect:/login";
+        if (profile == null)
+            return "redirect:/login";
 
         MaintenanceRequest req = requestRepo.findById(id).orElse(null);
         if (req == null || !req.getProfile().getProfileId().equals(profile.getProfileId())) {
@@ -274,9 +298,8 @@ public class ResidentMaintenanceController {
                 if (!image.isEmpty()) {
                     try {
                         var uploadResult = cloudinary.uploader().upload(
-                            image.getBytes(),
-                            ObjectUtils.asMap("folder", "maintenance/resident")
-                        );
+                                image.getBytes(),
+                                ObjectUtils.asMap("folder", "maintenance/resident"));
                         String url = uploadResult.get("secure_url").toString();
                         MaintenanceRequestImage img = new MaintenanceRequestImage();
                         img.setRequest(req);

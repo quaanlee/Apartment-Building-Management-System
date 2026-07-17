@@ -43,18 +43,20 @@ public class ManagerBillController {
     private final NotificationRepository notificationRepository;
     private final AccountNotificationRepository accountNotificationRepository;
     private final ProfileRepository profileRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
     public ManagerBillController(BillService billService,
-                                 BillDetailService billDetailService,
-                                 ApartmentService apartmentService,
-                                 ServiceItemService serviceItemService,
-                                 UtilityBookingService utilityBookingService,
-                                 PaymentService paymentService,
-                                 AccountService accountService,
-                                 PaymentMethodRepository paymentMethodRepository,
-                                 NotificationRepository notificationRepository,
-                                 AccountNotificationRepository accountNotificationRepository,
-                                 ProfileRepository profileRepository) {
+            BillDetailService billDetailService,
+            ApartmentService apartmentService,
+            ServiceItemService serviceItemService,
+            UtilityBookingService utilityBookingService,
+            PaymentService paymentService,
+            AccountService accountService,
+            PaymentMethodRepository paymentMethodRepository,
+            NotificationRepository notificationRepository,
+            AccountNotificationRepository accountNotificationRepository,
+            ProfileRepository profileRepository,
+            com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.billService = billService;
         this.billDetailService = billDetailService;
         this.apartmentService = apartmentService;
@@ -66,15 +68,16 @@ public class ManagerBillController {
         this.notificationRepository = notificationRepository;
         this.accountNotificationRepository = accountNotificationRepository;
         this.profileRepository = profileRepository;
+        this.systemLogService = systemLogService;
     }
 
     // 1. View & Search Bill List
     @GetMapping
     public String listBills(@RequestParam(value = "search", required = false) String search,
-                            @RequestParam(value = "status", required = false) Byte status,
-                            @RequestParam(value = "month", required = false) Byte month,
-                            @RequestParam(value = "year", required = false) Short year,
-                            Model model) {
+            @RequestParam(value = "status", required = false) Byte status,
+            @RequestParam(value = "month", required = false) Byte month,
+            @RequestParam(value = "year", required = false) Short year,
+            Model model) {
         List<Bill> bills = billService.findAll();
 
         // Check and update overdue status dynamically based on DueDate
@@ -89,10 +92,8 @@ public class ManagerBillController {
         // Apply filters
         if (search != null && !search.trim().isEmpty()) {
             String query = search.toLowerCase().trim();
-            bills = bills.stream().filter(b ->
-                b.getApartment().getApartmentNumber().toLowerCase().contains(query) ||
-                getOwnerName(b.getApartment()).toLowerCase().contains(query)
-            ).collect(Collectors.toList());
+            bills = bills.stream().filter(b -> b.getApartment().getApartmentNumber().toLowerCase().contains(query) ||
+                    getOwnerName(b.getApartment()).toLowerCase().contains(query)).collect(Collectors.toList());
         }
 
         if (status != null) {
@@ -120,10 +121,10 @@ public class ManagerBillController {
     // 2. View Payment Status & Monitor Dashboard
     @GetMapping("/payment-status")
     public String paymentStatus(@RequestParam(value = "search", required = false) String search,
-                                @RequestParam(value = "status", required = false) Byte status,
-                                Model model) {
+            @RequestParam(value = "status", required = false) Byte status,
+            Model model) {
         List<Bill> bills = billService.findAll();
-        
+
         // Update overdue status dynamically
         LocalDateTime now = LocalDateTime.now();
         for (Bill b : bills) {
@@ -152,10 +153,8 @@ public class ManagerBillController {
         // Apply filters
         if (search != null && !search.trim().isEmpty()) {
             String query = search.toLowerCase().trim();
-            bills = bills.stream().filter(b ->
-                b.getApartment().getApartmentNumber().toLowerCase().contains(query) ||
-                getOwnerName(b.getApartment()).toLowerCase().contains(query)
-            ).collect(Collectors.toList());
+            bills = bills.stream().filter(b -> b.getApartment().getApartmentNumber().toLowerCase().contains(query) ||
+                    getOwnerName(b.getApartment()).toLowerCase().contains(query)).collect(Collectors.toList());
         }
 
         if (status != null) {
@@ -182,7 +181,7 @@ public class ManagerBillController {
         List<Apartment> apartments = apartmentService.findAll().stream()
                 .filter(a -> a.getStatus() == 1) // Only occupied apartments can be billed
                 .collect(Collectors.toList());
-        
+
         List<ServiceItem> services = serviceItemService.findAll().stream()
                 .filter(s -> s.getStatus() && !"Utility Booking".equals(s.getServiceName()))
                 .collect(Collectors.toList());
@@ -194,20 +193,21 @@ public class ManagerBillController {
         return "manager/bills/form";
     }
 
-    // 4. Retrieve utility bookings and pending billing items for an apartment via AJAX (helper)
+    // 4. Retrieve utility bookings and pending billing items for an apartment via
+    // AJAX (helper)
     @GetMapping("/generate/preview")
     @ResponseBody
     public List<String> previewUtilityBookings(@RequestParam("apartmentId") Integer apartmentId,
-                                               @RequestParam("month") Byte month,
-                                               @RequestParam("year") Short year) {
+            @RequestParam("month") Byte month,
+            @RequestParam("year") Short year) {
         List<String> bookingDetails = new ArrayList<>();
         Optional<Apartment> aptOpt = apartmentService.findById(apartmentId);
         if (aptOpt.isPresent()) {
             Apartment apartment = aptOpt.get();
             List<UtilityBooking> bookings = getMonthBookings(apartment, month, year);
             for (UtilityBooking b : bookings) {
-                bookingDetails.add(b.getResource().getUtility().getUtilityName() + 
-                                   " (" + b.getStartTime().toLocalDate().toString() + "): $" + b.getTotalPrice());
+                bookingDetails.add(b.getResource().getUtility().getUtilityName() +
+                        " (" + b.getStartTime().toLocalDate().toString() + "): $" + b.getTotalPrice());
             }
         }
         return bookingDetails;
@@ -215,16 +215,16 @@ public class ManagerBillController {
 
     @PostMapping("/generate")
     public String generateBill(@Valid @ModelAttribute("billDto") BillDTO billDto,
-                               BindingResult bindingResult,
-                               Model model,
-                               HttpSession session,
-                               RedirectAttributes redirectAttributes) {
+            BindingResult bindingResult,
+            Model model,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             List<Apartment> apartments = apartmentService.findAll().stream()
                     .filter(a -> a.getStatus() == 1)
                     .collect(Collectors.toList());
-            
+
             List<ServiceItem> services = serviceItemService.findAll().stream()
                     .filter(s -> s.getStatus() && !"Utility Booking".equals(s.getServiceName()))
                     .collect(Collectors.toList());
@@ -245,11 +245,11 @@ public class ManagerBillController {
         Optional<Apartment> aptOpt = apartmentService.findById(apartmentId);
         if (aptOpt.isEmpty()) {
             bindingResult.rejectValue("apartmentId", "error.billDto", "Selected apartment not found.");
-            
+
             List<Apartment> apartments = apartmentService.findAll().stream()
                     .filter(a -> a.getStatus() == 1)
                     .collect(Collectors.toList());
-            
+
             List<ServiceItem> services = serviceItemService.findAll().stream()
                     .filter(s -> s.getStatus() && !"Utility Booking".equals(s.getServiceName()))
                     .collect(Collectors.toList());
@@ -268,12 +268,13 @@ public class ManagerBillController {
                 .collect(Collectors.toList());
 
         if (!existing.isEmpty()) {
-            bindingResult.rejectValue("month", "error.billDto", "Bill already exists for Apartment " + apartment.getApartmentNumber() + " for " + month + "/" + year);
-            
+            bindingResult.rejectValue("month", "error.billDto", "Bill already exists for Apartment "
+                    + apartment.getApartmentNumber() + " for " + month + "/" + year);
+
             List<Apartment> apartments = apartmentService.findAll().stream()
                     .filter(a -> a.getStatus() == 1)
                     .collect(Collectors.toList());
-            
+
             List<ServiceItem> services = serviceItemService.findAll().stream()
                     .filter(s -> s.getStatus() && !"Utility Booking".equals(s.getServiceName()))
                     .collect(Collectors.toList());
@@ -293,22 +294,23 @@ public class ManagerBillController {
         // Fallback 1: Look up known email usernames in database
         if (creator == null) {
             creator = accountService.findByUsername("manager@gmail.com")
-                .orElseGet(() -> accountService.findByUsername("manager1@gmail.com")
-                .orElseGet(() -> accountService.findByUsername("admin@gmail.com")
-                .orElseGet(() -> accountService.findByUsername("admin1@gmail.com")
-                .orElseGet(() -> accountService.findByUsername("manager")
-                .orElseGet(() -> accountService.findByUsername("admin")
-                .orElse(null))))));
+                    .orElseGet(() -> accountService.findByUsername("manager1@gmail.com")
+                            .orElseGet(() -> accountService.findByUsername("admin@gmail.com")
+                                    .orElseGet(() -> accountService.findByUsername("admin1@gmail.com")
+                                            .orElseGet(() -> accountService.findByUsername("manager")
+                                                    .orElseGet(() -> accountService.findByUsername("admin")
+                                                            .orElse(null))))));
         }
 
         // Fallback 2: Look up any manager or admin role account in database
         if (creator == null) {
             creator = accountService.findAll().stream()
-                .filter(acc -> acc.getRole() != null && 
-                    ("MANAGER".equalsIgnoreCase(acc.getRole().getRoleName().toUpperCase().replace(" ", "_")) || 
-                     "ADMIN".equalsIgnoreCase(acc.getRole().getRoleName().toUpperCase().replace(" ", "_"))))
-                .findFirst()
-                .orElse(null);
+                    .filter(acc -> acc.getRole() != null &&
+                            ("MANAGER".equalsIgnoreCase(acc.getRole().getRoleName().toUpperCase().replace(" ", "_")) ||
+                                    "ADMIN".equalsIgnoreCase(
+                                            acc.getRole().getRoleName().toUpperCase().replace(" ", "_"))))
+                    .findFirst()
+                    .orElse(null);
         }
 
         // Fallback 3: Extreme fallback to first account in database
@@ -317,7 +319,8 @@ public class ManagerBillController {
         }
 
         if (creator == null) {
-            redirectAttributes.addFlashAttribute("message", "Không tìm thấy tài khoản quản lý hoặc admin để ký hóa đơn.");
+            redirectAttributes.addFlashAttribute("message",
+                    "Không tìm thấy tài khoản quản lý hoặc admin để ký hóa đơn.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/manager/bills/generate";
         }
@@ -349,11 +352,11 @@ public class ManagerBillController {
         if (preCalculatedTotal.compareTo(BigDecimal.ZERO) <= 0) {
             model.addAttribute("message", "Không thể tạo hóa đơn có tổng số tiền bằng 0 hoặc nhỏ hơn.");
             model.addAttribute("messageType", "error");
-            
+
             List<Apartment> apartments = apartmentService.findAll().stream()
                     .filter(a -> a.getStatus() == 1)
                     .collect(Collectors.toList());
-            
+
             List<ServiceItem> services = serviceItemService.findAll().stream()
                     .filter(s -> s.getStatus() && !"Utility Booking".equals(s.getServiceName()))
                     .collect(Collectors.toList());
@@ -415,8 +418,8 @@ public class ManagerBillController {
                 detail.setServiceItem(bookingService);
                 detail.setBooking(booking);
                 detail.setQuantity(BigDecimal.ONE);
-                detail.setDescription("Booking: " + booking.getResource().getUtility().getUtilityName() + 
-                                       " (" + booking.getStartTime().toLocalDate().toString() + ")");
+                detail.setDescription("Booking: " + booking.getResource().getUtility().getUtilityName() +
+                        " (" + booking.getStartTime().toLocalDate().toString() + ")");
                 detail.setAmount(booking.getTotalPrice());
                 billDetailService.save(detail);
 
@@ -428,13 +431,21 @@ public class ManagerBillController {
         bill.setTotalAmount(totalAmount);
         bill = billService.save(bill);
 
+        com.quan.apartment_building_management_system.dto.systemlog.BillLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.BillLogDTO
+                .fromEntity(bill);
+        String aptNum = bill.getApartment() != null ? bill.getApartment().getApartmentNumber() : "Unknown";
+        systemLogService.logSystemAction("CREATE_BILL", "Bill", bill.getBillId(), null, newDto,
+                "Created bill for apartment " + aptNum);
+
         // Create notifications for the residents in this apartment
         List<Profile> profiles = profileRepository.findByApartmentApartmentId(apartment.getApartmentId());
         for (Profile p : profiles) {
             if (p.getAccount() != null) {
                 Notification notification = new Notification();
                 notification.setTitle("Hóa đơn mới tháng " + month + "/" + year);
-                notification.setContent("Căn hộ " + apartment.getApartmentNumber() + " có hóa đơn mới trị giá " + totalAmount + ". Hạn thanh toán đến ngày " + bill.getDueDate().toLocalDate().toString() + ".");
+                notification.setContent(
+                        "Căn hộ " + apartment.getApartmentNumber() + " có hóa đơn mới trị giá " + totalAmount
+                                + ". Hạn thanh toán đến ngày " + bill.getDueDate().toLocalDate().toString() + ".");
                 notification.setNotificationType((byte) 2); // 2: Hóa đơn
                 notification.setCreatedBy(creator);
                 notification.setCreatedAt(LocalDateTime.now());
@@ -450,7 +461,8 @@ public class ManagerBillController {
             }
         }
 
-        redirectAttributes.addFlashAttribute("message", "Tạo hóa đơn thành công cho Căn hộ " + apartment.getApartmentNumber() + " (" + totalAmount.toPlainString() + " đ)");
+        redirectAttributes.addFlashAttribute("message", "Tạo hóa đơn thành công cho Căn hộ "
+                + apartment.getApartmentNumber() + " (" + totalAmount.toPlainString() + " đ)");
         redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/manager/bills";
     }
@@ -476,10 +488,18 @@ public class ManagerBillController {
         if (billOpt.isPresent()) {
             Bill bill = billOpt.get();
             if (bill.getStatus() == 1) {
+                com.quan.apartment_building_management_system.dto.systemlog.BillLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.BillLogDTO
+                        .fromEntity(bill);
                 // Revert to Unpaid
                 bill.setStatus((byte) 0);
                 bill.setPaidDate(null);
-                billService.save(bill);
+                bill = billService.save(bill);
+
+                com.quan.apartment_building_management_system.dto.systemlog.BillLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.BillLogDTO
+                        .fromEntity(bill);
+                String aptNum = bill.getApartment() != null ? bill.getApartment().getApartmentNumber() : "Unknown";
+                systemLogService.logSystemAction("UPDATE_BILL", "Bill", bill.getBillId(), oldDto, newDto,
+                        "Updated bill for apartment " + aptNum);
 
                 // Delete associated successful payments
                 List<Payment> payments = paymentService.findByBillId(bill.getBillId());
@@ -487,24 +507,33 @@ public class ManagerBillController {
                     paymentService.deleteById(p.getPaymentId());
                 }
 
-                redirectAttributes.addFlashAttribute("message", "Hóa đơn căn hộ " + bill.getApartment().getApartmentNumber() + " đã được chuyển về trạng thái CHƯ A THANH TOÁN");
+                redirectAttributes.addFlashAttribute("message", "Hóa đơn căn hộ "
+                        + bill.getApartment().getApartmentNumber() + " đã được chuyển về trạng thái CHƯ A THANH TOÁN");
                 redirectAttributes.addFlashAttribute("messageType", "info");
             } else {
+                com.quan.apartment_building_management_system.dto.systemlog.BillLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.BillLogDTO
+                        .fromEntity(bill);
                 // Mark as Paid
                 bill.setStatus((byte) 1);
                 bill.setPaidDate(LocalDateTime.now());
-                billService.save(bill);
+                bill = billService.save(bill);
+
+                com.quan.apartment_building_management_system.dto.systemlog.BillLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.BillLogDTO
+                        .fromEntity(bill);
+                String aptNum = bill.getApartment() != null ? bill.getApartment().getApartmentNumber() : "Unknown";
+                systemLogService.logSystemAction("UPDATE_BILL", "Bill", bill.getBillId(), oldDto, newDto,
+                        "Updated bill for apartment " + aptNum);
 
                 // Create a Payment record
                 PaymentMethod cashMethod = paymentMethodRepository.findByMethodName("Cash").orElse(null);
-                Account managerAcc = accountService.findByUsername("manager").orElseGet(() ->
-                        accountService.findByUsername("admin").orElse(null)
-                );
+                Account managerAcc = accountService.findByUsername("manager")
+                        .orElseGet(() -> accountService.findByUsername("admin").orElse(null));
 
                 if (managerAcc != null && cashMethod != null) {
                     Payment payment = new Payment();
                     payment.setBill(bill);
-                    payment.setPaidBy(bill.getApartment().getProfiles().isEmpty() ? managerAcc : bill.getApartment().getProfiles().get(0).getAccount());
+                    payment.setPaidBy(bill.getApartment().getProfiles().isEmpty() ? managerAcc
+                            : bill.getApartment().getProfiles().get(0).getAccount());
                     payment.setPaymentMethod(cashMethod);
                     payment.setAmount(bill.getTotalAmount());
                     payment.setPaymentDate(LocalDateTime.now());
@@ -513,7 +542,8 @@ public class ManagerBillController {
                     paymentService.save(payment);
                 }
 
-                redirectAttributes.addFlashAttribute("message", "Hóa đơn căn hộ " + bill.getApartment().getApartmentNumber() + " đã được đánh dấu là ĐÃ THANH TOÁN");
+                redirectAttributes.addFlashAttribute("message", "Hóa đơn căn hộ "
+                        + bill.getApartment().getApartmentNumber() + " đã được đánh dấu là ĐÃ THANH TOÁN");
                 redirectAttributes.addFlashAttribute("messageType", "success");
             }
         }
@@ -528,8 +558,8 @@ public class ManagerBillController {
             List<UtilityBooking> bookings = utilityBookingService.findByProfileId(p.getProfileId());
             for (UtilityBooking b : bookings) {
                 if (b.getStatus() == 1 && // APPROVED
-                    b.getStartTime().getMonthValue() == month &&
-                    b.getStartTime().getYear() == year) {
+                        b.getStartTime().getMonthValue() == month &&
+                        b.getStartTime().getYear() == year) {
                     monthBookings.add(b);
                 }
             }
@@ -539,7 +569,8 @@ public class ManagerBillController {
 
     // Helper: Get fullName of primary owner or first profile
     public String getOwnerName(Apartment apt) {
-        if (apt == null || apt.getProfiles() == null) return "N/A";
+        if (apt == null || apt.getProfiles() == null)
+            return "N/A";
         return apt.getProfiles().stream()
                 .filter(p -> p.getIsHouseholdOwner() != null && p.getIsHouseholdOwner())
                 .map(Profile::getFullName)

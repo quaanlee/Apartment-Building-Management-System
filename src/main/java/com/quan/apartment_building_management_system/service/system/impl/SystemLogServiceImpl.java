@@ -1,6 +1,6 @@
 package com.quan.apartment_building_management_system.service.system.impl;
 
-import com.quan.apartment_building_management_system.dto.SystemLogViewDto;
+import com.quan.apartment_building_management_system.dto.systemlog.SystemLogViewDto;
 import com.quan.apartment_building_management_system.entity.SystemLog;
 import com.quan.apartment_building_management_system.repository.SystemLogRepository;
 import com.quan.apartment_building_management_system.service.system.SystemLogService;
@@ -19,9 +19,14 @@ import java.util.Optional;
 public class SystemLogServiceImpl implements SystemLogService {
 
     private final SystemLogRepository systemLogRepository;
+    private final com.quan.apartment_building_management_system.repository.AccountRepository accountRepository;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
-    public SystemLogServiceImpl(SystemLogRepository systemLogRepository) {
+    public SystemLogServiceImpl(SystemLogRepository systemLogRepository, com.quan.apartment_building_management_system.repository.AccountRepository accountRepository) {
         this.systemLogRepository = systemLogRepository;
+        this.accountRepository = accountRepository;
+        this.objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        this.objectMapper.findAndRegisterModules();
     }
 
     @Override
@@ -149,5 +154,48 @@ public class SystemLogServiceImpl implements SystemLogService {
                                                       String role, String action, String search) {
         return systemLogRepository.countLogsByRoleWithFilters(fromDate, toDate, role, action, search);
     }
-}
 
+    @Override
+    @Transactional
+    public void logSystemAction(String action, String entityType, Integer entityId, Object oldDto, Object newDto, String description) {
+        SystemLog log = new SystemLog();
+        log.setAction(action);
+        log.setEntityType(entityType);
+        log.setEntityId(entityId);
+        log.setDescription(description);
+
+        try {
+            log.setOldValue(oldDto == null ? "{}" : objectMapper.writeValueAsString(oldDto));
+            log.setNewValue(newDto == null ? "{}" : objectMapper.writeValueAsString(newDto));
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            log.setOldValue("{}");
+            log.setNewValue("{}");
+        }
+
+        // Get current user from Session or SecurityContext
+        com.quan.apartment_building_management_system.entity.Account currentUser = null;
+        org.springframework.web.context.request.RequestAttributes attributes = org.springframework.web.context.request.RequestContextHolder.getRequestAttributes();
+        if (attributes instanceof org.springframework.web.context.request.ServletRequestAttributes) {
+            jakarta.servlet.http.HttpServletRequest request = ((org.springframework.web.context.request.ServletRequestAttributes) attributes).getRequest();
+            jakarta.servlet.http.HttpSession session = request.getSession(false);
+            if (session != null) {
+                currentUser = (com.quan.apartment_building_management_system.entity.Account) session.getAttribute("currentUser");
+            }
+        }
+        
+        // Fallback to SecurityContextHolder if session currentUser is null
+        if (currentUser == null) {
+            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !(auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)) {
+                String username = auth.getName();
+                currentUser = accountRepository.findByUsername(username).orElse(null);
+            }
+        }
+        
+        if (currentUser != null) {
+            log.setAccount(currentUser);
+        }
+
+        systemLogRepository.save(log);
+    }
+}

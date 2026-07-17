@@ -28,4 +28,6 @@ public interface AccountService {
 
     @org.springframework.transaction.annotation.Transactional
     boolean changePassword(Integer accountId, String oldPassword, String newPassword);
+
+    void resetPassword(String email, String newPassword);
 }

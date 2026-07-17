@@ -396,8 +396,9 @@ CREATE TABLE SystemLog (
     Action      NVARCHAR(100)   NOT NULL,                   -- LOGIN, CREATE_BILL, LOCK_ACCOUNT,...
     EntityType  NVARCHAR(50)    NULL,                       -- Account, Bill, Booking,...
     EntityID    INT             NULL,
-    IPAddress   VARCHAR(45)     NULL,                       -- Hỗ trợ IPv6
-    Details     NVARCHAR(MAX)   NULL,
+    OldValue    NVARCHAR(MAX)   NULL,                       -- Chuỗi JSON của đối tượng cũ trước khi đổi
+    NewValue    NVARCHAR(MAX)   NULL,                       -- Chuỗi JSON của đối tượng mới sau khi đổi
+    Description NVARCHAR(MAX)   NULL,                       -- Mô tả hành động / thay đổi
     CreatedAt   DATETIME        NOT NULL         DEFAULT GETDATE(),
 
     CONSTRAINT FK_SystemLog_Account FOREIGN KEY (AccountID) REFERENCES Account(AccountID)
@@ -451,47 +452,7 @@ CREATE TABLE ApartmentImage (
         ON DELETE CASCADE -- Nếu căn hộ bị xóa, tự động xóa thông tin ảnh liên quan
 );
 GO
--- ============================================================
--- 24. ApartmentPriceHistory (Lịch sử giá căn hộ)
--- ============================================================
-CREATE TABLE ApartmentPriceHistory (
-    PriceHistoryID  INT             IDENTITY(1,1)   PRIMARY KEY,
-    ApartmentID     INT             NOT NULL,               -- Khóa ngoại liên kết tới Apartment
-    
-    Price           DECIMAL(18, 2)  NOT NULL,               -- Mức giá tại thời điểm áp dụng
-    
-    EffectiveDate   DATE            NOT NULL,               -- Ngày bắt đầu áp dụng mức giá này
-    EndDate         DATE                NULL,               -- Ngày kết thúc áp dụng (NULL nghĩa là giá hiện tại)
-    
-    CreatedAt       DATETIME        NOT NULL        DEFAULT GETDATE(), -- Ngày hệ thống ghi nhận việc đổi giá
-    Note            NVARCHAR(255)       NULL,               -- Lý do đổi giá (VD: "Tăng giá theo thị trường", "Sửa sang lại phòng")
 
-    -- Định nghĩa các ràng buộc
-    CONSTRAINT FK_PriceHistory_Apartment FOREIGN KEY (ApartmentID) REFERENCES Apartment(ApartmentID) ON DELETE CASCADE,
-    CONSTRAINT CHK_PriceHistory_Dates CHECK (EndDate IS NULL OR EndDate >= EffectiveDate),
-    CONSTRAINT CHK_PriceHistory_Price CHECK (Price >= 0)
-);
-GO
--- ============================================================
--- 25. SalesContract (Hợp đồn mua bán)
--- ============================================================
-CREATE TABLE SalesContract (
-    SalesContractID   INT             IDENTITY(1,1)   PRIMARY KEY,
-    ApartmentID       INT             NOT NULL,
-    ProfileID         INT             NOT NULL,
-    SellingPrice      DECIMAL(18, 2)  NOT NULL, -- Giá bán đứt căn hộ
-    MaintenanceFee    DECIMAL(18, 2)  NOT NULL        DEFAULT 0, -- Phí bảo trì (thường là 2% giá trị căn hộ)
-    HandoverDate      DATE                NULL, -- Ngày bàn giao nhà dự kiến/thực tế
-    SignDate          DATE            NOT NULL        DEFAULT GETDATE(), -- Ngày ký hợp đồng
-
-    PaymentStatus     TINYINT         NOT NULL        DEFAULT 0, -- 0: Chưa thanh toán | 1: Đang trả góp/theo đợt | 2: Đã thanh toán 100%
-    Note              NVARCHAR(255)       NULL,
-	CreatedAt       DATETIME        NOT NULL        DEFAULT GETDATE(), -- Ngày tạo hợp đồng
-    CONSTRAINT FK_SalesContract_Apartment FOREIGN KEY (ApartmentID) REFERENCES Apartment(ApartmentID),
-	CONSTRAINT FK_SalesContract_Profile FOREIGN KEY (ProfileID) REFERENCES Profile(ProfileID),
-    CONSTRAINT CHK_SalesContract_Price CHECK (SellingPrice >= 0)
-);
-GO
 
 -- ============================================================
 -- 26. UtilityMembership (Gói thành viên sử dụng tiện ích)

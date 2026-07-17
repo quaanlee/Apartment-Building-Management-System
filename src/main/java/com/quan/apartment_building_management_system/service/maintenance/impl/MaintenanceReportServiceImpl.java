@@ -14,9 +14,11 @@ import java.util.Optional;
 public class MaintenanceReportServiceImpl implements MaintenanceReportService {
 
     private final MaintenanceReportRepository maintenanceReportRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public MaintenanceReportServiceImpl(MaintenanceReportRepository maintenanceReportRepository) {
+    public MaintenanceReportServiceImpl(MaintenanceReportRepository maintenanceReportRepository, com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.maintenanceReportRepository = maintenanceReportRepository;
+        this.systemLogService = systemLogService;
     }
 
     @Override
@@ -37,7 +39,25 @@ public class MaintenanceReportServiceImpl implements MaintenanceReportService {
     @Override
     @Transactional
     public MaintenanceReport save(MaintenanceReport maintenanceReport) {
-        return maintenanceReportRepository.save(maintenanceReport);
+        boolean isNew = maintenanceReport.getReportId() == null;
+        com.quan.apartment_building_management_system.dto.systemlog.MaintenanceReportLogDTO oldDto = null;
+        if (!isNew) {
+            oldDto = com.quan.apartment_building_management_system.dto.systemlog.MaintenanceReportLogDTO.fromEntity(maintenanceReportRepository.findById(maintenanceReport.getReportId()).orElse(null));
+        }
+
+        MaintenanceReport saved = maintenanceReportRepository.save(maintenanceReport);
+        
+        com.quan.apartment_building_management_system.dto.systemlog.MaintenanceReportLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.MaintenanceReportLogDTO.fromEntity(saved);
+        String action = isNew ? "CREATE_MAINTENANCE_REPORT" : "UPDATE_MAINTENANCE_REPORT";
+        String taskIdStr = saved.getMaintenanceTask() != null ? String.valueOf(saved.getMaintenanceTask().getTaskId()) : "Unknown";
+        String desc = isNew ? "Created maintenance report for task ID " + taskIdStr : "Updated maintenance report for task ID " + taskIdStr;
+        
+        // Log ID might be Integer in some places, so handle safely. Log takes Integer entityId. 
+        // ReportId is Long, so cast it.
+        Integer entityId = saved.getReportId() != null ? saved.getReportId().intValue() : null;
+        systemLogService.logSystemAction(action, "MaintenanceReport", entityId, oldDto, newDto, desc);
+        
+        return saved;
     }
 
     @Override

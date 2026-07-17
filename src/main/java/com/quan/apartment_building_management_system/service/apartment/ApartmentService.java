@@ -11,6 +11,8 @@ public interface ApartmentService {
 
     List<Apartment> findAll();
 
+    List<Apartment> searchApartments(String query);
+
     Optional<Apartment> findById(Integer id);
 
     Optional<Apartment> findByApartmentNumber(String apartmentNumber);

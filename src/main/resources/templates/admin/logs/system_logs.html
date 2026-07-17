@@ -192,11 +192,7 @@
                                                        log.role == 'Security Officer' ? ' role-security' : log.role == 'Maintenance Staff' ? ' role-maintainer' :
                                                        log.role == 'Resident' ? ' role-resident' :
                                                        log.role == 'System' ? ' role-system' : ' role-default'}"
-                                      th:text="${log.role == 'Admin' ? 'Quản trị viên' :
-                                                (log.role == 'Manager' ? 'Quản lý' :
-                                                (log.role == 'Maintenance Staff' ? 'Nhân viên bảo trì' :
-                                                (log.role == 'Resident' ? 'Cư dân' :
-                                                (log.role == 'System' ? 'Hệ thống' : log.role))))}">Admin</span>
+                                      th:text="${log.roleName}">Admin</span>
                             </td>
                             <td>
                                 <span class="logs-action-badge"
@@ -208,16 +204,10 @@
                                                         log.action == 'CANCEL_BOOKING' ? ' action-cancel_booking' :
                                                         log.action == 'UPDATE_PERMISSIONS' ? ' action-update_permissions' :
                                                         log.action == 'DAILY_BACKUP' ? ' action-daily_backup' : ''}"
-                                      th:text="${log.action}">LOGIN</span>
+                                      th:text="${log.actionName}">LOGIN</span>
                             </td>
                             <td class="logs-td-secondary"
-                                th:text="${log.entityType == 'Account' ? 'Tài khoản' :
-                                          (log.entityType == 'Apartment' ? 'Căn hộ' :
-                                          (log.entityType == 'Request' ? 'Yêu cầu' :
-                                          (log.entityType == 'Utility' ? 'Tiện ích' :
-                                          (log.entityType == 'Resource' ? 'Tài nguyên' :
-                                          (log.entityType == 'Booking' ? 'Đặt chỗ' :
-                                          (log.entityType == 'Bill' ? 'Hóa đơn' : log.entityType))))))}">Account</td>
+                                th:text="${log.entityTypeName}">Account</td>
                             <td class="logs-td-secondary logs-td-nowrap" th:text="${log.createdAt}">2023-10-31 14:23:11</td>
                             <td class="text-right">
                                 <a class="logs-eye-btn" title="Xem chi tiết" style="text-decoration: none;"

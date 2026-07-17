@@ -1,6 +1,6 @@
 package com.quan.apartment_building_management_system.service.system;
 
-import com.quan.apartment_building_management_system.dto.SystemLogViewDto;
+import com.quan.apartment_building_management_system.dto.systemlog.SystemLogViewDto;
 import com.quan.apartment_building_management_system.entity.SystemLog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,4 +34,6 @@ public interface SystemLogService {
                                  String role, String action, String search, int page, int size);
 
     List<Object[]> countLogsByRoleWithFilters(LocalDateTime fromDate, LocalDateTime toDate, String role, String action, String search);
+
+    void logSystemAction(String action, String entityType, Integer entityId, Object oldDto, Object newDto, String description);
 }

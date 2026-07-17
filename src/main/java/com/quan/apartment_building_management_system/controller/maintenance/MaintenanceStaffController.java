@@ -43,6 +43,7 @@ public class MaintenanceStaffController {
     private final MaintenanceReportImageService maintenanceReportImageService;
     private final AccountService accountService;
     private final ProfileService profileService;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
     public MaintenanceStaffController(MaintenanceTaskService maintenanceTaskService,
                                       MaintenanceReportService maintenanceReportService,
@@ -51,7 +52,8 @@ public class MaintenanceStaffController {
                                       CloudinaryUploadService cloudinaryUploadService,
                                       MaintenanceReportImageService maintenanceReportImageService,
                                       AccountService accountService,
-                                      ProfileService profileService) {
+                                      ProfileService profileService,
+                                      com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.maintenanceTaskService = maintenanceTaskService;
         this.maintenanceReportService = maintenanceReportService;
         this.accountNotificationService = accountNotificationService;
@@ -60,6 +62,7 @@ public class MaintenanceStaffController {
         this.maintenanceReportImageService = maintenanceReportImageService;
         this.accountService = accountService;
         this.profileService = profileService;
+        this.systemLogService = systemLogService;
     }
 
     // Utility to simulate logged-in maintenance staff. 
@@ -270,6 +273,14 @@ public class MaintenanceStaffController {
         }
         
         maintenanceTaskService.save(task);
+
+        com.quan.apartment_building_management_system.dto.systemlog.MaintenanceReportLogDTO reportDto2 =
+                com.quan.apartment_building_management_system.dto.systemlog.MaintenanceReportLogDTO.fromEntity(savedReport);
+        systemLogService.logSystemAction("SUBMIT_MAINTENANCE_REPORT", "MaintenanceReport",
+                savedReport.getReportId() != null ? savedReport.getReportId().intValue() : null,
+                new com.quan.apartment_building_management_system.dto.systemlog.MaintenanceReportLogDTO(),
+                reportDto2,
+                "Maintenance staff submitted report for task #" + id + " (progress: " + reportDto.getProgressPercent() + "%)");
 
         redirectAttributes.addFlashAttribute("message", "Báo cáo đã được gửi thành công!");
         redirectAttributes.addFlashAttribute("messageType", "success");

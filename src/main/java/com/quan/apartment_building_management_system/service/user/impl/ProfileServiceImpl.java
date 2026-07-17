@@ -10,6 +10,7 @@ import com.quan.apartment_building_management_system.repository.AccountRepositor
 import com.quan.apartment_building_management_system.repository.ProfileRepository;
 import com.quan.apartment_building_management_system.repository.RoleRepository;
 import com.quan.apartment_building_management_system.service.user.ProfileService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,15 +28,18 @@ public class ProfileServiceImpl implements ProfileService {
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
     private final EmployeeProfileRepository employeeProfileRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public ProfileServiceImpl(ProfileRepository profileRepository,
             AccountRepository accountRepository,
             RoleRepository roleRepository,
-            EmployeeProfileRepository employeeProfileRepository) {
+            EmployeeProfileRepository employeeProfileRepository,
+            PasswordEncoder passwordEncoder) {
         this.profileRepository = profileRepository;
         this.accountRepository = accountRepository;
         this.roleRepository = roleRepository;
         this.employeeProfileRepository = employeeProfileRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -139,15 +143,26 @@ public class ProfileServiceImpl implements ProfileService {
         if (userDto.getProfileId() == null && userDto.getEmployeeProfileId() == null) {
             account.setUsername(userDto.getEmail());
             account.setRole(roleOpt.get());
+            if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+                account.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            }
         }
-        account.setPassword(userDto.getPassword());
+        
         account.setStatus(userDto.getAccountStatus() != null ? userDto.getAccountStatus() : true);
         account = accountRepository.save(account);
 
         if (isEmployee) {
             employeeProfile.setAccount(account);
             employeeProfile.setFullName(userDto.getFullName());
-            employeeProfile.setGender(userDto.getGender() != null && "Nam".equalsIgnoreCase(userDto.getGender()));
+            
+            if ("Male".equalsIgnoreCase(userDto.getGender())) {
+                employeeProfile.setGender(true);
+            } else if ("Female".equalsIgnoreCase(userDto.getGender())) {
+                employeeProfile.setGender(false);
+            } else {
+                employeeProfile.setGender(null);
+            }
+            
             employeeProfile.setDateOfBirth(userDto.getDateOfBirth());
             employeeProfile.setPhoneNumber(userDto.getPhoneNumber());
             employeeProfile.setEmail(userDto.getEmail());
@@ -155,6 +170,7 @@ public class ProfileServiceImpl implements ProfileService {
             employeeProfile.setAddress(userDto.getAddress());
             employeeProfile.setStatus(userDto.getAccountStatus() != null ? userDto.getAccountStatus() : true);
             employeeProfile = employeeProfileRepository.save(employeeProfile);
+            
             return new UserDTO(employeeProfile);
         } else {
             profile.setAccount(account);
@@ -181,6 +197,7 @@ public class ProfileServiceImpl implements ProfileService {
             profile.setOccupation(null); // Clear occupation just in case
 
             profile = profileRepository.save(profile);
+            
             return new UserDTO(profile);
         }
     }

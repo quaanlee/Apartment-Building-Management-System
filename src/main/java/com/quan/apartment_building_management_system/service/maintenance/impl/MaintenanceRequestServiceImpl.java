@@ -17,9 +17,11 @@ import org.springframework.data.domain.Pageable;
 public class MaintenanceRequestServiceImpl implements MaintenanceRequestService {
 
     private final MaintenanceRequestRepository maintenanceRequestRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public MaintenanceRequestServiceImpl(MaintenanceRequestRepository maintenanceRequestRepository) {
+    public MaintenanceRequestServiceImpl(MaintenanceRequestRepository maintenanceRequestRepository, com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.maintenanceRequestRepository = maintenanceRequestRepository;
+        this.systemLogService = systemLogService;
     }
 
     @Override
@@ -44,8 +46,8 @@ public class MaintenanceRequestServiceImpl implements MaintenanceRequestService 
 
     @Override
     @Transactional
-    public MaintenanceRequest save(MaintenanceRequest maintenanceRequest) {
-        return maintenanceRequestRepository.save(maintenanceRequest);
+    public MaintenanceRequest save(MaintenanceRequest request) {
+        return maintenanceRequestRepository.save(request);
     }
 
     @Override

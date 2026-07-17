@@ -34,14 +34,17 @@ public class SystemLog {
     @Column(name = "EntityID")
     private Integer entityId;
 
-    @Column(name = "IPAddress", length = 45)
-    private String ipAddress;
+    @Column(name = "OldValue", columnDefinition = "NVARCHAR(MAX)")
+    private String oldValue = "{}";
+
+    @Column(name = "NewValue", columnDefinition = "NVARCHAR(MAX)")
+    private String newValue = "{}";
+
+    @Column(name = "Description", columnDefinition = "NVARCHAR(MAX)")
+    private String description;
 
     @Column(name = "CreatedAt", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "Details", columnDefinition = "NVARCHAR(MAX)")
-    private String details = "{}";
 
     public SystemLog() {
     }
@@ -86,12 +89,28 @@ public class SystemLog {
         this.entityId = entityId;
     }
 
-    public String getIpAddress() {
-        return ipAddress;
+    public String getOldValue() {
+        return oldValue;
     }
 
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
+    public void setOldValue(String oldValue) {
+        this.oldValue = oldValue;
+    }
+
+    public String getNewValue() {
+        return newValue;
+    }
+
+    public void setNewValue(String newValue) {
+        this.newValue = newValue;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -100,13 +119,5 @@ public class SystemLog {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public void setDetails(String details) {
-        this.details = details;
     }
 }

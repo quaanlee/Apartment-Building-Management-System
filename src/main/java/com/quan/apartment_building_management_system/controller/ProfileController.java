@@ -29,22 +29,25 @@ public class ProfileController {
     private final EmployeeProfileService employeeProfileService;
     private final AccountService accountService;
     private final CloudinaryUploadService cloudinaryUploadService;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
     public ProfileController(ProfileService profileService,
             EmployeeProfileService employeeProfileService,
             AccountService accountService,
-            CloudinaryUploadService cloudinaryUploadService) {
+            CloudinaryUploadService cloudinaryUploadService,
+            com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.profileService = profileService;
         this.employeeProfileService = employeeProfileService;
         this.accountService = accountService;
         this.cloudinaryUploadService = cloudinaryUploadService;
+        this.systemLogService = systemLogService;
     }
 
     private Account getCurrentUser(HttpSession session) {
         return (Account) session.getAttribute("currentUser");
     }
 
-    @GetMapping("/admin/profile")
+    @GetMapping("admin/profile/profile")
     public String adminProfile(@RequestParam(value = "tab", defaultValue = "personal") String tab, HttpSession session,
             Model model) {
         return showProfile(session, model, "admin", tab);
@@ -106,9 +109,9 @@ public class ProfileController {
         model.addAttribute("activeTab", "profile");
 
         if ("admin".equals(role)) {
-            return "admin/profile";
+            return "admin/profile/profile";
         } else if ("manager".equals(role)) {
-            return "manager/profile";
+            return "manager/profile/profile";
         } else {
             return "resident/profile";
         }
@@ -171,9 +174,9 @@ public class ProfileController {
             model.addAttribute("activeProfileTab", "personal");
             model.addAttribute("userDto", userDto);
             if (redirectUrl.contains("admin"))
-                return "admin/profile";
+                return "admin/profile/profile";
             if (redirectUrl.contains("manager"))
-                return "manager/profile";
+                return "manager/profile/profile";
             return "resident/profile";
         }
 
@@ -212,6 +215,7 @@ public class ProfileController {
                 Optional<Profile> opt = profileService.findByAccountId(user.getAccountId());
                 if (opt.isPresent()) {
                     Profile p = opt.get();
+                    UserDTO oldDto = new UserDTO(p);
                     p.setFullName(userDto.getFullName());
                     p.setPhoneNumber(userDto.getPhoneNumber());
                     if (userDto.getGender() != null)
@@ -241,11 +245,13 @@ public class ProfileController {
                     if (userDto.getAvatarUrl() != null)
                         p.setAvatarUrl(userDto.getAvatarUrl());
                     profileService.save(p);
+                    systemLogService.logSystemAction("UPDATE_PROFILE", "Profile", p.getProfileId(), oldDto, new UserDTO(p), "Updated personal profile");
                 }
             } else {
                 Optional<EmployeeProfile> opt = employeeProfileService.findByAccountId(user.getAccountId());
                 if (opt.isPresent()) {
                     EmployeeProfile ep = opt.get();
+                    UserDTO oldDto = new UserDTO(ep);
                     ep.setFullName(userDto.getFullName());
                     ep.setPhoneNumber(userDto.getPhoneNumber());
                     if (userDto.getAddress() != null)
@@ -259,6 +265,7 @@ public class ProfileController {
                     if (userDto.getAvatarUrl() != null)
                         ep.setAvatarUrl(userDto.getAvatarUrl());
                     employeeProfileService.save(ep);
+                    systemLogService.logSystemAction("UPDATE_EMPLOYEE_PROFILE", "EmployeeProfile", ep.getEmployeeProfileId(), oldDto, new UserDTO(ep), "Updated personal employee profile");
                 }
             }
 
@@ -309,6 +316,11 @@ public class ProfileController {
             Optional<Account> updatedAccountOpt = accountService.findById(user.getAccountId());
             updatedAccountOpt.ifPresent(updatedAccount -> session.setAttribute("currentUser", updatedAccount));
 
+            systemLogService.logSystemAction("CHANGE_PASSWORD", "Account", user.getAccountId(),
+                    com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO.fromEntity(resolvedUser),
+                    com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO.fromEntity(resolvedUser),
+                    "Changed password for account " + resolvedUser.getUsername());
+
             ra.addFlashAttribute("message", "Đổi mật khẩu thành công!");
             ra.addFlashAttribute("messageType", "success");
         } else {
@@ -324,7 +336,7 @@ public class ProfileController {
             return "/login";
         String role = user.getRole().getRoleName().toUpperCase();
         if (role.contains("ADMIN"))
-            return "/admin/profile";
+            return "admin/profile/profile";
         if (role.contains("MANAGER"))
             return "/manager/my-profile";
         if (role.contains("MAINTENANCE"))

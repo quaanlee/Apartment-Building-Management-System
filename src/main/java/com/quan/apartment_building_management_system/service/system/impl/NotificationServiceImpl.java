@@ -24,15 +24,18 @@ public class NotificationServiceImpl implements NotificationService {
     private final JavaMailSender mailSender;
     private final AccountRepository accountRepository;
     private final AccountNotificationRepository accountNotificationRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
     public NotificationServiceImpl(NotificationRepository notificationRepository, 
                                    JavaMailSender mailSender,
                                    AccountRepository accountRepository,
-                                   AccountNotificationRepository accountNotificationRepository) {
+                                   AccountNotificationRepository accountNotificationRepository,
+                                   com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.notificationRepository = notificationRepository;
         this.mailSender = mailSender;
         this.accountRepository = accountRepository;
         this.accountNotificationRepository = accountNotificationRepository;
+        this.systemLogService = systemLogService;
     }
 
     @Override
@@ -74,6 +77,77 @@ public class NotificationServiceImpl implements NotificationService {
                 + "Best regards,\n"
                 + "ABM System Support Team");
         mailSender.send(message);
+    }
+
+    @Override
+    public void sendBookingSuccessEmail(String toEmail, String resourceName, String bookingDate, String amount) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Xác nhận thanh toán đặt lịch thành công | ABM System");
+        message.setText("Xin chào,\n\n"
+                + "Bạn đã thanh toán thành công cho đơn đặt lịch tiện ích của mình.\n\n"
+                + "Thông tin đặt lịch:\n"
+                + "- Tiện ích: " + resourceName + "\n"
+                + "- Ngày đặt: " + bookingDate + "\n"
+                + "- Số tiền thanh toán: " + amount + " VNĐ\n\n"
+                + "Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.\n\n"
+                + "Trân trọng,\n"
+                + "Ban quản lý tòa nhà");
+        mailSender.send(message);
+    }
+
+    @Override
+    public void sendBookingStatusUpdateNotification(com.quan.apartment_building_management_system.entity.UtilityBooking booking, Byte status) {
+        try {
+            if (status != 1 && status != 2) return; // Only notify for Approved/Rejected
+
+            String statusStr = (status == 1) ? "được phê duyệt" : "bị từ chối";
+            String title = (status == 1) ? "Yêu cầu đặt lịch được phê duyệt" : "Yêu cầu đặt lịch bị từ chối";
+            String resourceName = booking.getResource() != null ? booking.getResource().getResourceName() : "Tiện ích";
+            String bookingDate = booking.getStartTime() != null ? booking.getStartTime().toString() : "";
+
+            // 1. In-app Notification
+            Account residentAccount = booking.getProfile() != null ? booking.getProfile().getAccount() : null;
+            if (residentAccount != null) {
+                Notification notification = new Notification();
+                notification.setTitle(title);
+                String content = String.format("Đơn đặt lịch %s vào ngày %s của bạn đã %s.", resourceName, bookingDate, statusStr);
+                notification.setContent(content);
+                notification.setNotificationType((byte) 2); // 2: Utility Booking
+                notification.setRelatedEntityType("UtilityBooking");
+                notification.setReceiver(residentAccount);
+                notification.setRecipient("RESIDENT");
+                notification.setCreatedAt(java.time.LocalDateTime.now());
+
+                // Find manager/admin sender (optional, can be null or account id 1)
+                Account sender = accountRepository.findById(1).orElse(residentAccount);
+                notification.setCreatedBy(sender);
+
+                notification = notificationRepository.save(notification);
+
+                AccountNotification accountNotification = new AccountNotification();
+                accountNotification.setNotification(notification);
+                accountNotification.setAccount(residentAccount);
+                accountNotification.setIsRead(false);
+                accountNotification.setReadAt(null);
+                accountNotificationRepository.save(accountNotification);
+            }
+
+            // 2. Email Notification
+            if (booking.getProfile() != null && booking.getProfile().getEmail() != null && !booking.getProfile().getEmail().isEmpty()) {
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setTo(booking.getProfile().getEmail());
+                message.setSubject(title + " | ABM System");
+                message.setText("Xin chào,\n\n"
+                        + String.format("Đơn đặt lịch %s vào ngày %s của bạn đã %s.\n\n", resourceName, bookingDate, statusStr)
+                        + "Vui lòng đăng nhập vào hệ thống để xem chi tiết.\n\n"
+                        + "Trân trọng,\n"
+                        + "Ban quản lý tòa nhà");
+                mailSender.send(message);
+            }
+        } catch (Exception e) {
+            System.err.println("[Notification Error] Failed to create booking status update notification: " + e.getMessage());
+        }
     }
 
     private void distributeNotification(Notification notification) {

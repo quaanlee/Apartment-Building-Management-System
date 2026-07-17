@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="admin-layout(content, activeTab)">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,17 +11,18 @@
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
 
     <div class="app-container">
-        
+
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <h1>ABMS Admin</h1>
                 <p>Cổng Quản Trị</p>
             </div>
-            
+
             <ul class="sidebar-menu">
                 <li class="sidebar-item" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
                     <a th:href="@{/admin/dashboard}">
@@ -60,7 +62,7 @@
                     </a>
                 </li>
             </ul>
-            
+
             <div class="sidebar-footer">
                 <a th:href="@{/logout}" class="logout-btn">
                     <i class="fa-solid fa-right-from-bracket"></i>
@@ -71,50 +73,42 @@
 
         <!-- Main Panel (Header + Main Content) -->
         <div class="main-panel">
-            
+
             <!-- Header Section -->
             <header class="header">
-                <!-- Search Bar -->
-                <div class="search-wrapper">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" class="search-input" placeholder="Tìm kiếm...">
-                </div>
-                
+                <!-- Removed Search Bar and Settings Icon per user request -->
+
                 <!-- Action Controls -->
                 <div class="header-actions">
-                    <button class="icon-btn" title="Cài đặt">
-                        <i class="fa-solid fa-gear"></i>
-                    </button>
-                    
+                    <!-- Removed Settings Icon -->
+
                 </div>
                 <div style="margin-left:auto;"></div>
-                    <a th:href="@{/admin/profile}" class="user-profile-trigger" style="text-decoration:none;">
-                        <div class="user-avatar-placeholder">A</div>
-                        <span class="user-role">Quản trị viên</span>
-                    </a>
+                <a th:href="@{/admin/profile}" class="user-profile-trigger" style="text-decoration:none;">
+                    <div class="user-avatar-placeholder">A</div>
+                    <span class="user-role">Quản trị viên</span>
+                </a>
             </header>
-            
+
             <!-- Main Page Content Insertion -->
             <main class="content-container">
                 <div th:replace="${content}">
                     <!-- Page content will be injected here -->
                 </div>
             </main>
-            
+
         </div>
-        
+
     </div>
 
     <!-- Toast Notification Container -->
     <div class="toast-container" id="toastContainer"></div>
-    
+
     <!-- Toast message data bridge for external layout_admin.js script -->
-    <div id="toastMessageData"
-         th:if="${message != null}"
-         th:data-message="${message}" 
-         th:data-type="${messageType != null ? messageType : 'success'}" 
-         style="display: none;"></div>
+    <div id="toastMessageData" th:if="${message != null}" th:data-message="${message}"
+        th:data-type="${messageType != null ? messageType : 'success'}" style="display: none;"></div>
 
     <script th:src="@{/js/layout/layout_admin.js}"></script>
 </body>
+
 </html>

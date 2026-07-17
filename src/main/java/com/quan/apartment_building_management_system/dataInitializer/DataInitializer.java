@@ -19,7 +19,7 @@ public class DataInitializer implements CommandLineRunner {
     private final ProfileRepository profileRepository;
     private final ApartmentRepository apartmentRepository;
     private final ApartmentImageRepository apartmentImageRepository;
-    private final ApartmentPriceHistoryRepository apartmentPriceHistoryRepository;
+
     private final ResidentApartmentRepository residentApartmentRepository;
     private final VehicleRepository vehicleRepository;
     private final UnitRepository unitRepository;
@@ -41,7 +41,7 @@ public class DataInitializer implements CommandLineRunner {
     private final NotificationRepository notificationRepository;
     private final AccountNotificationRepository accountNotificationRepository;
     private final SystemLogRepository systemLogRepository;
-    private final SalesContractRepository salesContractRepository;
+
 
     public DataInitializer(
             RoleRepository roleRepository,
@@ -49,7 +49,7 @@ public class DataInitializer implements CommandLineRunner {
             ProfileRepository profileRepository,
             ApartmentRepository apartmentRepository,
             ApartmentImageRepository apartmentImageRepository,
-            ApartmentPriceHistoryRepository apartmentPriceHistoryRepository,
+
             ResidentApartmentRepository residentApartmentRepository,
             VehicleRepository vehicleRepository,
             UnitRepository unitRepository,
@@ -70,15 +70,14 @@ public class DataInitializer implements CommandLineRunner {
             MaintenanceRequestImageRepository maintenanceRequestImageRepository,
             NotificationRepository notificationRepository,
             AccountNotificationRepository accountNotificationRepository,
-            SystemLogRepository systemLogRepository,
-            SalesContractRepository salesContractRepository
+            SystemLogRepository systemLogRepository
     ) {
         this.roleRepository = roleRepository;
         this.accountRepository = accountRepository;
         this.profileRepository = profileRepository;
         this.apartmentRepository = apartmentRepository;
         this.apartmentImageRepository = apartmentImageRepository;
-        this.apartmentPriceHistoryRepository = apartmentPriceHistoryRepository;
+
         this.residentApartmentRepository = residentApartmentRepository;
         this.vehicleRepository = vehicleRepository;
         this.unitRepository = unitRepository;
@@ -100,7 +99,7 @@ public class DataInitializer implements CommandLineRunner {
         this.notificationRepository = notificationRepository;
         this.accountNotificationRepository = accountNotificationRepository;
         this.systemLogRepository = systemLogRepository;
-        this.salesContractRepository = salesContractRepository;
+
     }
 
     @Override
@@ -346,17 +345,6 @@ public class DataInitializer implements CommandLineRunner {
             }
         }
 
-        // 7. ApartmentPriceHistory
-        if (apartmentPriceHistoryRepository.count() == 0) {
-            if (apt101 != null) {
-                ApartmentPriceHistory ph = new ApartmentPriceHistory();
-                ph.setApartment(apt101);
-                ph.setPrice(new BigDecimal("1500000000")); // 1.5 tỷ VND
-                ph.setEffectiveDate(LocalDate.now().minusYears(1));
-                ph.setNote("Giá khởi điểm mở bán");
-                apartmentPriceHistoryRepository.save(ph);
-            }
-        }
 
         // 8. ResidentApartment
         if (residentApartmentRepository.count() == 0) {
@@ -369,21 +357,6 @@ public class DataInitializer implements CommandLineRunner {
             }
         }
 
-        // 9. SalesContract (VND pricing)
-        if (salesContractRepository.count() == 0) {
-            if (apt101 != null && residentProfile != null) {
-                SalesContract sc = new SalesContract();
-                sc.setApartment(apt101);
-                sc.setProfile(residentProfile);
-                sc.setSellingPrice(new BigDecimal("1500000000")); // 1.5 tỷ VND
-                sc.setMaintenanceFee(new BigDecimal("30000000")); // 30 triệu VND (2%)
-                sc.setHandoverDate(LocalDate.now().minusMonths(5));
-                sc.setSignDate(LocalDate.now().minusMonths(6));
-                sc.setPaymentStatus((byte) 2); // Đã thanh toán 100%
-                sc.setNote("Hợp đồng mua bán căn hộ B101");
-                salesContractRepository.save(sc);
-            }
-        }
 
         // 10. Vehicle
         if (vehicleRepository.count() == 0) {
@@ -781,7 +754,9 @@ public class DataInitializer implements CommandLineRunner {
                 log.setAction("SEED_DATA");
                 log.setEntityType("System");
                 log.setEntityId(1);
-                log.setIpAddress("127.0.0.1");
+                log.setOldValue("{}");
+                log.setNewValue("{}");
+                log.setDescription("Khởi tạo hệ thống ban đầu và nạp dữ liệu mẫu");
                 log.setCreatedAt(LocalDateTime.now());
                 systemLogRepository.save(log);
             }

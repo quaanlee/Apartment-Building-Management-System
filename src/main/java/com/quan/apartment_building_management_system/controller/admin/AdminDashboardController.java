@@ -31,6 +31,6 @@ public class AdminDashboardController {
         AdminDashboardStatsDto stats = adminDashboardService.getDashboardStats();
         model.addAttribute("stats", stats);
 
-        return "admin/dashboard";
+        return "admin/dashboard/dashboard";
     }
 }

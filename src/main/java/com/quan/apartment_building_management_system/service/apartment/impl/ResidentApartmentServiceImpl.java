@@ -14,9 +14,11 @@ import java.util.Optional;
 public class ResidentApartmentServiceImpl implements ResidentApartmentService {
 
     private final ResidentApartmentRepository residentApartmentRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public ResidentApartmentServiceImpl(ResidentApartmentRepository residentApartmentRepository) {
+    public ResidentApartmentServiceImpl(ResidentApartmentRepository residentApartmentRepository, com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.residentApartmentRepository = residentApartmentRepository;
+        this.systemLogService = systemLogService;
     }
 
     @Override
@@ -42,7 +44,17 @@ public class ResidentApartmentServiceImpl implements ResidentApartmentService {
     @Override
     @Transactional
     public ResidentApartment save(ResidentApartment residentApartment) {
-        return residentApartmentRepository.save(residentApartment);
+        boolean isNew = residentApartment.getResidentApartmentId() == null;
+        ResidentApartment saved = residentApartmentRepository.save(residentApartment);
+        
+        String action = isNew ? "ADD_RESIDENT" : "UPDATE_RESIDENT_APARTMENT";
+        String aptNum = saved.getApartment() != null ? saved.getApartment().getApartmentNumber() : "Unknown";
+        String residentName = saved.getProfile() != null ? saved.getProfile().getFullName() : "Unknown";
+        String desc = isNew ? "Added resident " + residentName + " to apartment " + aptNum : "Updated resident " + residentName + " in apartment " + aptNum;
+        
+        systemLogService.logSystemAction(action, "Apartment", saved.getApartment() != null ? saved.getApartment().getApartmentId() : null, null, null, desc);
+        
+        return saved;
     }
 
     @Override

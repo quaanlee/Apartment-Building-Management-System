@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import com.quan.apartment_building_management_system.service.system.SystemLogService;
 
 @Controller
 @RequestMapping("/admin/apartments")
@@ -25,18 +26,22 @@ public class ApartmentController {
     private final ApartmentService apartmentService;
     private final ProfileRepository profileRepository;
     private final ResidentApartmentRepository residentApartmentRepository;
+    private final SystemLogService systemLogService;
 
     public ApartmentController(ApartmentService apartmentService,
                                ProfileRepository profileRepository,
-                               ResidentApartmentRepository residentApartmentRepository) {
+                               ResidentApartmentRepository residentApartmentRepository,
+                               SystemLogService systemLogService) {
         this.apartmentService = apartmentService;
         this.profileRepository = profileRepository;
         this.residentApartmentRepository = residentApartmentRepository;
+        this.systemLogService = systemLogService;
     }
 
     @GetMapping
-    public String listApartments(Model model) {
-        List<Apartment> apartments = apartmentService.findAll();
+    public String listApartments(@RequestParam(value = "query", required = false) String query, Model model) {
+        List<Apartment> apartments = apartmentService.searchApartments(query);
+        model.addAttribute("query", query);
 
         model.addAttribute("apartments", apartments);
         model.addAttribute("totalUnits", apartments.size());
@@ -44,7 +49,7 @@ public class ApartmentController {
         model.addAttribute("occupiedUnits", apartments.stream().filter(a -> a.getStatus() == 1).count());
         model.addAttribute("maintenanceUnits", apartments.stream().filter(a -> a.getStatus() == 2).count());
 
-        return "admin/building-management";
+        return "admin/apartment/building-management";
     }
 
     @GetMapping("/add")
@@ -52,7 +57,7 @@ public class ApartmentController {
         model.addAttribute("apartment", new Apartment());
         model.addAttribute("pageTitle", "Thêm căn hộ mới");
         model.addAttribute("actionUrl", "/admin/apartments/save");
-        return "admin/apartment-form";
+        return "admin/apartment/apartment-form";
     }
 
     @PostMapping("/save")
@@ -70,7 +75,7 @@ public class ApartmentController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("pageTitle", "Thêm căn hộ mới");
             model.addAttribute("actionUrl", "/admin/apartments/save");
-            return "admin/apartment-form";
+            return "admin/apartment/apartment-form";
         }
 
         Optional<Apartment> existing = apartmentService.findByApartmentNumber(apartment.getApartmentNumber());
@@ -79,7 +84,7 @@ public class ApartmentController {
             bindingResult.rejectValue("apartmentNumber", "duplicate", "Số căn hộ đã tồn tại trong hệ thống!");
             model.addAttribute("pageTitle", "Thêm căn hộ mới");
             model.addAttribute("actionUrl", "/admin/apartments/save");
-            return "admin/apartment-form";
+            return "admin/apartment/apartment-form";
         }
 
         if (apartment.getStatus() == null) {
@@ -92,6 +97,10 @@ public class ApartmentController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi tải ảnh lên: " + e.getMessage());
         }
+
+        com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO.fromEntity(savedApartment);
+        systemLogService.logSystemAction("CREATE_APARTMENT", "Apartment", savedApartment.getApartmentId(), null, newDto, "Created apartment " + savedApartment.getApartmentNumber());
+
         redirectAttributes.addFlashAttribute("successMessage", "Thêm căn hộ thành công!");
 
         return "redirect:/admin/apartments";
@@ -113,7 +122,7 @@ public class ApartmentController {
         model.addAttribute("pageTitle", "Chỉnh sửa căn hộ");
         model.addAttribute("actionUrl", "/admin/apartments/update/" + id);
 
-        return "admin/apartment-form";
+        return "admin/apartment/apartment-form";
     }
 
     @PostMapping("/update/{id}")
@@ -139,7 +148,7 @@ public class ApartmentController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("pageTitle", "Chỉnh sửa căn hộ");
             model.addAttribute("actionUrl", "/admin/apartments/update/" + id);
-            return "admin/apartment-form";
+            return "admin/apartment/apartment-form";
         }
 
         Optional<Apartment> duplicate = apartmentService.findByApartmentNumber(apartment.getApartmentNumber());
@@ -148,10 +157,12 @@ public class ApartmentController {
             bindingResult.rejectValue("apartmentNumber", "duplicate", "Số căn hộ đã tồn tại trong hệ thống!");
             model.addAttribute("pageTitle", "Chỉnh sửa căn hộ");
             model.addAttribute("actionUrl", "/admin/apartments/update/" + id);
-            return "admin/apartment-form";
+            return "admin/apartment/apartment-form";
         }
 
         Apartment updateApartment = currentApartment.get();
+        com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO.fromEntity(updateApartment);
+
         updateApartment.setApartmentNumber(apartment.getApartmentNumber());
         updateApartment.setFloor(apartment.getFloor());
         updateApartment.setArea(apartment.getArea());
@@ -159,12 +170,16 @@ public class ApartmentController {
         updateApartment.setStatus(apartment.getStatus());
         updateApartment.setMaxOccupancy(apartment.getMaxOccupancy());
 
-        apartmentService.save(updateApartment);
+        updateApartment = apartmentService.save(updateApartment);
         try {
             apartmentService.saveApartmentImages(updateApartment, mainImage, subImage1, subImage2, deleteMainImage, deleteSubImage1, deleteSubImage2);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi tải ảnh lên: " + e.getMessage());
         }
+
+        com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO.fromEntity(updateApartment);
+        systemLogService.logSystemAction("UPDATE_APARTMENT", "Apartment", updateApartment.getApartmentId(), oldDto, newDto, "Updated apartment " + updateApartment.getApartmentNumber());
+
         redirectAttributes.addFlashAttribute("successMessage", "Cập nhật căn hộ thành công!");
 
         return "redirect:/admin/apartments";
@@ -188,7 +203,7 @@ public class ApartmentController {
         model.addAttribute("apartment", apartment.get());
         model.addAttribute("residentApartments", residentApartments);
 
-        return "admin/apartment-detail";
+        return "admin/apartment/apartment-detail";
     }
 
     @GetMapping("/delete/{id}")
@@ -203,6 +218,12 @@ public class ApartmentController {
         }
 
         apartmentService.deleteById(id);
+
+        com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO oldDto =
+                com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO.fromEntity(apartment.get());
+        systemLogService.logSystemAction("DELETE_APARTMENT", "Apartment", id, oldDto, null,
+                "Deleted apartment " + apartment.get().getApartmentNumber());
+
         redirectAttributes.addFlashAttribute("successMessage", "Xóa căn hộ thành công!");
 
         return "redirect:/admin/apartments";

@@ -72,7 +72,7 @@
 
     <!-- Filters Bar Card -->
     <div class="filter-bar-card">
-        <div class="filter-left">
+        <div class="filter-left" style="display: flex; align-items: center; gap: 16px;">
             <span class="filter-label">Trạng thái:</span>
             <div class="status-select-container">
                 <select id="statusFilter" class="status-select" onchange="filterByStatus()">
@@ -82,6 +82,15 @@
                 </select>
                 <i class="fa-solid fa-chevron-down"></i>
             </div>
+            
+            <form th:action="@{/manager/utilities}" method="get" style="display: flex; gap: 8px; margin: 0;">
+                <input type="hidden" name="status" th:value="${statusFilter != null ? statusFilter : 'all'}">
+                <div style="position: relative; width: 250px;">
+                    <input type="text" name="query" th:value="${query}" placeholder="Tìm kiếm tên tiện ích..." class="form-input search-input" style="padding-left: 36px; height: 38px; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;">
+                    <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8;"></i>
+                </div>
+                <button type="submit" class="btn btn-primary" style="height: 38px; padding: 0 16px; border-radius: 8px; font-weight: 500;">Tìm kiếm</button>
+            </form>
         </div>
         <div class="filter-right">
             <button id="gridViewBtn" class="view-toggle-btn" title="Xem dạng lưới" onclick="setViewMode('grid')"><i class="fa-solid fa-grip"></i></button>
@@ -153,7 +162,16 @@
         const status = document.getElementById("statusFilter").value;
         const searchInput = document.querySelector(".search-input");
         const query = searchInput ? searchInput.value.trim() : "";
-        window.location.href = "/manager/utilities?status=" + status + "&query=" + encodeURIComponent(query);
+        
+        const url = new URL(window.location.href);
+        url.searchParams.set("status", status);
+        if (query) {
+            url.searchParams.set("query", query);
+        } else {
+            url.searchParams.delete("query");
+        }
+        url.searchParams.set("page", 1);
+        window.location.href = url.toString();
     }
 
     function setViewMode(mode) {
@@ -177,22 +195,8 @@
 
     // Global search wiring
     document.addEventListener("DOMContentLoaded", function () {
-        const searchInput = document.querySelector(".search-input");
-        const queryFromModel = /*[[${query}]]*/ '';
-        const statusFromModel = /*[[${statusFilter}]]*/ 'all';
-
-        if (searchInput) {
-            searchInput.value = queryFromModel || "";
-            searchInput.placeholder = "Tìm kiếm tiện ích...";
-            searchInput.addEventListener("keypress", function (e) {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    const kw = encodeURIComponent(searchInput.value.trim());
-                    window.location.href = "/manager/utilities?status=" + statusFromModel + "&query=" + kw;
-                }
-            });
-        }
-
+        // JS Enter key listener is no longer needed since we use a <form> wrapper
+        
         // Restore saved view mode preference
         const savedMode = localStorage.getItem("utilityViewMode") || "list";
         setViewMode(savedMode);

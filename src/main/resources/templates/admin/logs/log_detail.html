@@ -28,15 +28,15 @@
                         </div>
                         <div>
                             <p class="logs-detail-field-label">Hành động thực hiện</p>
-                            <p class="logs-detail-field-value bold logs-action-badge" th:text="${log.action}" style="display: inline-block;">LOGIN</p>
+                            <p class="logs-detail-field-value bold logs-action-badge" th:text="${log.actionName}" style="display: inline-block;">LOGIN</p>
                         </div>
                         <div>
                             <p class="logs-detail-field-label">Vai trò tài khoản</p>
-                            <p class="logs-detail-field-value" th:text="${log.role == 'Admin' ? 'Quản trị viên' : (log.role == 'Resident' ? 'Cư dân' : (log.role == 'Manager' ? 'Quản lý' : (log.role == 'Staff' ? 'Nhân viên bảo trì' : log.role)))}">Admin</p>
+                            <p class="logs-detail-field-value" th:text="${log.roleName}">Admin</p>
                         </div>
                         <div>
                             <p class="logs-detail-field-label">Đối tượng tác động</p>
-                            <p class="logs-detail-field-value" th:text="${log.entityType == 'Account' ? 'Tài khoản' : (log.entityType == 'Apartment' ? 'Căn hộ' : (log.entityType == 'Request' ? 'Yêu cầu' : (log.entityType == 'Utility' ? 'Tiện ích' : (log.entityType == 'Resource' ? 'Tài nguyên' : log.entityType))))}">Account</p>
+                            <p class="logs-detail-field-value" th:text="${log.entityTypeName}">Account</p>
                         </div>
                     </div>
                 </section>
@@ -52,31 +52,48 @@
                             <span class="logs-detail-field-label">ID đối tượng tác động</span>
                             <span class="logs-detail-field-value mono bold" th:text="${log.entityId}">1</span>
                         </div>
-                        <div class="logs-detail-context-row" th:if="${log.ipAddress != null}">
-                            <span class="logs-detail-field-label">Địa chỉ IP</span>
-                            <span class="logs-detail-field-value mono" th:text="${log.ipAddress}">192.168.1.1</span>
+                        <div class="logs-detail-context-row" th:if="${log.description != null}">
+                            <span class="logs-detail-field-label">Mô tả thay đổi</span>
+                            <span class="logs-detail-field-value" th:text="${log.description}">Mô tả việc thay đổi</span>
                         </div>
                     </div>
                 </section>
                 
-                <section class="logs-detail-section" th:if="${log.details != null and log.details != '{}' and log.details != ''}">
-                    <h4 class="logs-detail-section-title">Chi tiết nội dung nhật ký</h4>
-                    <div class="logs-detail-json-box">
-                        <pre id="logDetailsJson" th:text="${log.details}" style="white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; margin: 0; background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 8px; overflow-x: auto;">{}</pre>
-                    </div>
-                </section>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; width: 100%;">
+                    <section class="logs-detail-section" th:if="${log.oldValue != null and log.oldValue != ''}">
+                        <h4 class="logs-detail-section-title">Dữ liệu cũ (Old Value)</h4>
+                        <div class="logs-detail-json-box">
+                            <pre id="logOldValueJson" th:text="${log.oldValue}" style="white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; margin: 0; background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 8px; overflow-x: auto;">{}</pre>
+                        </div>
+                    </section>
+                    
+                    <section class="logs-detail-section" th:if="${log.newValue != null and log.newValue != ''}">
+                        <h4 class="logs-detail-section-title">Dữ liệu mới (New Value)</h4>
+                        <div class="logs-detail-json-box">
+                            <pre id="logNewValueJson" th:text="${log.newValue}" style="white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; margin: 0; background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 8px; overflow-x: auto;">{}</pre>
+                        </div>
+                    </section>
+                </div>
                 <script>
                     (function() {
-                        var pre = document.getElementById("logDetailsJson");
-                        if (!pre) return;
-                        try {
-                            var text = pre.textContent || pre.innerText;
-                            var raw = text.trim();
-                            if (!raw || raw === "{}" || raw === "") { var section = pre.closest("section"); if (section) section.style.display = "none"; return; }
-                            var obj = JSON.parse(raw);
-                            var formatted = JSON.stringify(obj, null, 2);
-                            pre.innerHTML = highlightJson(formatted);
-                        } catch(e) { pre.textContent = raw; }
+                        function formatAndHighlight(elementId) {
+                            var pre = document.getElementById(elementId);
+                            if (!pre) return;
+                            try {
+                                var text = pre.textContent || pre.innerText;
+                                var raw = text.trim();
+                                if (!raw || raw === "") { 
+                                    var section = pre.closest("section"); 
+                                    if (section) section.style.display = "none"; 
+                                    return; 
+                                }
+                                var obj = JSON.parse(raw);
+                                var formatted = JSON.stringify(obj, null, 2);
+                                pre.innerHTML = highlightJson(formatted);
+                            } catch(e) { pre.textContent = raw; }
+                        }
+                        formatAndHighlight("logOldValueJson");
+                        formatAndHighlight("logNewValueJson");
                     })();
                     function highlightJson(json) {
                         var e = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

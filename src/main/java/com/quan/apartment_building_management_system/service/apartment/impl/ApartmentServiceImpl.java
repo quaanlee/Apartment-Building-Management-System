@@ -23,18 +23,42 @@ public class ApartmentServiceImpl implements ApartmentService {
     private final ApartmentRepository apartmentRepository;
     private final ApartmentImageRepository apartmentImageRepository;
     private final CloudinaryService cloudinaryService;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
     public ApartmentServiceImpl(ApartmentRepository apartmentRepository,
                                 ApartmentImageRepository apartmentImageRepository,
-                                CloudinaryService cloudinaryService) {
+                                CloudinaryService cloudinaryService,
+                                com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.apartmentRepository = apartmentRepository;
         this.apartmentImageRepository = apartmentImageRepository;
         this.cloudinaryService = cloudinaryService;
+        this.systemLogService = systemLogService;
     }
 
     @Override
     public List<Apartment> findAll() {
         return apartmentRepository.findAll();
+    }
+
+    @Override
+    public List<Apartment> searchApartments(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return findAll();
+        }
+        String normalizedQuery = removeAccents(query.trim().toLowerCase());
+        return findAll().stream()
+                .filter(a -> {
+                    String aptNum = a.getApartmentNumber() != null ? removeAccents(a.getApartmentNumber().toLowerCase()) : "";
+                    return aptNum.contains(normalizedQuery);
+                })
+                .toList();
+    }
+
+    private String removeAccents(String s) {
+        if (s == null) return "";
+        String temp = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD);
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(temp).replaceAll("").replace('đ', 'd').replace('Đ', 'D');
     }
 
     @Override

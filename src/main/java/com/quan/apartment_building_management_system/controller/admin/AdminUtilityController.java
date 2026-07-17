@@ -38,6 +38,7 @@ public class AdminUtilityController {
     private final AdminUtilityDTOHandler dtoHandler;
     private final CloudinaryUploadService cloudinaryUploadService;
     private final UtilityImageService utilityImageService;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
     public AdminUtilityController(UtilityService utilityService,
                                   UtilityResourceService utilityResourceService,
@@ -45,7 +46,8 @@ public class AdminUtilityController {
                                   UnitService unitService,
                                   AdminUtilityDTOHandler dtoHandler,
                                   CloudinaryUploadService cloudinaryUploadService,
-                                  UtilityImageService utilityImageService) {
+                                  UtilityImageService utilityImageService,
+                                  com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.utilityService = utilityService;
         this.utilityResourceService = utilityResourceService;
         this.utilityPriceService = utilityPriceService;
@@ -53,6 +55,7 @@ public class AdminUtilityController {
         this.dtoHandler = dtoHandler;
         this.cloudinaryUploadService = cloudinaryUploadService;
         this.utilityImageService = utilityImageService;
+        this.systemLogService = systemLogService;
     }
 
     @GetMapping
@@ -127,7 +130,7 @@ public class AdminUtilityController {
         model.addAttribute("totalResources", totalResources);
         model.addAttribute("totalPricing", totalPricing);
 
-        return "admin/utilities";
+        return "admin/utility/utilities";
     }
 
     @GetMapping("/{id}")
@@ -161,7 +164,7 @@ public class AdminUtilityController {
         model.addAttribute("currentPage", page);
         model.addAttribute("currentPricePage", pricePage);
         model.addAttribute("priceQuery", priceQuery);
-        return "admin/utility_detail";
+        return "admin/utility/utility_detail";
     }
 
     @PostMapping("/save")
@@ -202,6 +205,7 @@ public class AdminUtilityController {
         if (utilityDTO.getUtilityId() != null) {
             // Edit mode
             utilityService.findById(utilityDTO.getUtilityId()).ifPresent(existing -> {
+                com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO.fromEntity(existing);
                 dtoHandler.updateEntityFromDTO(utilityDTO, existing);
                 if (utilityImage != null && !utilityImage.isEmpty()) {
                     try {
@@ -213,6 +217,9 @@ public class AdminUtilityController {
                     }
                 }
                 utilityService.save(existing);
+                com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO.fromEntity(existing);
+                systemLogService.logSystemAction("UPDATE_UTILITY", "Utility", existing.getUtilityId(), oldDto, newDto, "Updated utility " + existing.getUtilityName());
+                
                 redirectAttributes.addFlashAttribute("message", "Cập nhật tiện ích thành công!");
                 redirectAttributes.addFlashAttribute("messageType", "success");
             });
@@ -236,6 +243,9 @@ public class AdminUtilityController {
             Utility utility = dtoHandler.toEntity(utilityDTO);
             utilityService.save(utility);
             
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO.fromEntity(utility);
+            systemLogService.logSystemAction("CREATE_UTILITY", "Utility", utility.getUtilityId(), null, newDto, "Created utility " + utility.getUtilityName());
+
             redirectAttributes.addFlashAttribute("message", "Thêm tiện ích mới thành công! Bạn có thể thêm tài nguyên cho tiện ích này.");
             redirectAttributes.addFlashAttribute("messageType", "success");
         }
@@ -256,8 +266,13 @@ public class AdminUtilityController {
                                @RequestParam(value = "priceQuery", required = false) String priceQuery,
                                RedirectAttributes redirectAttributes) {
         utilityService.findById(id).ifPresent(u -> {
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO.fromEntity(u);
             u.setStatus(!u.getStatus());
             utilityService.save(u);
+            
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO.fromEntity(u);
+            systemLogService.logSystemAction("UPDATE_UTILITY", "Utility", u.getUtilityId(), oldDto, newDto, "Toggled status for utility " + u.getUtilityName());
+
             redirectAttributes.addFlashAttribute("message", "Cập nhật trạng thái tiện ích thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         });
@@ -321,6 +336,10 @@ public class AdminUtilityController {
             resource = utilityResourceService.save(resource);
             try {
                 saveResourceImages(resource, primaryImage, secondaryImages);
+                
+                com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO.fromEntity(resource);
+                systemLogService.logSystemAction("CREATE_UTILITY_RESOURCE", "UtilityResource", resource.getResourceId(), null, newDto, "Created utility resource " + resource.getResourceName());
+
                 redirectAttributes.addFlashAttribute("message", "Thêm tài nguyên mới thành công!");
                 redirectAttributes.addFlashAttribute("messageType", "success");
             } catch (Exception e) {
@@ -353,6 +372,12 @@ public class AdminUtilityController {
                 utilityIdHolder[0] = resource.getUtility().getUtilityId();
             }
             unitService.findById(unitId).ifPresent(unit -> {
+                boolean isNew = utilityPriceService.findByResourceIdAndUnitId(resourceId, unitId).isEmpty();
+                com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO oldDto = isNew
+                        ? com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO.empty()
+                        : utilityPriceService.findByResourceIdAndUnitId(resourceId, unitId)
+                                .map(com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO::fromEntity)
+                                .orElseGet(com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO::empty);
                 UtilityPrice targetPrice = utilityPriceService.findByResourceIdAndUnitId(resourceId, unitId)
                         .orElseGet(() -> {
                             UtilityPrice newPrice = new UtilityPrice();
@@ -361,7 +386,12 @@ public class AdminUtilityController {
                             return newPrice;
                         });
                 targetPrice.setPrice(price);
-                utilityPriceService.save(targetPrice);
+                UtilityPrice saved = utilityPriceService.save(targetPrice);
+                com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO newDto =
+                        com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO.fromEntity(saved);
+                String priceAction = isNew ? "CREATE_UTILITY_PRICE" : "UPDATE_UTILITY_PRICE";
+                String priceDesc = (isNew ? "Created" : "Updated") + " price for resource " + resource.getResourceName() + " (unit: " + unit.getUnitName() + ")";
+                systemLogService.logSystemAction(priceAction, "UtilityPrice", saved.getUtilityPriceId(), oldDto, newDto, priceDesc);
                 redirectAttributes.addFlashAttribute("message", "Lưu cấu hình đơn giá thành công!");
                 redirectAttributes.addFlashAttribute("messageType", "success");
             });
@@ -414,8 +444,13 @@ public class AdminUtilityController {
                                        RedirectAttributes redirectAttributes) {
         final Integer[] utilityIdHolder = new Integer[1];
         utilityResourceService.findById(id).ifPresent(r -> {
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO.fromEntity(r);
             r.setStatus(!r.getStatus());
             utilityResourceService.save(r);
+            
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO.fromEntity(r);
+            systemLogService.logSystemAction("UPDATE_UTILITY_RESOURCE", "UtilityResource", r.getResourceId(), oldDto, newDto, "Toggled status for utility resource " + r.getResourceName());
+            
             if (r.getUtility() != null) {
                 utilityIdHolder[0] = r.getUtility().getUtilityId();
             }
@@ -459,6 +494,8 @@ public class AdminUtilityController {
         }
 
         utilityResourceService.findById(resourceId).ifPresent(resource -> {
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO.fromEntity(resource);
+            
             resource.setResourceName(resourceName.trim());
             resource.setDescription(resourceDescription);
             resource.setLocation(location.trim());
@@ -519,6 +556,10 @@ public class AdminUtilityController {
                     redirectAttributes.addFlashAttribute("messageType", "error");
                 }
             }
+            
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO.fromEntity(resource);
+            systemLogService.logSystemAction("UPDATE_UTILITY_RESOURCE", "UtilityResource", resource.getResourceId(), oldDto, newDto, "Updated utility resource " + resource.getResourceName());
+
             redirectAttributes.addFlashAttribute("message", "Cập nhật tài nguyên thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         });
@@ -555,7 +596,7 @@ public class AdminUtilityController {
         model.addAttribute("currentPage", page);
         model.addAttribute("currentPricePage", pricePage);
         model.addAttribute("priceQuery", priceQuery);
-        return "admin/resource_detail";
+        return "admin/utility/resource_detail";
     }
 
     private void saveResourceImages(UtilityResource resource,

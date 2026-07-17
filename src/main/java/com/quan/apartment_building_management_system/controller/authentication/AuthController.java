@@ -4,6 +4,7 @@ import com.quan.apartment_building_management_system.entity.Account;
 import com.quan.apartment_building_management_system.service.user.AccountService;
 import com.quan.apartment_building_management_system.service.system.NotificationService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,10 +24,15 @@ public class AuthController {
 
     private final AccountService accountService;
     private final NotificationService notificationService;
+    private final PasswordEncoder passwordEncoder;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public AuthController(AccountService accountService, NotificationService notificationService) {
+    public AuthController(AccountService accountService, NotificationService notificationService, PasswordEncoder passwordEncoder,
+                          com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.accountService = accountService;
         this.notificationService = notificationService;
+        this.passwordEncoder = passwordEncoder;
+        this.systemLogService = systemLogService;
     }
 
     @GetMapping("/login")
@@ -64,8 +70,23 @@ public class AuthController {
             return "redirect:/login";
         }
 
-        // Plaintext comparison for password authentication
-        if (!account.getPassword().equals(password)) {
+        // Authenticate using PasswordEncoder
+        if (account.getPassword() == null) {
+            redirectAttributes.addFlashAttribute("error", "Tài khoản không hợp lệ.");
+            return "redirect:/login";
+        }
+
+        // Allow both plain text (for existing un-hashed passwords) and BCrypt passwords temporarily during transition
+        boolean isPasswordValid = false;
+        if (account.getPassword().startsWith("$2a$") || account.getPassword().startsWith("$2b$") || account.getPassword().startsWith("$2y$")) {
+            isPasswordValid = passwordEncoder.matches(password, account.getPassword());
+        } else {
+            // Plain text comparison for backward compatibility
+            isPasswordValid = account.getPassword().equals(password);
+            // Optionally, we could hash and update the password here, but we will keep it simple
+        }
+
+        if (!isPasswordValid) {
             redirectAttributes.addFlashAttribute("error", "Email hoặc mật khẩu không đúng. Vui lòng thử lại.");
             return "redirect:/login";
         }
@@ -259,9 +280,18 @@ public class AuthController {
             return "redirect:/forgot-password";
         }
 
-        Account account = accountOpt.get();
-        account.setPassword(password); // Set new plaintext password
-        accountService.save(account);
+        Account accountBeforeReset = accountOpt.get();
+        com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO oldAccountDto =
+                com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO.fromEntity(accountBeforeReset);
+
+        accountService.resetPassword(email, password);
+
+        Account resetAccount = accountService.findByUsername(email).orElse(accountBeforeReset);
+        com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO newAccountDto =
+                com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO.fromEntity(resetAccount);
+        systemLogService.logSystemAction("RESET_PASSWORD", "Account",
+                resetAccount.getAccountId(),
+                oldAccountDto, newAccountDto, "Password reset via forgot-password flow for: " + email);
 
         // Clear session attributes
         session.removeAttribute("forgotPasswordEmail");

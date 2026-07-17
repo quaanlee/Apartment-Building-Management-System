@@ -14,9 +14,11 @@ import java.util.Optional;
 public class UtilityResourceServiceImpl implements UtilityResourceService {
 
     private final UtilityResourceRepository utilityResourceRepository;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public UtilityResourceServiceImpl(UtilityResourceRepository utilityResourceRepository) {
+    public UtilityResourceServiceImpl(UtilityResourceRepository utilityResourceRepository, com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.utilityResourceRepository = utilityResourceRepository;
+        this.systemLogService = systemLogService;
     }
 
     @Override
