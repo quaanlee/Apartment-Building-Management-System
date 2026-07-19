@@ -140,14 +140,81 @@
                 <label class="logs-filter-label">Hành động</label>
                 <select name="action" id="actionSelect" class="logs-filter-select">
                     <option value="" th:selected="${action == null or action == ''}">Tất cả hành động</option>
-                    <option value="LOGIN" th:selected="${action == 'LOGIN'}">LOGIN</option>
-                    <option value="LOGOUT" th:selected="${action == 'LOGOUT'}">LOGOUT</option>
-                    <option value="CREATE_BILL" th:selected="${action == 'CREATE_BILL'}">CREATE_BILL</option>
-                    <option value="LOCK_ACCOUNT" th:selected="${action == 'LOCK_ACCOUNT'}">LOCK_ACCOUNT</option>
-                    <option value="DELETE_BOOKING" th:selected="${action == 'DELETE_BOOKING'}">DELETE_BOOKING</option>
-                    <option value="AUTO_BACKUP" th:selected="${action == 'AUTO_BACKUP'}">AUTO_BACKUP</option>
-                    <option value="UPDATE_PERMISSIONS" th:selected="${action == 'UPDATE_PERMISSIONS'}">UPDATE_PERMISSIONS</option>
-                    <option value="CANCEL_BOOKING" th:selected="${action == 'CANCEL_BOOKING'}">CANCEL_BOOKING</option>
+
+                    <optgroup label="── Tài khoản ──">
+                        <option value="CHANGE_PASSWORD"   th:selected="${action == 'CHANGE_PASSWORD'}">Đổi mật khẩu</option>
+                        <option value="RESET_PASSWORD"    th:selected="${action == 'RESET_PASSWORD'}">Khôi phục mật khẩu</option>
+                        <option value="CREATE_ACCOUNT"    th:selected="${action == 'CREATE_ACCOUNT'}">Tạo tài khoản</option>
+                        <option value="UPDATE_ACCOUNT"    th:selected="${action == 'UPDATE_ACCOUNT'}">Cập nhật tài khoản</option>
+                        <option value="LOCK_ACCOUNT"      th:selected="${action == 'LOCK_ACCOUNT'}">Khóa tài khoản</option>
+                        <option value="UNLOCK_ACCOUNT"    th:selected="${action == 'UNLOCK_ACCOUNT'}">Mở khóa tài khoản</option>
+                    </optgroup>
+
+                    <optgroup label="── Hồ sơ ──">
+                        <option value="CREATE_PROFILE"          th:selected="${action == 'CREATE_PROFILE'}">Tạo hồ sơ cư dân</option>
+                        <option value="UPDATE_PROFILE"          th:selected="${action == 'UPDATE_PROFILE'}">Cập nhật hồ sơ cư dân</option>
+                        <option value="CREATE_EMPLOYEE_PROFILE" th:selected="${action == 'CREATE_EMPLOYEE_PROFILE'}">Tạo hồ sơ nhân viên</option>
+                        <option value="UPDATE_EMPLOYEE_PROFILE" th:selected="${action == 'UPDATE_EMPLOYEE_PROFILE'}">Cập nhật hồ sơ nhân viên</option>
+                    </optgroup>
+
+                    <optgroup label="── Căn hộ ──">
+                        <option value="CREATE_APARTMENT"      th:selected="${action == 'CREATE_APARTMENT'}">Tạo căn hộ</option>
+                        <option value="UPDATE_APARTMENT"      th:selected="${action == 'UPDATE_APARTMENT'}">Cập nhật căn hộ</option>
+                        <option value="DELETE_APARTMENT"      th:selected="${action == 'DELETE_APARTMENT'}">Xóa / Khóa căn hộ</option>
+                        <option value="ASSIGN_RESIDENT"       th:selected="${action == 'ASSIGN_RESIDENT'}">Gán cư dân vào phòng</option>
+                        <option value="MOVE_OUT_RESIDENT"     th:selected="${action == 'MOVE_OUT_RESIDENT'}">Chuyển cư dân ra khỏi phòng</option>
+                    </optgroup>
+
+                    <optgroup label="── Dịch vụ ──">
+                        <option value="CREATE_SERVICE"        th:selected="${action == 'CREATE_SERVICE'}">Tạo dịch vụ</option>
+                        <option value="UPDATE_SERVICE"        th:selected="${action == 'UPDATE_SERVICE'}">Cập nhật / Thay đổi trạng thái dịch vụ</option>
+                    </optgroup>
+
+                    <optgroup label="── Tiện ích ──">
+                        <option value="CREATE_UTILITY"          th:selected="${action == 'CREATE_UTILITY'}">Tạo tiện ích</option>
+                        <option value="UPDATE_UTILITY"          th:selected="${action == 'UPDATE_UTILITY'}">Cập nhật / Thay đổi trạng thái tiện ích</option>
+                        <option value="CREATE_UTILITY_RESOURCE" th:selected="${action == 'CREATE_UTILITY_RESOURCE'}">Tạo tài nguyên tiện ích</option>
+                        <option value="UPDATE_UTILITY_RESOURCE" th:selected="${action == 'UPDATE_UTILITY_RESOURCE'}">Cập nhật / Thay đổi trạng thái tài nguyên tiện ích</option>
+                        <option value="CREATE_UTILITY_PRICE"    th:selected="${action == 'CREATE_UTILITY_PRICE'}">Tạo đơn giá tiện ích</option>
+                        <option value="UPDATE_UTILITY_PRICE"    th:selected="${action == 'UPDATE_UTILITY_PRICE'}">Cập nhật đơn giá tiện ích</option>
+                    </optgroup>
+
+                    <optgroup label="── Đặt lịch tiện ích ──">
+                        <option value="CREATE_UTILITY_BOOKING" th:selected="${action == 'CREATE_UTILITY_BOOKING'}">Tạo đặt lịch tiện ích</option>
+                        <option value="UPDATE_UTILITY_BOOKING" th:selected="${action == 'UPDATE_UTILITY_BOOKING'}">Cập nhật đặt lịch tiện ích</option>
+                        <option value="UPDATE_BOOKING_STATUS"  th:selected="${action == 'UPDATE_BOOKING_STATUS'}">Cập nhật trạng thái đặt lịch</option>
+                        <option value="CANCEL_BOOKING"         th:selected="${action == 'CANCEL_BOOKING'}">Hủy đặt lịch tiện ích</option>
+                    </optgroup>
+
+                    <optgroup label="── Hóa đơn ──">
+                        <option value="CREATE_BILL"  th:selected="${action == 'CREATE_BILL'}">Tạo hóa đơn</option>
+                        <option value="UPDATE_BILL"  th:selected="${action == 'UPDATE_BILL'}">Cập nhật hóa đơn</option>
+                        <option value="PAYMENT_BILL" th:selected="${action == 'PAYMENT_BILL'}">Thanh toán hóa đơn</option>
+                    </optgroup>
+
+                    <optgroup label="── Bảo trì ──">
+                        <option value="CREATE_MAINTENANCE_REQUEST" th:selected="${action == 'CREATE_MAINTENANCE_REQUEST'}">Tạo yêu cầu bảo trì</option>
+                        <option value="UPDATE_MAINTENANCE_REQUEST" th:selected="${action == 'UPDATE_MAINTENANCE_REQUEST'}">Cập nhật yêu cầu bảo trì</option>
+                        <option value="CREATE_MAINTENANCE_REPORT"  th:selected="${action == 'CREATE_MAINTENANCE_REPORT'}">Tạo báo cáo bảo trì</option>
+                        <option value="UPDATE_MAINTENANCE_REPORT"  th:selected="${action == 'UPDATE_MAINTENANCE_REPORT'}">Cập nhật báo cáo bảo trì</option>
+                        <option value="SUBMIT_MAINTENANCE_REPORT"  th:selected="${action == 'SUBMIT_MAINTENANCE_REPORT'}">Nộp báo cáo bảo trì</option>
+                    </optgroup>
+
+                    <optgroup label="── Đăng ký xe ──">
+                        <option value="CREATE_VEHICLE_REGISTRATION"  th:selected="${action == 'CREATE_VEHICLE_REGISTRATION'}">Tạo đăng ký xe</option>
+                        <option value="UPDATE_VEHICLE_REGISTRATION"  th:selected="${action == 'UPDATE_VEHICLE_REGISTRATION'}">Cập nhật đăng ký xe</option>
+                        <option value="APPROVE_VEHICLE_REGISTRATION" th:selected="${action == 'APPROVE_VEHICLE_REGISTRATION'}">Phê duyệt đăng ký xe</option>
+                        <option value="REJECT_VEHICLE_REGISTRATION"  th:selected="${action == 'REJECT_VEHICLE_REGISTRATION'}">Từ chối đăng ký xe</option>
+                        <option value="REVOKE_VEHICLE_REGISTRATION"  th:selected="${action == 'REVOKE_VEHICLE_REGISTRATION'}">Thu hồi đăng ký xe</option>
+                    </optgroup>
+
+                    <optgroup label="── Thông báo ──">
+                        <option value="CREATE_NOTIFICATION" th:selected="${action == 'CREATE_NOTIFICATION'}">Tạo thông báo</option>
+                        <option value="UPDATE_NOTIFICATION" th:selected="${action == 'UPDATE_NOTIFICATION'}">Cập nhật thông báo</option>
+                        <option value="DELETE_NOTIFICATION" th:selected="${action == 'DELETE_NOTIFICATION'}">Xóa thông báo</option>
+                    </optgroup>
+
+
                 </select>
             </div>
 

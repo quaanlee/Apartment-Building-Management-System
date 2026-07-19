@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,8 +23,13 @@ public class ResidentServiceController {
     }
 
     @GetMapping
-    public String viewServices(Model model) {
-        List<ServiceItem> services = serviceItemService.findAll();
+    public String viewServices(@RequestParam(required = false) String search, Model model) {
+        List<ServiceItem> services;
+        if (search != null && !search.trim().isEmpty()) {
+            services = serviceItemService.searchServices(search, null);
+        } else {
+            services = serviceItemService.findAll();
+        }
 
         long totalServices = services.size();
         long activeServices = services.stream().filter(ServiceItem::getStatus).count();
@@ -35,6 +41,7 @@ public class ResidentServiceController {
         model.addAttribute("services", dtos);
         model.addAttribute("totalServices", totalServices);
         model.addAttribute("activeServices", activeServices);
+        model.addAttribute("search", search);
 
         return "resident/services/list";
     }

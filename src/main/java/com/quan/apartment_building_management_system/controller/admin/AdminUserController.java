@@ -47,10 +47,9 @@ public class AdminUserController {
             @RequestParam(value = "roleId", required = false) Integer roleId,
             @RequestParam(value = "status", required = false) Boolean status,
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size,
             Model model) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, 6);
         Page<UserDTO> userPage = accountService.findFilteredAccounts(search, roleId, status, pageable);
 
         // Fetch counts for cards
@@ -63,7 +62,8 @@ public class AdminUserController {
                 .filter(a -> a.getRole() != null && "MANAGER".equalsIgnoreCase(a.getRole().getRoleName()))
                 .count();
         long totalMaintenance = allAccounts.stream()
-                .filter(a -> a.getRole() != null && "MAINTENANCE_STAFF".equalsIgnoreCase(a.getRole().getRoleName().replace(" ", "_")))
+                .filter(a -> a.getRole() != null
+                        && "MAINTENANCE_STAFF".equalsIgnoreCase(a.getRole().getRoleName().replace(" ", "_")))
                 .count();
 
         // Get list of all roles for filter dropdown
@@ -98,11 +98,11 @@ public class AdminUserController {
             account.setStatus(newStatus);
             account = accountService.save(account);
             UserDTO newDto = new UserDTO(account);
-            
+
             String actionName = newStatus ? "UNLOCK_ACCOUNT" : "LOCK_ACCOUNT";
             String desc = "Account " + account.getUsername() + " was " + (newStatus ? "unlocked" : "locked");
             systemLogService.logSystemAction(actionName, "Account", account.getAccountId(), oldDto, newDto, desc);
-            
+
             String statusMsg = newStatus ? "mở khóa" : "khóa";
             redirectAttributes.addFlashAttribute("message",
                     "Tài khoản " + account.getUsername() + " đã được " + statusMsg + " thành công!");
@@ -117,10 +117,10 @@ public class AdminUserController {
         if (accountOpt.isEmpty()) {
             return "redirect:/admin/users";
         }
-        
+
         Account account = accountOpt.get();
         UserDTO user = new UserDTO(account);
-        
+
         model.addAttribute("user", user);
         model.addAttribute("account", account);
         model.addAttribute("activeTab", "users");
@@ -172,13 +172,14 @@ public class AdminUserController {
         Integer entityId = savedDto.getProfileId() != null ? savedDto.getProfileId() : savedDto.getEmployeeProfileId();
         String entityName = savedDto.getProfileId() != null ? "Profile" : "EmployeeProfile";
         String actionName = savedDto.getProfileId() != null ? "CREATE_PROFILE" : "CREATE_EMPLOYEE_PROFILE";
-        com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO newProfileDto =
-                com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO.fromUserDTO(savedDto);
+        com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO newProfileDto = com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO
+                .fromUserDTO(savedDto);
         systemLogService.logSystemAction(actionName, entityName, entityId,
                 com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO.empty(),
                 newProfileDto, "Created profile for " + savedDto.getFullName());
-        
-        redirectAttributes.addFlashAttribute("message", "Người dùng " + userDto.getFullName() + " đã được tạo thành công!");
+
+        redirectAttributes.addFlashAttribute("message",
+                "Người dùng " + userDto.getFullName() + " đã được tạo thành công!");
         redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/admin/users";
     }
@@ -206,7 +207,8 @@ public class AdminUserController {
                 bindingResult.rejectValue("citizenId", "error.userDto", "CCCD phải gồm đúng 12 chữ số!");
             } else {
                 Optional<Profile> existingProfile = profileService.findByCitizenId(userDto.getCitizenId());
-                if (existingProfile.isPresent() && existingProfile.get().getAccount() != null && !existingProfile.get().getAccount().getAccountId().equals(id)) {
+                if (existingProfile.isPresent() && existingProfile.get().getAccount() != null
+                        && !existingProfile.get().getAccount().getAccountId().equals(id)) {
                     bindingResult.rejectValue("citizenId", "error.userDto", "CCCD đã tồn tại trong hệ thống!");
                 }
             }
@@ -225,22 +227,25 @@ public class AdminUserController {
             model.addAttribute("activeTab", "users");
             return "admin/user/form_user";
         }
-        
+
         Optional<Account> oldAccOpt = accountService.findById(id);
-        com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO oldProfileDto =
-                oldAccOpt.isPresent() ? com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO.fromUserDTO(new UserDTO(oldAccOpt.get())) :
-                com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO.empty();
+        com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO oldProfileDto = oldAccOpt.isPresent()
+                ? com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO
+                        .fromUserDTO(new UserDTO(oldAccOpt.get()))
+                : com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO.empty();
 
         UserDTO savedDto = profileService.saveUserDTO(userDto);
 
         Integer entityId = savedDto.getProfileId() != null ? savedDto.getProfileId() : savedDto.getEmployeeProfileId();
         String entityName = savedDto.getProfileId() != null ? "Profile" : "EmployeeProfile";
         String actionName = savedDto.getProfileId() != null ? "UPDATE_PROFILE" : "UPDATE_EMPLOYEE_PROFILE";
-        com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO newProfileDto =
-                com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO.fromUserDTO(savedDto);
-        systemLogService.logSystemAction(actionName, entityName, entityId, oldProfileDto, newProfileDto, "Updated profile for " + savedDto.getFullName());
-        
-        redirectAttributes.addFlashAttribute("message", "Người dùng " + userDto.getFullName() + " đã được cập nhật thành công!");
+        com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO newProfileDto = com.quan.apartment_building_management_system.dto.systemlog.ProfileLogDTO
+                .fromUserDTO(savedDto);
+        systemLogService.logSystemAction(actionName, entityName, entityId, oldProfileDto, newProfileDto,
+                "Updated profile for " + savedDto.getFullName());
+
+        redirectAttributes.addFlashAttribute("message",
+                "Người dùng " + userDto.getFullName() + " đã được cập nhật thành công!");
         redirectAttributes.addFlashAttribute("messageType", "success");
         return "redirect:/admin/users";
     }

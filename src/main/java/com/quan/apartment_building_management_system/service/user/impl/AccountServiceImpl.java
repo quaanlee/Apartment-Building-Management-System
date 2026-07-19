@@ -22,7 +22,8 @@ public class AccountServiceImpl implements AccountService {
     private final PasswordEncoder passwordEncoder;
     private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
-    public AccountServiceImpl(AccountRepository accountRepository, PasswordEncoder passwordEncoder, com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
+    public AccountServiceImpl(AccountRepository accountRepository, PasswordEncoder passwordEncoder,
+            com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
         this.systemLogService = systemLogService;
@@ -89,21 +90,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public Account save(Account account) {
-        boolean isNew = account.getAccountId() == null;
-        com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO oldDto = null;
-        if (!isNew) {
-            oldDto = com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO.fromEntity(accountRepository.findById(account.getAccountId()).orElse(null));
-        }
-
-        Account saved = accountRepository.save(account);
-
-        com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO.fromEntity(saved);
-        String action = isNew ? "CREATE_ACCOUNT" : "UPDATE_ACCOUNT";
-        String desc = isNew ? "Created account " + saved.getUsername() : "Updated account " + saved.getUsername();
-        
-        systemLogService.logSystemAction(action, "Account", saved.getAccountId(), oldDto, newDto, desc);
-        
-        return saved;
+        return accountRepository.save(account);
     }
 
     @Override
@@ -135,15 +122,13 @@ public class AccountServiceImpl implements AccountService {
             return false;
 
         String encodedPassword = passwordEncoder.encode(newPassword);
-        
+
         // Execute an explicit UPDATE statement to guarantee the database is modified
         // immediately
         accountRepository.updatePassword(accountId, encodedPassword);
 
         // Update the persistence context as well
         account.setPassword(encodedPassword);
-
-        systemLogService.logSystemAction("CHANGE_PASSWORD", "Account", account.getAccountId(), null, null, "Changed password for account " + account.getUsername());
 
         return true;
     }
@@ -156,8 +141,6 @@ public class AccountServiceImpl implements AccountService {
             Account account = accountOpt.get();
             account.setPassword(passwordEncoder.encode(newPassword));
             accountRepository.save(account);
-
-            systemLogService.logSystemAction("RESET_PASSWORD", "Account", account.getAccountId(), null, null, "Reset password for account " + account.getUsername());
         }
     }
 }

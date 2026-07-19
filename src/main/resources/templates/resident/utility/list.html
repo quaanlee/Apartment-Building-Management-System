@@ -1,53 +1,82 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" 
-      th:replace="~{layout/resident/layout_resident :: resident-layout(~{::#main-content}, 'booking')}"
-      th:with="pageTitle='Tiện Ích Khu Dân Cư'">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/resident/layout_resident :: resident-layout(~{::#main-content}, 'booking')}"
+    th:with="pageTitle='Tiện Ích Khu Dân Cư'">
+
 <head>
     <title>Tiện Ích Khu Dân Cư</title>
 </head>
+
 <body>
-<div id="main-content" class="utility-container">
-    <link rel="stylesheet" th:href="@{/css/resident/utility-resident.css}">
-    
-    <div class="utility-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-        <div>
-            <h1 class="page-header-title">Tiện Ích Khu Dân Cư</h1>
-            <p class="page-header-subtitle">Đặt chỗ trước các dịch vụ, tiện ích cao cấp dành riêng cho cư dân tòa nhà.</p>
-        </div>
-        <div style="display: flex; gap: 12px; margin-top: 10px;">
-            <a th:href="@{/resident/utilities/history}" class="btn-secondary" style="border-radius: 8px; text-decoration: none;">
-                <i class="fa-solid fa-clock-rotate-left" style="margin-right: 6px;"></i> Lịch Sử Đặt Chỗ
-            </a>
-            <a th:href="@{/resident/utilities/memberships}" class="btn-secondary" style="border-radius: 8px; text-decoration: none;">
-                <i class="fa-solid fa-id-card" style="margin-right: 6px;"></i> Gói Thành Viên
-            </a>
-        </div>
-    </div>
-    
-    <div class="utility-grid">
-        <div class="utility-card" th:each="utility : ${utilities}">
-            <div class="utility-image-container">
-                <img th:src="@{${!#strings.isEmpty(utility.imageUrl) ? utility.imageUrl : '/images/utilities/garden.jpg'}}" class="utility-image" alt="Utility Image">
+    <div id="main-content" class="utility-container">
+        <link rel="stylesheet" th:href="@{/css/resident/utility-resident.css}">
+
+        <div class="utility-header"
+            style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <h1 class="page-header-title">Tiện Ích Khu Dân Cư</h1>
+                <p class="page-header-subtitle">Đặt chỗ trước các dịch vụ, tiện ích cao cấp dành riêng cho cư dân tòa
+                    nhà.</p>
             </div>
-            <div class="utility-card-body">
-                <div class="utility-card-header">
-                    <h3 class="utility-card-title" th:text="${utility.utilityName}">Tên Tiện Ích</h3>
-                    <span class="utility-price-badge" th:text="${utility.type} ? 'Đặt trước' : 'Miễn phí'">Đặt trước</span>
-                </div>
-                <p class="utility-card-desc" th:text="${utility.description}">Elevated aquatic serenity with...</p>
-                
-                <div class="utility-card-footer">
-                    <a th:href="@{/resident/utilities/{id}/resources(id=${utility.utilityId})}" class="btn-primary btn-book-now">
-                        Đặt Ngay <i class="fas fa-calendar-alt" style="margin-left: 8px;"></i>
-                    </a>
-                </div>
+            <div style="display: flex; gap: 12px; margin-top: 10px;">
+                <a th:href="@{/resident/utilities/history}" class="btn-secondary"
+                    style="border-radius: 8px; text-decoration: none;">
+                    <i class="fa-solid fa-clock-rotate-left" style="margin-right: 6px;"></i> Lịch Sử Đặt Chỗ
+                </a>
+                <a th:href="@{/resident/utilities/memberships}" class="btn-secondary"
+                    style="border-radius: 8px; text-decoration: none;">
+                    <i class="fa-solid fa-id-card" style="margin-right: 6px;"></i> Gói Thành Viên
+                </a>
             </div>
         </div>
-        
-        <div th:if="${#lists.isEmpty(utilities)}" class="empty-state">
-            <h4 style="color: var(--text-muted);">Hiện tại chưa có tiện ích nào hoạt động.</h4>
+
+        <!-- Filter Section -->
+        <div class="filter-section"
+            style="background-color: var(--white); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-top: 16px;">
+            <form th:action="@{/resident/utilities}" method="get" class="filter-form"
+                style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                <div class="filter-group" style="position: relative; width: 300px; max-width: 100%;">
+                    <input type="text" name="search" th:value="${search}" placeholder="Tìm kiếm tiện ích"
+                        style="width: 100%; padding: 10px 14px 10px 36px; border: 1px solid var(--border-color); border-radius: 6px; outline: none; transition: border-color 0.2s; box-sizing: border-box;">
+                    <i class="fa-solid fa-search"
+                        style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8;"></i>
+                </div>
+                <div class="filter-group">
+                    <button type="submit" class="btn-primary"
+                        style="padding: 10px 20px; border-radius: 6px; border: none; font-weight: 500; cursor: pointer; background-color: var(--primary-color, #6366f1); color: white;">Tìm
+                        kiếm</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="utility-grid">
+            <div class="utility-card" th:each="utility : ${utilities}">
+                <div class="utility-image-container">
+                    <img th:src="@{${!#strings.isEmpty(utility.imageUrl) ? utility.imageUrl : '/images/utilities/garden.jpg'}}"
+                        class="utility-image" alt="Utility Image">
+                </div>
+                <div class="utility-card-body">
+                    <div class="utility-card-header">
+                        <h3 class="utility-card-title" th:text="${utility.utilityName}">Tên Tiện Ích</h3>
+                        <span class="utility-price-badge" th:text="${utility.type} ? 'Đặt trước' : 'Miễn phí'">Đặt
+                            trước</span>
+                    </div>
+                    <p class="utility-card-desc" th:text="${utility.description}">Elevated aquatic serenity with...</p>
+
+                    <div class="utility-card-footer">
+                        <a th:href="@{/resident/utilities/{id}/resources(id=${utility.utilityId})}"
+                            class="btn-primary btn-book-now">
+                            Đặt Ngay <i class="fas fa-calendar-alt" style="margin-left: 8px;"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(utilities)}" class="empty-state">
+                <h4 style="color: var(--text-muted);">Hiện tại chưa có tiện ích nào hoạt động.</h4>
+            </div>
         </div>
     </div>
-</div>
 </body>
+
 </html>

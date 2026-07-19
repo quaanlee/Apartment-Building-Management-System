@@ -179,7 +179,11 @@ public class UtilityBookingServiceImpl implements UtilityBookingService {
         UtilityBooking saved = utilityBookingRepository.save(booking);
         
         com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO.fromEntity(saved);
-        systemLogService.logSystemAction("UPDATE_BOOKING_STATUS", "UtilityBooking", saved.getBookingId(), oldDto, newDto, "Changed booking status to " + newStatus);
+        String logAction = (newStatus != null && newStatus == 3) ? "CANCEL_BOOKING" : "UPDATE_BOOKING_STATUS";
+        String logDesc = (newStatus != null && newStatus == 3)
+                ? "Manager cancelled booking #" + saved.getBookingId()
+                : "Changed booking status to " + newStatus;
+        systemLogService.logSystemAction(logAction, "UtilityBooking", saved.getBookingId(), oldDto, newDto, logDesc);
 
         // Send notifications when booking is Approved (1) or Rejected (2)
         if (newStatus == 1 || newStatus == 2) {

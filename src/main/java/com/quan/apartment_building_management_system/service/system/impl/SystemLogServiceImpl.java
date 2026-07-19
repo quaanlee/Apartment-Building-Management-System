@@ -192,6 +192,11 @@ public class SystemLogServiceImpl implements SystemLogService {
             }
         }
         
+        // Fallback for unauthenticated actions on accounts (e.g. Forgot Password / Reset Password)
+        if (currentUser == null && "Account".equals(entityType) && entityId != null) {
+            currentUser = accountRepository.findById(entityId).orElse(null);
+        }
+
         if (currentUser != null) {
             log.setAccount(currentUser);
         }

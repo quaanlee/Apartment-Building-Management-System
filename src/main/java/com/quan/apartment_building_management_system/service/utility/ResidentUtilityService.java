@@ -28,6 +28,7 @@ public class ResidentUtilityService {
     private final ProfileRepository profileRepository;
     private final UtilityImageRepository imageRepository;
     private final UtilityBookingService utilityBookingService;
+    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
     public ResidentUtilityService(UtilityRepository utilityRepository,
             UtilityResourceRepository resourceRepository,
@@ -36,7 +37,8 @@ public class ResidentUtilityService {
             UtilityMembershipRepository membershipRepository,
             ProfileRepository profileRepository,
             UtilityImageRepository imageRepository,
-            UtilityBookingService utilityBookingService) {
+            UtilityBookingService utilityBookingService,
+            com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.utilityRepository = utilityRepository;
         this.resourceRepository = resourceRepository;
         this.priceRepository = priceRepository;
@@ -45,14 +47,28 @@ public class ResidentUtilityService {
         this.profileRepository = profileRepository;
         this.imageRepository = imageRepository;
         this.utilityBookingService = utilityBookingService;
+        this.systemLogService = systemLogService;
     }
 
-    public List<UtilityDTO> getActiveUtilities() {
+    public List<UtilityDTO> getActiveUtilities(String query) {
+        String normalizedQuery = removeAccents(query != null ? query.trim().toLowerCase() : "");
         return utilityRepository.findAll().stream()
                 .filter(Utility::getStatus)
+                .filter(u -> {
+                    if (normalizedQuery.isEmpty()) return true;
+                    String name = u.getUtilityName() != null ? removeAccents(u.getUtilityName().toLowerCase()) : "";
+                    return name.contains(normalizedQuery);
+                })
                 .map(u -> new UtilityDTO(u.getUtilityId(), u.getUtilityName(), u.getDescription(), u.getStatus(),
                         u.getType()))
                 .collect(Collectors.toList());
+    }
+
+    private String removeAccents(String s) {
+        if (s == null) return "";
+        String temp = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD);
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(temp).replaceAll("").replace('đ', 'd').replace('Đ', 'D');
     }
 
     public UtilityDTO getUtility(Integer utilityId) {
@@ -165,13 +181,14 @@ public class ResidentUtilityService {
         } else {
             // FREE_USE
             String unitName = price.getUnit().getUnitName().toLowerCase();
-            if (unitName.contains("hour") || unitName.contains("day")) {
+            if (unitName.contains("hour") || unitName.contains("giờ") || unitName.contains("day")
+                    || unitName.contains("ngày")) {
                 UtilityBooking booking = new UtilityBooking();
                 booking.setProfile(profile);
                 booking.setResource(resource);
                 booking.setUtilityPrice(price);
                 booking.setStartTime(LocalDateTime.now());
-                if (unitName.contains("hour")) {
+                if (unitName.contains("hour") || unitName.contains("giờ")) {
                     booking.setEndTime(LocalDateTime.now().plusHours(1));
                 } else {
                     booking.setEndTime(LocalDateTime.now().plusDays(1));
@@ -187,7 +204,7 @@ public class ResidentUtilityService {
                 membership.setUtility(utility);
                 membership.setUtilityPrice(price);
                 membership.setStartDate(LocalDate.now());
-                if (unitName.contains("month")) {
+                if (unitName.contains("month") || unitName.contains("tháng")) {
                     membership.setEndDate(LocalDate.now().plusMonths(1));
                 } else {
                     membership.setEndDate(LocalDate.now().plusYears(1));
@@ -205,11 +222,11 @@ public class ResidentUtilityService {
     public UtilityBooking submitBookingByManager(BookingRequestDTO req) {
         Profile profile = profileRepository.findByPhoneNumber(req.getPhoneNumber())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy cư dân với số điện thoại này."));
-        
+
         if (profile.getAccount() == null) {
             throw new IllegalArgumentException("Cư dân này chưa có tài khoản hệ thống.");
         }
-        
+
         return submitBookingRequest(profile.getAccount().getAccountId(), req);
     }
 
@@ -227,12 +244,12 @@ public class ResidentUtilityService {
         if (!end.isAfter(start)) {
             throw new IllegalArgumentException("Thời gian kết thúc phải sau thời gian bắt đầu.");
         }
-        
+
         // Add operating hours validation (06:00 to 22:00)
         int startHour = start.getHour();
         int endHour = end.getHour();
         int endMinute = end.getMinute();
-        
+
         if (startHour < 6 || startHour >= 22 || endHour < 6 || (endHour > 22 || (endHour == 22 && endMinute > 0))) {
             throw new IllegalArgumentException("Giờ hoạt động của tiện ích là từ 06:00 đến 22:00.");
         }
@@ -305,9 +322,18 @@ public class ResidentUtilityService {
             throw new IllegalArgumentException("Only Pending bookings can be cancelled");
         }
 
+        com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO
+                .fromEntity(booking);
+
         booking.setStatus((byte) 3); // Cancelled
         booking.setCancelledAt(LocalDateTime.now());
         booking.setCancelReason(reason);
-        bookingRepository.save(booking);
+        UtilityBooking saved = bookingRepository.save(booking);
+
+        com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityBookingLogDTO
+                .fromEntity(saved);
+        String resourceName = saved.getResource() != null ? saved.getResource().getResourceName() : "Unknown";
+        systemLogService.logSystemAction("CANCEL_BOOKING", "UtilityBooking", saved.getBookingId(),
+                oldDto, newDto, "Resident cancelled booking for " + resourceName + ". Reason: " + reason);
     }
 }

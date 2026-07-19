@@ -36,9 +36,10 @@ public class ResidentUtilityController {
     }
 
     @GetMapping
-    public String listUtilities(Model model, HttpSession session) {
+    public String listUtilities(@RequestParam(required = false) String search, Model model, HttpSession session) {
         getCurrentUser(session);
-        model.addAttribute("utilities", utilityService.getActiveUtilities());
+        model.addAttribute("utilities", utilityService.getActiveUtilities(search));
+        model.addAttribute("search", search);
         return "resident/utility/list";
     }
 
@@ -55,14 +56,15 @@ public class ResidentUtilityController {
         Account user = getCurrentUser(session);
         var resource = utilityService.getResourceDetail(id);
         model.addAttribute("resource", resource);
-        
+
         // For FREE_USE, check membership
         var utility = utilityService.getUtility(resource.getUtilityId());
         if (Boolean.FALSE.equals(utility.getType())) {
             boolean hasMembership = utilityService.hasActiveMembership(user.getAccountId(), utility.getUtilityId());
             model.addAttribute("hasMembership", hasMembership);
             if (hasMembership) {
-                model.addAttribute("activeMembership", utilityService.getActiveMembership(user.getAccountId(), utility.getUtilityId()));
+                model.addAttribute("activeMembership",
+                        utilityService.getActiveMembership(user.getAccountId(), utility.getUtilityId()));
             }
         }
         model.addAttribute("utilityType", utility.getType());
@@ -71,53 +73,55 @@ public class ResidentUtilityController {
     }
 
     @GetMapping("/book/{id}")
-    public String bookResource(@PathVariable Integer id, 
-                               @RequestParam(required = false) String date,
-                               Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String bookResource(@PathVariable Integer id,
+            @RequestParam(required = false) String date,
+            Model model, HttpSession session, RedirectAttributes redirectAttributes) {
         Account user = getCurrentUser(session);
         var resource = utilityService.getResourceDetail(id);
         var utility = utilityService.getUtility(resource.getUtilityId());
-        
+
         if (Boolean.FALSE.equals(utility.getType())) {
             redirectAttributes.addFlashAttribute("errorMessage", "Tiện ích này không yêu cầu đặt trước.");
             return "redirect:/resident/utilities/resources/" + id;
         }
-        
+
         LocalDate bookingDate = (date != null && !date.isEmpty()) ? LocalDate.parse(date) : LocalDate.now();
         List<UtilityBooking> bookings = utilityService.getBookingsForDate(id, bookingDate);
-        
+
         boolean hasMembership = utilityService.hasActiveMembership(user.getAccountId(), utility.getUtilityId());
-        
+
         model.addAttribute("resource", resource);
         model.addAttribute("utility", utility);
         model.addAttribute("bookings", bookings);
         model.addAttribute("hasMembership", hasMembership);
         model.addAttribute("selectedDate", bookingDate);
-        
+
         BookingRequestDTO req = new BookingRequestDTO();
         req.setBookingDate(bookingDate);
         model.addAttribute("bookingRequest", req);
-        
+
         return "resident/utility/booking";
     }
 
     @PostMapping("/book")
-    public String submitBooking(@ModelAttribute BookingRequestDTO request, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String submitBooking(@ModelAttribute BookingRequestDTO request, HttpSession session,
+            RedirectAttributes redirectAttributes) {
         try {
             Account user = getCurrentUser(session);
             UtilityBooking booking = utilityService.submitBookingRequest(user.getAccountId(), request);
-            
+
             boolean hasMembership = utilityService.hasActiveMembership(user.getAccountId(), request.getUtilityId());
             if (!hasMembership && "ONLINE".equalsIgnoreCase(request.getPaymentMethod())) {
                 try {
                     String checkoutUrl = payOSService.createBookingPaymentLink(booking.getBookingId());
                     return "redirect:" + checkoutUrl;
                 } catch (Exception e) {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Không thể tạo link thanh toán: " + e.getMessage());
+                    redirectAttributes.addFlashAttribute("errorMessage",
+                            "Không thể tạo link thanh toán: " + e.getMessage());
                     return "redirect:/resident/utilities/resources/" + request.getResourceId();
                 }
             }
-            
+
             redirectAttributes.addFlashAttribute("successMessage", "Đăng ký sử dụng tiện ích thành công!");
             return "redirect:/resident/utilities/history";
         } catch (IllegalArgumentException e) {
@@ -139,23 +143,24 @@ public class ResidentUtilityController {
         Account user = getCurrentUser(session);
         var resource = utilityService.getResourceDetail(request.getResourceId());
         var utility = utilityService.getUtility(resource.getUtilityId());
-        
+
         LocalDate bookingDate = request.getBookingDate() != null ? request.getBookingDate() : LocalDate.now();
         List<UtilityBooking> bookings = utilityService.getBookingsForDate(request.getResourceId(), bookingDate);
         boolean hasMembership = utilityService.hasActiveMembership(user.getAccountId(), utility.getUtilityId());
-        
+
         model.addAttribute("resource", resource);
         model.addAttribute("utility", utility);
         model.addAttribute("bookings", bookings);
         model.addAttribute("hasMembership", hasMembership);
         model.addAttribute("selectedDate", bookingDate);
         model.addAttribute("bookingRequest", request);
-        
+
         String packageName = "-";
         java.math.BigDecimal total = java.math.BigDecimal.ZERO;
-        
+
         if (request.getPriceId() != null) {
-            var priceOpt = resource.getPrices().stream().filter(p -> p.getUtilityPriceId().equals(request.getPriceId())).findFirst();
+            var priceOpt = resource.getPrices().stream().filter(p -> p.getUtilityPriceId().equals(request.getPriceId()))
+                    .findFirst();
             if (priceOpt.isPresent()) {
                 var price = priceOpt.get();
                 packageName = price.getUnit().getUnitName();
@@ -168,9 +173,11 @@ public class ResidentUtilityController {
                         }
 
                         if (packageName.toLowerCase().contains("giờ") || packageName.toLowerCase().contains("hour")) {
-                            long diffMinutes = java.time.Duration.between(request.getStartTime(), request.getEndTime()).toMinutes();
+                            long diffMinutes = java.time.Duration.between(request.getStartTime(), request.getEndTime())
+                                    .toMinutes();
                             if (diffMinutes > 0) {
-                                java.math.BigDecimal hours = java.math.BigDecimal.valueOf(diffMinutes).divide(java.math.BigDecimal.valueOf(60), 2, java.math.RoundingMode.HALF_UP);
+                                java.math.BigDecimal hours = java.math.BigDecimal.valueOf(diffMinutes)
+                                        .divide(java.math.BigDecimal.valueOf(60), 2, java.math.RoundingMode.HALF_UP);
                                 total = price.getPrice().multiply(hours);
                             }
                         } else {
@@ -182,10 +189,10 @@ public class ResidentUtilityController {
                 }
             }
         }
-        
+
         model.addAttribute("calculatedPackageName", packageName);
         model.addAttribute("calculatedTotal", total);
-        
+
         return "resident/utility/booking";
     }
 
@@ -206,7 +213,8 @@ public class ResidentUtilityController {
     }
 
     @PostMapping("/cancel/{id}")
-    public String cancelBooking(@PathVariable Integer id, @RequestParam String reason, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String cancelBooking(@PathVariable Integer id, @RequestParam String reason, HttpSession session,
+            RedirectAttributes redirectAttributes) {
         try {
             Account user = getCurrentUser(session);
             utilityService.cancelBooking(user.getAccountId(), id, reason);

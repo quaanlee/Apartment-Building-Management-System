@@ -27,6 +27,25 @@
             </div>
         </div>
 
+        <!-- Filter Section -->
+        <div class="filter-section"
+            style="background-color: var(--white); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+            <form th:action="@{/resident/services}" method="get" class="filter-form"
+                style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                <div class="filter-group" style="position: relative; width: 300px; max-width: 100%;">
+                    <input type="text" name="search" th:value="${search}" placeholder="Tìm kiếm dịch vụ"
+                        style="width: 100%; padding: 10px 14px 10px 36px; border: 1px solid var(--border-color); border-radius: 6px; outline: none; transition: border-color 0.2s; box-sizing: border-box;">
+                    <i class="fa-solid fa-search"
+                        style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8;"></i>
+                </div>
+                <div class="filter-group">
+                    <button type="submit" class="btn-primary"
+                        style="padding: 10px 20px; border-radius: 6px; border: none; font-weight: 500; cursor: pointer; background-color: var(--primary-color, #6366f1); color: white;">Tìm
+                        kiếm</button>
+                </div>
+            </form>
+        </div>
+
         <!-- SERVICES GRID -->
         <div class="services-grid">
             <div class="service-card" th:each="service : ${services}">
@@ -34,12 +53,18 @@
                 <!-- Card header: icon + status/type -->
                 <div class="service-card-header">
                     <div th:class="'service-icon-box type-' + ${#strings.toLowerCase(service.serviceType)}">
-                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'electricity')}" class="fa-solid fa-bolt"></i>
-                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'water')}" class="fa-solid fa-droplet"></i>
-                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'cleaning')}" class="fa-solid fa-broom"></i>
-                        <span th:if="${#strings.equalsIgnoreCase(service.serviceType, 'parking')}" class="parking-letter">P</span>
-                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'management')}" class="fa-solid fa-building-circle-check"></i>
-                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'internet')}" class="fa-solid fa-wifi"></i>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'electricity')}"
+                            class="fa-solid fa-bolt"></i>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'water')}"
+                            class="fa-solid fa-droplet"></i>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'cleaning')}"
+                            class="fa-solid fa-broom"></i>
+                        <span th:if="${#strings.equalsIgnoreCase(service.serviceType, 'parking')}"
+                            class="parking-letter">P</span>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'management')}"
+                            class="fa-solid fa-building-circle-check"></i>
+                        <i th:if="${#strings.equalsIgnoreCase(service.serviceType, 'internet')}"
+                            class="fa-solid fa-wifi"></i>
                         <i th:if="${!#strings.equalsIgnoreCase(service.serviceType, 'electricity') and
                                      !#strings.equalsIgnoreCase(service.serviceType, 'water') and
                                      !#strings.equalsIgnoreCase(service.serviceType, 'cleaning') and
@@ -51,10 +76,10 @@
 
                     <div class="service-meta-right">
                         <span th:class="${service.status ? 'status-badge active' : 'status-badge locked'}"
-                               th:text="${service.status ? 'ĐANG HOẠT ĐỘNG' : 'TẠM KHÓA'}">ĐANG HOẠT ĐỘNG</span>
+                            th:text="${service.status ? 'ĐANG HOẠT ĐỘNG' : 'TẠM KHÓA'}">ĐANG HOẠT ĐỘNG</span>
                         <span class="service-type-label"
-                               th:classappend="'label-' + ${#strings.toLowerCase(service.serviceType)}"
-                               th:text="${#strings.toUpperCase(service.serviceType)}">ELECTRICITY</span>
+                            th:classappend="'label-' + ${#strings.toLowerCase(service.serviceType)}"
+                            th:text="${#strings.toUpperCase(service.serviceType)}">ELECTRICITY</span>
                     </div>
                 </div>
 
@@ -65,7 +90,9 @@
                 <div class="pricing-details">
                     <div class="pricing-row">
                         <span class="detail-label">Đơn giá</span>
-                        <span class="detail-value" th:text="${#numbers.formatDecimal(service.unitPrice, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</span>
+                        <span class="detail-value"
+                            th:text="${#numbers.formatDecimal(service.unitPrice, 1, 'POINT', 0, 'COMMA') + ' VNĐ'}">0
+                            VNĐ</span>
                     </div>
                     <div class="pricing-row">
                         <span class="detail-label">Đơn vị tính</span>
@@ -74,13 +101,16 @@
                 </div>
 
                 <!-- Description -->
-                <p class="service-desc" th:text="${service.description}" style="font-size: 13px; color: var(--text-secondary); margin-top: 12px; line-height: 1.5;"></p>
+                <p class="service-desc" th:text="${service.description}"
+                    style="font-size: 13px; color: var(--text-secondary); margin-top: 12px; line-height: 1.5;"></p>
             </div>
         </div>
 
         <!-- Empty state -->
-        <div class="no-results-card" th:if="${#lists.isEmpty(services)}" style="text-align: center; padding: 48px; background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-top: 24px;">
-            <i class="fa-solid fa-box-open" style="font-size: 48px; color: var(--text-secondary); margin-bottom: 16px;"></i>
+        <div class="no-results-card" th:if="${#lists.isEmpty(services)}"
+            style="text-align: center; padding: 48px; background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-top: 24px;">
+            <i class="fa-solid fa-box-open"
+                style="font-size: 48px; color: var(--text-secondary); margin-bottom: 16px;"></i>
             <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary);">Không tìm thấy dịch vụ nào</h3>
         </div>
 

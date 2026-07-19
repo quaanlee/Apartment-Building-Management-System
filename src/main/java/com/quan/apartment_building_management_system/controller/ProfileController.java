@@ -47,7 +47,7 @@ public class ProfileController {
         return (Account) session.getAttribute("currentUser");
     }
 
-    @GetMapping("admin/profile/profile")
+    @GetMapping("/admin/profile")
     public String adminProfile(@RequestParam(value = "tab", defaultValue = "personal") String tab, HttpSession session,
             Model model) {
         return showProfile(session, model, "admin", tab);
@@ -245,7 +245,8 @@ public class ProfileController {
                     if (userDto.getAvatarUrl() != null)
                         p.setAvatarUrl(userDto.getAvatarUrl());
                     profileService.save(p);
-                    systemLogService.logSystemAction("UPDATE_PROFILE", "Profile", p.getProfileId(), oldDto, new UserDTO(p), "Updated personal profile");
+                    systemLogService.logSystemAction("UPDATE_PROFILE", "Profile", p.getProfileId(), oldDto,
+                            new UserDTO(p), "Updated personal profile");
                 }
             } else {
                 Optional<EmployeeProfile> opt = employeeProfileService.findByAccountId(user.getAccountId());
@@ -265,7 +266,8 @@ public class ProfileController {
                     if (userDto.getAvatarUrl() != null)
                         ep.setAvatarUrl(userDto.getAvatarUrl());
                     employeeProfileService.save(ep);
-                    systemLogService.logSystemAction("UPDATE_EMPLOYEE_PROFILE", "EmployeeProfile", ep.getEmployeeProfileId(), oldDto, new UserDTO(ep), "Updated personal employee profile");
+                    systemLogService.logSystemAction("UPDATE_EMPLOYEE_PROFILE", "EmployeeProfile",
+                            ep.getEmployeeProfileId(), oldDto, new UserDTO(ep), "Updated personal employee profile");
                 }
             }
 
@@ -295,7 +297,6 @@ public class ProfileController {
         // Re-fetch account from DB to ensure lazy associations (role) are loaded
         Account resolvedUser = accountService.findById(user.getAccountId()).orElse(user);
         String redirectUrl = getProfileRedirectUrl(resolvedUser);
-
 
         if (!newPassword.equals(confirmPassword)) {
             ra.addFlashAttribute("message", "Mật khẩu mới không khớp!");
@@ -336,7 +337,7 @@ public class ProfileController {
             return "/login";
         String role = user.getRole().getRoleName().toUpperCase();
         if (role.contains("ADMIN"))
-            return "admin/profile/profile";
+            return "/admin/profile";
         if (role.contains("MANAGER"))
             return "/manager/my-profile";
         if (role.contains("MAINTENANCE"))

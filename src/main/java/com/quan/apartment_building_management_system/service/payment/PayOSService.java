@@ -175,9 +175,9 @@ public class PayOSService {
         membership.setStartDate(LocalDate.now());
 
         String unitName = price.getUnit().getUnitName().toLowerCase();
-        if (unitName.contains("hour") || unitName.contains("day")) {
+        if (unitName.contains("hour") || unitName.contains("giờ") || unitName.contains("day") || unitName.contains("ngày")) {
             membership.setEndDate(LocalDate.now());
-        } else if (unitName.contains("month")) {
+        } else if (unitName.contains("month") || unitName.contains("tháng")) {
             membership.setEndDate(LocalDate.now().plusMonths(1));
         } else {
             membership.setEndDate(LocalDate.now().plusYears(1));

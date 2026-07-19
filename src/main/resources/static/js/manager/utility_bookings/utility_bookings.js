@@ -20,10 +20,10 @@
   const STATUS = { PENDING: 0, APPROVED: 1, REJECTED: 2, CANCELLED: 3 };
 
   const STATUS_LABEL = {
-    0: 'Pending',
-    1: 'Approved',
-    2: 'Rejected',
-    3: 'Cancelled',
+    0: 'Chờ duyệt',
+    1: 'Đã duyệt',
+    2: 'Từ chối',
+    3: 'Đã hủy',
   };
 
   const STATUS_CLASS = {
@@ -79,19 +79,19 @@
       .then(r => r.json())
       .then(resp => {
         if (resp.success) {
-          showToast(`Auto Approve has been turned ${enabled ? 'ON' : 'OFF'}`, 'success');
+          showToast(`Tự động duyệt đã được ${enabled ? 'BẬT' : 'TẮT'}`, 'success');
           if (enabled) {
               // Reload page to reflect newly approved bookings
               setTimeout(() => location.reload(), 1500);
           }
         } else {
           toggle.checked = !enabled; // revert
-          showToast(resp.message || 'Operation failed.', 'error');
+          showToast(resp.message || 'Thao tác thất bại.', 'error');
         }
       })
       .catch(() => {
         toggle.checked = !enabled; // revert
-        showToast('Network error. Please try again.', 'error');
+        showToast('Lỗi mạng. Vui lòng thử lại.', 'error');
       });
     });
   }
@@ -249,7 +249,7 @@
         modal.innerHTML = buildDetailModalContent(resp.data);
         bindDetailModalActions(resp.data);
       })
-      .catch(() => { modal.innerHTML = '<p style="padding:24px;color:red">Failed to load booking details.</p>'; });
+      .catch(() => { modal.innerHTML = '<p style="padding:24px;color:red">Không thể tải chi tiết đặt lịch.</p>'; });
   }
 
   function buildDetailModalContent(d) {
@@ -263,7 +263,7 @@
         <div class="ub-detail-title-row">
           <div class="ub-detail-icon"><i class="fas fa-calendar-check"></i></div>
           <div>
-            <div class="ub-detail-title">Booking Details – #BB${String(d.bookingId).padStart(3,'0')}</div>
+            <div class="ub-detail-title">Chi tiết đặt lịch – #BB${String(d.bookingId).padStart(3,'0')}</div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
@@ -275,36 +275,36 @@
       <div class="ub-detail-body">
         <!-- Resident Information -->
         <div class="ub-detail-section">
-          <div class="ub-detail-section-title"><i class="fas fa-user"></i> Resident Information</div>
+          <div class="ub-detail-section-title"><i class="fas fa-user"></i> Thông tin Cư dân</div>
           <div class="ub-detail-info-grid">
-            <div class="ub-detail-field"><label>Full Name</label><span>${esc(d.residentFullName || '—')}</span></div>
-            <div class="ub-detail-field"><label>Phone</label><span>${esc(d.residentPhone || '—')}</span></div>
+            <div class="ub-detail-field"><label>Họ và tên</label><span>${esc(d.residentFullName || '—')}</span></div>
+            <div class="ub-detail-field"><label>Số điện thoại</label><span>${esc(d.residentPhone || '—')}</span></div>
             <div class="ub-detail-field"><label>Email</label><span>${esc(d.residentEmail || '—')}</span></div>
           </div>
         </div>
 
         <!-- Booking Information -->
         <div class="ub-detail-section">
-          <div class="ub-detail-section-title"><i class="fas fa-calendar-alt"></i> Booking Information</div>
+          <div class="ub-detail-section-title"><i class="fas fa-calendar-alt"></i> Thông tin Đặt lịch</div>
           <div class="ub-detail-info-grid">
-            <div class="ub-detail-field"><label>Utility</label><span>${esc(d.utilityName || '—')}</span></div>
-            <div class="ub-detail-field"><label>Location</label><span>${esc(d.resourceLocation || d.resourceName || '—')}</span></div>
-            <div class="ub-detail-field"><label>Start Time</label><span>${esc(d.startTime || '—')}</span></div>
-            <div class="ub-detail-field"><label>Duration</label><span>${d.durationHours} ${d.durationHours === 1 ? 'Hour' : 'Hours'}</span></div>
-            <div class="ub-detail-field"><label>Created At</label><span>${esc(d.createdAt || '—')}</span></div>
+            <div class="ub-detail-field"><label>Tiện ích</label><span>${esc(d.utilityName || '—')}</span></div>
+            <div class="ub-detail-field"><label>Vị trí</label><span>${esc(d.resourceLocation || d.resourceName || '—')}</span></div>
+            <div class="ub-detail-field"><label>Thời gian bắt đầu</label><span>${esc(d.startTime || '—')}</span></div>
+            <div class="ub-detail-field"><label>Thời lượng</label><span>${d.durationHours} ${d.durationHours === 1 ? 'Giờ' : 'Giờ'}</span></div>
+            <div class="ub-detail-field"><label>Ngày tạo</label><span>${esc(d.createdAt || '—')}</span></div>
           </div>
         </div>
 
         <!-- Payment Details -->
         <div class="ub-detail-section">
-          <div class="ub-detail-section-title"><i class="fas fa-credit-card"></i> Payment Details</div>
+          <div class="ub-detail-section-title"><i class="fas fa-credit-card"></i> Thông tin Thanh toán</div>
           <div class="ub-detail-info-grid">
-            <div class="ub-detail-field"><label>Status</label>
-              <span><span class="ub-payment-pill ${payClass}">${esc(d.paymentStatus)}</span></span>
+            <div class="ub-detail-field"><label>Trạng thái</label>
+              <span><span class="ub-payment-pill ${payClass}">${esc(d.paymentStatus === 'Paid' ? 'Đã thanh toán' : (d.paymentStatus === 'Unpaid' ? 'Chưa thanh toán' : d.paymentStatus))}</span></span>
             </div>
-            <div class="ub-detail-field"><label>Amount</label><span>${d.amount != null ? '$' + parseFloat(d.amount).toFixed(2) : '—'}</span></div>
-            <div class="ub-detail-field"><label>Transaction ID</label><span>${esc(d.transactionCode || '—')}</span></div>
-            <div class="ub-detail-field"><label>Approved By</label><span>${esc(d.approvedByName || '—')}</span></div>
+            <div class="ub-detail-field"><label>Số tiền</label><span>${d.amount != null ? parseFloat(d.amount).toLocaleString('vi-VN') + ' đ' : '—'}</span></div>
+            <div class="ub-detail-field"><label>Mã giao dịch</label><span>${esc(d.transactionCode || '—')}</span></div>
+            <div class="ub-detail-field"><label>Người duyệt</label><span>${esc(d.approvedByName || '—')}</span></div>
           </div>
         </div>
       </div>
@@ -320,20 +320,20 @@
     if (s === STATUS.PENDING) {
       return `
         <button type="button" class="ub-btn ub-btn-detail-approve" data-action="approve" data-id="${id}">
-          <i class="fas fa-check" style="margin-right:6px"></i>Approve
+          <i class="fas fa-check" style="margin-right:6px"></i>Duyệt
         </button>
         <button type="button" class="ub-btn ub-btn-detail-reject" data-action="reject" data-id="${id}">
-          <i class="fas fa-times" style="margin-right:6px"></i>Reject
+          <i class="fas fa-times" style="margin-right:6px"></i>Từ chối
         </button>`;
     }
     if (s === STATUS.APPROVED) {
       return `<button type="button" class="ub-btn ub-btn-detail-cancel" data-action="cancel" data-id="${id}">
-                <i class="fas fa-ban"></i> Cancel Approval
+                <i class="fas fa-ban"></i> Hủy Duyệt
               </button>`;
     }
     if (s === STATUS.REJECTED) {
       return `<button type="button" class="ub-btn ub-btn-detail-cancel" data-action="cancel" data-id="${id}">
-                <i class="fas fa-ban"></i> Cancel Rejection
+                <i class="fas fa-ban"></i> Hủy Từ chối
               </button>`;
     }
     return ''; // Cancelled: no buttons
@@ -383,30 +383,30 @@
 
     modal.innerHTML = `
       <div class="ub-confirm-body">
-        <div class="ub-confirm-tag">Review Action</div>
+        <div class="ub-confirm-tag">Xác nhận thao tác</div>
         <div class="ub-confirm-title">${config.title}</div>
         <div class="ub-confirm-desc">${config.desc}</div>
         <div class="ub-confirm-card">
           <div class="ub-confirm-field">
-            <label>Resident</label>
+            <label>Cư dân</label>
             <span><i class="fas fa-user"></i>${esc(d.residentFullName || '—')}</span>
           </div>
           <div class="ub-confirm-field">
-            <label>Utility</label>
+            <label>Tiện ích</label>
             <span><i class="fas fa-dumbbell"></i>${esc(d.utilityName || '—')}</span>
           </div>
           <div class="ub-confirm-field">
-            <label>Date</label>
+            <label>Ngày</label>
             <span><i class="fas fa-calendar"></i>${esc((d.startTime || '').split('·')[0].trim())}</span>
           </div>
           <div class="ub-confirm-field">
-            <label>Time Slot</label>
+            <label>Khung giờ</label>
             <span><i class="fas fa-clock"></i>${extractTimeSlot(d)}</span>
           </div>
         </div>
       </div>
       <div class="ub-confirm-footer">
-        <button type="button" class="ub-btn-cancel-plain" id="ubConfirmCancel">Cancel</button>
+        <button type="button" class="ub-btn-cancel-plain" id="ubConfirmCancel">Hủy bỏ</button>
         <button type="button" class="${config.btnClass}" id="ubConfirmProceed">${config.btnLabel}</button>
       </div>`;
 
@@ -421,11 +421,11 @@
     if (newStatus === STATUS.PENDING) {
       const isApproved = (curr === STATUS.APPROVED);
       return {
-        title: isApproved ? 'Cancel Approval' : 'Cancel Rejection',
+        title: isApproved ? 'Hủy Duyệt' : 'Hủy Từ chối',
         desc: isApproved 
-          ? 'You are about to cancel the approval for this utility booking. The status will return to pending.'
-          : 'You are about to cancel the rejection for this utility booking. The status will return to pending.',
-        btnLabel: 'Confirm Cancel',
+          ? 'Bạn sắp hủy trạng thái đã duyệt cho lịch đặt này. Trạng thái sẽ quay về chờ duyệt.'
+          : 'Bạn sắp hủy trạng thái từ chối cho lịch đặt này. Trạng thái sẽ quay về chờ duyệt.',
+        btnLabel: 'Xác nhận',
         btnClass: 'ub-btn-confirm-cancel',
       };
     }
@@ -433,20 +433,20 @@
     switch (newStatus) {
       case STATUS.APPROVED:
         return {
-          title: 'Confirm Approval',
-          desc: 'Please verify the following utility booking details before final approval. This action will notify the resident and finalize the schedule.',
-          btnLabel: 'Confirm Approval',
+          title: 'Xác nhận Duyệt',
+          desc: 'Vui lòng kiểm tra lại thông tin trước khi duyệt. Thao tác này sẽ thông báo cho cư dân và chốt lịch đặt.',
+          btnLabel: 'Xác nhận Duyệt',
           btnClass: 'ub-btn-confirm-approve',
         };
       case STATUS.REJECTED:
         return {
-          title: 'Confirm Rejection',
-          desc: 'Please verify the following utility booking details before rejecting. The resident will be notified of this decision.',
-          btnLabel: 'Confirm Rejection',
+          title: 'Xác nhận Từ chối',
+          desc: 'Vui lòng kiểm tra lại thông tin trước khi từ chối. Cư dân sẽ được thông báo về quyết định này.',
+          btnLabel: 'Xác nhận Từ chối',
           btnClass: 'ub-btn-confirm-reject',
         };
       default:
-        return { title: 'Confirm Action', desc: '', btnLabel: 'Confirm', btnClass: 'ub-btn-confirm-approve' };
+        return { title: 'Xác nhận Thao tác', desc: '', btnLabel: 'Xác nhận', btnClass: 'ub-btn-confirm-approve' };
     }
   }
 
@@ -463,11 +463,11 @@
     pendingAction = null;
   }
 
-  function executePendingAction() {
+    function executePendingAction() {
     if (!pendingAction) return;
     const { bookingId, newStatus } = pendingAction;
     const proceedBtn = document.getElementById('ubConfirmProceed');
-    if (proceedBtn) { proceedBtn.disabled = true; proceedBtn.textContent = 'Processing…'; }
+    if (proceedBtn) { proceedBtn.disabled = true; proceedBtn.textContent = 'Đang xử lý…'; }
 
     const body = new URLSearchParams();
     body.set('status', newStatus);
@@ -480,10 +480,10 @@
           // Simply reload the page to refresh the backend-rendered list and statistics
           window.location.reload();
         } else {
-          showToast(resp.message || 'Operation failed.', 'error');
+          showToast(resp.message || 'Thao tác thất bại.', 'error');
         }
       })
-      .catch(() => { closeConfirmModal(); showToast('Network error. Please try again.', 'error'); });
+      .catch(() => { closeConfirmModal(); showToast('Lỗi mạng. Vui lòng thử lại.', 'error'); });
   }
 
   // ── Confirm modal overlay close on outside click ─────────────────────────────
