@@ -75,17 +75,15 @@
 
                     <div class="package-cards" style="display: flex; gap: 16px; align-items: stretch;">
                         <div th:each="price, iterStat : ${resource.prices}" style="flex: 1;">
-                            <input type="radio" name="priceId" th:value="${price.utilityPriceId}" class="package-input"
-                                style="display: none;" th:id="${'price_' + price.utilityPriceId}"
-                                th:checked="${iterStat.index == 0}">
-                            <label class="package-card" th:for="${'price_' + price.utilityPriceId}"
-                                style="display: block; height: 100%; pointer-events: none; cursor: default; margin: 0; box-sizing: border-box; border: 1px solid var(--border-color) !important; box-shadow: none !important;">
+                            <input th:if="${iterStat.index == 0}" type="hidden" name="priceId" th:value="${price.utilityPriceId}">
+                            <div class="package-card"
+                                style="display: block; height: 100%; margin: 0; box-sizing: border-box; border: 1px solid var(--primary-color) !important; box-shadow: none !important; background-color: #f8fafc;">
                                 <h6 th:text="${price.unit.unitName}">Package Name</h6>
                                 <div class="price"
                                     th:text="${#numbers.formatDecimal(price.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
                                     Price</div>
                                 <p>Gói sử dụng tiêu chuẩn.</p>
-                            </label>
+                            </div>
                         </div>
                     </div>
 
@@ -273,15 +271,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            try {
-                // Find the first radio input and mark it checked to ensure it's selected
-                const firstPriceInput = document.querySelector('input[type="radio"].package-input');
-                if (firstPriceInput && !document.querySelector('input[type="radio"].package-input:checked')) {
-                    firstPriceInput.checked = true;
-                }
-            } catch (e) {
-                console.error("Error on DOMContentLoaded", e);
-            }
+            // Document loaded
         });
 
         function reloadWithDate() {

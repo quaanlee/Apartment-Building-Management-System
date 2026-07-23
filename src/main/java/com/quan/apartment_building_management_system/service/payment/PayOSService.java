@@ -175,7 +175,8 @@ public class PayOSService {
         membership.setStartDate(LocalDate.now());
 
         String unitName = price.getUnit().getUnitName().toLowerCase();
-        if (unitName.contains("hour") || unitName.contains("giờ") || unitName.contains("day") || unitName.contains("ngày")) {
+        if (unitName.contains("hour") || unitName.contains("giờ") || unitName.contains("day")
+                || unitName.contains("ngày")) {
             membership.setEndDate(LocalDate.now());
         } else if (unitName.contains("month") || unitName.contains("tháng")) {
             membership.setEndDate(LocalDate.now().plusMonths(1));
@@ -206,7 +207,7 @@ public class PayOSService {
                 .price(amount)
                 .build();
 
-        long expiredAt = (System.currentTimeMillis() / 1000L) + (2 * 60);
+        long expiredAt = (System.currentTimeMillis() / 1000L) + (1 * 60); // 1 minute demooo
 
         CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
                 .orderCode(orderCode)
@@ -360,15 +361,18 @@ public class PayOSService {
                 booking.setPaymentStatus(true);
                 // Status remains unchanged (e.g. 0 - Pending) so manager can approve it later
                 utilityBookingRepository.save(booking);
-                
+
                 // Send notifications (In-app and Email)
                 Account residentAccount = booking.getProfile() != null ? booking.getProfile().getAccount() : null;
                 if (residentAccount != null) {
                     sendBookingSuccessNotification(residentAccount, booking);
                     if (booking.getProfile().getEmail() != null && !booking.getProfile().getEmail().isEmpty()) {
-                        String resourceName = booking.getResource() != null ? booking.getResource().getResourceName() : "Tiện ích";
-                        String amount = String.format("%,.0f", booking.getTotalPrice() != null ? booking.getTotalPrice() : 0.0);
-                        notificationService.sendBookingSuccessEmail(booking.getProfile().getEmail(), resourceName, booking.getStartTime().toString(), amount);
+                        String resourceName = booking.getResource() != null ? booking.getResource().getResourceName()
+                                : "Tiện ích";
+                        String amount = String.format("%,.0f",
+                                booking.getTotalPrice() != null ? booking.getTotalPrice() : 0.0);
+                        notificationService.sendBookingSuccessEmail(booking.getProfile().getEmail(), resourceName,
+                                booking.getStartTime().toString(), amount);
                     }
                 }
             });
@@ -380,8 +384,8 @@ public class PayOSService {
                 return;
             }
 
-            com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO oldDto =
-                    com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO.fromEntity(payment);
+            com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO
+                    .fromEntity(payment);
 
             payment.setStatus((byte) 1);
             payment.setPaymentDate(LocalDateTime.now());
@@ -400,8 +404,8 @@ public class PayOSService {
 
             paymentRepository.save(payment);
 
-            com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO newDto =
-                    com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO.fromEntity(payment);
+            com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.PaymentLogDTO
+                    .fromEntity(payment);
             systemLogService.logSystemAction("PAYMENT_BILL", "Payment", payment.getPaymentId(), oldDto, newDto,
                     "Bill payment completed for bill #" + (bill != null ? bill.getBillId() : "?"));
         });
@@ -442,7 +446,8 @@ public class PayOSService {
         }
     }
 
-    private void sendBookingSuccessNotification(Account residentAccount, com.quan.apartment_building_management_system.entity.UtilityBooking booking) {
+    private void sendBookingSuccessNotification(Account residentAccount,
+            com.quan.apartment_building_management_system.entity.UtilityBooking booking) {
         try {
             Account sender = accountRepository.findById(1).orElse(residentAccount);
 

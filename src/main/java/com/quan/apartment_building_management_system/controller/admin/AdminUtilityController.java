@@ -41,13 +41,13 @@ public class AdminUtilityController {
     private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
 
     public AdminUtilityController(UtilityService utilityService,
-                                  UtilityResourceService utilityResourceService,
-                                  UtilityPriceService utilityPriceService,
-                                  UnitService unitService,
-                                  AdminUtilityDTOHandler dtoHandler,
-                                  CloudinaryUploadService cloudinaryUploadService,
-                                  UtilityImageService utilityImageService,
-                                  com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
+            UtilityResourceService utilityResourceService,
+            UtilityPriceService utilityPriceService,
+            UnitService unitService,
+            AdminUtilityDTOHandler dtoHandler,
+            CloudinaryUploadService cloudinaryUploadService,
+            UtilityImageService utilityImageService,
+            com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
         this.utilityService = utilityService;
         this.utilityResourceService = utilityResourceService;
         this.utilityPriceService = utilityPriceService;
@@ -60,13 +60,13 @@ public class AdminUtilityController {
 
     @GetMapping
     public String listUtilities(@RequestParam(value = "query", required = false) String query,
-                                @RequestParam(value = "status", required = false) String status,
-                                @RequestParam(value = "statusFilter", required = false) String statusFilter,
-                                @RequestParam(value = "page", defaultValue = "1") int page,
-                                @RequestParam(value = "size", defaultValue = "5") int size,
-                                @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                                @RequestParam(value = "priceQuery", required = false) String priceQuery,
-                                Model model) {
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "statusFilter", required = false) String statusFilter,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size,
+            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+            @RequestParam(value = "priceQuery", required = false) String priceQuery,
+            Model model) {
         List<Utility> allUtilities = utilityService.searchUtilities(query);
 
         String activeStatus = "all";
@@ -100,8 +100,11 @@ public class AdminUtilityController {
         if (priceQuery != null && !priceQuery.trim().isEmpty()) {
             String pq = priceQuery.trim().toLowerCase();
             allPrices = utilityPriceService.findAll().stream()
-                    .filter(price -> (price.getResource() != null && price.getResource().getUtility() != null && price.getResource().getUtility().getUtilityName() != null && price.getResource().getUtility().getUtilityName().toLowerCase().contains(pq)) ||
-                                     (price.getUnit() != null && price.getUnit().getUnitName() != null && price.getUnit().getUnitName().toLowerCase().contains(pq)))
+                    .filter(price -> (price.getResource() != null && price.getResource().getUtility() != null
+                            && price.getResource().getUtility().getUtilityName() != null
+                            && price.getResource().getUtility().getUtilityName().toLowerCase().contains(pq)) ||
+                            (price.getUnit() != null && price.getUnit().getUnitName() != null
+                                    && price.getUnit().getUnitName().toLowerCase().contains(pq)))
                     .toList();
         } else {
             allPrices = utilityPriceService.findAll();
@@ -135,14 +138,14 @@ public class AdminUtilityController {
 
     @GetMapping("/{id}")
     public String viewUtilityDetails(@PathVariable("id") Integer id,
-                                     @RequestParam(value = "query", required = false) String query,
-                                     @RequestParam(value = "status", required = false) String status,
-                                     @RequestParam(value = "statusFilter", required = false) String statusFilter,
-                                     @RequestParam(value = "page", defaultValue = "1") int page,
-                                     @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                                     @RequestParam(value = "priceQuery", required = false) String priceQuery,
-                                     Model model,
-                                     RedirectAttributes redirectAttributes) {
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "statusFilter", required = false) String statusFilter,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+            @RequestParam(value = "priceQuery", required = false) String priceQuery,
+            Model model,
+            RedirectAttributes redirectAttributes) {
         Utility utility = utilityService.findById(id).orElse(null);
         if (utility == null) {
             redirectAttributes.addFlashAttribute("message", "Không tìm thấy tiện ích.");
@@ -169,20 +172,22 @@ public class AdminUtilityController {
 
     @PostMapping("/save")
     public String saveUtility(@ModelAttribute("newUtility") UtilityDTO utilityDTO,
-                              @RequestParam(value = "resourceName", required = false) String resourceName,
-                              @RequestParam(value = "resourceDescription", required = false) String resourceDescription,
-                              @RequestParam(value = "resourceLocation", required = false) String resourceLocation,
-                              @RequestParam(value = "primaryImage", required = false) MultipartFile primaryImage,
-                              @RequestParam(value = "secondaryImages", required = false) List<MultipartFile> secondaryImages,
-                              @RequestParam(value = "utilityImage", required = false) MultipartFile utilityImage,
-                              @RequestParam(value = "query", required = false) String query,
-                              @RequestParam(value = "statusFilter", required = false) String statusFilter,
-                              @RequestParam(value = "page", defaultValue = "1") int page,
-                              @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                              @RequestParam(value = "priceQuery", required = false) String priceQuery,
-                              RedirectAttributes redirectAttributes) {
-        if (utilityDTO.getUtilityName() == null || utilityDTO.getUtilityName().trim().isEmpty() || utilityDTO.getUtilityName().trim().length() > 100) {
-            redirectAttributes.addFlashAttribute("message", "Tên tiện ích không được để trống và phải ít hơn 100 ký tự.");
+            @RequestParam(value = "resourceName", required = false) String resourceName,
+            @RequestParam(value = "resourceDescription", required = false) String resourceDescription,
+            @RequestParam(value = "resourceLocation", required = false) String resourceLocation,
+            @RequestParam(value = "primaryImage", required = false) MultipartFile primaryImage,
+            @RequestParam(value = "secondaryImages", required = false) List<MultipartFile> secondaryImages,
+            @RequestParam(value = "utilityImage", required = false) MultipartFile utilityImage,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "statusFilter", required = false) String statusFilter,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+            @RequestParam(value = "priceQuery", required = false) String priceQuery,
+            RedirectAttributes redirectAttributes) {
+        if (utilityDTO.getUtilityName() == null || utilityDTO.getUtilityName().trim().isEmpty()
+                || utilityDTO.getUtilityName().trim().length() > 100) {
+            redirectAttributes.addFlashAttribute("message",
+                    "Tên tiện ích không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             redirectAttributes.addAttribute("query", query);
             redirectAttributes.addAttribute("statusFilter", statusFilter);
@@ -191,7 +196,8 @@ public class AdminUtilityController {
             redirectAttributes.addAttribute("priceQuery", priceQuery);
             return "redirect:/admin/utilities";
         }
-        if (utilityDTO.getDescription() == null || utilityDTO.getDescription().trim().isEmpty() || utilityDTO.getDescription().trim().length() > 100) {
+        if (utilityDTO.getDescription() == null || utilityDTO.getDescription().trim().isEmpty()
+                || utilityDTO.getDescription().trim().length() > 100) {
             redirectAttributes.addFlashAttribute("message", "Mô tả không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             redirectAttributes.addAttribute("query", query);
@@ -205,21 +211,25 @@ public class AdminUtilityController {
         if (utilityDTO.getUtilityId() != null) {
             // Edit mode
             utilityService.findById(utilityDTO.getUtilityId()).ifPresent(existing -> {
-                com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO.fromEntity(existing);
+                com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO
+                        .fromEntity(existing);
                 dtoHandler.updateEntityFromDTO(utilityDTO, existing);
                 if (utilityImage != null && !utilityImage.isEmpty()) {
                     try {
                         String mainUrl = cloudinaryUploadService.uploadUtilityImage(utilityImage);
                         existing.setImageUrl(mainUrl);
                     } catch (Exception e) {
-                        redirectAttributes.addFlashAttribute("message", "Không tải được ảnh chính tiện ích: " + e.getMessage());
+                        redirectAttributes.addFlashAttribute("message",
+                                "Không tải được ảnh chính tiện ích: " + e.getMessage());
                         redirectAttributes.addFlashAttribute("messageType", "error");
                     }
                 }
                 utilityService.save(existing);
-                com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO.fromEntity(existing);
-                systemLogService.logSystemAction("UPDATE_UTILITY", "Utility", existing.getUtilityId(), oldDto, newDto, "Updated utility " + existing.getUtilityName());
-                
+                com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO
+                        .fromEntity(existing);
+                systemLogService.logSystemAction("UPDATE_UTILITY", "Utility", existing.getUtilityId(), oldDto, newDto,
+                        "Updated utility " + existing.getUtilityName());
+
                 redirectAttributes.addFlashAttribute("message", "Cập nhật tiện ích thành công!");
                 redirectAttributes.addFlashAttribute("messageType", "success");
             });
@@ -230,7 +240,7 @@ public class AdminUtilityController {
                 redirectAttributes.addFlashAttribute("messageType", "error");
                 return "redirect:/admin/utilities";
             }
-            
+
             try {
                 String mainUrl = cloudinaryUploadService.uploadUtilityImage(utilityImage);
                 utilityDTO.setImageUrl(mainUrl);
@@ -242,11 +252,14 @@ public class AdminUtilityController {
 
             Utility utility = dtoHandler.toEntity(utilityDTO);
             utilityService.save(utility);
-            
-            com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO.fromEntity(utility);
-            systemLogService.logSystemAction("CREATE_UTILITY", "Utility", utility.getUtilityId(), null, newDto, "Created utility " + utility.getUtilityName());
 
-            redirectAttributes.addFlashAttribute("message", "Thêm tiện ích mới thành công! Bạn có thể thêm tài nguyên cho tiện ích này.");
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO
+                    .fromEntity(utility);
+            systemLogService.logSystemAction("CREATE_UTILITY", "Utility", utility.getUtilityId(), null, newDto,
+                    "Created utility " + utility.getUtilityName());
+
+            redirectAttributes.addFlashAttribute("message",
+                    "Thêm tiện ích mới thành công! Bạn có thể thêm tài nguyên cho tiện ích này.");
             redirectAttributes.addFlashAttribute("messageType", "success");
         }
         redirectAttributes.addAttribute("query", query);
@@ -259,19 +272,22 @@ public class AdminUtilityController {
 
     @PostMapping("/toggle-status/{id}")
     public String toggleStatus(@PathVariable("id") Integer id,
-                               @RequestParam(value = "query", required = false) String query,
-                               @RequestParam(value = "statusFilter", required = false) String statusFilter,
-                               @RequestParam(value = "page", defaultValue = "1") int page,
-                               @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                               @RequestParam(value = "priceQuery", required = false) String priceQuery,
-                               RedirectAttributes redirectAttributes) {
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "statusFilter", required = false) String statusFilter,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+            @RequestParam(value = "priceQuery", required = false) String priceQuery,
+            RedirectAttributes redirectAttributes) {
         utilityService.findById(id).ifPresent(u -> {
-            com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO.fromEntity(u);
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO
+                    .fromEntity(u);
             u.setStatus(!u.getStatus());
             utilityService.save(u);
-            
-            com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO.fromEntity(u);
-            systemLogService.logSystemAction("UPDATE_UTILITY", "Utility", u.getUtilityId(), oldDto, newDto, "Toggled status for utility " + u.getUtilityName());
+
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO
+                    .fromEntity(u);
+            systemLogService.logSystemAction("UPDATE_UTILITY", "Utility", u.getUtilityId(), oldDto, newDto,
+                    "Toggled status for utility " + u.getUtilityName());
 
             redirectAttributes.addFlashAttribute("message", "Cập nhật trạng thái tiện ích thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
@@ -286,20 +302,21 @@ public class AdminUtilityController {
 
     @PostMapping("/add-resource")
     public String addResource(@RequestParam("utilityId") Integer utilityId,
-                              @RequestParam("resourceName") String resourceName,
-                              @RequestParam(value = "resourceDescription", required = false) String resourceDescription,
-                              @RequestParam("resourceLocation") String location,
-                              @RequestParam(value = "primaryImage", required = false) MultipartFile primaryImage,
-                              @RequestParam(value = "secondaryImages", required = false) List<MultipartFile> secondaryImages,
-                              @RequestParam(value = "status", defaultValue = "true") Boolean status,
-                              @RequestParam(value = "query", required = false) String query,
-                              @RequestParam(value = "statusFilter", required = false) String statusFilter,
-                              @RequestParam(value = "page", defaultValue = "1") int page,
-                              @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                              @RequestParam(value = "priceQuery", required = false) String priceQuery,
-                              RedirectAttributes redirectAttributes) {
+            @RequestParam("resourceName") String resourceName,
+            @RequestParam(value = "resourceDescription", required = false) String resourceDescription,
+            @RequestParam("resourceLocation") String location,
+            @RequestParam(value = "primaryImage", required = false) MultipartFile primaryImage,
+            @RequestParam(value = "secondaryImages", required = false) List<MultipartFile> secondaryImages,
+            @RequestParam(value = "status", defaultValue = "true") Boolean status,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "statusFilter", required = false) String statusFilter,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+            @RequestParam(value = "priceQuery", required = false) String priceQuery,
+            RedirectAttributes redirectAttributes) {
         if (resourceName == null || resourceName.trim().isEmpty() || resourceName.trim().length() > 100) {
-            redirectAttributes.addFlashAttribute("message", "Tên tài nguyên không được để trống và phải ít hơn 100 ký tự.");
+            redirectAttributes.addFlashAttribute("message",
+                    "Tên tài nguyên không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             redirectAttributes.addAttribute("query", query);
             redirectAttributes.addAttribute("statusFilter", statusFilter);
@@ -309,7 +326,8 @@ public class AdminUtilityController {
             return "redirect:/admin/utilities/" + utilityId;
         }
         if (location == null || location.trim().isEmpty() || location.trim().length() > 100) {
-            redirectAttributes.addFlashAttribute("message", "Vị trí tài nguyên không được để trống và phải ít hơn 100 ký tự.");
+            redirectAttributes.addFlashAttribute("message",
+                    "Vị trí tài nguyên không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             redirectAttributes.addAttribute("query", query);
             redirectAttributes.addAttribute("statusFilter", statusFilter);
@@ -336,9 +354,11 @@ public class AdminUtilityController {
             resource = utilityResourceService.save(resource);
             try {
                 saveResourceImages(resource, primaryImage, secondaryImages);
-                
-                com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO.fromEntity(resource);
-                systemLogService.logSystemAction("CREATE_UTILITY_RESOURCE", "UtilityResource", resource.getResourceId(), null, newDto, "Created utility resource " + resource.getResourceName());
+
+                com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO
+                        .fromEntity(resource);
+                systemLogService.logSystemAction("CREATE_UTILITY_RESOURCE", "UtilityResource", resource.getResourceId(),
+                        null, newDto, "Created utility resource " + resource.getResourceName());
 
                 redirectAttributes.addFlashAttribute("message", "Thêm tài nguyên mới thành công!");
                 redirectAttributes.addFlashAttribute("messageType", "success");
@@ -357,15 +377,15 @@ public class AdminUtilityController {
 
     @PostMapping("/manage-pricing")
     public String managePricing(@RequestParam("resourceId") Integer resourceId,
-                                @RequestParam("unitId") Integer unitId,
-                                @RequestParam("price") BigDecimal price,
-                                @RequestParam(value = "fromResourceDetail", required = false, defaultValue = "false") Boolean fromResourceDetail,
-                                @RequestParam(value = "query", required = false) String query,
-                                @RequestParam(value = "statusFilter", required = false) String statusFilter,
-                                @RequestParam(value = "page", defaultValue = "1") int page,
-                                @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                                @RequestParam(value = "priceQuery", required = false) String priceQuery,
-                                RedirectAttributes redirectAttributes) {
+            @RequestParam("unitId") Integer unitId,
+            @RequestParam("price") BigDecimal price,
+            @RequestParam(value = "fromResourceDetail", required = false, defaultValue = "false") Boolean fromResourceDetail,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "statusFilter", required = false) String statusFilter,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+            @RequestParam(value = "priceQuery", required = false) String priceQuery,
+            RedirectAttributes redirectAttributes) {
         final Integer[] utilityIdHolder = new Integer[1];
         utilityResourceService.findById(resourceId).ifPresent(resource -> {
             if (resource.getUtility() != null) {
@@ -377,7 +397,8 @@ public class AdminUtilityController {
                         ? com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO.empty()
                         : utilityPriceService.findByResourceIdAndUnitId(resourceId, unitId)
                                 .map(com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO::fromEntity)
-                                .orElseGet(com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO::empty);
+                                .orElseGet(
+                                        com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO::empty);
                 UtilityPrice targetPrice = utilityPriceService.findByResourceIdAndUnitId(resourceId, unitId)
                         .orElseGet(() -> {
                             UtilityPrice newPrice = new UtilityPrice();
@@ -387,11 +408,13 @@ public class AdminUtilityController {
                         });
                 targetPrice.setPrice(price);
                 UtilityPrice saved = utilityPriceService.save(targetPrice);
-                com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO newDto =
-                        com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO.fromEntity(saved);
+                com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityPriceLogDTO
+                        .fromEntity(saved);
                 String priceAction = isNew ? "CREATE_UTILITY_PRICE" : "UPDATE_UTILITY_PRICE";
-                String priceDesc = (isNew ? "Created" : "Updated") + " price for resource " + resource.getResourceName() + " (unit: " + unit.getUnitName() + ")";
-                systemLogService.logSystemAction(priceAction, "UtilityPrice", saved.getUtilityPriceId(), oldDto, newDto, priceDesc);
+                String priceDesc = (isNew ? "Created" : "Updated") + " price for resource " + resource.getResourceName()
+                        + " (unit: " + unit.getUnitName() + ")";
+                systemLogService.logSystemAction(priceAction, "UtilityPrice", saved.getUtilityPriceId(), oldDto, newDto,
+                        priceDesc);
                 redirectAttributes.addFlashAttribute("message", "Lưu cấu hình đơn giá thành công!");
                 redirectAttributes.addFlashAttribute("messageType", "success");
             });
@@ -412,17 +435,26 @@ public class AdminUtilityController {
 
     @PostMapping("/delete-pricing/{id}")
     public String deletePricing(@PathVariable("id") Integer id,
-                                @RequestParam(value = "fromResourceDetail", required = false, defaultValue = "false") Boolean fromResourceDetail,
-                                @RequestParam(value = "resourceId", required = false) Integer resourceId,
-                                @RequestParam(value = "query", required = false) String query,
-                                @RequestParam(value = "statusFilter", required = false) String statusFilter,
-                                @RequestParam(value = "page", defaultValue = "1") int page,
-                                @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                                @RequestParam(value = "priceQuery", required = false) String priceQuery,
-                                RedirectAttributes redirectAttributes) {
-        utilityPriceService.deleteById(id);
-        redirectAttributes.addFlashAttribute("message", "Xóa cấu hình đơn giá thành công!");
-        redirectAttributes.addFlashAttribute("messageType", "success");
+            @RequestParam(value = "fromResourceDetail", required = false, defaultValue = "false") Boolean fromResourceDetail,
+            @RequestParam(value = "resourceId", required = false) Integer resourceId,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "statusFilter", required = false) String statusFilter,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+            @RequestParam(value = "priceQuery", required = false) String priceQuery,
+            RedirectAttributes redirectAttributes) {
+        try {
+            utilityPriceService.deleteById(id);
+            redirectAttributes.addFlashAttribute("message", "Xóa cấu hình đơn giá thành công!");
+            redirectAttributes.addFlashAttribute("messageType", "success");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("message",
+                    "Không thể xóa cấu hình đơn giá này vì đang được sử dụng cho một số đăng ký tiện ích!");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "Đã xảy ra lỗi khi xóa cấu hình đơn giá!");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+        }
         redirectAttributes.addAttribute("query", query);
         redirectAttributes.addAttribute("statusFilter", statusFilter);
         redirectAttributes.addAttribute("page", page);
@@ -436,21 +468,24 @@ public class AdminUtilityController {
 
     @PostMapping("/resources/toggle-status/{id}")
     public String toggleResourceStatus(@PathVariable("id") Integer id,
-                                       @RequestParam(value = "query", required = false) String query,
-                                       @RequestParam(value = "statusFilter", required = false) String statusFilter,
-                                       @RequestParam(value = "page", defaultValue = "1") int page,
-                                       @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                                       @RequestParam(value = "priceQuery", required = false) String priceQuery,
-                                       RedirectAttributes redirectAttributes) {
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "statusFilter", required = false) String statusFilter,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+            @RequestParam(value = "priceQuery", required = false) String priceQuery,
+            RedirectAttributes redirectAttributes) {
         final Integer[] utilityIdHolder = new Integer[1];
         utilityResourceService.findById(id).ifPresent(r -> {
-            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO.fromEntity(r);
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO
+                    .fromEntity(r);
             r.setStatus(!r.getStatus());
             utilityResourceService.save(r);
-            
-            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO.fromEntity(r);
-            systemLogService.logSystemAction("UPDATE_UTILITY_RESOURCE", "UtilityResource", r.getResourceId(), oldDto, newDto, "Toggled status for utility resource " + r.getResourceName());
-            
+
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO
+                    .fromEntity(r);
+            systemLogService.logSystemAction("UPDATE_UTILITY_RESOURCE", "UtilityResource", r.getResourceId(), oldDto,
+                    newDto, "Toggled status for utility resource " + r.getResourceName());
+
             if (r.getUtility() != null) {
                 utilityIdHolder[0] = r.getUtility().getUtilityId();
             }
@@ -470,32 +505,35 @@ public class AdminUtilityController {
 
     @PostMapping("/resources/edit")
     public String editResource(@RequestParam("resourceId") Integer resourceId,
-                               @RequestParam("resourceName") String resourceName,
-                               @RequestParam(value = "resourceDescription", required = false) String resourceDescription,
-                               @RequestParam("resourceLocation") String location,
-                               @RequestParam(value = "primaryImage", required = false) MultipartFile primaryImage,
-                               @RequestParam(value = "secondaryImages", required = false) List<MultipartFile> secondaryImages,
-                               @RequestParam(value = "status", defaultValue = "true") Boolean status,
-                               @RequestParam(value = "query", required = false) String query,
-                               @RequestParam(value = "statusFilter", required = false) String statusFilter,
-                               @RequestParam(value = "page", defaultValue = "1") int page,
-                               @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                               @RequestParam(value = "priceQuery", required = false) String priceQuery,
-                               RedirectAttributes redirectAttributes) {
+            @RequestParam("resourceName") String resourceName,
+            @RequestParam(value = "resourceDescription", required = false) String resourceDescription,
+            @RequestParam("resourceLocation") String location,
+            @RequestParam(value = "primaryImage", required = false) MultipartFile primaryImage,
+            @RequestParam(value = "secondaryImages", required = false) List<MultipartFile> secondaryImages,
+            @RequestParam(value = "status", defaultValue = "true") Boolean status,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "statusFilter", required = false) String statusFilter,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+            @RequestParam(value = "priceQuery", required = false) String priceQuery,
+            RedirectAttributes redirectAttributes) {
         if (resourceName == null || resourceName.trim().isEmpty() || resourceName.trim().length() > 100) {
-            redirectAttributes.addFlashAttribute("message", "Tên tài nguyên không được để trống và phải ít hơn 100 ký tự.");
+            redirectAttributes.addFlashAttribute("message",
+                    "Tên tài nguyên không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/admin/utilities/resources/" + resourceId;
         }
         if (location == null || location.trim().isEmpty() || location.trim().length() > 100) {
-            redirectAttributes.addFlashAttribute("message", "Vị trí tài nguyên không được để trống và phải ít hơn 100 ký tự.");
+            redirectAttributes.addFlashAttribute("message",
+                    "Vị trí tài nguyên không được để trống và phải ít hơn 100 ký tự.");
             redirectAttributes.addFlashAttribute("messageType", "error");
             return "redirect:/admin/utilities/resources/" + resourceId;
         }
 
         utilityResourceService.findById(resourceId).ifPresent(resource -> {
-            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO.fromEntity(resource);
-            
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO
+                    .fromEntity(resource);
+
             resource.setResourceName(resourceName.trim());
             resource.setDescription(resourceDescription);
             resource.setLocation(location.trim());
@@ -526,9 +564,10 @@ public class AdminUtilityController {
             }
 
             // Handle secondary images only if new ones are provided
-            int secondaryCount = secondaryImages == null ? 0 : (int) secondaryImages.stream()
-                    .filter(file -> file != null && !file.isEmpty())
-                    .count();
+            int secondaryCount = secondaryImages == null ? 0
+                    : (int) secondaryImages.stream()
+                            .filter(file -> file != null && !file.isEmpty())
+                            .count();
             if (secondaryCount > 0) {
                 try {
                     // Remove old secondary images
@@ -556,9 +595,11 @@ public class AdminUtilityController {
                     redirectAttributes.addFlashAttribute("messageType", "error");
                 }
             }
-            
-            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO.fromEntity(resource);
-            systemLogService.logSystemAction("UPDATE_UTILITY_RESOURCE", "UtilityResource", resource.getResourceId(), oldDto, newDto, "Updated utility resource " + resource.getResourceName());
+
+            com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO newDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityResourceLogDTO
+                    .fromEntity(resource);
+            systemLogService.logSystemAction("UPDATE_UTILITY_RESOURCE", "UtilityResource", resource.getResourceId(),
+                    oldDto, newDto, "Updated utility resource " + resource.getResourceName());
 
             redirectAttributes.addFlashAttribute("message", "Cập nhật tài nguyên thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
@@ -574,13 +615,13 @@ public class AdminUtilityController {
 
     @GetMapping("/resources/{id}")
     public String viewResourceDetails(@PathVariable("id") Integer id,
-                                      @RequestParam(value = "query", required = false) String query,
-                                      @RequestParam(value = "statusFilter", required = false) String statusFilter,
-                                      @RequestParam(value = "page", defaultValue = "1") int page,
-                                      @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                                      @RequestParam(value = "priceQuery", required = false) String priceQuery,
-                                      Model model,
-                                      RedirectAttributes redirectAttributes) {
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "statusFilter", required = false) String statusFilter,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
+            @RequestParam(value = "priceQuery", required = false) String priceQuery,
+            Model model,
+            RedirectAttributes redirectAttributes) {
         UtilityResource resource = utilityResourceService.findById(id).orElse(null);
         if (resource == null) {
             redirectAttributes.addFlashAttribute("message", "Không tìm thấy tài nguyên.");
@@ -600,8 +641,8 @@ public class AdminUtilityController {
     }
 
     private void saveResourceImages(UtilityResource resource,
-                                    MultipartFile primaryImage,
-                                    List<MultipartFile> secondaryImages) throws IOException {
+            MultipartFile primaryImage,
+            List<MultipartFile> secondaryImages) throws IOException {
         String validationError = validateResourceImages(primaryImage, secondaryImages);
         if (validationError != null) {
             throw new IllegalArgumentException(validationError);
@@ -628,9 +669,10 @@ public class AdminUtilityController {
     }
 
     private String validateResourceImages(MultipartFile primaryImage, List<MultipartFile> secondaryImages) {
-        int secondaryCount = secondaryImages == null ? 0 : (int) secondaryImages.stream()
-                .filter(file -> file != null && !file.isEmpty())
-                .count();
+        int secondaryCount = secondaryImages == null ? 0
+                : (int) secondaryImages.stream()
+                        .filter(file -> file != null && !file.isEmpty())
+                        .count();
         if (primaryImage == null || primaryImage.isEmpty()) {
             return "Ảnh chính là bắt buộc cho mỗi tài nguyên.";
         }

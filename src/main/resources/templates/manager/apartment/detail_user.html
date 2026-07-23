@@ -82,7 +82,7 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Giới tính</span>
-                        <span class="info-value" th:text="${#strings.isEmpty(profile.gender) ? 'N/A' : profile.gender}" th:classappend="${#strings.isEmpty(profile.gender) ? 'empty' : ''}">Male</span>
+                        <span class="info-value" th:text="${(profile.gender == 'Male' || profile.gender == '1') ? 'Nam' : ((profile.gender == 'Female' || profile.gender == '0') ? 'Nữ' : (#strings.isEmpty(profile.gender) ? 'N/A' : profile.gender))}" th:classappend="${#strings.isEmpty(profile.gender) ? 'empty' : ''}">Male</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Ngày sinh</span>

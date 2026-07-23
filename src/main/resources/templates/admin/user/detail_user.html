@@ -81,7 +81,7 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Giới tính</span>
-                        <span class="info-value" th:text="${user.gender == 'Male' ? 'Nam' : (user.gender == 'Female' ? 'Nữ' : (#strings.isEmpty(user.gender) ? 'N/A' : user.gender))}" th:classappend="${#strings.isEmpty(user.gender) ? 'empty' : ''}">Nam</span>
+                        <span class="info-value" th:text="${(user.gender == 'Male' || user.gender == '1') ? 'Nam' : ((user.gender == 'Female' || user.gender == '0') ? 'Nữ' : (#strings.isEmpty(user.gender) ? 'N/A' : user.gender))}" th:classappend="${#strings.isEmpty(user.gender) ? 'empty' : ''}">Nam</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Ngày sinh</span>

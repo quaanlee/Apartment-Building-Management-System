@@ -59,8 +59,11 @@ public class ResidentUtilityService {
                     String name = u.getUtilityName() != null ? removeAccents(u.getUtilityName().toLowerCase()) : "";
                     return name.contains(normalizedQuery);
                 })
-                .map(u -> new UtilityDTO(u.getUtilityId(), u.getUtilityName(), u.getDescription(), u.getStatus(),
-                        u.getType()))
+                .map(u -> {
+                    UtilityDTO dto = new UtilityDTO(u.getUtilityId(), u.getUtilityName(), u.getDescription(), u.getStatus(), u.getType());
+                    dto.setImageUrl(u.getImageUrl());
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -74,7 +77,9 @@ public class ResidentUtilityService {
     public UtilityDTO getUtility(Integer utilityId) {
         Utility u = utilityRepository.findById(utilityId)
                 .orElseThrow(() -> new IllegalArgumentException("Utility not found"));
-        return new UtilityDTO(u.getUtilityId(), u.getUtilityName(), u.getDescription(), u.getStatus(), u.getType());
+        UtilityDTO dto = new UtilityDTO(u.getUtilityId(), u.getUtilityName(), u.getDescription(), u.getStatus(), u.getType());
+        dto.setImageUrl(u.getImageUrl());
+        return dto;
     }
 
     public List<UtilityDTO.Resource> getActiveResources(Integer utilityId) {

@@ -101,9 +101,9 @@ public class UtilityBookingController {
     // ── Manager Create Booking Flow ──────────────────────────────────────────────
 
     @GetMapping("/utilities")
-    public String listUtilities(Model model, HttpSession session) {
+    public String listUtilities(@RequestParam(value = "search", required = false) String search, Model model, HttpSession session) {
         if (isUnauthorized(session)) return "redirect:/login";
-        model.addAttribute("utilities", residentUtilityService.getActiveUtilities());
+        model.addAttribute("utilities", residentUtilityService.getActiveUtilities(search));
         return "manager/utility_bookings/booking/utilities";
     }
 

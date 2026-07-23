@@ -26,11 +26,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Keep tab active based on roleName from model if present
     const submittedRoleEl = document.getElementById('submittedRole');
     if (submittedRoleEl) {
-        const submittedRole = submittedRoleEl.value;
+        const submittedRole = submittedRoleEl.value ? submittedRoleEl.value.toUpperCase().replace(" ", "_") : "";
         if (submittedRole === 'MANAGER') {
             switchTab('manager-tab');
         } else if (submittedRole === 'MAINTENANCE_STAFF') {
             switchTab('staff-tab');
+        } else if (submittedRole === 'ADMIN') {
+            switchTab('admin-tab');
         } else {
             switchTab('resident-tab');
         }

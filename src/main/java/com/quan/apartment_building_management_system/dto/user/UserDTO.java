@@ -146,7 +146,7 @@ public class UserDTO {
         if (employeeProfile != null) {
             this.employeeProfileId = employeeProfile.getEmployeeProfileId();
             this.fullName = employeeProfile.getFullName();
-            this.gender = employeeProfile.getGender() != null ? (employeeProfile.getGender() ? "Male" : "Female") : "Other";
+            this.gender = employeeProfile.getGender() != null ? (employeeProfile.getGender() ? "1" : "0") : null;
             this.dateOfBirth = employeeProfile.getDateOfBirth();
             this.phoneNumber = employeeProfile.getPhoneNumber();
             this.email = employeeProfile.getEmail();
@@ -178,7 +178,7 @@ public class UserDTO {
                 EmployeeProfile ep = account.getEmployeeProfile();
                 this.employeeProfileId = ep.getEmployeeProfileId();
                 this.fullName = ep.getFullName();
-                this.gender = ep.getGender() != null ? (ep.getGender() ? "Male" : "Female") : "Other";
+                this.gender = ep.getGender() != null ? (ep.getGender() ? "1" : "0") : null;
                 this.dateOfBirth = ep.getDateOfBirth();
                 this.phoneNumber = ep.getPhoneNumber();
                 this.email = ep.getEmail();

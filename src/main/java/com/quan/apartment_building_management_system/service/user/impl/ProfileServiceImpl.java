@@ -106,7 +106,8 @@ public class ProfileServiceImpl implements ProfileService {
 
         boolean isEmployee = "MANAGER".equalsIgnoreCase(userDto.getRoleName())
                 || "MAINTENANCE_STAFF".equalsIgnoreCase(userDto.getRoleName())
-                || "MAINTENANCE STAFF".equalsIgnoreCase(userDto.getRoleName());
+                || "MAINTENANCE STAFF".equalsIgnoreCase(userDto.getRoleName())
+                || "ADMIN".equalsIgnoreCase(userDto.getRoleName());
 
         Account account;
         Profile profile = null;
@@ -120,6 +121,11 @@ public class ProfileServiceImpl implements ProfileService {
                 account = employeeProfile.getAccount();
                 if (account == null)
                     account = new Account();
+            } else if (userDto.getAccountId() != null) {
+                account = accountRepository.findById(userDto.getAccountId())
+                        .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
+                                "Account not found with ID: " + userDto.getAccountId()));
+                employeeProfile = new EmployeeProfile();
             } else {
                 employeeProfile = new EmployeeProfile();
                 account = new Account();
@@ -132,6 +138,11 @@ public class ProfileServiceImpl implements ProfileService {
                 account = profile.getAccount();
                 if (account == null)
                     account = new Account();
+            } else if (userDto.getAccountId() != null) {
+                account = accountRepository.findById(userDto.getAccountId())
+                        .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
+                                "Account not found with ID: " + userDto.getAccountId()));
+                profile = new Profile();
             } else {
                 profile = new Profile();
                 account = new Account();
@@ -147,22 +158,22 @@ public class ProfileServiceImpl implements ProfileService {
                 account.setPassword(passwordEncoder.encode(userDto.getPassword()));
             }
         }
-        
+
         account.setStatus(userDto.getAccountStatus() != null ? userDto.getAccountStatus() : true);
         account = accountRepository.save(account);
 
         if (isEmployee) {
             employeeProfile.setAccount(account);
             employeeProfile.setFullName(userDto.getFullName());
-            
-            if ("Male".equalsIgnoreCase(userDto.getGender())) {
+
+            if ("1".equals(userDto.getGender()) || "Male".equalsIgnoreCase(userDto.getGender())) {
                 employeeProfile.setGender(true);
-            } else if ("Female".equalsIgnoreCase(userDto.getGender())) {
+            } else if ("0".equals(userDto.getGender()) || "Female".equalsIgnoreCase(userDto.getGender())) {
                 employeeProfile.setGender(false);
             } else {
                 employeeProfile.setGender(null);
             }
-            
+
             employeeProfile.setDateOfBirth(userDto.getDateOfBirth());
             employeeProfile.setPhoneNumber(userDto.getPhoneNumber());
             employeeProfile.setEmail(userDto.getEmail());
@@ -170,7 +181,7 @@ public class ProfileServiceImpl implements ProfileService {
             employeeProfile.setAddress(userDto.getAddress());
             employeeProfile.setStatus(userDto.getAccountStatus() != null ? userDto.getAccountStatus() : true);
             employeeProfile = employeeProfileRepository.save(employeeProfile);
-            
+
             return new UserDTO(employeeProfile);
         } else {
             profile.setAccount(account);
@@ -197,7 +208,7 @@ public class ProfileServiceImpl implements ProfileService {
             profile.setOccupation(null); // Clear occupation just in case
 
             profile = profileRepository.save(profile);
-            
+
             return new UserDTO(profile);
         }
     }

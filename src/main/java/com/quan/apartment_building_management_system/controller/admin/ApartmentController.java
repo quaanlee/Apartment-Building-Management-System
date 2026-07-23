@@ -217,7 +217,12 @@ public class ApartmentController {
             return "redirect:/admin/apartments";
         }
 
-        apartmentService.deleteById(id);
+        try {
+            apartmentService.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể xóa căn hộ vì đang có cư dân hoặc dữ liệu liên quan!");
+            return "redirect:/admin/apartments";
+        }
 
         com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO oldDto =
                 com.quan.apartment_building_management_system.dto.systemlog.ApartmentLogDTO.fromEntity(apartment.get());

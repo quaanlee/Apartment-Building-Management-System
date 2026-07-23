@@ -4,20 +4,20 @@ function showToast(message, type = 'success') {
 
     const toast = document.createElement('div');
     toast.className = `toast-notification ${type}`;
-    
+
     let iconClass = 'fa-circle-check';
     if (type === 'info') iconClass = 'fa-circle-info';
-    
+
     toast.innerHTML = `
         <div class="toast-icon"><i class="fa-solid ${iconClass}"></i></div>
         <div class="toast-message">${message}</div>
     `;
-    
+
     container.appendChild(toast);
-    
+
     // Force reflow and add show class
     setTimeout(() => toast.classList.add('show'), 10);
-    
+
     // Slide out and remove after 3 seconds
     setTimeout(() => {
         toast.classList.replace('show', 'hide');
@@ -25,7 +25,7 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const messageEl = document.getElementById('toastMessageData');
     if (messageEl) {
         const message = messageEl.getAttribute('data-message');
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
             searchInput.value = searchQuery;
         }
 
-        searchInput.addEventListener("keypress", function(e) {
+        searchInput.addEventListener("keypress", function (e) {
             if (e.key === "Enter") {
                 const val = searchInput.value.trim();
                 const targetPath = "/admin/apartments";
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Already on the list page, client-side filtering handles it instantly.
                     // We just update the URL without page reload for clean user experience.
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?search=' + encodeURIComponent(val);
-                    window.history.pushState({path:newUrl}, '', newUrl);
+                    window.history.pushState({ path: newUrl }, '', newUrl);
                 } else {
                     window.location.href = `${targetPath}?search=${encodeURIComponent(val)}`;
                 }

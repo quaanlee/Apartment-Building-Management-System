@@ -27,6 +27,10 @@ public class ResidentUtilityController {
         this.payOSService = payOSService;
     }
 
+    /**
+     * Lấy thông tin người dùng hiện tại từ session.
+     * Kiểm tra xem người dùng đã đăng nhập chưa và có phải là Cư dân (RESIDENT) hay không.
+     */
     private Account getCurrentUser(HttpSession session) {
         Account user = (Account) session.getAttribute("currentUser");
         if (user == null || !"RESIDENT".equalsIgnoreCase(user.getRole().getRoleName())) {
@@ -35,6 +39,10 @@ public class ResidentUtilityController {
         return user;
     }
 
+    /**
+     * Hiển thị danh sách các Tiện ích (Utilities) đang hoạt động.
+     * Hỗ trợ tìm kiếm theo tên tiện ích.
+     */
     @GetMapping
     public String listUtilities(@RequestParam(required = false) String search, Model model, HttpSession session) {
         getCurrentUser(session);
@@ -43,6 +51,10 @@ public class ResidentUtilityController {
         return "resident/utility/list";
     }
 
+    /**
+     * Hiển thị danh sách các Tài nguyên (Resources) thuộc một Tiện ích cụ thể.
+     * Ví dụ: Tiện ích là "Bể bơi", Tài nguyên là "Làn bơi số 1", "Làn bơi số 2".
+     */
     @GetMapping("/{id}/resources")
     public String listResources(@PathVariable Integer id, Model model, HttpSession session) {
         getCurrentUser(session);
@@ -51,6 +63,11 @@ public class ResidentUtilityController {
         return "resident/utility/resources";
     }
 
+    /**
+     * Hiển thị trang Chi tiết của một Tài nguyên cụ thể.
+     * Tại đây cũng kiểm tra xem tài nguyên này có hỗ trợ vé tháng hay không
+     * và trạng thái vé tháng (Membership) hiện tại của cư dân.
+     */
     @GetMapping("/resources/{id}")
     public String resourceDetail(@PathVariable Integer id, Model model, HttpSession session) {
         Account user = getCurrentUser(session);
@@ -72,6 +89,10 @@ public class ResidentUtilityController {
         return "resident/utility/resource_detail";
     }
 
+    /**
+     * Hiển thị giao diện Đặt lịch (Booking) cho một tài nguyên.
+     * Load lên danh sách các khung giờ đã có người đặt trong ngày để cư dân chọn giờ trống.
+     */
     @GetMapping("/book/{id}")
     public String bookResource(@PathVariable Integer id,
             @RequestParam(required = false) String date,
@@ -103,6 +124,11 @@ public class ResidentUtilityController {
         return "resident/utility/booking";
     }
 
+    /**
+     * Xử lý hành động Submit Đặt lịch của cư dân.
+     * Sẽ kiểm tra trùng lặp (overlap) thời gian, tạo hóa đơn.
+     * Nếu chọn thanh toán ONLINE và chưa có vé tháng, sẽ tự động chuyển hướng sang cổng thanh toán PayOS.
+     */
     @PostMapping("/book")
     public String submitBooking(@ModelAttribute BookingRequestDTO request, HttpSession session,
             RedirectAttributes redirectAttributes) {
@@ -138,6 +164,10 @@ public class ResidentUtilityController {
         return "redirect:/resident/utilities";
     }
 
+    /**
+     * Tính toán tổng tiền dựa trên giờ bắt đầu, giờ kết thúc và cấu hình giá (Price).
+     * Hàm này được dùng khi người dùng thay đổi thời gian trên form để cập nhật lại màn hình hiển thị.
+     */
     @PostMapping("/calculate")
     public String calculateSummary(@ModelAttribute BookingRequestDTO request, Model model, HttpSession session) {
         Account user = getCurrentUser(session);
@@ -205,6 +235,9 @@ public class ResidentUtilityController {
         return calculateSummary(request, model, session);
     }
 
+    /**
+     * Hiển thị Lịch sử các đơn đặt lịch (Booking History) của cư dân.
+     */
     @GetMapping("/history")
     public String bookingHistory(Model model, HttpSession session) {
         Account user = getCurrentUser(session);
@@ -212,6 +245,10 @@ public class ResidentUtilityController {
         return "resident/utility/history";
     }
 
+    /**
+     * Xử lý yêu cầu tự Hủy đơn đặt lịch (Cancel) của cư dân.
+     * Yêu cầu phải nhập lý do hủy.
+     */
     @PostMapping("/cancel/{id}")
     public String cancelBooking(@PathVariable Integer id, @RequestParam String reason, HttpSession session,
             RedirectAttributes redirectAttributes) {
@@ -225,6 +262,9 @@ public class ResidentUtilityController {
         return "redirect:/resident/utilities/history";
     }
 
+    /**
+     * Hiển thị Lịch sử gói Hội viên (Vé tháng) mà cư dân đã mua.
+     */
     @GetMapping("/memberships")
     public String membershipHistory(Model model, HttpSession session) {
         Account user = getCurrentUser(session);
