@@ -112,7 +112,7 @@
                     <span th:text="${util.typeLabel == 'RESERVABLE' ? 'ĐĂNG KÝ TRƯỚC' : (util.typeLabel == 'FREE USE' ? 'SỬ DỤNG MIỄN PHÍ' : util.typeLabel)}">RESERVABLE</span>
                 </div>
                 <div class="card-actions-row">
-                    <a th:href="@{/admin/utilities/{id}(id=${util.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" class="btn-detail-link">Chi tiết</a>
+                    <a th:href="@{/admin/utilities/{id}(id=${util.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage})}" class="btn-detail-link">Chi tiết</a>
 
                     <button class="icon-action-btn" 
                             th:data-id="${util.utilityId}"
@@ -124,7 +124,7 @@
                             title="Chỉnh sửa tiện ích">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                    <form th:action="@{/admin/utilities/toggle-status/{id}(id=${util.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" style="display:inline;">
+                    <form th:action="@{/admin/utilities/toggle-status/{id}(id=${util.utilityId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage})}" method="POST" style="display:inline;">
                         <button type="submit" class="icon-action-btn toggle-lock" th:classappend="${util.status} ? 'active' : 'inactive'" title="Bật/Tắt trạng thái hoạt động">
                             <i th:class="${util.status} ? 'fas fa-lock-open' : 'fas fa-lock'"></i>
                         </button>
@@ -146,16 +146,16 @@
     <div class="pagination-container-row" th:if="${totalPages > 1}">
         <span class="pagination-info" th:text="'Hiển thị trang ' + ${currentPage} + ' trên ' + ${totalPages}">Hiển thị trang 1 trên 3</span>
         <div class="pagination-pages-box">
-            <a th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage - 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+            <a th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage - 1})}"
                class="page-nav-btn" th:classappend="${currentPage == 1} ? 'disabled'"><i class="fa-solid fa-chevron-left"></i></a>
 
             <a th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
-               th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${pageNum}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+               th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${pageNum})}"
                class="page-num-btn"
                th:classappend="${currentPage == pageNum} ? 'active'"
                th:text="${pageNum}">1</a>
 
-            <a th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage + 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+            <a th:href="@{/admin/utilities(query=${query}, status=${statusFilter}, page=${currentPage + 1})}"
                class="page-nav-btn" th:classappend="${currentPage == totalPages} ? 'disabled'"><i class="fa-solid fa-chevron-right"></i></a>
         </div>
     </div>
@@ -171,7 +171,7 @@
                 <h3 id="utilityModalTitle">Thêm tiện ích mới</h3>
                 <button class="modal-close" onclick="closeModal('utilityModal')"><i class="fas fa-times"></i></button>
             </div>
-            <form th:action="@{/admin/utilities/save(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" enctype="multipart/form-data">
+            <form th:action="@{/admin/utilities/save(query=${query}, statusFilter=${statusFilter}, page=${currentPage})}" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="utilityId" id="utilityIdField">
                 <div class="modal-body">
                     <div class="form-group">
@@ -216,7 +216,7 @@
                 <h3 id="resourceTitle">Thêm tài nguyên</h3>
                 <button class="modal-close" onclick="closeModal('resourceModal')"><i class="fas fa-times"></i></button>
             </div>
-            <form th:action="@{/admin/utilities/add-resource(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST">
+            <form th:action="@{/admin/utilities/add-resource(query=${query}, statusFilter=${statusFilter}, page=${currentPage})}" method="POST">
                 <input type="hidden" name="utilityId" id="resourceUtilityId">
                 <div class="modal-body">
                     <div class="form-group">
@@ -250,7 +250,7 @@
                 <h3 id="pricingTitle">Thiết lập đơn giá</h3>
                 <button class="modal-close" onclick="closeModal('pricingModal')"><i class="fas fa-times"></i></button>
             </div>
-            <form th:action="@{/admin/utilities/manage-pricing(query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST">
+            <form th:action="@{/admin/utilities/manage-pricing(query=${query}, statusFilter=${statusFilter}, page=${currentPage})}" method="POST">
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="pricingUtilityId">Chọn tiện ích</label>

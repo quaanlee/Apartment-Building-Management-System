@@ -85,8 +85,6 @@ public class ManagerServiceController {
                                 @RequestParam(value = "status", defaultValue = "all") String status,
                                 @RequestParam(value = "page", defaultValue = "1") int page,
                                 @RequestParam(value = "size", defaultValue = "5") int size,
-                                @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                                @RequestParam(value = "priceQuery", required = false) String priceQuery,
                                 Model model) {
         List<Utility> allUtilities = utilityService.searchUtilities(query);
 
@@ -108,39 +106,15 @@ public class ManagerServiceController {
         long activeUtilities = dtoHandler.countActiveUtilities(fullUtilities);
         long totalResources = utilityResourceService.findAll().size();
 
-        List<UtilityPrice> allPrices;
-        if (priceQuery != null && !priceQuery.trim().isEmpty()) {
-            String pq = priceQuery.trim().toLowerCase();
-            allPrices = utilityPriceService.findAll().stream()
-                    .filter(price -> (price.getResource() != null
-                            && price.getResource().getUtility() != null
-                            && price.getResource().getUtility().getUtilityName() != null
-                            && price.getResource().getUtility().getUtilityName().toLowerCase().contains(pq))
-                            || (price.getUnit() != null
-                            && price.getUnit().getUnitName() != null
-                            && price.getUnit().getUnitName().toLowerCase().contains(pq)))
-                    .toList();
-        } else {
-            allPrices = utilityPriceService.findAll();
-        }
-
-        long totalPricing = allPrices.size();
-        int totalPricePages = dtoHandler.calculateTotalPages((int) totalPricing, 5);
-        int validPricePage = dtoHandler.validatePage(pricePage, totalPricePages);
-        List<UtilityPrice> paginatedPrices = dtoHandler.getPaginatedList(allPrices, validPricePage, 5);
-        List<UtilityDTO.Price> paginatedPricesDTO = dtoHandler.toUtilityPriceDTOList(paginatedPrices);
+        long totalPricing = utilityPriceService.findAll().size();
 
         model.addAttribute("utilities", paginatedUtilities);
         model.addAttribute("query", query);
         model.addAttribute("statusFilter", status);
-        model.addAttribute("priceQuery", priceQuery);
         model.addAttribute("currentPage", validPage);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("allUnits", dtoHandler.toUnitDTOList(unitService.findAll()));
         model.addAttribute("allUtilities", dtoHandler.toUtilityDTOList(fullUtilities, false));
-        model.addAttribute("utilityPrices", paginatedPricesDTO);
-        model.addAttribute("currentPricePage", validPricePage);
-        model.addAttribute("totalPricePages", totalPricePages);
         model.addAttribute("totalUtilities", totalUtilities);
         model.addAttribute("activeUtilities", activeUtilities);
         model.addAttribute("totalResources", totalResources);
@@ -155,8 +129,6 @@ public class ManagerServiceController {
                                      @RequestParam(value = "query", required = false) String query,
                                      @RequestParam(value = "status", defaultValue = "all") String status,
                                      @RequestParam(value = "page", defaultValue = "1") int page,
-                                     @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                                     @RequestParam(value = "priceQuery", required = false) String priceQuery,
                                      Model model,
                                      RedirectAttributes redirectAttributes) {
         Utility utility = utilityService.findById(id).orElse(null);
@@ -170,8 +142,6 @@ public class ManagerServiceController {
         model.addAttribute("query", query);
         model.addAttribute("statusFilter", status);
         model.addAttribute("currentPage", page);
-        model.addAttribute("currentPricePage", pricePage);
-        model.addAttribute("priceQuery", priceQuery);
         model.addAttribute("activeTab", "service_utility");
         return "manager/utilities/detail";
     }
@@ -181,8 +151,6 @@ public class ManagerServiceController {
                                       @RequestParam(value = "query", required = false) String query,
                                       @RequestParam(value = "statusFilter", required = false) String statusFilter,
                                       @RequestParam(value = "page", defaultValue = "1") int page,
-                                      @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                                      @RequestParam(value = "priceQuery", required = false) String priceQuery,
                                       Model model,
                                       RedirectAttributes redirectAttributes) {
         UtilityResource resource = utilityResourceService.findById(id).orElse(null);
@@ -196,8 +164,6 @@ public class ManagerServiceController {
         model.addAttribute("query", query);
         model.addAttribute("statusFilter", statusFilter);
         model.addAttribute("currentPage", page);
-        model.addAttribute("currentPricePage", pricePage);
-        model.addAttribute("priceQuery", priceQuery);
         model.addAttribute("activeTab", "service_utility");
         return "manager/utilities/resource_detail";
     }
@@ -207,8 +173,6 @@ public class ManagerServiceController {
                                        @RequestParam(value = "query", required = false) String query,
                                        @RequestParam(value = "status", defaultValue = "all") String status,
                                        @RequestParam(value = "page", defaultValue = "1") int page,
-                                       @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-                                       @RequestParam(value = "priceQuery", required = false) String priceQuery,
                                        RedirectAttributes redirectAttributes) {
         final Integer[] utilityIdHolder = new Integer[1];
         utilityResourceService.findById(id).ifPresent(r -> {
@@ -222,8 +186,6 @@ public class ManagerServiceController {
         redirectAttributes.addAttribute("query", query);
         redirectAttributes.addAttribute("status", status);
         redirectAttributes.addAttribute("page", page);
-        redirectAttributes.addAttribute("pricePage", pricePage);
-        redirectAttributes.addAttribute("priceQuery", priceQuery);
         if (utilityIdHolder[0] != null) {
             return "redirect:/manager/utilities/" + utilityIdHolder[0];
         }

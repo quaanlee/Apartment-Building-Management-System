@@ -5,6 +5,7 @@ import com.quan.apartment_building_management_system.dto.utility.UtilityDTO;
 import com.quan.apartment_building_management_system.entity.Utility;
 import com.quan.apartment_building_management_system.entity.UtilityPrice;
 import com.quan.apartment_building_management_system.entity.UtilityResource;
+import com.quan.apartment_building_management_system.service.system.SystemLogService;
 import com.quan.apartment_building_management_system.service.utility.UnitService;
 import com.quan.apartment_building_management_system.service.utility.UtilityPriceService;
 import com.quan.apartment_building_management_system.service.utility.UtilityResourceService;
@@ -38,7 +39,7 @@ public class AdminUtilityController {
     private final AdminUtilityDTOHandler dtoHandler;
     private final CloudinaryUploadService cloudinaryUploadService;
     private final UtilityImageService utilityImageService;
-    private final com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService;
+    private final SystemLogService systemLogService;
 
     public AdminUtilityController(UtilityService utilityService,
             UtilityResourceService utilityResourceService,
@@ -47,7 +48,7 @@ public class AdminUtilityController {
             AdminUtilityDTOHandler dtoHandler,
             CloudinaryUploadService cloudinaryUploadService,
             UtilityImageService utilityImageService,
-            com.quan.apartment_building_management_system.service.system.SystemLogService systemLogService) {
+            SystemLogService systemLogService) {
         this.utilityService = utilityService;
         this.utilityResourceService = utilityResourceService;
         this.utilityPriceService = utilityPriceService;
@@ -64,8 +65,6 @@ public class AdminUtilityController {
             @RequestParam(value = "statusFilter", required = false) String statusFilter,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "5") int size,
-            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-            @RequestParam(value = "priceQuery", required = false) String priceQuery,
             Model model) {
         List<Utility> allUtilities = utilityService.searchUtilities(query);
 
@@ -95,38 +94,15 @@ public class AdminUtilityController {
         long activeUtilities = dtoHandler.countActiveUtilities(fullUtilities);
         long totalResources = utilityResourceService.findAll().size();
 
-        // Paginate Pricing Configurations (5 items per page) with search
-        List<UtilityPrice> allPrices;
-        if (priceQuery != null && !priceQuery.trim().isEmpty()) {
-            String pq = priceQuery.trim().toLowerCase();
-            allPrices = utilityPriceService.findAll().stream()
-                    .filter(price -> (price.getResource() != null && price.getResource().getUtility() != null
-                            && price.getResource().getUtility().getUtilityName() != null
-                            && price.getResource().getUtility().getUtilityName().toLowerCase().contains(pq)) ||
-                            (price.getUnit() != null && price.getUnit().getUnitName() != null
-                                    && price.getUnit().getUnitName().toLowerCase().contains(pq)))
-                    .toList();
-        } else {
-            allPrices = utilityPriceService.findAll();
-        }
-
-        long totalPricing = allPrices.size();
-        int totalPricePages = dtoHandler.calculateTotalPages((int) totalPricing, 5);
-        int validPricePage = dtoHandler.validatePage(pricePage, totalPricePages);
-        List<UtilityPrice> paginatedPrices = dtoHandler.getPaginatedList(allPrices, validPricePage, 5);
-        List<UtilityDTO.Price> paginatedPricesDTO = dtoHandler.toUtilityPriceDTOList(paginatedPrices);
+        long totalPricing = utilityPriceService.findAll().size();
 
         model.addAttribute("utilities", paginatedUtilities);
         model.addAttribute("query", query);
         model.addAttribute("statusFilter", activeStatus);
-        model.addAttribute("priceQuery", priceQuery);
         model.addAttribute("currentPage", validPage);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("allUnits", dtoHandler.toUnitDTOList(unitService.findAll()));
         model.addAttribute("allUtilities", dtoHandler.toUtilityDTOList(fullUtilities, false));
-        model.addAttribute("utilityPrices", paginatedPricesDTO);
-        model.addAttribute("currentPricePage", validPricePage);
-        model.addAttribute("totalPricePages", totalPricePages);
         model.addAttribute("newUtility", new UtilityDTO());
         model.addAttribute("totalUtilities", totalUtilities);
         model.addAttribute("activeUtilities", activeUtilities);
@@ -142,8 +118,6 @@ public class AdminUtilityController {
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "statusFilter", required = false) String statusFilter,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-            @RequestParam(value = "priceQuery", required = false) String priceQuery,
             Model model,
             RedirectAttributes redirectAttributes) {
         Utility utility = utilityService.findById(id).orElse(null);
@@ -165,24 +139,15 @@ public class AdminUtilityController {
         }
         model.addAttribute("statusFilter", activeStatus);
         model.addAttribute("currentPage", page);
-        model.addAttribute("currentPricePage", pricePage);
-        model.addAttribute("priceQuery", priceQuery);
         return "admin/utility/utility_detail";
     }
 
     @PostMapping("/save")
     public String saveUtility(@ModelAttribute("newUtility") UtilityDTO utilityDTO,
-            @RequestParam(value = "resourceName", required = false) String resourceName,
-            @RequestParam(value = "resourceDescription", required = false) String resourceDescription,
-            @RequestParam(value = "resourceLocation", required = false) String resourceLocation,
-            @RequestParam(value = "primaryImage", required = false) MultipartFile primaryImage,
-            @RequestParam(value = "secondaryImages", required = false) List<MultipartFile> secondaryImages,
             @RequestParam(value = "utilityImage", required = false) MultipartFile utilityImage,
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "statusFilter", required = false) String statusFilter,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-            @RequestParam(value = "priceQuery", required = false) String priceQuery,
             RedirectAttributes redirectAttributes) {
         if (utilityDTO.getUtilityName() == null || utilityDTO.getUtilityName().trim().isEmpty()
                 || utilityDTO.getUtilityName().trim().length() > 100) {
@@ -192,8 +157,6 @@ public class AdminUtilityController {
             redirectAttributes.addAttribute("query", query);
             redirectAttributes.addAttribute("statusFilter", statusFilter);
             redirectAttributes.addAttribute("page", page);
-            redirectAttributes.addAttribute("pricePage", pricePage);
-            redirectAttributes.addAttribute("priceQuery", priceQuery);
             return "redirect:/admin/utilities";
         }
         if (utilityDTO.getDescription() == null || utilityDTO.getDescription().trim().isEmpty()
@@ -203,8 +166,6 @@ public class AdminUtilityController {
             redirectAttributes.addAttribute("query", query);
             redirectAttributes.addAttribute("statusFilter", statusFilter);
             redirectAttributes.addAttribute("page", page);
-            redirectAttributes.addAttribute("pricePage", pricePage);
-            redirectAttributes.addAttribute("priceQuery", priceQuery);
             return "redirect:/admin/utilities";
         }
 
@@ -265,8 +226,6 @@ public class AdminUtilityController {
         redirectAttributes.addAttribute("query", query);
         redirectAttributes.addAttribute("statusFilter", statusFilter);
         redirectAttributes.addAttribute("page", page);
-        redirectAttributes.addAttribute("pricePage", pricePage);
-        redirectAttributes.addAttribute("priceQuery", priceQuery);
         return "redirect:/admin/utilities";
     }
 
@@ -275,8 +234,6 @@ public class AdminUtilityController {
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "statusFilter", required = false) String statusFilter,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-            @RequestParam(value = "priceQuery", required = false) String priceQuery,
             RedirectAttributes redirectAttributes) {
         utilityService.findById(id).ifPresent(u -> {
             com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO oldDto = com.quan.apartment_building_management_system.dto.systemlog.UtilityLogDTO
@@ -295,8 +252,6 @@ public class AdminUtilityController {
         redirectAttributes.addAttribute("query", query);
         redirectAttributes.addAttribute("statusFilter", statusFilter);
         redirectAttributes.addAttribute("page", page);
-        redirectAttributes.addAttribute("pricePage", pricePage);
-        redirectAttributes.addAttribute("priceQuery", priceQuery);
         return "redirect:/admin/utilities";
     }
 
@@ -311,8 +266,6 @@ public class AdminUtilityController {
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "statusFilter", required = false) String statusFilter,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-            @RequestParam(value = "priceQuery", required = false) String priceQuery,
             RedirectAttributes redirectAttributes) {
         if (resourceName == null || resourceName.trim().isEmpty() || resourceName.trim().length() > 100) {
             redirectAttributes.addFlashAttribute("message",
@@ -321,8 +274,6 @@ public class AdminUtilityController {
             redirectAttributes.addAttribute("query", query);
             redirectAttributes.addAttribute("statusFilter", statusFilter);
             redirectAttributes.addAttribute("page", page);
-            redirectAttributes.addAttribute("pricePage", pricePage);
-            redirectAttributes.addAttribute("priceQuery", priceQuery);
             return "redirect:/admin/utilities/" + utilityId;
         }
         if (location == null || location.trim().isEmpty() || location.trim().length() > 100) {
@@ -332,8 +283,6 @@ public class AdminUtilityController {
             redirectAttributes.addAttribute("query", query);
             redirectAttributes.addAttribute("statusFilter", statusFilter);
             redirectAttributes.addAttribute("page", page);
-            redirectAttributes.addAttribute("pricePage", pricePage);
-            redirectAttributes.addAttribute("priceQuery", priceQuery);
             return "redirect:/admin/utilities/" + utilityId;
         }
 
@@ -370,8 +319,6 @@ public class AdminUtilityController {
         redirectAttributes.addAttribute("query", query);
         redirectAttributes.addAttribute("statusFilter", statusFilter);
         redirectAttributes.addAttribute("page", page);
-        redirectAttributes.addAttribute("pricePage", pricePage);
-        redirectAttributes.addAttribute("priceQuery", priceQuery);
         return "redirect:/admin/utilities/" + utilityId;
     }
 
@@ -383,8 +330,6 @@ public class AdminUtilityController {
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "statusFilter", required = false) String statusFilter,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-            @RequestParam(value = "priceQuery", required = false) String priceQuery,
             RedirectAttributes redirectAttributes) {
         final Integer[] utilityIdHolder = new Integer[1];
         utilityResourceService.findById(resourceId).ifPresent(resource -> {
@@ -422,8 +367,6 @@ public class AdminUtilityController {
         redirectAttributes.addAttribute("query", query);
         redirectAttributes.addAttribute("statusFilter", statusFilter);
         redirectAttributes.addAttribute("page", page);
-        redirectAttributes.addAttribute("pricePage", pricePage);
-        redirectAttributes.addAttribute("priceQuery", priceQuery);
         if (Boolean.TRUE.equals(fromResourceDetail)) {
             return "redirect:/admin/utilities/resources/" + resourceId;
         }
@@ -440,8 +383,6 @@ public class AdminUtilityController {
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "statusFilter", required = false) String statusFilter,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-            @RequestParam(value = "priceQuery", required = false) String priceQuery,
             RedirectAttributes redirectAttributes) {
         try {
             utilityPriceService.deleteById(id);
@@ -458,8 +399,6 @@ public class AdminUtilityController {
         redirectAttributes.addAttribute("query", query);
         redirectAttributes.addAttribute("statusFilter", statusFilter);
         redirectAttributes.addAttribute("page", page);
-        redirectAttributes.addAttribute("pricePage", pricePage);
-        redirectAttributes.addAttribute("priceQuery", priceQuery);
         if (Boolean.TRUE.equals(fromResourceDetail) && resourceId != null) {
             return "redirect:/admin/utilities/resources/" + resourceId;
         }
@@ -471,8 +410,6 @@ public class AdminUtilityController {
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "statusFilter", required = false) String statusFilter,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-            @RequestParam(value = "priceQuery", required = false) String priceQuery,
             RedirectAttributes redirectAttributes) {
         final Integer[] utilityIdHolder = new Integer[1];
         utilityResourceService.findById(id).ifPresent(r -> {
@@ -495,8 +432,6 @@ public class AdminUtilityController {
         redirectAttributes.addAttribute("query", query);
         redirectAttributes.addAttribute("statusFilter", statusFilter);
         redirectAttributes.addAttribute("page", page);
-        redirectAttributes.addAttribute("pricePage", pricePage);
-        redirectAttributes.addAttribute("priceQuery", priceQuery);
         if (utilityIdHolder[0] != null) {
             return "redirect:/admin/utilities/" + utilityIdHolder[0];
         }
@@ -514,8 +449,6 @@ public class AdminUtilityController {
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "statusFilter", required = false) String statusFilter,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-            @RequestParam(value = "priceQuery", required = false) String priceQuery,
             RedirectAttributes redirectAttributes) {
         if (resourceName == null || resourceName.trim().isEmpty() || resourceName.trim().length() > 100) {
             redirectAttributes.addFlashAttribute("message",
@@ -608,8 +541,6 @@ public class AdminUtilityController {
         redirectAttributes.addAttribute("query", query);
         redirectAttributes.addAttribute("statusFilter", statusFilter);
         redirectAttributes.addAttribute("page", page);
-        redirectAttributes.addAttribute("pricePage", pricePage);
-        redirectAttributes.addAttribute("priceQuery", priceQuery);
         return "redirect:/admin/utilities/resources/" + resourceId;
     }
 
@@ -618,8 +549,6 @@ public class AdminUtilityController {
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "statusFilter", required = false) String statusFilter,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "pricePage", defaultValue = "1") int pricePage,
-            @RequestParam(value = "priceQuery", required = false) String priceQuery,
             Model model,
             RedirectAttributes redirectAttributes) {
         UtilityResource resource = utilityResourceService.findById(id).orElse(null);
@@ -635,8 +564,6 @@ public class AdminUtilityController {
         model.addAttribute("query", query);
         model.addAttribute("statusFilter", statusFilter);
         model.addAttribute("currentPage", page);
-        model.addAttribute("currentPricePage", pricePage);
-        model.addAttribute("priceQuery", priceQuery);
         return "admin/utility/resource_detail";
     }
 

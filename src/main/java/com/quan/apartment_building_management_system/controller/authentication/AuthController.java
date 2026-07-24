@@ -1,5 +1,6 @@
 package com.quan.apartment_building_management_system.controller.authentication;
 
+import com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO;
 import com.quan.apartment_building_management_system.entity.Account;
 import com.quan.apartment_building_management_system.service.user.AccountService;
 import com.quan.apartment_building_management_system.service.system.NotificationService;
@@ -281,14 +282,12 @@ public class AuthController {
         }
 
         Account accountBeforeReset = accountOpt.get();
-        com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO oldAccountDto =
-                com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO.fromEntity(accountBeforeReset);
+        AccountLogDTO oldAccountDto = AccountLogDTO.fromEntity(accountBeforeReset);
 
         accountService.resetPassword(email, password);
 
         Account resetAccount = accountService.findByUsername(email).orElse(accountBeforeReset);
-        com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO newAccountDto =
-                com.quan.apartment_building_management_system.dto.systemlog.AccountLogDTO.fromEntity(resetAccount);
+        AccountLogDTO newAccountDto = AccountLogDTO.fromEntity(resetAccount);
         systemLogService.logSystemAction("RESET_PASSWORD", "Account",
                 resetAccount.getAccountId(),
                 oldAccountDto, newAccountDto, "Password reset via forgot-password flow for: " + email);

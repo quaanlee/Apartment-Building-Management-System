@@ -29,7 +29,7 @@
             <p class="subtitle-text" th:text="${utility.description}">State-of-the-art gym with cardio equipment, weights, and studio space.</p>
         </div>
         <div class="header-right">
-            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage})}"
                class="btn-back-list">
                 <i class="fa-solid fa-arrow-left"></i>
                 Quay lại Danh sách
@@ -62,10 +62,10 @@
             <div class="resources-list">
                 <div class="resource-row" th:each="res : ${utility.utilityResources}">
                     <div class="resource-meta">
-                        <a th:href="@{/manager/utilities/resources/{id}(id=${res.resourceId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" class="resource-name" style="color: var(--primary-color); text-decoration: none; font-weight: 700;" th:text="${res.resourceName}">Main Gym Hall</a>
+                        <a th:href="@{/manager/utilities/resources/{id}(id=${res.resourceId}, query=${query}, statusFilter=${statusFilter}, page=${currentPage})}" class="resource-name" style="color: var(--primary-color); text-decoration: none; font-weight: 700;" th:text="${res.resourceName}">Main Gym Hall</a>
                         <span class="resource-location"><i class="fa-solid fa-location-dot"></i> <span th:text="${res.location}">Floor 2, Block A</span></span>
                     </div>
-                    <form th:action="@{/manager/utilities/resources/toggle-status/{id}(id=${res.resourceId}, query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" method="POST" style="display:inline; margin: 0;">
+                    <form th:action="@{/manager/utilities/resources/toggle-status/{id}(id=${res.resourceId}, query=${query}, status=${statusFilter}, page=${currentPage})}" method="POST" style="display:inline; margin: 0;">
                         <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer; font-family: inherit;">
                             <span th:class="${res.status} ? 'badge-status active' : 'badge-status maintenance'" 
                                   th:text="${res.status} ? 'Sẵn sàng' : 'Bảo trì'" 

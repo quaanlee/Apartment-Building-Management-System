@@ -120,7 +120,7 @@
                     <span th:text="${util.typeLabel == 'RESERVABLE' ? 'ĐẶT TRƯỚC' : (util.typeLabel == 'FREE' ? 'MIỄN PHÍ' : util.typeLabel)}">ĐẶT TRƯỚC</span>
                 </div>
                 <div class="card-actions-row">
-                    <a th:href="@{/manager/utilities/{id}(id=${util.utilityId}, query=${query}, status=${statusFilter}, page=${currentPage}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}" class="btn-detail-link">Xem Chi tiết</a>
+                    <a th:href="@{/manager/utilities/{id}(id=${util.utilityId}, query=${query}, status=${statusFilter}, page=${currentPage})}" class="btn-detail-link">Xem Chi tiết</a>
                 </div>
             </div>
 
@@ -140,16 +140,16 @@
     <div class="pagination-container-row" th:if="${totalPages > 1}">
         <span class="pagination-info" th:text="'Hiển thị trang ' + ${currentPage} + ' trên ' + ${totalPages}">Hiển thị trang 1 trên 3</span>
         <div class="pagination-pages-box">
-            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage - 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage - 1})}"
                class="page-nav-btn" th:classappend="${currentPage == 1} ? 'disabled'"><i class="fa-solid fa-chevron-left"></i></a>
 
             <a th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
-               th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${pageNum}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+               th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${pageNum})}"
                class="page-num-btn"
                th:classappend="${currentPage == pageNum} ? 'active'"
                th:text="${pageNum}">1</a>
 
-            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage + 1}, pricePage=${currentPricePage}, priceQuery=${priceQuery})}"
+            <a th:href="@{/manager/utilities(query=${query}, status=${statusFilter}, page=${currentPage + 1})}"
                class="page-nav-btn" th:classappend="${currentPage == totalPages} ? 'disabled'"><i class="fa-solid fa-chevron-right"></i></a>
         </div>
     </div>
